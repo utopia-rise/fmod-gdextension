@@ -1,0 +1,7 @@
+# FMOD API
+api/fsbank
+api/lowlevel
+api/studio
+
+__pycache__
+*.obj
