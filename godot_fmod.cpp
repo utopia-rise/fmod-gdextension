@@ -40,6 +40,17 @@ void Fmod::initialize(int numOfChannels, int studioFlags, int flags) {
 		fprintf(stderr, "FMOD Sound System failed to initialize\n");	
 }
 
+void Fmod::update() {
+	// update all event positions
+	// update listener position
+	checkErrors(system->update());
+}
+
+void Fmod::shutdown() {
+	checkErrors(system->unloadAll());
+	checkErrors(system->release());
+}
+
 // helper function to check for errors
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
@@ -51,6 +62,8 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 
 void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("initialize", "num_of_channels", "studio_flags", "flags"), &Fmod::initialize);
+	ClassDB::bind_method(D_METHOD("update"), &Fmod::update);
+	ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
 	
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);
@@ -79,4 +92,8 @@ void Fmod::_bind_methods() {
 
 Fmod::Fmod() {
 	FMOD::Studio::System *system = nullptr;
+}
+
+Fmod::~Fmod() {
+
 }

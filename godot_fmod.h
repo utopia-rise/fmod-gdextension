@@ -51,9 +51,12 @@ protected:
 	static void _bind_methods();
 
 public:
-	void initialize(int numOfChannels, int studioFlags, int flags);	
+	void initialize(int numOfChannels, int studioFlags, int flags);
+	void update();
+	void shutdown();
 
 	Fmod();
+	~Fmod();
 };
 
 #endif
