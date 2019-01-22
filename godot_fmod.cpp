@@ -29,15 +29,15 @@
 
 #include "godot_fmod.h"
 
-void Fmod::initialize(int numOfChannels, int studioFlags, int flags) {
+void Fmod::init(int numOfChannels, int studioFlags, int flags) {
 	checkErrors(FMOD::Studio::System::create(&system));
 	// initialize FMOD Studio and FMOD Low Level System with provided flags
 	if (checkErrors(system->initialize(numOfChannels, studioFlags, flags, nullptr))) {
 		printf("FMOD Sound System successfully initialized with %d channels\n", numOfChannels);
 		if (studioFlags == FMOD_STUDIO_INIT_LIVEUPDATE)
 			printf("Live update enabled!\n");
-	} else 
-		fprintf(stderr, "FMOD Sound System failed to initialize\n");	
+	} else
+		fprintf(stderr, "FMOD Sound System failed to initialize\n");
 }
 
 void Fmod::update() {
@@ -51,6 +51,34 @@ void Fmod::shutdown() {
 	checkErrors(system->release());
 }
 
+String Fmod::loadbank(const String &pathToBank, int flags) {
+	if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
+	FMOD::Studio::Bank *bank = nullptr;
+	checkErrors(system->loadBankFile(pathToBank.ascii().get_data(), flags, &bank));
+	if (bank) {
+		banks.insert(pathToBank, bank);
+		return pathToBank;
+	}
+	return pathToBank;
+}
+
+void Fmod::unloadBank(const String &pathToBank) {
+	if (!banks.has(pathToBank)) return; // bank is not loaded
+	auto bank = banks.find(pathToBank);
+	if (bank) checkErrors(bank->value()->unload());
+}
+
+int Fmod::getBankLoadingState(const String &pathToBank) {
+	if (!banks.has(pathToBank)) return -1; // bank is not loaded
+	auto bank = banks.find(pathToBank);
+	if (bank) {
+		FMOD_STUDIO_LOADING_STATE state;
+		checkErrors(bank->value()->getLoadingState(&state));
+		return state;
+	}
+	return -1;
+}
+
 // helper function to check for errors
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
@@ -61,10 +89,14 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 }
 
 void Fmod::_bind_methods() {
-	ClassDB::bind_method(D_METHOD("initialize", "num_of_channels", "studio_flags", "flags"), &Fmod::initialize);
-	ClassDB::bind_method(D_METHOD("update"), &Fmod::update);
-	ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
-	
+	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
+	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
+	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);
+
+	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
+	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);
+	ClassDB::bind_method(D_METHOD("bank_get_loading_state", "path_to_bank"), &Fmod::getBankLoadingState);
+
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);
 	BIND_CONSTANT(FMOD_INIT_STREAM_FROM_UPDATE);
@@ -87,7 +119,19 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE);
 	BIND_CONSTANT(FMOD_STUDIO_INIT_DEFERRED_CALLBACKS);
 	BIND_CONSTANT(FMOD_STUDIO_INIT_LOAD_FROM_UPDATE);
-	
+
+	/* FMOD_STUDIO_LOAD_BANK_FLAGS */
+	BIND_CONSTANT(FMOD_STUDIO_LOAD_BANK_NORMAL);
+	BIND_CONSTANT(FMOD_STUDIO_LOAD_BANK_NONBLOCKING);
+	BIND_CONSTANT(FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES);
+
+	/* FMOD_STUDIO_LOADING_STATE */
+	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_UNLOADING);
+	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADING);
+	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADED);
+	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_ERROR);
+
+
 }
 
 Fmod::Fmod() {
@@ -95,5 +139,5 @@ Fmod::Fmod() {
 }
 
 Fmod::~Fmod() {
-
+	Fmod::shutdown();
 }

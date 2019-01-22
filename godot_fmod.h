@@ -40,10 +40,16 @@
 class Fmod : public Object {
 	GDCLASS(Fmod, Object);
 
-	FMOD::Studio::System *system;	
-
+	FMOD::Studio::System *system;
+	
+	// currently loaded banks
 	Map<String, FMOD::Studio::Bank *> banks;
-	Map<String, FMOD::Studio::EventInstance *> events;
+
+	List<FMOD::Studio::EventInstance *> oneShotList;
+
+	Map<String, FMOD::Studio::EventInstance *> unmanagedEvents;
+
+	
 
 	int checkErrors(FMOD_RESULT result);
 
@@ -51,9 +57,23 @@ protected:
 	static void _bind_methods();
 
 public:
-	void initialize(int numOfChannels, int studioFlags, int flags);
+	void init(int numOfChannels, int studioFlags, int flags);
 	void update();
 	void shutdown();
+
+	/* helper functions for common FMOD Studio actions */
+	/*void playOneShot(String eventName, Object *gameObj);*/
+
+	String loadbank(const String &pathToBank, int flags);
+	void unloadBank(const String &pathToBank);
+	int getBankLoadingState(const String &pathToBank);
+
+	/*void getEvent();
+	void getEventParameter();
+	void setEventParameter();
+	void releaseEvent();*/
+
+	
 
 	Fmod();
 	~Fmod();
