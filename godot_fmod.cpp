@@ -52,12 +52,51 @@ void Fmod::update() {
 			i--;
 		}
 	}
+
+	// update and clean up attached one shots
+	for (int i = 0; i < attachedOneShots.size(); i++) {
+		auto aShot = attachedOneShots.get(i);
+		if (!aShot.gameObj) {
+			// null object
+			checkErrors(aShot.instance->release());
+			attachedOneShots.remove(i);
+			i--;
+			continue;
+		}
+		FMOD_STUDIO_PLAYBACK_STATE s;
+		checkErrors(aShot.instance->getPlaybackState(&s));
+		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+			// one shot has finished playing
+			checkErrors(aShot.instance->release());
+			attachedOneShots.remove(i);
+			i--;
+			continue;
+		}
+		updateInstance3DAttributes(aShot.instance, aShot.gameObj);
+	}
 	
 	// update listener position
 	setListenerAttributes();
 
 	// dispatch update to FMOD
 	checkErrors(system->update());
+}
+
+void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
+	if (instance) {
+		// try to set 3D attributes
+		if (o) {
+			CanvasItem *ci = Object::cast_to<CanvasItem>(o);
+			if (ci) {
+				Transform2D t2d = ci->get_transform();
+				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
+						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
+				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+				checkErrors(instance->set3DAttributes(&attr));
+			}
+		}
+		// TODO: Add 3D node support
+	}
 }
 
 void Fmod::shutdown() {
@@ -114,6 +153,46 @@ int Fmod::getBankLoadingState(const String &pathToBank) {
 	return -1;
 }
 
+int Fmod::getBankBusCount(const String &pathToBank) {
+	if (banks.has(pathToBank)) {
+		int count;
+		auto bank = banks.find(pathToBank);
+		checkErrors(bank->value()->getBusCount(&count));
+		return count;
+	}
+	return -1;
+}
+
+int Fmod::getBankEventCount(const String &pathToBank) {
+	if (banks.has(pathToBank)) {
+		int count;
+		auto bank = banks.find(pathToBank);
+		checkErrors(bank->value()->getEventCount(&count));
+		return count;
+	}
+	return -1;
+}
+
+int Fmod::getBankStringCount(const String &pathToBank) {
+	if (banks.has(pathToBank)) {
+		int count;
+		auto bank = banks.find(pathToBank);
+		checkErrors(bank->value()->getStringCount(&count));
+		return count;
+	}
+	return -1;
+}
+
+int Fmod::getBankVCACount(const String &pathToBank) {
+	if (banks.has(pathToBank)) {
+		int count;
+		auto bank = banks.find(pathToBank);
+		checkErrors(bank->value()->getVCACount(&count));
+		return count;
+	}
+	return -1;
+}
+
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
 		fprintf(stderr, "FMOD Sound System: %s\n", FMOD_ErrorString(result));
@@ -164,6 +243,19 @@ void Fmod::playOneShot(String eventName, Object *gameObj) {
 
 }
 
+void Fmod::playOneShotAttached(String eventName, Object *gameObj) {
+	// TODO: Cache event descriptions
+	FMOD::Studio::EventDescription *desc = nullptr;
+	checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+	FMOD::Studio::EventInstance *instance = nullptr;
+	checkErrors(desc->createInstance(&instance));
+	if (instance && gameObj) {
+		AttachedOneShot aShot = { instance, gameObj };
+		attachedOneShots.push_back(aShot);
+		checkErrors(instance->start());
+	}
+}
+
 void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
 	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
@@ -172,10 +264,19 @@ void Fmod::_bind_methods() {
 
 
 	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
+	ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "node"), &Fmod::playOneShotAttached);
+
 
 	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
 	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);
 	ClassDB::bind_method(D_METHOD("bank_get_loading_state", "path_to_bank"), &Fmod::getBankLoadingState);
+	ClassDB::bind_method(D_METHOD("bank_get_bus_count", "path_to_bank"), &Fmod::getBankBusCount);
+	ClassDB::bind_method(D_METHOD("bank_get_event_count", "path_to_bank"), &Fmod::getBankEventCount);
+	ClassDB::bind_method(D_METHOD("bank_get_string_count", "path_to_bank"), &Fmod::getBankStringCount);
+	ClassDB::bind_method(D_METHOD("bank_get_vca_count", "path_to_bank"), &Fmod::getBankVCACount);
+
+
+
 
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);

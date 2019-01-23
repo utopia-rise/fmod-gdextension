@@ -49,17 +49,22 @@ class Fmod : public Object {
 
 	Object *listener; // TODO: Multiple listener support
 	
-	// currently loaded banks
 	Map<String, FMOD::Studio::Bank *> banks;
 
-	// list of one shot instances 
+	// keep track of one shot instances internally
 	Vector<FMOD::Studio::EventInstance *> oneShotInstances;
+	struct AttachedOneShot {
+		FMOD::Studio::EventInstance *instance;
+		Object *gameObj;
+	};
+	Vector<AttachedOneShot> attachedOneShots;
 
 	//Map<String, FMOD::Studio::EventInstance *> unmanagedEvents;
 
 	FMOD_3D_ATTRIBUTES get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel);
 	FMOD_VECTOR toFmodVector(Vector3 vec);
 	void setListenerAttributes();
+	void updateInstance3DAttributes(FMOD::Studio::EventInstance *i, Object *o);
 	int checkErrors(FMOD_RESULT result);
 
 protected:
@@ -73,10 +78,15 @@ public:
 
 	/* helper functions for common FMOD Studio actions */
 	void playOneShot(String eventName, Object *gameObj);
+	void playOneShotAttached(String eventName, Object *gameObj);
 
 	String loadbank(const String &pathToBank, int flags);
 	void unloadBank(const String &pathToBank);
 	int getBankLoadingState(const String &pathToBank);
+	int getBankBusCount(const String &pathToBank);
+	int getBankEventCount(const String &pathToBank);
+	int getBankStringCount(const String &pathToBank);
+	int getBankVCACount(const String &pathToBank);
 
 	/*void getEvent();
 	void getEventParameter();
