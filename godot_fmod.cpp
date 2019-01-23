@@ -193,6 +193,10 @@ int Fmod::getBankVCACount(const String &pathToBank) {
 	return -1;
 }
 
+void Fmod::createEventInstance(const String &uuid, const String &eventPath) {
+	
+}
+
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
 		fprintf(stderr, "FMOD Sound System: %s\n", FMOD_ErrorString(result));
@@ -218,12 +222,15 @@ FMOD_3D_ATTRIBUTES Fmod::get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_V
 	return f3d;
 }
 
-void Fmod::playOneShot(String eventName, Object *gameObj) {
-	// TODO: cache event descriptions
-	FMOD::Studio::EventDescription *desc = nullptr;
-	checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
-	FMOD::Studio::EventInstance *instance = nullptr;
-	checkErrors(desc->createInstance(&instance));
+void Fmod::playOneShot(const String &eventName, Object *gameObj) {
+	if (!eventDescriptions.has(eventName)) {
+		FMOD::Studio::EventDescription *desc = nullptr;
+		checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+		eventDescriptions.insert(eventName, desc);
+	}
+	auto desc = eventDescriptions.find(eventName);
+	FMOD::Studio::EventInstance *instance;
+	checkErrors(desc->value()->createInstance(&instance));
 	if (instance) {
 		// try to set 3D attributes
 		if (gameObj) {
@@ -243,12 +250,15 @@ void Fmod::playOneShot(String eventName, Object *gameObj) {
 
 }
 
-void Fmod::playOneShotAttached(String eventName, Object *gameObj) {
-	// TODO: Cache event descriptions
-	FMOD::Studio::EventDescription *desc = nullptr;
-	checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
-	FMOD::Studio::EventInstance *instance = nullptr;
-	checkErrors(desc->createInstance(&instance));
+void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
+	if (!eventDescriptions.has(eventName)) {
+		FMOD::Studio::EventDescription *desc = nullptr;
+		checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+		eventDescriptions.insert(eventName, desc);
+	}
+	auto desc = eventDescriptions.find(eventName);
+	FMOD::Studio::EventInstance *instance;
+	checkErrors(desc->value()->createInstance(&instance));
 	if (instance && gameObj) {
 		AttachedOneShot aShot = { instance, gameObj };
 		attachedOneShots.push_back(aShot);
@@ -257,16 +267,17 @@ void Fmod::playOneShotAttached(String eventName, Object *gameObj) {
 }
 
 void Fmod::_bind_methods() {
+	/* system functions */
 	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
 	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
 	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);	
 	ClassDB::bind_method(D_METHOD("system_add_listener", "node"), &Fmod::addListener);
 
-
+	/* integration helper functions */
 	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
 	ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "node"), &Fmod::playOneShotAttached);
 
-
+	/* bank functions */
 	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
 	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);
 	ClassDB::bind_method(D_METHOD("bank_get_loading_state", "path_to_bank"), &Fmod::getBankLoadingState);
