@@ -112,7 +112,7 @@ void Fmod::setListenerAttributes() {
 	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
 	if (ci) {
 		Transform2D t2d = ci->get_transform();
-		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f ),
+		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 		up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler 
 		FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 		checkErrors(system->setListenerAttributes(0, &attr));
