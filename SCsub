@@ -4,4 +4,4 @@ module_env = env.Clone()
 module_env.add_source_files(env.modules_sources,"*.cpp") 
 module_env.Append(CPPPATH=["#modules/fmod/api/lowlevel/inc", "#modules/fmod/api/studio/inc"])
 env.Append(LIBPATH=["#modules/fmod/api/lowlevel/lib/", "#modules/fmod/api/studio/lib/"])
-env.Append(LIBS=["fmod_vc", "fmodstudio_vc"]) # change this to fmod_vc and fmodstudio_vc if building for 32-bit
+env.Append(LIBS=["fmod_vc", "fmodstudio_vc"]) 
