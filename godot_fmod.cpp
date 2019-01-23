@@ -37,18 +37,53 @@ void Fmod::init(int numOfChannels, int studioFlags, int flags) {
 		if (studioFlags == FMOD_STUDIO_INIT_LIVEUPDATE)
 			printf("Live update enabled!\n");
 	} else
-		fprintf(stderr, "FMOD Sound System failed to initialize\n");
+		fprintf(stderr, "FMOD Sound System failed to initialize :|\n");
 }
 
 void Fmod::update() {
-	// update all event positions
+	// clean up one shots
+	for (int i = 0; i < oneShotInstances.size(); i++) {
+		auto instance = oneShotInstances.get(i);
+		FMOD_STUDIO_PLAYBACK_STATE s;
+		checkErrors(instance->getPlaybackState(&s));
+		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+			checkErrors(instance->release());
+			oneShotInstances.remove(i);
+			i--;
+		}
+	}
+	
 	// update listener position
+	setListenerAttributes();
+
+	// dispatch update to FMOD
 	checkErrors(system->update());
 }
 
 void Fmod::shutdown() {
 	checkErrors(system->unloadAll());
 	checkErrors(system->release());
+}
+
+void Fmod::setListenerAttributes() {
+	if (!listener) {
+		fprintf(stderr, "FMOD Sound System: Listener not set!\n");
+		return;
+	}
+	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
+	if (ci) {
+		Transform2D t2d = ci->get_transform();
+		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f ),
+		up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler 
+		FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+		checkErrors(system->setListenerAttributes(0, &attr));
+		return;
+	}
+	// TODO: add support for 3D Nodes 
+}
+
+void Fmod::addListener(Object *gameObj) {
+	listener = gameObj;
 }
 
 String Fmod::loadbank(const String &pathToBank, int flags) {
@@ -79,7 +114,6 @@ int Fmod::getBankLoadingState(const String &pathToBank) {
 	return -1;
 }
 
-// helper function to check for errors
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
 		fprintf(stderr, "FMOD Sound System: %s\n", FMOD_ErrorString(result));
@@ -88,10 +122,56 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 	return 1;
 }
 
+FMOD_VECTOR Fmod::toFmodVector(Vector3 vec) {
+	FMOD_VECTOR fv;
+	fv.x = vec.x;
+	fv.y = vec.y;
+	fv.z = vec.z;
+	return fv;
+}
+
+FMOD_3D_ATTRIBUTES Fmod::get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel) {
+	FMOD_3D_ATTRIBUTES f3d;
+	f3d.forward = forward;
+	f3d.position = pos;
+	f3d.up = up;
+	f3d.velocity = vel;
+	return f3d;
+}
+
+void Fmod::playOneShot(String eventName, Object *gameObj) {
+	// TODO: cache event descriptions
+	FMOD::Studio::EventDescription *desc = nullptr;
+	checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+	FMOD::Studio::EventInstance *instance = nullptr;
+	checkErrors(desc->createInstance(&instance));
+	if (instance) {
+		// try to set 3D attributes
+		if (gameObj) {
+			CanvasItem *ci = Object::cast_to<CanvasItem>(gameObj);
+			if (ci) {
+				Transform2D t2d = ci->get_transform();
+				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
+						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
+				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+				checkErrors(instance->set3DAttributes(&attr));
+			}
+		}
+		checkErrors(instance->start());
+		oneShotInstances.push_back(instance);
+		// TODO: Add 3D node support
+	}
+
+}
+
 void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
 	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
-	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);
+	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);	
+	ClassDB::bind_method(D_METHOD("system_add_listener", "node"), &Fmod::addListener);
+
+
+	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
 
 	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
 	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);
@@ -131,11 +211,10 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADED);
 	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_ERROR);
 
-
 }
 
 Fmod::Fmod() {
-	FMOD::Studio::System *system = nullptr;
+	system, listener = nullptr;
 }
 
 Fmod::~Fmod() {

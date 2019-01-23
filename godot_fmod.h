@@ -32,25 +32,34 @@
 
 #include "core/object.h"
 #include "core/reference.h"
+#include "scene/2d/canvas_item.h"
+#include "core/vector.h"
+#include "core/map.h"
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
 #include "fmod_studio.hpp"
 
+#include <iostream>
+
 class Fmod : public Object {
 	GDCLASS(Fmod, Object);
 
 	FMOD::Studio::System *system;
+
+	Object *listener; // TODO: Multiple listener support
 	
 	// currently loaded banks
 	Map<String, FMOD::Studio::Bank *> banks;
 
-	List<FMOD::Studio::EventInstance *> oneShotList;
+	// list of one shot instances 
+	Vector<FMOD::Studio::EventInstance *> oneShotInstances;
 
-	Map<String, FMOD::Studio::EventInstance *> unmanagedEvents;
+	//Map<String, FMOD::Studio::EventInstance *> unmanagedEvents;
 
-	
-
+	FMOD_3D_ATTRIBUTES get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel);
+	FMOD_VECTOR toFmodVector(Vector3 vec);
+	void setListenerAttributes();
 	int checkErrors(FMOD_RESULT result);
 
 protected:
@@ -60,9 +69,10 @@ public:
 	void init(int numOfChannels, int studioFlags, int flags);
 	void update();
 	void shutdown();
+	void addListener(Object *gameObj);
 
 	/* helper functions for common FMOD Studio actions */
-	/*void playOneShot(String eventName, Object *gameObj);*/
+	void playOneShot(String eventName, Object *gameObj);
 
 	String loadbank(const String &pathToBank, int flags);
 	void unloadBank(const String &pathToBank);
