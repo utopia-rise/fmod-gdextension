@@ -238,11 +238,11 @@ void Fmod::startEvent(const String &uuid) {
 	if (i) checkErrors(i->value()->start());
 }
 
-void Fmod::stopEvent(const String &uuid, bool allowFadeOut) {
+void Fmod::stopEvent(const String &uuid, int stopMode) {
 	if (!unmanagedEvents.has(uuid)) return;
 	auto i = unmanagedEvents.find(uuid);
 	if (i) {
-		FMOD_STUDIO_STOP_MODE m = allowFadeOut ? FMOD_STUDIO_STOP_ALLOWFADEOUT : FMOD_STUDIO_STOP_IMMEDIATE;
+		auto m = static_cast<FMOD_STUDIO_STOP_MODE>(stopMode);
 		checkErrors(i->value()->stop(m));
 	}
 }
@@ -373,7 +373,7 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("event_set_parameter", "uuid", "parameter_name", "value"), &Fmod::setEventParameter);
 	ClassDB::bind_method(D_METHOD("event_release", "uuid"), &Fmod::releaseEvent);
 	ClassDB::bind_method(D_METHOD("event_start", "uuid"), &Fmod::startEvent);
-	ClassDB::bind_method(D_METHOD("event_stop", "uuid", "allow_fade_out"), &Fmod::stopEvent);
+	ClassDB::bind_method(D_METHOD("event_stop", "uuid", "stop_mode"), &Fmod::stopEvent);
 	ClassDB::bind_method(D_METHOD("event_trigger_cue", "uuid"), &Fmod::triggerEventCue);
 	ClassDB::bind_method(D_METHOD("event_get_playback_state", "uuid"), &Fmod::getEventPlaybackState);
 
@@ -417,6 +417,10 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPED);
 	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
 	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
+
+	/* FMOD_STUDIO_STOP_MODE */
+	BIND_CONSTANT(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+	BIND_CONSTANT(FMOD_STUDIO_STOP_IMMEDIATE);
 
 	/* FMOD_SPEAKERMODE */
 	BIND_CONSTANT(FMOD_SPEAKERMODE_DEFAULT);

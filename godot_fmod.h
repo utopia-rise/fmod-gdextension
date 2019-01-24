@@ -105,12 +105,11 @@ public:
 	void setEventParameter(const String &uuid, const String &parameterName, float value);
 	void releaseEvent(const String &uuid);
 	void startEvent(const String &uuid);
-	void stopEvent(const String &uuid, bool allowFadeOut);
+	void stopEvent(const String &uuid, int stopMode);
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
 
 	// TODOS:
-	// setSoftwareFormat
 	// 3D Node attributes
 	// More helper functions
 	// set initial parameter values in playoneshot
