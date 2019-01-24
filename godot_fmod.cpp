@@ -283,6 +283,62 @@ int Fmod::getEventPlaybackState(const String &uuid) {
 	}
 }
 
+bool Fmod::getBusMute(const String &busPath) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return false;
+	bool mute = false;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->getMute(&mute));
+	return mute;
+}
+
+bool Fmod::getBusPaused(const String &busPath) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return false;
+	bool paused = false;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->getPaused(&paused));
+	return paused;
+}
+
+float Fmod::getBusVolume(const String &busPath) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return 0.0f;
+	float volume = 0.0f;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->getVolume(&volume));
+	return volume;
+}
+
+void Fmod::setBusMute(const String &busPath, bool mute) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->setMute(mute));
+}
+
+void Fmod::setBusPaused(const String &busPath, bool paused) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->setPaused(paused));
+}
+
+void Fmod::setBusVolume(const String &busPath, float volume) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return;
+	auto bus = buses.find(busPath);
+	checkErrors(bus->value()->setVolume(volume));
+}
+
+void Fmod::stopAllBusEvents(const String &busPath, int stopMode) {
+	loadBus(busPath);
+	if (!buses.has(busPath)) return;
+	auto bus = buses.find(busPath);
+	auto m = static_cast<FMOD_STUDIO_STOP_MODE>(stopMode);
+	checkErrors(bus->value()->stopAllEvents(m));
+}
+
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
 		fprintf(stderr, "FMOD Sound System: %s\n", FMOD_ErrorString(result));
@@ -299,6 +355,14 @@ bool Fmod::isNull(Object *o) {
 		// which means if one of them was null both has to be null
 		return true;
 	return false; // all g.
+}
+
+void Fmod::loadBus(const String &busPath) {
+	if (!buses.has(busPath)) {
+		FMOD::Studio::Bus *b = nullptr;
+		checkErrors(system->getBus(busPath.ascii().get_data(), &b));
+		if (b) buses.insert(busPath, b);
+	}
 }
 
 FMOD_VECTOR Fmod::toFmodVector(Vector3 vec) {
@@ -459,6 +523,16 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("event_stop", "uuid", "stop_mode"), &Fmod::stopEvent);
 	ClassDB::bind_method(D_METHOD("event_trigger_cue", "uuid"), &Fmod::triggerEventCue);
 	ClassDB::bind_method(D_METHOD("event_get_playback_state", "uuid"), &Fmod::getEventPlaybackState);
+
+	/* bus functions */
+	ClassDB::bind_method(D_METHOD("bus_get_mute", "path_to_bus"), &Fmod::getBusMute);
+	ClassDB::bind_method(D_METHOD("bus_get_paused", "path_to_bus"), &Fmod::getBusPaused);
+	ClassDB::bind_method(D_METHOD("bus_get_volume", "path_to_bus"), &Fmod::getBusVolume);
+	ClassDB::bind_method(D_METHOD("bus_set_mute", "path_to_bus", "mute"), &Fmod::setBusMute);
+	ClassDB::bind_method(D_METHOD("bus_set_paused", "path_to_bus", "paused"), &Fmod::setBusPaused);
+	ClassDB::bind_method(D_METHOD("bus_set_volume", "path_to_bus", "volume"), &Fmod::setBusVolume);
+	ClassDB::bind_method(D_METHOD("bus_stop_all_events", "path_to_bus", "stop_mode"), &Fmod::stopAllBusEvents);
+					
 
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);

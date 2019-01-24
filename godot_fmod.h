@@ -77,6 +77,7 @@ class Fmod : public Object {
 	void updateInstance3DAttributes(FMOD::Studio::EventInstance *i, Object *o);
 	int checkErrors(FMOD_RESULT result);
 	bool isNull(Object *o);
+	void loadBus(const String &busPath);
 
 protected:
 	static void _bind_methods();
@@ -116,11 +117,18 @@ public:
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
 
+	/* bus functions */
+	bool getBusMute(const String &busPath);
+	bool getBusPaused(const String &busPath);
+	float getBusVolume(const String &busPath);
+	void setBusMute(const String &busPath, bool mute);
+	void setBusPaused(const String &busPath, bool paused);
+	void setBusVolume(const String &busPath, float volume);
+	void stopAllBusEvents(const String &busPath, int stopMode);
+
 	// TODOS:	
 	// VCA functions
-	// Bus functions
-	// Demo project and GDScript code
-	// Update SCons for multiplatform + multi bit
+	// Demo project and GDScript code	
 
 	Fmod();
 	~Fmod();
