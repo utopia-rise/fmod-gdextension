@@ -352,7 +352,7 @@ bool Fmod::isNull(Object *o) {
 	Spatial *s = Object::cast_to<Spatial>(o);
 	if (ci == NULL && s == NULL)
 		// an object cannot be 2D and 3D at the same time
-		// which means if one of them was null both has to be null
+		// which means if the first cast returned null then the second cast also returned null
 		return true;
 	return false; // all g.
 }
