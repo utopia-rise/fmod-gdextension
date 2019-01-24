@@ -55,17 +55,17 @@ void Fmod::update() {
 	// update and clean up attached one shots
 	for (int i = 0; i < attachedOneShots.size(); i++) {
 		auto aShot = attachedOneShots.get(i);
-		if (checkNull(aShot.gameObj)) {			
+		if (checkNull(aShot.gameObj)) {
 			FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
 			checkErrors(aShot.instance->stop(m));
 			checkErrors(aShot.instance->release());
-			attachedOneShots.remove(i); 
+			attachedOneShots.remove(i);
 			i--;
 			continue;
 		}
 		FMOD_STUDIO_PLAYBACK_STATE s;
 		checkErrors(aShot.instance->getPlaybackState(&s));
-		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {			
+		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
 			checkErrors(aShot.instance->release());
 			attachedOneShots.remove(i);
 			i--;
@@ -73,7 +73,7 @@ void Fmod::update() {
 		}
 		updateInstance3DAttributes(aShot.instance, aShot.gameObj);
 	}
-	
+
 	// update listener position
 	setListenerAttributes();
 
@@ -82,19 +82,26 @@ void Fmod::update() {
 }
 
 void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
-	if (instance) {
-		// try to set 3D attributes
-		if (!checkNull(o)) {
-			CanvasItem *ci = Object::cast_to<CanvasItem>(o);
-			if (ci != NULL) {
-				Transform2D t2d = ci->get_transform();
-				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
-						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
-				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-				checkErrors(instance->set3DAttributes(&attr));
-			}
+	// try to set 3D attributes
+	if (instance && !checkNull(o)) {
+		CanvasItem *ci = Object::cast_to<CanvasItem>(o);
+		if (ci != NULL) {
+			Transform2D t2d = ci->get_transform();
+			Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
+					up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
+			FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+			checkErrors(instance->set3DAttributes(&attr));
+		} else {
+			// needs testing
+			Spatial *s = Object::cast_to<Spatial>(o);
+			Transform t = s->get_transform();
+			Vector3 pos = t.get_origin();
+			Vector3 up = t.get_basis().elements[1];
+			Vector3 forward = t.get_basis().elements[2];
+			Vector3 vel(0, 0, 0);
+			FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+			checkErrors(instance->set3DAttributes(&attr));
 		}
-		// TODO: Add 3D node support
 	}
 }
 
@@ -112,12 +119,21 @@ void Fmod::setListenerAttributes() {
 	if (ci != NULL) {
 		Transform2D t2d = ci->get_transform();
 		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
-		up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler 
+				up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
 		FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 		checkErrors(system->setListenerAttributes(0, &attr));
-		return;
+
+	} else {
+		// needs testing
+		Spatial *s = Object::cast_to<Spatial>(listener);
+		Transform t = s->get_transform();
+		Vector3 pos = t.get_origin();
+		Vector3 up = t.get_basis().elements[1];
+		Vector3 forward = t.get_basis().elements[2];
+		Vector3 vel(0, 0, 0);
+		FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+		checkErrors(system->setListenerAttributes(0, &attr));
 	}
-	// TODO: add support for 3D Nodes 
 }
 
 void Fmod::addListener(Object *gameObj) {
@@ -254,7 +270,8 @@ void Fmod::triggerEventCue(const String &uuid) {
 }
 
 int Fmod::getEventPlaybackState(const String &uuid) {
-	if (!unmanagedEvents.has(uuid)) return -1;
+	if (!unmanagedEvents.has(uuid))
+		return -1;
 	else {
 		auto i = unmanagedEvents.find(uuid);
 		if (i) {
@@ -320,13 +337,21 @@ void Fmod::playOneShot(const String &eventName, Object *gameObj) {
 						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
 				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 				checkErrors(instance->set3DAttributes(&attr));
+			} else {
+				// needs testing
+				Spatial *s = Object::cast_to<Spatial>(gameObj);
+				Transform t = s->get_transform();
+				Vector3 pos = t.get_origin();
+				Vector3 up = t.get_basis().elements[1];
+				Vector3 forward = t.get_basis().elements[2];
+				Vector3 vel(0, 0, 0);
+				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+				checkErrors(instance->set3DAttributes(&attr));
 			}
 		}
 		checkErrors(instance->start());
 		oneShotInstances.push_back(instance);
-		// TODO: Add 3D node support
 	}
-
 }
 
 void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
@@ -349,10 +374,9 @@ void Fmod::_bind_methods() {
 	/* system functions */
 	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
 	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
-	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);	
+	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);
 	ClassDB::bind_method(D_METHOD("system_add_listener", "node"), &Fmod::addListener);
 	ClassDB::bind_method(D_METHOD("system_set_software_format", "sample_rate", "speaker_mode", "num_raw_speakers"), &Fmod::setSoftwareFormat);
-
 
 	/* integration helper functions */
 	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
@@ -433,8 +457,6 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1);
 	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1POINT4);
 	BIND_CONSTANT(FMOD_SPEAKERMODE_MAX);
-
-
 }
 
 Fmod::Fmod() {

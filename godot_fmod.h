@@ -30,13 +30,14 @@
 #ifndef GODOT_FMOD_H
 #define GODOT_FMOD_H
 
+#include "core/map.h"
 #include "core/object.h"
 #include "core/reference.h"
-#include "scene/main/node.h"
+#include "core/vector.h"
 #include "scene/2d/canvas_item.h"
 #include "scene/3d/spatial.h"
-#include "core/vector.h"
-#include "core/map.h"
+#include "scene/main/node.h"
+#include "core/dictionary.h"
 #include "core/node_path.h"
 
 #include "fmod.hpp"
@@ -51,11 +52,11 @@ class Fmod : public Object {
 	FMOD::Studio::System *system;
 	FMOD::System *lowLevelSystem;
 
-	Object *listener; 
-	
+	Object *listener;
+
 	Map<String, FMOD::Studio::Bank *> banks;
 	Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
-	
+
 	// keep track of one shot instances internally
 	Vector<FMOD::Studio::EventInstance *> oneShotInstances;
 	struct AttachedOneShot {
@@ -108,7 +109,7 @@ public:
 	void stopEvent(const String &uuid, int stopMode);
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
-
+	
 	// TODOS:
 	// 3D Node attributes
 	// More helper functions
@@ -116,7 +117,7 @@ public:
 	// VCA functions
 	// Bus functions
 	// Demo project and GDScript code
-	// Update SCons for multiplatform + multi bit	  	
+	// Update SCons for multiplatform + multi bit
 
 	Fmod();
 	~Fmod();
