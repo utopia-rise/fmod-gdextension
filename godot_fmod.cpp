@@ -55,7 +55,7 @@ void Fmod::update() {
 	// update and clean up attached one shots
 	for (int i = 0; i < attachedOneShots.size(); i++) {
 		auto aShot = attachedOneShots.get(i);
-		if (checkNull(aShot.gameObj)) {
+		if (isNull(aShot.gameObj)) {
 			FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
 			checkErrors(aShot.instance->stop(m));
 			checkErrors(aShot.instance->release());
@@ -83,7 +83,7 @@ void Fmod::update() {
 
 void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
 	// try to set 3D attributes
-	if (instance && !checkNull(o)) {
+	if (instance && !isNull(o)) {
 		CanvasItem *ci = Object::cast_to<CanvasItem>(o);
 		if (ci != NULL) {
 			Transform2D t2d = ci->get_transform();
@@ -111,7 +111,7 @@ void Fmod::shutdown() {
 }
 
 void Fmod::setListenerAttributes() {
-	if (checkNull(listener)) {
+	if (isNull(listener)) {
 		fprintf(stderr, "FMOD Sound System: Listener not set!\n");
 		return;
 	}
@@ -291,7 +291,7 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 	return 1;
 }
 
-bool Fmod::checkNull(Object *o) {
+bool Fmod::isNull(Object *o) {
 	CanvasItem *ci = Object::cast_to<CanvasItem>(o);
 	Spatial *s = Object::cast_to<Spatial>(o);
 	if (ci == NULL && s == NULL)
@@ -329,7 +329,7 @@ void Fmod::playOneShot(const String &eventName, Object *gameObj) {
 	checkErrors(desc->value()->createInstance(&instance));
 	if (instance) {
 		// set 3D attributes once
-		if (!checkNull(gameObj)) {
+		if (!isNull(gameObj)) {
 			updateInstance3DAttributes(instance, gameObj);
 		}
 		checkErrors(instance->start());
@@ -348,7 +348,7 @@ void Fmod::playOneShotWithParams(const String &eventName, Object *gameObj, const
 	checkErrors(desc->value()->createInstance(&instance));
 	if (instance) {
 		// set 3D attributes once
-		if (!checkNull(gameObj)) {
+		if (!isNull(gameObj)) {
 			updateInstance3DAttributes(instance, gameObj);
 		}
 		// set the initial parameter values
@@ -372,7 +372,7 @@ void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
 	auto desc = eventDescriptions.find(eventName);
 	FMOD::Studio::EventInstance *instance;
 	checkErrors(desc->value()->createInstance(&instance));
-	if (instance && !checkNull(gameObj)) {
+	if (instance && !isNull(gameObj)) {
 		AttachedOneShot aShot = { instance, gameObj };
 		attachedOneShots.push_back(aShot);
 		checkErrors(instance->start());
@@ -388,7 +388,7 @@ void Fmod::playOneShotAttachedWithParams(const String &eventName, Object *gameOb
 	auto desc = eventDescriptions.find(eventName);
 	FMOD::Studio::EventInstance *instance;
 	checkErrors(desc->value()->createInstance(&instance));
-	if (instance && !checkNull(gameObj)) {
+	if (instance && !isNull(gameObj)) {
 		AttachedOneShot aShot = { instance, gameObj };
 		attachedOneShots.push_back(aShot);
 		// set the initial parameter values
@@ -399,6 +399,29 @@ void Fmod::playOneShotAttachedWithParams(const String &eventName, Object *gameOb
 			checkErrors(instance->setParameterValue(k.ascii().get_data(), v));
 		}
 		checkErrors(instance->start());
+	}
+}
+
+void Fmod::attachInstanceToNode(const String &uuid, Object *gameObj) {
+	if (!unmanagedEvents.has(uuid) || isNull(gameObj)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) {
+		AttachedOneShot aShot = { i->value(), gameObj };
+		attachedOneShots.push_back(aShot);
+	}
+}
+
+void Fmod::detachInstanceFromNode(const String &uuid) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto instance = unmanagedEvents.find(uuid);
+	if (instance) {
+		for (int i = 0; attachedOneShots.size(); i++) {
+			auto attachedInstance = attachedOneShots.get(i).instance;						
+			if (attachedInstance == instance->value()) {
+				attachedOneShots.remove(i);
+				break;
+			}
+		}
 	}
 }
 
@@ -415,7 +438,9 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "event_name", "node", "initial_parameters"), &Fmod::playOneShotWithParams);
 	ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "node"), &Fmod::playOneShotAttached);
 	ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "event_name", "node", "initial_parameters"), &Fmod::playOneShotAttachedWithParams);
-	
+	ClassDB::bind_method(D_METHOD("attach_instance_to_node", "uuid", "node"), &Fmod::attachInstanceToNode);
+	ClassDB::bind_method(D_METHOD("detach_instance_from_node", "uuid"), &Fmod::detachInstanceFromNode);
+
 	/* bank functions */
 	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
 	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);

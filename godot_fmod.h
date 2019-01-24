@@ -74,7 +74,7 @@ class Fmod : public Object {
 	void setListenerAttributes();
 	void updateInstance3DAttributes(FMOD::Studio::EventInstance *i, Object *o);
 	int checkErrors(FMOD_RESULT result);
-	bool checkNull(Object *o);
+	bool isNull(Object *o);
 
 protected:
 	static void _bind_methods();
@@ -92,6 +92,8 @@ public:
 	void playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);	
 	void playOneShotAttached(const String &eventName, Object *gameObj);
 	void playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
+	void attachInstanceToNode(const String &uuid, Object *gameObj);
+	void detachInstanceFromNode(const String &uuid);
 
 	/* bank functions */
 	String loadbank(const String &pathToBank, int flags);
