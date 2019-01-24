@@ -30,7 +30,6 @@
 #include "godot_fmod.h"
 
 void Fmod::init(int numOfChannels, int studioFlags, int flags) {
-	checkErrors(FMOD::Studio::System::create(&system));
 	// initialize FMOD Studio and FMOD Low Level System with provided flags
 	if (checkErrors(system->initialize(numOfChannels, studioFlags, flags, nullptr))) {
 		printf("FMOD Sound System successfully initialized with %d channels\n", numOfChannels);
@@ -125,6 +124,11 @@ void Fmod::addListener(Object *gameObj) {
 	listener = gameObj;
 }
 
+void Fmod::setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers) {
+	auto m = static_cast<FMOD_SPEAKERMODE>(speakerMode);
+	checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, m, numRawSpeakers));
+}
+
 String Fmod::loadbank(const String &pathToBank, int flags) {
 	if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
 	FMOD::Studio::Bank *bank = nullptr;
@@ -194,6 +198,7 @@ int Fmod::getBankVCACount(const String &pathToBank) {
 }
 
 void Fmod::createEventInstance(const String &uuid, const String &eventPath) {
+	if (unmanagedEvents.has(uuid)) return; // provided uuid is not valid
 	if (!eventDescriptions.has(eventPath)) {
 		FMOD::Studio::EventDescription *desc = nullptr;
 		checkErrors(system->getEvent(eventPath.ascii().get_data(), &desc));
@@ -346,6 +351,8 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("system_update"), &Fmod::update);
 	ClassDB::bind_method(D_METHOD("system_shutdown"), &Fmod::shutdown);	
 	ClassDB::bind_method(D_METHOD("system_add_listener", "node"), &Fmod::addListener);
+	ClassDB::bind_method(D_METHOD("system_set_software_format", "sample_rate", "speaker_mode", "num_raw_speakers"), &Fmod::setSoftwareFormat);
+
 
 	/* integration helper functions */
 	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
@@ -411,10 +418,25 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
 	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
 
+	/* FMOD_SPEAKERMODE */
+	BIND_CONSTANT(FMOD_SPEAKERMODE_DEFAULT);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_RAW);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_MONO);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_STEREO);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_QUAD);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_SURROUND);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_5POINT1);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1POINT4);
+	BIND_CONSTANT(FMOD_SPEAKERMODE_MAX);
+
+
 }
 
 Fmod::Fmod() {
-	system, listener = nullptr;
+	system, lowLevelSystem, listener = nullptr;
+	checkErrors(FMOD::Studio::System::create(&system));
+	checkErrors(system->getLowLevelSystem(&lowLevelSystem));
 }
 
 Fmod::~Fmod() {

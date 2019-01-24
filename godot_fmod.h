@@ -49,6 +49,7 @@ class Fmod : public Object {
 	GDCLASS(Fmod, Object);
 
 	FMOD::Studio::System *system;
+	FMOD::System *lowLevelSystem;
 
 	Object *listener; 
 	
@@ -64,6 +65,7 @@ class Fmod : public Object {
 	Vector<AttachedOneShot> attachedOneShots;
 
 	// events not directly managed by the integration
+	// referenced through uuids generated in script
 	Map<String, FMOD::Studio::EventInstance *> unmanagedEvents;
 
 	FMOD_3D_ATTRIBUTES get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel);
@@ -82,6 +84,7 @@ public:
 	void update();
 	void shutdown();
 	void addListener(Object *gameObj);
+	void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
 
 	/* helper functions for common FMOD Studio actions */
 	void playOneShot(const String &eventName, Object *gameObj);
