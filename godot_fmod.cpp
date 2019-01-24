@@ -337,6 +337,32 @@ void Fmod::playOneShot(const String &eventName, Object *gameObj) {
 	}
 }
 
+void Fmod::playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters) {
+	if (!eventDescriptions.has(eventName)) {
+		FMOD::Studio::EventDescription *desc = nullptr;
+		checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+		eventDescriptions.insert(eventName, desc);
+	}
+	auto desc = eventDescriptions.find(eventName);
+	FMOD::Studio::EventInstance *instance;
+	checkErrors(desc->value()->createInstance(&instance));
+	if (instance) {
+		// set 3D attributes once
+		if (!checkNull(gameObj)) {
+			updateInstance3DAttributes(instance, gameObj);
+		}
+		// set the initial parameter values
+		auto keys = parameters.keys();
+		for (int i = 0; i < keys.size(); i++) {
+			String k = keys[i];
+			float v = parameters[keys[i]];
+			checkErrors(instance->setParameterValue(k.ascii().get_data(), v));
+		}
+		checkErrors(instance->start());
+		oneShotInstances.push_back(instance);
+	}
+}
+
 void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
 	if (!eventDescriptions.has(eventName)) {
 		FMOD::Studio::EventDescription *desc = nullptr;
@@ -353,6 +379,29 @@ void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
 	}
 }
 
+void Fmod::playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters) {
+	if (!eventDescriptions.has(eventName)) {
+		FMOD::Studio::EventDescription *desc = nullptr;
+		checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
+		eventDescriptions.insert(eventName, desc);
+	}
+	auto desc = eventDescriptions.find(eventName);
+	FMOD::Studio::EventInstance *instance;
+	checkErrors(desc->value()->createInstance(&instance));
+	if (instance && !checkNull(gameObj)) {
+		AttachedOneShot aShot = { instance, gameObj };
+		attachedOneShots.push_back(aShot);
+		// set the initial parameter values
+		auto keys = parameters.keys();
+		for (int i = 0; i < keys.size(); i++) {
+			String k = keys[i];
+			float v = parameters[keys[i]];
+			checkErrors(instance->setParameterValue(k.ascii().get_data(), v));
+		}
+		checkErrors(instance->start());
+	}
+}
+
 void Fmod::_bind_methods() {
 	/* system functions */
 	ClassDB::bind_method(D_METHOD("system_init", "num_of_channels", "studio_flags", "flags"), &Fmod::init);
@@ -363,8 +412,10 @@ void Fmod::_bind_methods() {
 
 	/* integration helper functions */
 	ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "node"), &Fmod::playOneShot);
+	ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "event_name", "node", "initial_parameters"), &Fmod::playOneShotWithParams);
 	ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "node"), &Fmod::playOneShotAttached);
-
+	ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "event_name", "node", "initial_parameters"), &Fmod::playOneShotAttachedWithParams);
+	
 	/* bank functions */
 	ClassDB::bind_method(D_METHOD("bank_load", "path_to_bank", "flags"), &Fmod::loadbank);
 	ClassDB::bind_method(D_METHOD("bank_unload", "path_to_bank"), &Fmod::unloadBank);

@@ -30,15 +30,15 @@
 #ifndef GODOT_FMOD_H
 #define GODOT_FMOD_H
 
+#include "core/dictionary.h"
 #include "core/map.h"
+#include "core/node_path.h"
 #include "core/object.h"
 #include "core/reference.h"
 #include "core/vector.h"
 #include "scene/2d/canvas_item.h"
 #include "scene/3d/spatial.h"
 #include "scene/main/node.h"
-#include "core/dictionary.h"
-#include "core/node_path.h"
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
@@ -87,9 +87,11 @@ public:
 	void addListener(Object *gameObj);
 	void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
 
-	/* helper functions for common FMOD Studio actions */
+	/* helper functions for playing sounds in 3D */
 	void playOneShot(const String &eventName, Object *gameObj);
+	void playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);	
 	void playOneShotAttached(const String &eventName, Object *gameObj);
+	void playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
 
 	/* bank functions */
 	String loadbank(const String &pathToBank, int flags);
@@ -109,10 +111,8 @@ public:
 	void stopEvent(const String &uuid, int stopMode);
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
-	
+
 	// TODOS:	
-	// More helper functions
-	// set initial parameter values in playoneshot
 	// VCA functions
 	// Bus functions
 	// Demo project and GDScript code
