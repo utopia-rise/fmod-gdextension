@@ -78,6 +78,7 @@ class Fmod : public Object {
 	int checkErrors(FMOD_RESULT result);
 	bool isNull(Object *o);
 	void loadBus(const String &busPath);
+	void loadVCA(const String &VCAPath);
 
 protected:
 	static void _bind_methods();
@@ -126,9 +127,9 @@ public:
 	void setBusVolume(const String &busPath, float volume);
 	void stopAllBusEvents(const String &busPath, int stopMode);
 
-	// TODOS:	
-	// VCA functions
-	// Demo project and GDScript code	
+	/* VCA functions */
+	float getVCAVolume(const String &VCAPath);
+	void setVCAVolume(const String &VCAPath, float volume);
 
 	Fmod();
 	~Fmod();

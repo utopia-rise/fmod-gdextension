@@ -365,6 +365,14 @@ void Fmod::loadBus(const String &busPath) {
 	}
 }
 
+void Fmod::loadVCA(const String &VCAPath) {
+	if (!VCAs.has(VCAPath)) {
+		FMOD::Studio::VCA *vca = nullptr;
+		checkErrors(system->getVCA(VCAPath.ascii().get_data(), &vca));
+		if (vca) VCAs.insert(VCAPath, vca);
+	}
+}
+
 FMOD_VECTOR Fmod::toFmodVector(Vector3 vec) {
 	FMOD_VECTOR fv;
 	fv.x = vec.x;
@@ -532,7 +540,11 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("bus_set_paused", "path_to_bus", "paused"), &Fmod::setBusPaused);
 	ClassDB::bind_method(D_METHOD("bus_set_volume", "path_to_bus", "volume"), &Fmod::setBusVolume);
 	ClassDB::bind_method(D_METHOD("bus_stop_all_events", "path_to_bus", "stop_mode"), &Fmod::stopAllBusEvents);
-					
+
+	/* VCA functions */
+	ClassDB::bind_method(D_METHOD("vca_get_volume", "path_to_vca"), &Fmod::getVCAVolume);
+	ClassDB::bind_method(D_METHOD("vca_set_volume", "path_to_vca", "volume"), &Fmod::setVCAVolume);
+
 
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);
@@ -590,6 +602,22 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1);
 	BIND_CONSTANT(FMOD_SPEAKERMODE_7POINT1POINT4);
 	BIND_CONSTANT(FMOD_SPEAKERMODE_MAX);
+}
+
+float Fmod::getVCAVolume(const String &VCAPath) {
+	loadVCA(VCAPath);
+	if (!VCAs.has(VCAPath)) return 0.0f;
+	auto vca = VCAs.find(VCAPath);
+	float volume = 0.0f;
+	checkErrors(vca->value()->getVolume(&volume));
+	return volume;
+}
+
+void Fmod::setVCAVolume(const String &VCAPath, float volume) {
+	loadVCA(VCAPath);
+	if (!VCAs.has(VCAPath)) return;
+	auto vca = VCAs.find(VCAPath);
+	checkErrors(vca->value()->setVolume(volume));
 }
 
 Fmod::Fmod() {
