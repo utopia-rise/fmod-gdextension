@@ -328,26 +328,9 @@ void Fmod::playOneShot(const String &eventName, Object *gameObj) {
 	FMOD::Studio::EventInstance *instance;
 	checkErrors(desc->value()->createInstance(&instance));
 	if (instance) {
-		// try to set 3D attributes
+		// set 3D attributes once
 		if (!checkNull(gameObj)) {
-			CanvasItem *ci = Object::cast_to<CanvasItem>(gameObj);
-			if (ci != NULL) {
-				Transform2D t2d = ci->get_transform();
-				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
-						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
-				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-				checkErrors(instance->set3DAttributes(&attr));
-			} else {
-				// needs testing
-				Spatial *s = Object::cast_to<Spatial>(gameObj);
-				Transform t = s->get_transform();
-				Vector3 pos = t.get_origin();
-				Vector3 up = t.get_basis().elements[1];
-				Vector3 forward = t.get_basis().elements[2];
-				Vector3 vel(0, 0, 0);
-				FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-				checkErrors(instance->set3DAttributes(&attr));
-			}
+			updateInstance3DAttributes(instance, gameObj);
 		}
 		checkErrors(instance->start());
 		oneShotInstances.push_back(instance);

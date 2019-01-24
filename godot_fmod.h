@@ -110,8 +110,7 @@ public:
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
 	
-	// TODOS:
-	// 3D Node attributes
+	// TODOS:	
 	// More helper functions
 	// set initial parameter values in playoneshot
 	// VCA functions
