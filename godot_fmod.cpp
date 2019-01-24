@@ -56,17 +56,17 @@ void Fmod::update() {
 	// update and clean up attached one shots
 	for (int i = 0; i < attachedOneShots.size(); i++) {
 		auto aShot = attachedOneShots.get(i);
-		if (!aShot.gameObj) {
-			// null object
+		if (checkNull(aShot.gameObj)) {			
+			FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+			checkErrors(aShot.instance->stop(m));
 			checkErrors(aShot.instance->release());
-			attachedOneShots.remove(i);
+			attachedOneShots.remove(i); 
 			i--;
 			continue;
 		}
 		FMOD_STUDIO_PLAYBACK_STATE s;
 		checkErrors(aShot.instance->getPlaybackState(&s));
-		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
-			// one shot has finished playing
+		if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {			
 			checkErrors(aShot.instance->release());
 			attachedOneShots.remove(i);
 			i--;
@@ -85,9 +85,9 @@ void Fmod::update() {
 void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
 	if (instance) {
 		// try to set 3D attributes
-		if (o) {
+		if (!checkNull(o)) {
 			CanvasItem *ci = Object::cast_to<CanvasItem>(o);
-			if (ci) {
+			if (ci != NULL) {
 				Transform2D t2d = ci->get_transform();
 				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
@@ -105,12 +105,12 @@ void Fmod::shutdown() {
 }
 
 void Fmod::setListenerAttributes() {
-	if (!listener) {
+	if (checkNull(listener)) {
 		fprintf(stderr, "FMOD Sound System: Listener not set!\n");
 		return;
 	}
 	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
-	if (ci) {
+	if (ci != NULL) {
 		Transform2D t2d = ci->get_transform();
 		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 		up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler 
@@ -194,7 +194,71 @@ int Fmod::getBankVCACount(const String &pathToBank) {
 }
 
 void Fmod::createEventInstance(const String &uuid, const String &eventPath) {
-	
+	if (!eventDescriptions.has(eventPath)) {
+		FMOD::Studio::EventDescription *desc = nullptr;
+		checkErrors(system->getEvent(eventPath.ascii().get_data(), &desc));
+		eventDescriptions.insert(eventPath, desc);
+	}
+	auto desc = eventDescriptions.find(eventPath);
+	FMOD::Studio::EventInstance *instance;
+	checkErrors(desc->value()->createInstance(&instance));
+	if (instance)
+		unmanagedEvents.insert(uuid, instance);
+}
+
+float Fmod::getEventParameter(const String &uuid, const String &parameterName) {
+	float p = -1;
+	if (!unmanagedEvents.has(uuid)) return p;
+	auto i = unmanagedEvents.find(uuid);
+	if (i)
+		checkErrors(i->value()->getParameterValue(parameterName.ascii().get_data(), &p));
+	return p;
+}
+
+void Fmod::setEventParameter(const String &uuid, const String &parameterName, float value) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) checkErrors(i->value()->setParameterValue(parameterName.ascii().get_data(), value));
+}
+
+void Fmod::releaseEvent(const String &uuid) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) checkErrors(i->value()->release());
+}
+
+void Fmod::startEvent(const String &uuid) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) checkErrors(i->value()->start());
+}
+
+void Fmod::stopEvent(const String &uuid, bool allowFadeOut) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) {
+		FMOD_STUDIO_STOP_MODE m = allowFadeOut ? FMOD_STUDIO_STOP_ALLOWFADEOUT : FMOD_STUDIO_STOP_IMMEDIATE;
+		checkErrors(i->value()->stop(m));
+	}
+}
+
+void Fmod::triggerEventCue(const String &uuid) {
+	if (!unmanagedEvents.has(uuid)) return;
+	auto i = unmanagedEvents.find(uuid);
+	if (i) checkErrors(i->value()->triggerCue());
+}
+
+int Fmod::getEventPlaybackState(const String &uuid) {
+	if (!unmanagedEvents.has(uuid)) return -1;
+	else {
+		auto i = unmanagedEvents.find(uuid);
+		if (i) {
+			FMOD_STUDIO_PLAYBACK_STATE s;
+			checkErrors(i->value()->getPlaybackState(&s));
+			return s;
+		}
+		return -1;
+	}
 }
 
 int Fmod::checkErrors(FMOD_RESULT result) {
@@ -203,6 +267,16 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 		return 0;
 	}
 	return 1;
+}
+
+bool Fmod::checkNull(Object *o) {
+	CanvasItem *ci = Object::cast_to<CanvasItem>(o);
+	Spatial *s = Object::cast_to<Spatial>(o);
+	if (ci == NULL && s == NULL)
+		// an object cannot be 2D and 3D at the same time
+		// which means if one of them was null both has to be null
+		return true;
+	return false; // all g.
 }
 
 FMOD_VECTOR Fmod::toFmodVector(Vector3 vec) {
@@ -233,9 +307,9 @@ void Fmod::playOneShot(const String &eventName, Object *gameObj) {
 	checkErrors(desc->value()->createInstance(&instance));
 	if (instance) {
 		// try to set 3D attributes
-		if (gameObj) {
+		if (!checkNull(gameObj)) {
 			CanvasItem *ci = Object::cast_to<CanvasItem>(gameObj);
-			if (ci) {
+			if (ci != NULL) {
 				Transform2D t2d = ci->get_transform();
 				Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 						up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
@@ -259,7 +333,7 @@ void Fmod::playOneShotAttached(const String &eventName, Object *gameObj) {
 	auto desc = eventDescriptions.find(eventName);
 	FMOD::Studio::EventInstance *instance;
 	checkErrors(desc->value()->createInstance(&instance));
-	if (instance && gameObj) {
+	if (instance && !checkNull(gameObj)) {
 		AttachedOneShot aShot = { instance, gameObj };
 		attachedOneShots.push_back(aShot);
 		checkErrors(instance->start());
@@ -286,8 +360,15 @@ void Fmod::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("bank_get_string_count", "path_to_bank"), &Fmod::getBankStringCount);
 	ClassDB::bind_method(D_METHOD("bank_get_vca_count", "path_to_bank"), &Fmod::getBankVCACount);
 
-
-
+	/* event functions */
+	ClassDB::bind_method(D_METHOD("event_create_instance", "uuid", "event_path"), &Fmod::createEventInstance);
+	ClassDB::bind_method(D_METHOD("event_get_parameter", "uuid", "parameter_name"), &Fmod::getEventParameter);
+	ClassDB::bind_method(D_METHOD("event_set_parameter", "uuid", "parameter_name", "value"), &Fmod::setEventParameter);
+	ClassDB::bind_method(D_METHOD("event_release", "uuid"), &Fmod::releaseEvent);
+	ClassDB::bind_method(D_METHOD("event_start", "uuid"), &Fmod::startEvent);
+	ClassDB::bind_method(D_METHOD("event_stop", "uuid", "allow_fade_out"), &Fmod::stopEvent);
+	ClassDB::bind_method(D_METHOD("event_trigger_cue", "uuid"), &Fmod::triggerEventCue);
+	ClassDB::bind_method(D_METHOD("event_get_playback_state", "uuid"), &Fmod::getEventPlaybackState);
 
 	/* FMOD_INITFLAGS */
 	BIND_CONSTANT(FMOD_INIT_NORMAL);
@@ -322,6 +403,13 @@ void Fmod::_bind_methods() {
 	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADING);
 	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADED);
 	BIND_CONSTANT(FMOD_STUDIO_LOADING_STATE_ERROR);
+
+	/* FMOD_STUDIO_PLAYBACK_STATE */
+	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_PLAYING);
+	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_SUSTAINING);
+	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPED);
+	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
+	BIND_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
 
 }
 

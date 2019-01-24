@@ -32,9 +32,12 @@
 
 #include "core/object.h"
 #include "core/reference.h"
+#include "scene/main/node.h"
 #include "scene/2d/canvas_item.h"
+#include "scene/3d/spatial.h"
 #include "core/vector.h"
 #include "core/map.h"
+#include "core/node_path.h"
 
 #include "fmod.hpp"
 #include "fmod_errors.h"
@@ -47,7 +50,7 @@ class Fmod : public Object {
 
 	FMOD::Studio::System *system;
 
-	Object *listener; // TODO: Multiple listener support
+	Object *listener; 
 	
 	Map<String, FMOD::Studio::Bank *> banks;
 	Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
@@ -68,6 +71,7 @@ class Fmod : public Object {
 	void setListenerAttributes();
 	void updateInstance3DAttributes(FMOD::Studio::EventInstance *i, Object *o);
 	int checkErrors(FMOD_RESULT result);
+	bool checkNull(Object *o);
 
 protected:
 	static void _bind_methods();
@@ -97,8 +101,20 @@ public:
 	float getEventParameter(const String &uuid, const String &parameterName);
 	void setEventParameter(const String &uuid, const String &parameterName, float value);
 	void releaseEvent(const String &uuid);
+	void startEvent(const String &uuid);
+	void stopEvent(const String &uuid, bool allowFadeOut);
+	void triggerEventCue(const String &uuid);
+	int getEventPlaybackState(const String &uuid);
 
-	
+	// TODOS:
+	// setSoftwareFormat
+	// 3D Node attributes
+	// More helper functions
+	// set initial parameter values in playoneshot
+	// VCA functions
+	// Bus functions
+	// Demo project and GDScript code
+	// Update SCons for multiplatform + multi bit	  	
 
 	Fmod();
 	~Fmod();
