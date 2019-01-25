@@ -125,4 +125,4 @@ FMOD.detach_instance_from_node(uuid)
 
 ## Issues
 
-This project is still a work in progress and is probably not yet ready for full-blown production. If you run into issues (crashes, memory leaks, broken 3D sound etc.) open a issue or submit a PR with your fix.
+This project is still a work in progress and is probably not yet ready for use in full-blown production. If you run into issues (crashes, memory leaks, broken 3D sound etc.) open a issue or submit a PR with your fix.
