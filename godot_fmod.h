@@ -93,7 +93,7 @@ public:
 
 	/* helper functions for playing sounds in 3D */
 	void playOneShot(const String &eventName, Object *gameObj);
-	void playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);	
+	void playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
 	void playOneShotAttached(const String &eventName, Object *gameObj);
 	void playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
 	void attachInstanceToNode(const String &uuid, Object *gameObj);
@@ -117,6 +117,17 @@ public:
 	void stopEvent(const String &uuid, int stopMode);
 	void triggerEventCue(const String &uuid);
 	int getEventPlaybackState(const String &uuid);
+	bool getEventPaused(const String &uuid);
+	void setEventPaused(const String &uuid, bool paused);
+	float getEventPitch(const String &uuid);
+	void setEventPitch(const String &uuid, float pitch);
+	float getEventVolume(const String &uuid);
+	void setEventVolume(const String &uuid, float volume);
+	int getEventTimelinePosition(const String &uuid);
+	void setEventTimelinePosition(const String &uuid, int position);
+	float getEventReverbLevel(const String &uuid, int index);
+	void setEventReverbLevel(const String &uuid, int index, float level);
+	bool isEventVirtual(const String &uuid);
 
 	/* bus functions */
 	bool getBusMute(const String &busPath);

@@ -5,3 +5,5 @@ api/studio
 
 __pycache__
 *.obj
+
+demo/.import/
