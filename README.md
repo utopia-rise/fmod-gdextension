@@ -87,6 +87,7 @@ yield(music_timer, "timeout")
 
 # stop the event
 FMOD.event_stop(my_music_event, Fmod.FMOD_STUDIO_STOP_ALLOWFADEOUT)
+
 # release the event
 FMOD.event_release(my_music_event)
 ```
