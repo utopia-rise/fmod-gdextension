@@ -94,7 +94,7 @@ FMOD.event_release(my_music_event)
 
 ### Using the integration helpers
 
-These are helper functions provided by the integration for attaching event instances to Godot Nodes for 3D/positional audio. The listener position and 3D attributes of any attached instances are automatically updated every time you call `FMOD.system_update()`. Instances are also automatically cleaned up once finished so you don't have to manually call `event_release()`.
+These are helper functions provided by the integration for attaching event instances to Godot Nodes for 3D/positional audio. The listener position and 3D attributes of any attached instances are automatically updated every time you call `system_update()`. Instances are also automatically cleaned up once finished so you don't have to manually call `event_release()`.
 
 ```gdscript
 # play an event at this Node's position
