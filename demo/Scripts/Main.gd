@@ -14,4 +14,5 @@ func _ready():
 	
 	# play some events
 	FMOD.play_one_shot("event:/Car engine", $SoundSource1)
-	FMOD.play_one_shot("event:/Waterfall", $SoundSource2)	
+	FMOD.play_one_shot("event:/Waterfall", $SoundSource2)
+		
