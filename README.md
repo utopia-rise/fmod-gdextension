@@ -11,7 +11,7 @@ This module exposes most of the Studio API functions to Godot's GDScript and als
 1. Clone the repository.
 2. [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and install it on your system.
 3. Copy the contents of the api directory of the FMOD API into the repository's api directory. On Windows this is (usually) found at `C:/Program Files (x86)/FMOD SoundSystem/FMOD Studio API Windows/api`
-4. Clone the latest version of Godot from the [master branch](https://github.com/godotengine/godot). At the time of writing this was Godot 3.1 beta.
+4. Clone the latest version of Godot from the [master branch](https://github.com/godotengine/godot). At the time of writing this is Godot 3.1 beta.
 5. `cd` into the source directory and create a new directory named `fmod` inside modules folder `godot/modules/fmod`
 6. Copy the contents of the Godot FMOD repository (with the FMOD API now included) into this directory.
 7. Recompile the engine. For more information on compiling the engine, refer to the [Godot documentation](https://docs.godotengine.org/en/latest/development/compiling/index.html).
@@ -51,6 +51,12 @@ func _ready():
 	# play some events
 	FMOD.play_one_shot("event:/Car engine", $SoundSource1)
 	FMOD.play_one_shot("event:/Waterfall", $SoundSource2)
+
+func _process(delta):
+	# update FMOD every tick
+	# calling system_update also updates the listener 3D position
+	# and 3D positions of any attached event instances
+	FMOD.system_update()
 ```
 
 ### Calling Studio events
