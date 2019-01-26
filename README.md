@@ -8,14 +8,12 @@ This module exposes most of the Studio API functions to Godot's GDScript and als
 
 ## Installing the module
 
-1. Clone the repository.
-2. [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and install it on your system.
-3. Copy the contents of the api directory of the FMOD API into the repository's api directory. On Windows this is (usually) found at `C:/Program Files (x86)/FMOD SoundSystem/FMOD Studio API Windows/api`
-4. Clone the latest version of Godot from the [master branch](https://github.com/godotengine/godot). At the time of writing this is Godot 3.1 beta.
-5. `cd` into the source directory and create a new directory named `fmod` inside modules folder `godot/modules/fmod`
-6. Copy the contents of the Godot FMOD repository (with the FMOD API now included) into this directory.
-7. Recompile the engine. For more information on compiling the engine, refer to the [Godot documentation](https://docs.godotengine.org/en/latest/development/compiling/index.html).
-8. Place the FMOD library files within the `bin` directory for Godot to start. Eg. on Windows these would be `fmod64.dll` and `fmodstudio64.dll` for a 64-bit build of Godot.
+0. [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and install it on your system.
+1. Clone the latest version of Godot from the [master branch](https://github.com/godotengine/godot). At the time of writing this is Godot 3.1 beta.
+1. `cd` into the source directory and add the FMOD integration as a submodule into the `modules` directory `git submodule add https://github.com/alexfonseka/godot-fmod-integration modules/fmod`.
+1. Copy the contents of the `api` directory of the FMOD API into the module's `api` directory `modules/fmod/api`. On Windows this is (usually) found at `C:/Program Files (x86)/FMOD SoundSystem/FMOD Studio API Windows/api`.
+1. Recompile the engine. For more information on compiling the engine, refer to the [Godot documentation](https://docs.godotengine.org/en/latest/development/compiling/index.html).
+1. Place the FMOD library files within the `bin` directory for Godot to start. Eg. on Windows these would be `fmod64.dll` and `fmodstudio64.dll` for a 64-bit build of Godot.
 
 FMOD should now be integrated. If you are tweaking/extending the module it is faster to compile it as a dynamic library instead of a static library. Refer to the Godot documentation for more details on this.
 
