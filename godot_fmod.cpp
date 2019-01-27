@@ -85,7 +85,7 @@ void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Obj
 	// try to set 3D attributes
 	if (instance && !isNull(o)) {
 		CanvasItem *ci = Object::cast_to<CanvasItem>(o);
-		if (ci != NULL) {
+		if (ci != nullptr) {
 			Transform2D t2d = ci->get_transform();
 			Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 					up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
@@ -119,7 +119,7 @@ void Fmod::setListenerAttributes() {
 		return;
 	}
 	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
-	if (ci != NULL) {
+	if (ci != nullptr) {
 		Transform2D t2d = ci->get_transform();
 		Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
 				up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
@@ -431,7 +431,7 @@ int Fmod::checkErrors(FMOD_RESULT result) {
 bool Fmod::isNull(Object *o) {
 	CanvasItem *ci = Object::cast_to<CanvasItem>(o);
 	Spatial *s = Object::cast_to<Spatial>(o);
-	if (ci == NULL && s == NULL)
+	if (ci == nullptr && s == nullptr)
 		// an object cannot be 2D and 3D at the same time
 		// which means if the first cast returned null then the second cast also returned null
 		return true;
