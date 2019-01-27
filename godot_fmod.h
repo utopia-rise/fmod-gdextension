@@ -52,6 +52,8 @@ class Fmod : public Object {
 
 	Object *listener;
 
+	bool nullListenerWarning = true;
+
 	Map<String, FMOD::Studio::Bank *> banks;
 	Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
 	Map<String, FMOD::Studio::Bus *> buses;

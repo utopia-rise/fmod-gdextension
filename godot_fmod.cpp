@@ -112,7 +112,10 @@ void Fmod::shutdown() {
 
 void Fmod::setListenerAttributes() {
 	if (isNull(listener)) {
-		print_error("FMOD Sound System: Listener not set!");
+		if (nullListenerWarning) {
+			print_error("FMOD Sound System: Listener not set!");
+			nullListenerWarning = false;
+		}
 		return;
 	}
 	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
