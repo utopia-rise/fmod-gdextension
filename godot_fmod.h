@@ -44,8 +44,6 @@
 #include "fmod_errors.h"
 #include "fmod_studio.hpp"
 
-#include <iostream>
-
 class Fmod : public Object {
 	GDCLASS(Fmod, Object);
 

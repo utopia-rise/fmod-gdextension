@@ -32,11 +32,11 @@
 void Fmod::init(int numOfChannels, int studioFlags, int flags) {
 	// initialize FMOD Studio and FMOD Low Level System with provided flags
 	if (checkErrors(system->initialize(numOfChannels, studioFlags, flags, nullptr))) {
-		printf("FMOD Sound System successfully initialized with %d channels\n", numOfChannels);
+		print_line("FMOD Sound System: Successfully initialized");
 		if (studioFlags == FMOD_STUDIO_INIT_LIVEUPDATE)
-			printf("Live update enabled!\n");
+			print_line("FMOD Sound System: Live update enabled!");
 	} else
-		fprintf(stderr, "FMOD Sound System failed to initialize :|\n");
+		print_error("FMOD Sound System: Failed to initialize :|");
 }
 
 void Fmod::update() {
@@ -112,7 +112,7 @@ void Fmod::shutdown() {
 
 void Fmod::setListenerAttributes() {
 	if (isNull(listener)) {
-		fprintf(stderr, "FMOD Sound System: Listener not set!\n");
+		print_error("FMOD Sound System: Listener not set!");
 		return;
 	}
 	CanvasItem *ci = Object::cast_to<CanvasItem>(listener);
@@ -419,7 +419,7 @@ void Fmod::stopAllBusEvents(const String &busPath, int stopMode) {
 
 int Fmod::checkErrors(FMOD_RESULT result) {
 	if (result != FMOD_OK) {
-		fprintf(stderr, "FMOD Sound System: %s\n", FMOD_ErrorString(result));
+		print_error(FMOD_ErrorString(result));
 		return 0;
 	}
 	return 1;
