@@ -1,4 +1,4 @@
-# FMOD Studio integration for Godot
+# FMOD Studio integration for Godot (WIP)
 
 A Godot C++ module that provides an integration and GDScript bindings for the FMOD Studio API.
 
