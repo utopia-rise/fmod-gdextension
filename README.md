@@ -1,10 +1,12 @@
 # FMOD Studio integration for Godot
 
-A Godot C++ module that provides an integration and wrapper around the FMOD Studio API.
+A Godot C++ module that provides an integration and GDScript bindings for the FMOD Studio API.
 
 FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many titles such as Transistor, Pyre and Celeste. [More on FMOD's website](https://www.fmod.com/).
 
 This module exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
+
+**Note:** FMOD provides a C# wrapper for their API which is used in the Unity integration. It is possible to use the same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot as C# support is required and performance might not be on the same level as a C++ integration. 
 
 ## Installing the module
 
