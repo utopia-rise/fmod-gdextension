@@ -1,14 +1,53 @@
-# TODO : Rewrite the README
+# FMOD Studio integration for Godot using GDNative (WIP)
 
-# FMOD Studio integration for Godot (WIP)
+A Godot C++ GDNative that provides an integration for the FMOD Studio API.
 
-A Godot C++ module that provides an integration and GDScript bindings for the FMOD Studio API.
+FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many
+titles such as Transistor, Pyre and Celeste. [More on FMOD's website](https://www.fmod.com/).
 
-FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many titles such as Transistor, Pyre and Celeste. [More on FMOD's website](https://www.fmod.com/).
+This GDNative exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
+common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a
+work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
 
-This module exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
+**Note:** FMOD provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
+same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
+as C# support is required and performance might not be on the same level as a C++ integration. 
 
-**Note:** FMOD provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot as C# support is required and performance might not be on the same level as a C++ integration. 
+**Note:** This project is a fork of [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
+which uses godot module to integrate fmod in the engine. This fork was designed to be able to use Fmod without building
+Godot Engine !
+
+![wowmeme]
+
+## Typical Project structure
+
+```
+└── Project root
+    ├── libs
+    |   └── fmod
+    |       └── {platform}
+    |           └── specific platform fmod api goes here
+    ├── godot-cpp (gdnative bindings, consider using a git submodule)
+    └── fmod-gdnative (this repo, consider using it as a submodule of you GDNatives repo)
+        ├── CMakeLists.txt (Here for CLion)
+        ├── LICENSE
+        ├── README.md
+        ├── SConstruct (here to build on Windows, Linux, OSX and IOS
+        ├── godot_fmod.h
+        ├── godot_fmod.cpp
+        └── gdlibrary.cpp
+```
+
+If you look at [Sconstruct](SConstruct) script, you'll see that it refers to libraries that are in path relatives to
+parent folder. This is because Utopia-Rise team chose to make this repo integrated to a unique repository, storing all
+the GDNative for our project.
+
+So, you are supposed to put fmod libraries under `libs/fmod/{platform}`, according to the platforms you want to support.
+
+Feel free to modify SConstruct according to your project structure.
+
+`CMakeLists` is here for CLion ide, as we are used to JetBrains tools. Unfortunately, CLion does not currently support
+Sconstruct.
 
 ## Installing the module
 
@@ -128,3 +167,6 @@ FMOD.detach_instance_from_node(uuid)
 ## Issues
 
 This project is still a work in progress and is probably not yet ready for use in full-blown production. If you run into issues (crashes, memory leaks, broken 3D sound etc.) open a issue or submit a PR with your fix.
+
+
+[wowmeme]: .README/wowmeme.png
