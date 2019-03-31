@@ -59,6 +59,16 @@ void GodotFmod::_register_methods() {
     register_method("playOneShotAttachedWithParams", &GodotFmod::playOneShotAttachedWithParams);
     register_method("attachInstanceToNode", &GodotFmod::attachInstanceToNode);
     register_method("detachInstanceFromNode", &GodotFmod::detachInstanceFromNode);
+    register_method("loadSound", &GodotFmod::loadSound);
+    register_method("playSound", &GodotFmod::playSound);
+    register_method("stopSound", &GodotFmod::stopSound);
+    register_method("releaseSound", &GodotFmod::releaseSound);
+    register_method("setSoundPaused", &GodotFmod::setSoundPaused);
+    register_method("isSoundPlaying", &GodotFmod::isSoundPlaying);
+    register_method("setSoundVolume", &GodotFmod::setSoundVolume);
+    register_method("getSoundVolume", &GodotFmod::getSoundVolume);
+    register_method("setSoundPitch", &GodotFmod::setSoundPitch);
+    register_method("getSoundPitch", &GodotFmod::getSoundPitch);
 }
 
 void GodotFmod::init(int numOfChannels, String studioFlags, String flags) {
@@ -141,7 +151,8 @@ void GodotFmod::setListenerAttributes() {
         Transform2D t2d = ci->get_transform();
         Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
                 up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
-        FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+        const FMOD_VECTOR &posFmodVector = toFmodVector(pos);
+        auto attr = get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
         checkErrors(system->setListenerAttributes(0, &attr));
 
     } else {
@@ -152,12 +163,12 @@ void GodotFmod::setListenerAttributes() {
         Vector3 up = t.get_basis().elements[1];
         Vector3 forward = t.get_basis().elements[2];
         Vector3 vel(0, 0, 0);
-        FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
+        auto attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
         checkErrors(system->setListenerAttributes(0, &attr));
     }
 }
 
-FMOD_VECTOR GodotFmod::toFmodVector(Vector3 vec) {
+FMOD_VECTOR GodotFmod::toFmodVector(Vector3 &vec) {
     FMOD_VECTOR fv;
     fv.x = vec.x;
     fv.y = vec.y;
@@ -165,7 +176,8 @@ FMOD_VECTOR GodotFmod::toFmodVector(Vector3 vec) {
     return fv;
 }
 
-FMOD_3D_ATTRIBUTES GodotFmod::get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel) {
+FMOD_3D_ATTRIBUTES GodotFmod::get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
+                                              const FMOD_VECTOR &vel) {
     FMOD_3D_ATTRIBUTES f3d;
     f3d.forward = forward;
     f3d.position = pos;
@@ -219,7 +231,7 @@ void GodotFmod::setSoftwareFormat(int sampleRate, String speakerMode, int numRaw
     checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, m, numRawSpeakers));
 }
 
-String GodotFmod::loadbank(const String pathToBank, String flags) {
+String GodotFmod::loadbank(const String &pathToBank, String flags) {
     if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
     auto flagsItr = fmodLoadBankFlags.find(flags.alloc_c_string());
     FMOD::Studio::Bank *bank = nullptr;
@@ -290,18 +302,20 @@ int GodotFmod::getBankVCACount(const String &pathToBank) {
     return -1;
 }
 
-void GodotFmod::createEventInstance(const String &uuid, const String &eventPath) {
-    if (unmanagedEvents.count(uuid)) return; // provided uuid is not valid
+String GodotFmod::createEventInstance(const String &uuid, const String &eventPath) {
+    if (unmanagedEvents.count(uuid)) return uuid; // provided uuid is not valid
     if (!eventDescriptions.count(eventPath)) {
         FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventPath.ascii().get_data(), &desc));
+        checkErrors(system->getEvent(eventPath.alloc_c_string(), &desc));
         eventDescriptions[eventPath] = desc;
     }
     auto descIt = eventDescriptions.find(eventPath);
     FMOD::Studio::EventInstance *instance;
     checkErrors(descIt->second->createInstance(&instance));
-    if (instance)
+    if (instance) {
         unmanagedEvents[uuid] = instance;
+    }
+    return uuid;
 }
 
 float GodotFmod::getEventParameter(const String &uuid, const String &parameterName) {
@@ -331,11 +345,11 @@ void GodotFmod::startEvent(const String &uuid) {
     if (i != unmanagedEvents.end()) checkErrors(i->second->start());
 }
 
-void GodotFmod::stopEvent(const String &uuid, int stopMode) {
+void GodotFmod::stopEvent(const String &uuid, const String stopModeStr) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) {
-        auto m = static_cast<FMOD_STUDIO_STOP_MODE>(stopMode);
+        auto m = static_cast<FMOD_STUDIO_STOP_MODE>(fmodStudioStopModes.find(stopModeStr.alloc_c_string())->second);
         checkErrors(i->second->stop(m));
     }
 }
@@ -530,7 +544,7 @@ void GodotFmod::playOneShot(const String eventName, Object *gameObj) {
     }
 }
 
-void GodotFmod::playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters) {
+void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
@@ -556,7 +570,7 @@ void GodotFmod::playOneShotWithParams(const String &eventName, Object *gameObj, 
     }
 }
 
-void GodotFmod::playOneShotAttached(const String &eventName, Object *gameObj) {
+void GodotFmod::playOneShotAttached(const String eventName, Object *gameObj) {
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
@@ -572,7 +586,7 @@ void GodotFmod::playOneShotAttached(const String &eventName, Object *gameObj) {
     }
 }
 
-void GodotFmod::playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters) {
+void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
@@ -634,6 +648,100 @@ void GodotFmod::setVCAVolume(const String &VCAPath, float volume) {
     checkErrors(vca->second->setVolume(volume));
 }
 
+void GodotFmod::playSound(const String &uuid) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        checkErrors(c->setPaused(false));
+    }
+}
+
+void GodotFmod::setSoundPaused(const String &uuid, bool paused) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        checkErrors(c->setPaused(paused));
+    }
+}
+
+void GodotFmod::stopSound(const String &uuid) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        checkErrors(c->stop());
+    }
+}
+
+bool GodotFmod::isSoundPlaying(const String &uuid) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        bool isPlaying = false;
+        checkErrors(c->isPlaying(&isPlaying));
+        return isPlaying;
+    }
+    return false;
+}
+
+void GodotFmod::setSoundVolume(const String &uuid, float volume) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        checkErrors(c->setVolume(volume));
+    }
+}
+
+float GodotFmod::getSoundVolume(const String &uuid) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        float volume = 0.f;
+        checkErrors(c->getVolume(&volume));
+        return volume;
+    }
+    return 0.f;
+}
+
+float GodotFmod::getSoundPitch(const String &uuid) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        float pitch = 0.f;
+        checkErrors(c->getPitch(&pitch));
+        return pitch;
+    }
+    return 0.f;
+}
+
+void GodotFmod::setSoundPitch(const String &uuid, float pitch) {
+    if (sounds.count(uuid)) {
+        auto s = sounds.find(uuid)->second;
+        auto c = channels.find(s)->second;
+        checkErrors(c->setPitch(pitch));
+    }
+}
+
+String GodotFmod::loadSound(const String &uuid, const String path, const String &modeStr) {
+    if (!sounds.count(path)) {
+        auto mode = fmodSoundConstants.find(modeStr.alloc_c_string())->second;
+        FMOD::Sound *sound = nullptr;
+        checkErrors(lowLevelSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
+        if (sound) {
+            sounds[uuid] = sound;
+            FMOD::Channel *channel = nullptr;
+            checkErrors(lowLevelSystem->playSound(sound, nullptr, true, &channel));
+            if (channel) channels[sound] = channel;
+        }
+    }
+    return uuid;
+}
+
+void GodotFmod::releaseSound(const String &path) {
+    if (!sounds.count(path)) return; // sound is not loaded
+    auto sound = sounds.find(path);
+    if (sound->second) checkErrors(sound->second->release());
+}
+
 void GodotFmod::_init() {
     fmodInitFlags = {
             {"FMOD_INIT_NORMAL", FMOD_INIT_NORMAL},
@@ -654,7 +762,7 @@ void GodotFmod::_init() {
             {"FMOD_STUDIO_INIT_NORMAL", FMOD_STUDIO_INIT_NORMAL},
             {"FMOD_STUDIO_INIT_LIVEUPDATE", FMOD_STUDIO_INIT_LIVEUPDATE},
             {"FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS", FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS},
-            {"FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE", FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE},
+            {"FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS", FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE},
             {"FMOD_STUDIO_INIT_DEFERRED_CALLBACKS", FMOD_STUDIO_INIT_DEFERRED_CALLBACKS},
             {"FMOD_STUDIO_INIT_LOAD_FROM_UPDATE", FMOD_STUDIO_INIT_LOAD_FROM_UPDATE},
     };
@@ -674,6 +782,42 @@ void GodotFmod::_init() {
             {"FMOD_STUDIO_LOAD_BANK_NORMAL", FMOD_STUDIO_LOAD_BANK_NORMAL},
             {"FMOD_STUDIO_LOAD_BANK_NONBLOCKING", FMOD_STUDIO_LOAD_BANK_NONBLOCKING},
             {"FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES", FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES}
+    };
+    fmodSoundConstants = {
+            {"FMOD_DEFAULT", FMOD_DEFAULT},
+            {"FMOD_LOOP_OFF", FMOD_LOOP_OFF},
+            {"FMOD_LOOP_NORMAL", FMOD_LOOP_NORMAL},
+            {"FMOD_LOOP_BIDI", FMOD_LOOP_BIDI},
+            {"FMOD_2D", FMOD_2D},
+            {"FMOD_3D", FMOD_3D},
+            {"FMOD_CREATESTREAM", FMOD_CREATESTREAM},
+            {"FMOD_CREATESAMPLE", FMOD_CREATESAMPLE},
+            {"FMOD_CREATECOMPRESSEDSAMPLE", FMOD_CREATECOMPRESSEDSAMPLE},
+            {"FMOD_OPENUSER", FMOD_OPENUSER},
+            {"FMOD_OPENMEMORY", FMOD_OPENMEMORY},
+            {"FMOD_OPENMEMORY_POINT", FMOD_OPENMEMORY_POINT},
+            {"FMOD_OPENRAW", FMOD_OPENRAW},
+            {"FMOD_OPENONLY", FMOD_OPENONLY},
+            {"FMOD_ACCURATETIME", FMOD_ACCURATETIME},
+            {"FMOD_MPEGSEARCH", FMOD_MPEGSEARCH},
+            {"FMOD_NONBLOCKING", FMOD_NONBLOCKING},
+            {"FMOD_UNIQUE", FMOD_UNIQUE},
+            {"FMOD_3D_HEADRELATIVE", FMOD_3D_HEADRELATIVE},
+            {"FMOD_3D_WORLDRELATIVE", FMOD_3D_WORLDRELATIVE},
+            {"FMOD_3D_INVERSEROLLOFF", FMOD_3D_INVERSEROLLOFF},
+            {"FMOD_3D_LINEARROLLOFF", FMOD_3D_LINEARROLLOFF},
+            {"FMOD_3D_LINEARSQUAREROLLOFF", FMOD_3D_LINEARSQUAREROLLOFF},
+            {"FMOD_3D_INVERSETAPEREDROLLOFF", FMOD_3D_INVERSETAPEREDROLLOFF},
+            {"FMOD_3D_CUSTOMROLLOFF", FMOD_3D_CUSTOMROLLOFF},
+            {"FMOD_3D_IGNOREGEOMETRY", FMOD_3D_IGNOREGEOMETRY},
+            {"FMOD_IGNORETAGS", FMOD_IGNORETAGS},
+            {"FMOD_LOWMEM", FMOD_LOWMEM},
+            {"FMOD_VIRTUAL_PLAYFROMSTART", FMOD_VIRTUAL_PLAYFROMSTART}
+    };
+    fmodStudioStopModes = {
+            {"FMOD_STUDIO_STOP_ALLOWFADEOUT", FMOD_STUDIO_STOP_ALLOWFADEOUT},
+            {"FMOD_STUDIO_STOP_IMMEDIATE", FMOD_STUDIO_STOP_IMMEDIATE},
+            {"FMOD_STUDIO_STOP_FORCEINT", FMOD_STUDIO_STOP_FORCEINT}
     };
     system, lowLevelSystem, listener = nullptr;
     checkErrors(FMOD::Studio::System::create(&system));

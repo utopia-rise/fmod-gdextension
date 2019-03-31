@@ -29,11 +29,15 @@ namespace godot {
         std::map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         std::map<String, FMOD::Studio::Bus *> buses;
         std::map<String, FMOD::Studio::VCA *> VCAs;
+        std::map<String, FMOD::Sound *> sounds;
+        std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
         std::map<std::string, FMOD_INITFLAGS> fmodInitFlags;
         std::map<std::string, FMOD_STUDIO_INITFLAGS > fmodStudioInitFlags;
         std::map<std::string, FMOD_SPEAKERMODE> fmodSpeakerModeFlags;
         std::map<std::string, FMOD_STUDIO_LOAD_BANK_FLAGS> fmodLoadBankFlags;
+        std::map<std::string, int > fmodSoundConstants;
+        std::map<std::string, FMOD_STUDIO_STOP_MODE> fmodStudioStopModes;
 
         // keep track of one shot instances internally
         std::vector<FMOD::Studio::EventInstance *> oneShotInstances;
@@ -52,8 +56,9 @@ namespace godot {
     private:
         int checkErrors(FMOD_RESULT result);
         void setListenerAttributes();
-        FMOD_VECTOR toFmodVector(Vector3 vec);
-        FMOD_3D_ATTRIBUTES get3DAttributes(FMOD_VECTOR pos, FMOD_VECTOR up, FMOD_VECTOR forward, FMOD_VECTOR vel);
+        FMOD_VECTOR toFmodVector(Vector3 &vec);
+        FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
+                                           const FMOD_VECTOR &vel);
         bool isNull(Object *o);
         void loadBus(const String &busPath);
         void loadVCA(const String &VCAPath);
@@ -71,19 +76,19 @@ namespace godot {
         void shutdown();
         void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, String speakerMode, int numRawSpeakers);
-        String loadbank(const String pathToBank, String flags);
+        String loadbank(const String &pathToBank, String flags);
         void unloadBank(const String &pathToBank);
         int getBankLoadingState(const String &pathToBank);
         int getBankBusCount(const String &pathToBank);
         int getBankEventCount(const String &pathToBank);
         int getBankStringCount(const String &pathToBank);
         int getBankVCACount(const String &pathToBank);
-        void createEventInstance(const String &uuid, const String &eventPath);
+        String createEventInstance(const String &uuid, const String &eventPath);
         float getEventParameter(const String &uuid, const String &parameterName);
         void setEventParameter(const String &uuid, const String &parameterName, float value);
         void releaseEvent(const String &uuid);
         void startEvent(const String &uuid);
-        void stopEvent(const String &uuid, int stopMode);
+        void stopEvent(const String &uuid, const String stopModeStr);
         void triggerEventCue(const String &uuid);
         int getEventPlaybackState(const String &uuid);
         bool getEventPaused(const String &uuid);
@@ -111,11 +116,22 @@ namespace godot {
         float getVCAVolume(const String &VCAPath);
         void setVCAVolume(const String &VCAPath, float volume);
         void playOneShot(const String eventName, Object *gameObj);
-        void playOneShotWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
-        void playOneShotAttached(const String &eventName, Object *gameObj);
-        void playOneShotAttachedWithParams(const String &eventName, Object *gameObj, const Dictionary &parameters);
+        void playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters);
+        void playOneShotAttached(const String eventName, Object *gameObj);
+        void playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters);
         void attachInstanceToNode(const String &uuid, Object *gameObj);
         void detachInstanceFromNode(const String &uuid);
+
+        void playSound(const String &uuid);
+        String loadSound(const String &uuid, const String path, const String &modeStr);
+        void releaseSound(const String &path);
+        void setSoundPaused(const String &uuid, bool paused);
+        void stopSound(const String &uuid);
+        bool isSoundPlaying(const String &uuid);
+        void setSoundVolume(const String &uuid, float volume);
+        float getSoundVolume(const String &uuid);
+        float getSoundPitch(const String &uuid);
+        void setSoundPitch(const String &uuid, float pitch);
 
     };
 }
