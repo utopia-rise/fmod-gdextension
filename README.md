@@ -44,6 +44,8 @@ the GDNative for our project.
 
 So, you are supposed to put fmod libraries under `libs/fmod/{platform}`, according to the platforms you want to support.
 
+Otherwise, you can use [our example project](https://github.com/utopia-rise/GDNative-example-repo), which already contains the appropriate structure.
+
 Feel free to modify SConstruct according to your project structure.
 
 `CMakeLists` is here for CLion ide, as we are used to JetBrains tools. Unfortunately, CLion does not currently support
