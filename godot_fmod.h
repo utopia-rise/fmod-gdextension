@@ -88,7 +88,7 @@ namespace godot {
         void setEventParameter(const String &uuid, const String &parameterName, float value);
         void releaseEvent(const String &uuid);
         void startEvent(const String &uuid);
-        void stopEvent(const String &uuid, const String stopModeStr);
+        void stopEvent(const String &uuid, String stopModeStr);
         void triggerEventCue(const String &uuid);
         int getEventPlaybackState(const String &uuid);
         bool getEventPaused(const String &uuid);
@@ -115,15 +115,15 @@ namespace godot {
         /* VCA functions */
         float getVCAVolume(const String &VCAPath);
         void setVCAVolume(const String &VCAPath, float volume);
-        void playOneShot(const String eventName, Object *gameObj);
-        void playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters);
-        void playOneShotAttached(const String eventName, Object *gameObj);
-        void playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters);
+        void playOneShot(String eventName, Object *gameObj);
+        void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
+        void playOneShotAttached(String eventName, Object *gameObj);
+        void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void attachInstanceToNode(const String &uuid, Object *gameObj);
         void detachInstanceFromNode(const String &uuid);
 
         void playSound(const String &uuid);
-        String loadSound(const String &uuid, const String path, const String &modeStr);
+        String loadSound(const String &uuid, String path, const String &modeStr);
         void releaseSound(const String &path);
         void setSoundPaused(const String &uuid, bool paused);
         void stopSound(const String &uuid);
