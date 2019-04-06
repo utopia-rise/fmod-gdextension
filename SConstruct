@@ -59,7 +59,7 @@ elif platform == "windows":
     else:
         env.Append(CCFLAGS = ['-O2', '-EHsc', '-DNDEBUG', '/MD'])
     env.Append(LINKFLAGS = ['/WX'])
-    cpp_bindings_libname = 'godot_cpp_bindings'
+    cpp_bindings_libname = 'libgodot-cpp.windows.64.lib'
 
 def add_sources(sources, directory):
     if os.path.isdir(directory):
@@ -74,11 +74,16 @@ if platform == "osx":
                godot_bindings_path + 'include/gen/', '../libs/fmod/osx/lowlevel/inc/', '../libs/fmod/osx/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, 'libfmod.dylib', 'libfmodstudio.dylib'])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/osx/lowlevel/lib/', '../libs/fmod/osx/studio/lib/' ])
-else:
+elif platform == "linux":
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
                godot_bindings_path + 'include/gen/', '../libs/fmod/linux/lowlevel/inc/', '../libs/fmod/linux/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, 'libfmod.so', 'libfmodstudio.so'])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/linux/lowlevel/lib/x86_64', '../libs/fmod/linux/studio/lib/x86_64' ])
+elif platform == "windows":
+    env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
+                        godot_bindings_path + 'include/gen/', '../libs/fmod/windows/lowlevel/inc/', '../libs/fmod/windows/studio/inc/'])
+    env.Append(LIBS=[cpp_bindings_libname, 'fmod64', 'fmodstudio64'])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/windows/lowlevel/lib/', '../libs/fmod/windows/studio/lib/' ])
 
 sources = []
 add_sources(sources, "./")
@@ -92,6 +97,8 @@ if dynamic == "yes":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.dylib' % platform, source=sources)
     elif platform == "android" or platform == "linux":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.so' % platform, source=sources)
+    elif platform == "windows":
+        library = env.SharedLibrary(target='bin/libGodotFmod.windows.dll', source=sources)
 else:
     library = env.StaticLibrary(target="bin/libGodotFmod.%s.a" % platform, source=sources)
 

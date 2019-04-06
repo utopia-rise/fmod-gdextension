@@ -123,7 +123,7 @@ namespace godot {
         void detachInstanceFromNode(const String &uuid);
 
         void playSound(const String &uuid);
-        String loadSound(const String &uuid, String path, const String &modeStr);
+        String loadSound(const String &uuid, const String path, const String modeStr);
         void releaseSound(const String &path);
         void setSoundPaused(const String &uuid, bool paused);
         void stopSound(const String &uuid);

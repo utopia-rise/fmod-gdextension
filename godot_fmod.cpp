@@ -721,7 +721,7 @@ void GodotFmod::setSoundPitch(const String &uuid, float pitch) {
     }
 }
 
-String GodotFmod::loadSound(const String &uuid, const String path, const String &modeStr) {
+String GodotFmod::loadSound(const String &uuid, const String path, const String modeStr) {
     if (!sounds.count(path)) {
         auto mode = fmodSoundConstants.find(modeStr.alloc_c_string())->second;
         FMOD::Sound *sound = nullptr;
