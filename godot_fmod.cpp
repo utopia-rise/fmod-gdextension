@@ -225,19 +225,19 @@ void GodotFmod::addListener(Object *gameObj) {
     listener = gameObj;
 }
 
-void GodotFmod::setSoftwareFormat(int sampleRate, String speakerMode, int numRawSpeakers) {
+void GodotFmod::setSoftwareFormat(int sampleRate, const String& speakerMode, int numRawSpeakers) {
     auto speakerModeItr = fmodSpeakerModeFlags.find(speakerMode.alloc_c_string());
     auto m = speakerModeItr != fmodSpeakerModeFlags.end() ? speakerModeItr->second : FMOD_SPEAKERMODE_DEFAULT;
     checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, m, numRawSpeakers));
 }
 
-String GodotFmod::loadbank(const String &pathToBank, String flags) {
+String GodotFmod::loadbank(const String &pathToBank, const String& flags) {
     if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
     auto flagsItr = fmodLoadBankFlags.find(flags.alloc_c_string());
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(),
-            flagsItr != fmodLoadBankFlags.end() ? flagsItr->second : FMOD_STUDIO_LOAD_BANK_NORMAL,
-            &bank));
+                                     flagsItr != fmodLoadBankFlags.end() ? flagsItr->second : FMOD_STUDIO_LOAD_BANK_NORMAL,
+                                     &bank));
     if (bank) {
         banks[pathToBank] = bank;
         return pathToBank;
@@ -525,7 +525,6 @@ void GodotFmod::loadVCA(const String &VCAPath) {
 }
 
 void GodotFmod::playOneShot(const String eventName, Object *gameObj) {
-    Godot::print(eventName);
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));

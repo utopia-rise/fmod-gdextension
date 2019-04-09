@@ -75,8 +75,8 @@ namespace godot {
         void update();
         void shutdown();
         void addListener(Object *gameObj);
-        void setSoftwareFormat(int sampleRate, String speakerMode, int numRawSpeakers);
-        String loadbank(const String &pathToBank, String flags);
+        void setSoftwareFormat(int sampleRate, const String& speakerMode, int numRawSpeakers);
+        String loadbank(const String &pathToBank, const String& flags);
         void unloadBank(const String &pathToBank);
         int getBankLoadingState(const String &pathToBank);
         int getBankBusCount(const String &pathToBank);
