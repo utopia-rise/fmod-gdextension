@@ -14,6 +14,8 @@ dynamic = ARGUMENTS.get("dynamic", "yes")
 ndk_path = ARGUMENTS.get("ndk-path", "/Users/piertho/Library/android-sdks/ndk-bundle/")
 ndk_toolchain = ARGUMENTS.get("ndk-toolchain", "/tmp/android-21-toolchain/")
 
+if target != "debug":
+    target = "release"
 # This makes sure to keep the session environment variables on windows, 
 # that way you can run scons in a vs 2017 prompt and it will find all the required tools
 env = Environment()
@@ -37,15 +39,18 @@ if ARGUMENTS.get("use_llvm", "no") == "yes" and platform != "ios" and platform !
     env["CXX"] = "clang++"
 
 # put stuff that is the same for all first, saves duplication
-cpp_bindings_libname = 'libgodot-cpp.%s.64.a' % platform
+cpp_bindings_libname = 'libgodot-cpp.%s' % platform
+cpp_bindings_libname += '.%s.64' % target
 if platform == "osx":
-    cpp_bindings_libname = 'libgodot-cpp.osx.64.a'
+    cpp_bindings_libname += '.a'
     env.Append(CCFLAGS = ['-g','-O3', '-std=c++14', '-arch', 'x86_64'])
     env.Append(LINKFLAGS = ['-arch', 'x86_64', '-framework', 'Cocoa', '-Wl,-undefined,dynamic_lookup'])
 elif platform == "ios":
+    cpp_bindings_libname += '.a'
     env.Append(CCFLAGS = ['-g','-O3', '-std=c++11', '-arch', 'arm64', '-arch', 'armv7', '-arch', 'armv7s', '-isysroot', '%s/iPhoneOS.platform/Developer/SDKs/iPhoneOS%s.sdk' % (IOS_PLATFORM_SDK, SDK_VERSION) , '-miphoneos-version-min=%s' % SDK_MIN_VERSION])
     env.Append(LINKFLAGS = ['-arch', 'arm64', '-arch', 'armv7', '-arch', 'armv7s', '-isysroot', '%s/iPhoneOS.platform/Developer/SDKs/iPhoneOS%s.sdk' % (IOS_PLATFORM_SDK, SDK_VERSION) , '-miphoneos-version-min=%s' % SDK_MIN_VERSION])
 elif platform == "android":
+    cpp_bindings_libname += '.a'
     env.Append(CCFLAGS = ['-fPIE', '-fPIC', '-mfpu=neon', '-march=armv7-a'])
     env.Append(LDFLAGS = ['-pie', '-Wl'])
 elif platform == "linux":
@@ -59,7 +64,7 @@ elif platform == "windows":
     else:
         env.Append(CCFLAGS = ['-O2', '-EHsc', '-DNDEBUG', '/MD'])
     env.Append(LINKFLAGS = ['/WX'])
-    cpp_bindings_libname = 'libgodot-cpp.windows.64.lib'
+    cpp_bindings_libname += '.lib'
 
 def add_sources(sources, directory):
     if os.path.isdir(directory):
@@ -69,20 +74,29 @@ def add_sources(sources, directory):
     else:
         sources.append(directory)
 
+lfix = ""
+if target == "debug":
+    lfix = "L"
 if platform == "osx":
+    libfmod = 'libfmod%s.dylib' % lfix
+    libfmodstudio = 'libfmodstudio%s.dylib' % lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
                godot_bindings_path + 'include/gen/', '../libs/fmod/osx/lowlevel/inc/', '../libs/fmod/osx/studio/inc/'])
-    env.Append(LIBS=[cpp_bindings_libname, 'libfmod.dylib', 'libfmodstudio.dylib'])
+    env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/osx/lowlevel/lib/', '../libs/fmod/osx/studio/lib/' ])
 elif platform == "linux":
+    libfmod = 'libfmod%s.so'% lfix
+    libfmodstudio = 'libfmodstudio%s.so'% lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
                godot_bindings_path + 'include/gen/', '../libs/fmod/linux/lowlevel/inc/', '../libs/fmod/linux/studio/inc/'])
-    env.Append(LIBS=[cpp_bindings_libname, 'libfmod.so', 'libfmodstudio.so'])
+    env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/linux/lowlevel/lib/x86_64', '../libs/fmod/linux/studio/lib/x86_64' ])
 elif platform == "windows":
+    libfmod = 'fmod%s64'% lfix
+    libfmodstudio = 'fmodstudio%s64'% lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
                         godot_bindings_path + 'include/gen/', '../libs/fmod/windows/lowlevel/inc/', '../libs/fmod/windows/studio/inc/'])
-    env.Append(LIBS=[cpp_bindings_libname, 'fmod64', 'fmodstudio64'])
+    env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/windows/lowlevel/lib/', '../libs/fmod/windows/studio/lib/' ])
 
 sources = []
@@ -95,16 +109,15 @@ def change_id(self, arg, env):
 if dynamic == "yes":
     if platform == "osx":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.dylib' % platform, source=sources)
+        change_id_action = Action('', change_id)
+        AddPostAction(library, change_id_action)
     elif platform == "android" or platform == "linux":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.so' % platform, source=sources)
     elif platform == "windows":
-        library = env.SharedLibrary(target='bin/libGodotFmod.windows.dll', source=sources)
+        library = env.SharedLibrary(target='bin/libGodotFmod.%s.dll' % platform, source=sources)
 else:
     library = env.StaticLibrary(target="bin/libGodotFmod.%s.a" % platform, source=sources)
-
 # can't figure it out what type of parameter should be at 1st one
 # send in '' and it works
 if dynamic == "yes":
-    change_id_action = Action('', change_id)
-    AddPostAction(library, change_id_action)
     Default(library)
