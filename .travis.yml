@@ -13,5 +13,5 @@ before_install:
   - git clone --recursive  https://github.com/utopia-rise/godot-cpp godot-cpp
   - cd godot-cpp
   - git checkout 3.1-utopia
-install: scons godotbinpath="~/Documents/Godot_v3.1-stable_x11.64" use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/ && mv bin/libgodot-cpp.linux.release.64.a bin/libgodot-cpp.linux.64.a && cd ../fmod-gdnative
-script: scons p=linux use_llvm=yes clang-path=/usr/local/clang-5.0.0/bin/
+install: scons godotbinpath="~/Documents/Godot_v3.1-stable_x11.64" use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/ && cd ../fmod-gdnative
+script: scons p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/
