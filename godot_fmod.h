@@ -76,7 +76,7 @@ namespace godot {
         void shutdown();
         void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, const String& speakerMode, int numRawSpeakers);
-        String loadbank(const String &pathToBank, const String& flags);
+        String loadbank(const String pathToBank, const String flags);
         void unloadBank(const String &pathToBank);
         int getBankLoadingState(const String &pathToBank);
         int getBankBusCount(const String &pathToBank);
@@ -115,7 +115,7 @@ namespace godot {
         /* VCA functions */
         float getVCAVolume(const String &VCAPath);
         void setVCAVolume(const String &VCAPath, float volume);
-        void playOneShot(String eventName, Object *gameObj);
+        void playOneShot(const String eventName, Object *gameObj);
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);

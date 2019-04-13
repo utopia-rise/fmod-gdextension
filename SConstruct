@@ -13,6 +13,7 @@ godot_bindings_path = ARGUMENTS.get("cpp_bindings", "../godot-cpp/")
 dynamic = ARGUMENTS.get("dynamic", "yes")
 ndk_path = ARGUMENTS.get("ndk-path", "/Users/piertho/Library/android-sdks/ndk-bundle/")
 ndk_toolchain = ARGUMENTS.get("ndk-toolchain", "/tmp/android-21-toolchain/")
+fmodLibInstallPath = ARGUMENTS.get("fmod-lib-install-path", "libs")
 
 if target != "debug":
     target = "release"
@@ -104,6 +105,8 @@ add_sources(sources, "./")
 
 def change_id(self, arg, env):
     sys_exec(["install_name_tool", "-id", "@rpath/libGodotFmod.%s.dylib" % platform, "bin/libGodotFmod.%s.dylib" % platform])
+    sys_exec(["install_name_tool", "-change", "@rpath/libfmodstudio.dylib", "@loader_path/%s/libfmodstudio.dylib" % fmodLibInstallPath, "bin/libGodotFmod.%s.dylib" % platform])
+    sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/%s/libfmod.dylib" % fmodLibInstallPath, "bin/libGodotFmod.%s.dylib" % platform])
 
 # determine to link as shared or static library
 if dynamic == "yes":

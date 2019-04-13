@@ -231,7 +231,8 @@ void GodotFmod::setSoftwareFormat(int sampleRate, const String& speakerMode, int
     checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, m, numRawSpeakers));
 }
 
-String GodotFmod::loadbank(const String &pathToBank, const String& flags) {
+String GodotFmod::loadbank(const String pathToBank, const String flags) {
+    Godot::print(flags.alloc_c_string());
     if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
     auto flagsItr = fmodLoadBankFlags.find(flags.alloc_c_string());
     FMOD::Studio::Bank *bank = nullptr;
