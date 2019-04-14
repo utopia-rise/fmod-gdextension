@@ -57,7 +57,7 @@ elif platform == "android":
 elif platform == "linux":
     env.Append(CCFLAGS = ['-fPIC', '-g','-O3', '-std=c++14'])
     env.Append(LINKFLAGS=[
-        '-Wl,-rpath,\'$$ORIGIN\'/libs'
+        '-Wl,-rpath,\'$$ORIGIN\'/%s' % fmodLibInstallPath
     ])
 elif platform == "windows":
     if target == "debug":
