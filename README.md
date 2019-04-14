@@ -85,7 +85,7 @@ scons p=osx target=release
 This will generate `libGodotFmod.osx.dylib` in `fmod-gdnative/bin` folder. 
 
 Be aware that osx is a bit tricky with dynamic library loading. [This link](https://blogs.oracle.com/dipol/dynamic-libraries,-rpath,-and-mac-os) 
-explains how to load dynamic dependencies on OSX. By default the GDNative will look for fmod libraries in a `lib` folder
+explains how to load dynamic dependencies on OSX. By default the GDNative will look for fmod libraries in a `libs` folder
 relative to its path when loading the game or the engine. We will describe it in the installing module section. Otherwise,
 if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
 
@@ -97,7 +97,7 @@ scons p=linux use_llvm=yes target=release bits=64
 ```
 This will generate a `libGodotFmod.linux.so` in `fmod-gdnative/bin` folder.
 
-To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder libs by default, as in OSX
+To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder `libs` by default, as in OSX
 part. you can overload this relative path adding this parameter to the command `fmod-lib-install-path="path to fmod dll"`. 
 
 #### Windows
