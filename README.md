@@ -14,8 +14,8 @@ same wrapper to build an integration for Godot in C#. However do note that this 
 as C# support is required and performance might not be on the same level as a C++ integration. 
 
 **Note:** This project is a fork of [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
-which uses godot module to integrate fmod in the engine. This fork was designed to be able to use Fmod without building
-Godot Engine !
+which uses godot module to integrate fmod in the engine. We thank [alexfonseka](https://github.com/alexfonseka) for the work he did.
+This fork was designed to be able to use Fmod without building Godot Engine !
 
 ![wowmeme]
 
@@ -50,6 +50,46 @@ Feel free to modify SConstruct according to your project structure.
 
 `CMakeLists` is here for CLion ide, as we are used to JetBrains tools. Unfortunately, CLion does not currently support
 Sconstruct.
+
+## Building the GDNative
+
+### Building GDNative API bindings
+
+To Build GDNative bindings you can follow [this tutorial from godot official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#building-the-c-bindings).
+If you want to regenerate bindings you can add the following argument to your building command :
+```
+godotbinpath="path to your godot binary"
+```
+For the moment we are focusing on release target. So you may need to add :
+```
+target=release
+```
+When you're done with that part you should have `libgodot-cpp.<platform>.<target>.<bits>.<a|lib>` in godot-cpp/bin` folder.
+
+### Building the GDNative
+
+#### OSX
+
+To build the GDNative for OSX, you should use this command in `fmod-gdnative` folder :
+
+```
+scons p=osx target=release
+```
+
+This will generate `libGodotFmod.osx.dylib` in `fmod-gdnative/bin` folder. 
+
+Be aware that osx is a bit tricky with dynamic library loading. [This link](https://blogs.oracle.com/dipol/dynamic-libraries,-rpath,-and-mac-os) 
+explains how to load dynamic dependencies on OSX. By default the GDNative will look for fmod libraries in a `lib` folder
+relative to its path when loading the game or the engine. We will describe it in the installing module section. Otherwise,
+if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
+
+#### Linux
+
+#### Windows
+
+#### Android
+
+#### iOS
 
 ## Installing the module
 
