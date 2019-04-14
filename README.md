@@ -68,6 +68,9 @@ When you're done with that part you should have `libgodot-cpp.<platform>.<target
 
 ### Building the GDNative
 
+For each platforms, if your project structure is different from the one proposed here, you can overload `cpp_bindings` 
+and `headers` parameters.
+
 #### OSX
 
 To build the GDNative for OSX, you should use this command in `fmod-gdnative` folder :
@@ -84,6 +87,15 @@ relative to its path when loading the game or the engine. We will describe it in
 if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
 
 #### Linux
+
+To build the GDNative for Linux, you should use this command in `fmod-gdnative` folder :
+```
+scons p=linux target=release bits=64
+```
+This will generate a `libGodotFmod.linux.so` in `fmod-gdnative/bin folder`.
+
+To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder libs by default, as in OSX
+part. you can overload this relative path adding this parameter to the command `fmod-lib-install-path="path to fmod dll"`. 
 
 #### Windows
 
