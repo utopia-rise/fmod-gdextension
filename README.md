@@ -68,6 +68,9 @@ When you're done with that part you should have `libgodot-cpp.<platform>.<target
 
 ### Building the GDNative
 
+[Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and place it in the
+appropriate platform folder into lib folder (see project structure).
+
 For each platforms, if your project structure is different from the one proposed here, you can overload `cpp_bindings` 
 and `headers` parameters.
 
@@ -90,29 +93,35 @@ if you want to change that loading path, you can add this parameter `fmod-lib-in
 
 To build the GDNative for Linux, you should use this command in `fmod-gdnative` folder :
 ```
-scons p=linux target=release bits=64
+scons p=linux use_llvm=yes target=release bits=64
 ```
-This will generate a `libGodotFmod.linux.so` in `fmod-gdnative/bin folder`.
+This will generate a `libGodotFmod.linux.so` in `fmod-gdnative/bin` folder.
 
 To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder libs by default, as in OSX
 part. you can overload this relative path adding this parameter to the command `fmod-lib-install-path="path to fmod dll"`. 
 
 #### Windows
 
+To build the GDNative for Windows, you should use this command in `fmod-gdnative` folder :
+```
+scons p=windows target=release bits=64
+```
+This will generate `libGodotFmod.windows.dll` in `fmod-gdnative/bin` folder.
+
+To load fmod dynamic libraries on app or engine loading, the simplest way is to put fmod dynamic dependencies in the 
+same folder as GDNative dll. 
+
 #### Android
+
+Not yet done.
 
 #### iOS
 
+Not yet tested in game.
+
+## Installing the GDNative in your project
+
 ## Installing the module
-
-1. [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and install it on your system.
-2. Clone the latest version of Godot from the [master branch](https://github.com/godotengine/godot). At the time of writing this is Godot 3.1 beta.
-3. `cd` into the source directory and add the FMOD integration as a submodule into the `modules` directory `git submodule add https://github.com/alexfonseka/godot-fmod-integration modules/fmod`.
-4. Copy the contents of the `api` directory of the FMOD API into the module's `api` directory `modules/fmod/api`. On Windows this is (usually) found at `C:/Program Files (x86)/FMOD SoundSystem/FMOD Studio API Windows/api`.
-5. Recompile the engine. For more information on compiling the engine, refer to the [Godot documentation](https://docs.godotengine.org/en/latest/development/compiling/index.html).
-6. Place the FMOD library files within the `bin` directory for Godot to start. Eg. on Windows these would be `fmod64.dll` and `fmodstudio64.dll` for a 64-bit build of Godot.
-
-FMOD should now be integrated. If you are tweaking/extending the module it is faster to compile it as a dynamic library instead of a static library. Refer to the Godot documentation for more details on this.
 
 ## Using the module
 
