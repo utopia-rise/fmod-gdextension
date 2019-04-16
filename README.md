@@ -121,6 +121,19 @@ Not yet tested in game.
 
 ## Installing the GDNative in your project
 
+In order to understand how to link thé driver you built to your game, you can read the [official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
+
+### Example project
+
+We provide an [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to help you to understand how to link the driver to your game project, and how to use it. 
+
+- It does not contains built driver.
+- It contains gdnlib and gdns.
+- It contains Fmod gdscript singleton.
+- It contains test scripts.
+
+### Create the gdnlib
+
 ## Installing the module
 
 ## Using the module
