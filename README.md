@@ -86,8 +86,7 @@ This will generate `libGodotFmod.osx.dylib` in `fmod-gdnative/bin` folder.
 
 Be aware that osx is a bit tricky with dynamic library loading. [This link](https://blogs.oracle.com/dipol/dynamic-libraries,-rpath,-and-mac-os) 
 explains how to load dynamic dependencies on OSX. By default the GDNative will look for fmod libraries in a `libs` folder
-relative to its path when loading the game or the engine. We will describe it in the installing module section. Otherwise,
-if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
+relative to its path when loading the game or the engine. Otherwise, if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
 
 #### Linux
 
@@ -166,63 +165,51 @@ You should set this script as auto-loaded in editor.
 
 If you choose the GDNative as singleton method, you also should provide yourself the process loop method implementation.
 
-### Dynamic dependencies loading subtilities.
-
-#### OSX
-
-#### Linux
-
-#### Windows
-
-#### Android
-
-Not yet supported.
-
-#### IOS
-
-No dynamic dependencies for iOS. Those are statics ans should be specified in gdnlib.
-
 ## Using the GDNative
 
 ### Basic usage
 
-```gdscript
+```
 extends Node
 
-# create an instance of the module
-# ideally this has to be done in an AutoLoad script
-# as that way you'll be able to call FMOD functions from any script
-# refer to the demo project provided
-var FMOD = Fmod.new()
-
 func _ready():
+
 	# set up FMOD
-	FMOD.system_set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	# initializing with the LIVE_UPDATE flag lets you
-	# connect to Godot from the FMOD Studio editor
-	# and author events in realtime
-	FMOD.system_init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
+
+	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
+
+	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+
+	
 
 	# load banks
-	# place your banks inside the project directory
-	FMOD.bank_load("./Banks/Desktop/Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	FMOD.bank_load("./Banks/Desktop/Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+
+	
 
 	# register listener
-	FMOD.system_add_listener($Listener)
+
+	Fmod.addListener(self)
+
+	
 
 	# play some events
-	FMOD.play_one_shot("event:/Car engine", $SoundSource1)
-	FMOD.play_one_shot("event:/Waterfall", $SoundSource2)
 
-func _process(delta):
-	# update FMOD every tick
-	# calling system_update also updates the listener 3D position
-	# and 3D positions of any attached event instances
-	FMOD.system_update()
+	Fmod.playOneShot("event:/Music/Level 02", self)
+
+
 ```
 
+You can look at test scenes in POC folder of [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to find how to use the provided methods.
+
 ### Calling Studio events
+
+//TODO 
 
 Following is an example of an event instance called manually (ie. not directly managed by the integration). These instances are identified by a unique ID in the form of a string that you must generate in script ideally through a UUID generator. You could write one yourself or use something like [UUID for Godot](https://github.com/binogure-studio/godot-uuid). Note that the string could be anything as long as it is unique within the current instance pool. Remember to release the instance once you're done with it.
 
@@ -256,6 +243,8 @@ FMOD.event_release(my_music_event)
 ```
 
 ### Using the integration helpers
+
+//TODO
 
 These are helper functions provided by the integration for attaching event instances to Godot Nodes for 3D/positional audio. The listener position and 3D attributes of any attached instances are automatically updated every time you call `system_update()`. Instances are also automatically cleaned up once finished so you don't have to manually call `event_release()`.
 
