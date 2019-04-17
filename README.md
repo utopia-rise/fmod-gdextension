@@ -127,16 +127,62 @@ In order to understand how to link thé driver you built to your game, you can r
 
 We provide an [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to help you to understand how to link the driver to your game project, and how to use it. 
 
-- It does not contains built driver.
-- It contains gdnlib and gdns.
-- It contains Fmod gdscript singleton.
-- It contains test scripts.
+It does not contains :
+- built driver.
+
+It contains : 
+- gdnlib and gdns
+- Fmod gdscript singleton
+- test scripts.
+
+### Copy built GDNative
+
+You first should copy the built GDNative into your project, for each supported platform.
+You can look at [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to get inspired of you don't know how to process.
 
 ### Create the gdnlib
 
-## Installing the module
+In order to create the gdnlib you should go on [the following part of Godot engine documentation](
+https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).  
+You can look at the [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) gdnlib in lib folder.  
+It tells to godot where to look for dependencies of each platform.
 
-## Using the module
+### Create the gdns
+
+To create the gdns, you still should go on [the same part of documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
+You still can look at the [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project), the gdns is located in main/backend/sound/  
+It is used by the scripts as entry point to get gdnlib.
+
+### Create the Fmod singleton
+
+We recommand to wrap an instance of the GDNative into a singleton script. You also can set the GDNative directly as a singleton, but you won't be able to know what methods you can access.  
+You can copy the [Fmod singleton script](https://github.com/utopia-rise/fmod-gndative-godot-example-project/blob/master/main/backend/sound/Fmod.gd) and modify gdns loading according to your project structure.
+
+This script contains :
+- fmod binding methods.
+- process loop implementation to call Fmod update.
+
+You should set this script as auto-loaded in editor.
+
+If you choose the GDNative as singleton method, you also should provide yourself the process loop method implementation.
+
+### Dynamic dependencies loading subtilities.
+
+#### OSX
+
+#### Linux
+
+#### Windows
+
+#### Android
+
+Not yet supported.
+
+#### IOS
+
+No dynamic dependencies for iOS. Those are statics ans should be specified in gdnlib.
+
+## Using the GDNative
 
 ### Basic usage
 
