@@ -119,7 +119,7 @@ namespace godot {
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
-        void attachInstanceToNode(const String &uuid, Object *gameObj);
+        void attachInstanceToNode(const String uuid, Object *gameObj);
         void detachInstanceFromNode(const String &uuid);
 
         void playSound(const String &uuid);
