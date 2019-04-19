@@ -339,13 +339,13 @@ void GodotFmod::releaseEvent(const String &uuid) {
     if (i != unmanagedEvents.end()) checkErrors(i->second->release());
 }
 
-void GodotFmod::startEvent(const String &uuid) {
+void GodotFmod::startEvent(const String uuid) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) checkErrors(i->second->start());
 }
 
-void GodotFmod::stopEvent(const String &uuid, const String stopModeStr) {
+void GodotFmod::stopEvent(const String uuid, const String stopModeStr) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) {
@@ -617,7 +617,7 @@ void GodotFmod::attachInstanceToNode(const String uuid, Object *gameObj) {
     }
 }
 
-void GodotFmod::detachInstanceFromNode(const String &uuid) {
+void GodotFmod::detachInstanceFromNode(const String uuid) {
     if (!unmanagedEvents.count(uuid)) return;
     auto instance = unmanagedEvents.find(uuid);
     if (instance != unmanagedEvents.end()) {
