@@ -1,1 +1,2 @@
+language: cpp
 install: ./getFmodAPIScript.sh $FMODUSER $FMODPASS
