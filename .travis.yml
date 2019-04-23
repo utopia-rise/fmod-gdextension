@@ -21,4 +21,4 @@ jobs:
         - scons godotbinpath="~/Documents/Godot_v3.1-stable_x11.64" use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/ && cd ../fmod-gdnative
     - stage: "fmod-gdnative"
       name: "Buile fmod-gdnative"
-      script: scons p=linux use_llvm=yes
+      script: scons p=linux use_llvm=yes clang-path=/usr/local/clang-5.0.0/bin/

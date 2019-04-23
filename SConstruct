@@ -14,6 +14,8 @@ dynamic = ARGUMENTS.get("dynamic", "yes")
 ndk_path = ARGUMENTS.get("ndk-path", "/Users/piertho/Library/android-sdks/ndk-bundle/")
 ndk_toolchain = ARGUMENTS.get("ndk-toolchain", "/tmp/android-21-toolchain/")
 
+clang_path = ARGUMENTS.get("clang-path", "")
+
 # This makes sure to keep the session environment variables on windows, 
 # that way you can run scons in a vs 2017 prompt and it will find all the required tools
 env = Environment()
@@ -34,7 +36,7 @@ elif platform == "android":
     env["STRIP"] = ndk_toolchain + "/bin/arm-linux-androideabi-strip"
 
 if ARGUMENTS.get("use_llvm", "no") == "yes" and platform != "ios" and platform != "android":
-    env["CXX"] = "clang++"
+    env["CXX"] = "%sclang++" % clang_path
 
 # put stuff that is the same for all first, saves duplication
 cpp_bindings_libname = 'libgodot-cpp.%s.64.a' % platform
