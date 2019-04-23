@@ -87,8 +87,8 @@ namespace godot {
         float getEventParameter(const String &uuid, const String &parameterName);
         void setEventParameter(const String &uuid, const String &parameterName, float value);
         void releaseEvent(const String &uuid);
-        void startEvent(const String &uuid);
-        void stopEvent(const String &uuid, String stopModeStr);
+        void startEvent(const String uuid);
+        void stopEvent(const String uuid, const String stopModeStr);
         void triggerEventCue(const String &uuid);
         int getEventPlaybackState(const String &uuid);
         bool getEventPaused(const String &uuid);
@@ -119,8 +119,8 @@ namespace godot {
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
-        void attachInstanceToNode(const String &uuid, Object *gameObj);
-        void detachInstanceFromNode(const String &uuid);
+        void attachInstanceToNode(const String uuid, Object *gameObj);
+        void detachInstanceFromNode(const String uuid);
 
         void playSound(const String &uuid);
         String loadSound(const String &uuid, const String path, const String modeStr);

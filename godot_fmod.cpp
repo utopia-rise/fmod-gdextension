@@ -116,7 +116,7 @@ void GodotFmod::update() {
             FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
             checkErrors(aShot.instance->stop(m));
             checkErrors(aShot.instance->release());
-            oneShotInstances.erase(oneShotInstances.begin() + i);
+            attachedOneShots.erase(attachedOneShots.begin() + i);
             i--;
             continue;
         }
@@ -124,7 +124,7 @@ void GodotFmod::update() {
         checkErrors(aShot.instance->getPlaybackState(&s));
         if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
             checkErrors(aShot.instance->release());
-            oneShotInstances.erase(oneShotInstances.begin() + i);
+            attachedOneShots.erase(attachedOneShots.begin() + i);
             i--;
             continue;
         }
@@ -232,7 +232,6 @@ void GodotFmod::setSoftwareFormat(int sampleRate, const String& speakerMode, int
 }
 
 String GodotFmod::loadbank(const String pathToBank, const String flags) {
-    Godot::print(flags.alloc_c_string());
     if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
     auto flagsItr = fmodLoadBankFlags.find(flags.alloc_c_string());
     FMOD::Studio::Bank *bank = nullptr;
@@ -340,13 +339,13 @@ void GodotFmod::releaseEvent(const String &uuid) {
     if (i != unmanagedEvents.end()) checkErrors(i->second->release());
 }
 
-void GodotFmod::startEvent(const String &uuid) {
+void GodotFmod::startEvent(const String uuid) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) checkErrors(i->second->start());
 }
 
-void GodotFmod::stopEvent(const String &uuid, const String stopModeStr) {
+void GodotFmod::stopEvent(const String uuid, const String stopModeStr) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) {
@@ -609,7 +608,7 @@ void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *ga
     }
 }
 
-void GodotFmod::attachInstanceToNode(const String &uuid, Object *gameObj) {
+void GodotFmod::attachInstanceToNode(const String uuid, Object *gameObj) {
     if (!unmanagedEvents.count(uuid) || isNull(gameObj)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) {
@@ -618,7 +617,7 @@ void GodotFmod::attachInstanceToNode(const String &uuid, Object *gameObj) {
     }
 }
 
-void GodotFmod::detachInstanceFromNode(const String &uuid) {
+void GodotFmod::detachInstanceFromNode(const String uuid) {
     if (!unmanagedEvents.count(uuid)) return;
     auto instance = unmanagedEvents.find(uuid);
     if (instance != unmanagedEvents.end()) {
