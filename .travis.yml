@@ -5,8 +5,9 @@ before_install:
   - cd ..
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
-  - cp ../../fmod-gdnative/getFmodAPIScript.sh ./
-  - ./getFmodAPIScript.sh $FMODUSER $FMODPASS
+  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/d75b66f3ec78aee3231d83de3b5d2b59784589f3/getFmodAPI.sh
+  - chmod +x getFmodAPI.sh
+  - ./getFmodAPI.sh $FMODUSER $FMODPASS
   - tar -xvf fmodstudioapi11012linux.tar.gz
   - mv fmodstudioapi11012linux/api linux
   - cd ../../
@@ -15,3 +16,11 @@ before_install:
   - git checkout 3.1-utopia
 install: scons godotbinpath="~/Documents/Godot_v3.1-stable_x11.64" use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/ && cd ../fmod-gdnative
 script: scons p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/
+deploy:
+  provider: releases
+  api_key:
+    secure: $TRAVIS_TOKEN
+  file: "bin/libGodotFmod.linux.so"
+  skip_cleanup: true
+  on:
+    tags: true
