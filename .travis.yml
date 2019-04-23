@@ -7,3 +7,7 @@ install:
   - ./getFmodAPIScript.sh $FMODUSER $FMODPASS
   - tar -xvf fmodstudioapi11012linux.tar.gz
   - mv fmodstudioapi11012linux linux
+  - cd ../../
+  - git clone https://github.com/utopia-rise/godot-cpp godot-cpp
+  - cd godot-cpp
+  - git checkout 3.1-utopia
