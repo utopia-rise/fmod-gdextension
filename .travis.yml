@@ -1,2 +1,7 @@
 language: cpp
-install: ./getFmodAPIScript.sh $FMODUSER $FMODPASS
+install: 
+  - cd ..
+  - mkdir libs && cd libs
+  - mkdir fmod && cd fmod
+  - ./getFmodAPIScript.sh $FMODUSER $FMODPASS
+  - tar -xvf fmodstudioapi11012linux.tar.gz linux
