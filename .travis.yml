@@ -15,7 +15,7 @@ jobs:
   include:
     - stage: "bindings"
       name: "Generates and build bindings"
-      script: ./scons-generate-linus.sh && cd ../fmod-gdnative
+      script: ./scons-generate-linux.sh && cd ../fmod-gdnative
     - stage: "fmod-gdnative"
       name: "Buile fmod-gdnative"
       script: scons p=linux use_llvm=yes
