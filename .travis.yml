@@ -3,5 +3,6 @@ install:
   - cd ..
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
+  - cp ../../fmod-gdnative/getFmodAPIScript.sh ./
   - ./getFmodAPIScript.sh $FMODUSER $FMODPASS
   - tar -xvf fmodstudioapi11012linux.tar.gz linux
