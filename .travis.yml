@@ -1,26 +1,45 @@
 language: cpp
+os:
+  - linux
+  - osx
+env:
+  global:
+    - LINUX_BINDINGS_ARGS="use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/"
+    - LINUX_DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/"
+    - OSX_BINDINGS_ARGS="platform=osx generate_bindings=yes bits=64 target=release"
+    - OSX_DRIVER_ARGS="p=osx target=release"
+addons:
+  homebrew:
+    packages:
+      - jq
+      - scons
+    update: true
 compiler:
   - clang
 before_install:
   - cd ..
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
-  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/d75b66f3ec78aee3231d83de3b5d2b59784589f3/getFmodAPI.sh
+  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/14d1478b26bba38bbb0dd92970810b2d4621e6dd/getFmodAPI.sh
   - chmod +x getFmodAPI.sh
-  - ./getFmodAPI.sh $FMODUSER $FMODPASS
-  - tar -xvf fmodstudioapi11012linux.tar.gz
-  - mv fmodstudioapi11012linux/api linux
+  - ./getFmodAPI.sh $FMODUSER $FMODPASS $TRAVIS_OS_NAME
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xvf fmodstudioapi11012linux.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach fmodstudioapi11012osx.dmg; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv fmodstudioapi11012linux/api linux; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
   - cd ../../
   - git clone --recursive  https://github.com/utopia-rise/godot-cpp godot-cpp
   - cd godot-cpp
   - git checkout 3.1-utopia
-install: scons godotbinpath="~/Documents/Godot_v3.1-stable_x11.64" use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/ && cd ../fmod-gdnative
-script: scons p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/
+install: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_BINDINGS_ARGS && cd ../fmod-gdnative; fi
+script: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_DRIVER_ARGS; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_DRIVER_ARGS; fi
 deploy:
   provider: releases
   api_key:
     secure: $TRAVIS_TOKEN
-  file: "bin/libGodotFmod.linux.so"
+  file:
+    - "bin/libGodotFmod.linux.so"
+    - "bin/libGodotFmod.osx.dylib"
   skip_cleanup: true
   on:
     tags: true
