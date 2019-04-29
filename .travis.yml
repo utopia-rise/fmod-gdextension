@@ -1,0 +1,55 @@
+language: cpp
+os:
+  - linux
+  - osx
+  - windows
+python:
+  - "2.7"
+env:
+  global:
+    - LINUX_BINDINGS_ARGS="use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/"
+    - LINUX_DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/"
+    - OSX_BINDINGS_ARGS="platform=osx generate_bindings=yes bits=64 target=release"
+    - OSX_DRIVER_ARGS="p=osx target=release"
+    - WIN_BINDINGS_ARGS="platform=windows generate_bindings=yes bits=64 target=release"
+    - WIN_DRIVER_ARGS="p=windows target=release"
+addons:
+  homebrew:
+    packages:
+      - jq
+      - scons
+    update: true
+compiler:
+  - clang
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O Python27.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv Python27.zip C:/Python27.zip && 7z x C:/Python27.zip -oC:/ && export PATH="/c/Python27:/c/Python27/Scripts:$PATH"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O scons.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv scons.zip C:/scons.zip && 7z x C:/scons.zip -oC:/scons; fi
+  - cd ..
+  - mkdir libs && cd libs
+  - mkdir fmod && cd fmod
+  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/157dc6233c77e18963a0a5e2d849926fa531216a/getFmodAPI.sh
+  - chmod +x getFmodAPI.sh
+  - ./getFmodAPI.sh $FMODUSER $FMODPASS $TRAVIS_OS_NAME
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then tar -xvf fmodstudioapi11012linux.tar.gz; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then hdiutil attach fmodstudioapi11012osx.dmg; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then 7z x fmodstudioapi11012win-installer.exe; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then mv fmodstudioapi11012linux/api linux; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then mv api/ windows && mv windows/lowlevel/lib/fmod_vc.lib windows/lowlevel/lib/fmod.lib && mv windows/lowlevel/lib/fmod64_vc.lib windows/lowlevel/lib/fmod64.lib && mv windows/studio/lib/fmodstudio_vc.lib windows/studio/lib/fmodstudio.lib && mv windows/studio/lib/fmodstudio64_vc.lib windows/studio/lib/fmodstudio64.lib; fi
+  - cd ../../
+  - git clone --recursive  https://github.com/utopia-rise/godot-cpp godot-cpp
+  - cd godot-cpp
+  - git checkout 3.1-utopia
+install: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $WIN_BINDINGS_ARGS && cd ../fmod-gdnative; fi
+script: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_DRIVER_ARGS; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_DRIVER_ARGS; elif [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $WIN_DRIVER_ARGS; fi
+deploy:
+  provider: releases
+  api_key:
+    secure: $TRAVIS_TOKEN
+  file:
+    - "bin/libGodotFmod.linux.so"
+    - "bin/libGodotFmod.osx.dylib"
+    - "bin/libGodotFmod.windows.dll"
+  skip_cleanup: true
+  on:
+    tags: true

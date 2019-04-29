@@ -15,9 +15,11 @@ ndk_path = ARGUMENTS.get("ndk-path", "/Users/piertho/Library/android-sdks/ndk-bu
 ndk_toolchain = ARGUMENTS.get("ndk-toolchain", "/tmp/android-21-toolchain/")
 fmodLibInstallPath = ARGUMENTS.get("fmod-lib-install-path", "libs")
 
+clang_path = ARGUMENTS.get("clang-path", "")
+
 if target != "debug":
     target = "release"
-# This makes sure to keep the session environment variables on windows, 
+# This makes sure to keep the session environment variables on windows,
 # that way you can run scons in a vs 2017 prompt and it will find all the required tools
 env = Environment()
 if platform == "windows":
@@ -37,7 +39,7 @@ elif platform == "android":
     env["STRIP"] = ndk_toolchain + "/bin/arm-linux-androideabi-strip"
 
 if ARGUMENTS.get("use_llvm", "no") == "yes" and platform != "ios" and platform != "android":
-    env["CXX"] = "clang++"
+    env["CXX"] = "%sclang++" % clang_path
 
 # put stuff that is the same for all first, saves duplication
 cpp_bindings_libname = 'libgodot-cpp.%s' % platform
@@ -127,6 +129,7 @@ if dynamic == "yes" and platform != "ios":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.dll' % platform, source=sources)
 else:
     library = env.StaticLibrary(target="bin/libGodotFmod.%s.a" % platform, source=sources)
+
 # can't figure it out what type of parameter should be at 1st one
 # send in '' and it works
 if dynamic == "yes":
