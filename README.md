@@ -53,6 +53,26 @@ Sconstruct.
 
 ## Building the GDNative
 
+Current CI status : ![CI status](https://travis-ci.com/utopia-rise/fmod-gdnative.svg?branch=master)
+
+### Continuous delivery
+
+This project uses Travis-CI to continuously deploy released drivers. If you use those releases, you can skip building
+api (not for iOS) and driver. Installing is still necessary.  
+This project uses [SEMVER](https://semver.org/).
+
+#### Currently supported OS :
+
+- Windows
+- Linux
+- OSX
+
+(iOS and android will be added after being tested locally, in game)
+
+#### Godot compatibility matrix
+
+TODO
+
 ### Building GDNative API bindings
 
 To Build GDNative bindings you can follow [this tutorial from godot official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#building-the-c-bindings).
@@ -66,7 +86,7 @@ target=release
 ```
 When you're done with that part you should have `libgodot-cpp.<platform>.<target>.<bits>.<a|lib>` in godot-cpp/bin` folder.
 
-### Building the GDNative
+### Building the GDNative driver
 
 [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and place it in the
 appropriate platform folder into lib folder (see project structure).
