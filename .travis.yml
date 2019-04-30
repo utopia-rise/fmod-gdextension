@@ -1,26 +1,23 @@
 language: cpp
-os:
-  - linux
-  - osx
-  - windows
 python:
   - "2.7"
-env:
-  global:
-    - LINUX_BINDINGS_ARGS="use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/"
-    - LINUX_DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/"
-    - OSX_BINDINGS_ARGS="platform=osx generate_bindings=yes bits=64 target=release"
-    - OSX_DRIVER_ARGS="p=osx target=release"
-    - WIN_BINDINGS_ARGS="platform=windows generate_bindings=yes bits=64 target=release"
-    - WIN_DRIVER_ARGS="p=windows target=release"
-addons:
-  homebrew:
-    packages:
-      - jq
-      - scons
-    update: true
-compiler:
-  - clang
+matrix:
+  include:
+    - env: BINDINGS_ARGS="use_llvm=yes  platform=linux generate_bindings=yes bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/" DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/"
+      os: linux
+      compiler: clang
+    - env: BINDINGS_ARGS="platform=osx generate_bindings=yes bits=64 target=release" DRIVER_ARGS="p=osx target=release"
+      os: osx
+      compiler: clang
+      addons:
+        homebrew:
+          packages:
+            - jq
+            - scons
+          update: true
+    - env: BINDINGS_ARGS="platform=windows generate_bindings=yes bits=64 target=release" DRIVER_ARGS="p=windows target=release"
+      os: windows
+      compiler: clang
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O Python27.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv Python27.zip C:/Python27.zip && 7z x C:/Python27.zip -oC:/ && export PATH="/c/Python27:/c/Python27/Scripts:$PATH"; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O scons.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv scons.zip C:/scons.zip && 7z x C:/scons.zip -oC:/scons; fi
@@ -40,8 +37,8 @@ before_install:
   - git clone --recursive  https://github.com/utopia-rise/godot-cpp godot-cpp
   - cd godot-cpp
   - git checkout 3.1-utopia
-install: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $WIN_BINDINGS_ARGS && cd ../fmod-gdnative; fi
-script: if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then scons $LINUX_DRIVER_ARGS; elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then scons $OSX_DRIVER_ARGS; elif [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $WIN_DRIVER_ARGS; fi
+install: if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $BINDINGS_ARGS && cd ../fmod-gdnative; else scons $BINDINGS_ARGS && cd ../fmod-gdnative; fi
+script: if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; else scons $DRIVER_ARGS; fi
 deploy:
   provider: releases
   api_key:
