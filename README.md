@@ -58,7 +58,7 @@ Current CI status : ![CI status](https://travis-ci.com/utopia-rise/fmod-gdnative
 ### Continuous delivery
 
 This project uses Travis-CI to continuously deploy released drivers. If you use those releases, you can skip building
-api (not for iOS) and driver. Installing is still necessary.  
+api and driver. Installing is still necessary.  
 This project uses [SEMVER](https://semver.org/).
 
 #### Currently supported OS :
@@ -66,8 +66,7 @@ This project uses [SEMVER](https://semver.org/).
 - Windows
 - Linux
 - OSX
-
-(iOS and android will be added after being tested locally, in game)
+- iOS
 
 #### Godot compatibility matrix
 
