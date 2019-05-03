@@ -1,6 +1,10 @@
 
 # Created by https://www.gitignore.io/api/clion,cmake,scons
 # Edit at https://www.gitignore.io/?templates=clion,cmake,scons
+### OSX ###
+
+.DS_Store
+
 ### Android ###
 
 libs/
