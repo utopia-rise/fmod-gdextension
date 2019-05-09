@@ -337,42 +337,42 @@ You can look at test scenes in POC folder of [example project](https://github.co
 
 ### Calling Studio events
 
-//TODO 
-
 Following is an example of an event instance called manually (ie. not directly managed by the integration). These instances are identified by a unique ID in the form of a string that you must generate in script ideally through a UUID generator. You could write one yourself or use something like [UUID for Godot](https://github.com/binogure-studio/godot-uuid). Note that the string could be anything as long as it is unique within the current instance pool. Remember to release the instance once you're done with it.
 
 ```gdscript
-# unique identifier used to id your event instance
-# throughout its lifecycle
-var my_music_event = UUID.new()
-
-# create an event instance associated with the unique identifier
-# this is a music event that has been authored in the Studio editor
-FMOD.event_create_instance(my_music_event, "event:/Waveshaper - Wisdom of Rage")
-
-# start the event
-FMOD.event_start(my_music_event)
-
-# wait a bit
-yield(music_state_timer, "timeout")
-
-# setting an event parameter
-# in this case causes the music to transition to the next phase
-FMOD.event_set_parameter(my_music_event, "State", 2.0)
-
-# wait a bit
-yield(music_timer, "timeout")
-
-# stop the event
-FMOD.event_stop(my_music_event, Fmod.FMOD_STUDIO_STOP_ALLOWFADEOUT)
-
-# release the event
-FMOD.event_release(my_music_event)
+func _ready():
+	# set up FMOD
+	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	
+	# load banks
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	# register listener
+	Fmod.addListener(self)
+	
+	# play some events
+	var my_music_event = Fmod.createEventInstance("my_music_event", "event:/Music/Level 02")
+	Fmod.startEvent(my_music_event)
+	var t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.stopEvent(my_music_event, FmodFlags.fmodStudioStopModes.FMOD_STUDIO_STOP_ALLOWFADEOUT)
+	t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.releaseEvent(my_music_event)
 ```
 
 ### Using the integration helpers
-
-//TODO
 
 These are helper functions provided by the integration for attaching event instances to Godot Nodes for 3D/positional audio. The listener position and 3D attributes of any attached instances are automatically updated every time you call `system_update()`. Instances are also automatically cleaned up once finished so you don't have to manually call `event_release()`.
 
@@ -380,32 +380,57 @@ These are helper functions provided by the integration for attaching event insta
 # play an event at this Node's position
 # 3D attributes are only set ONCE
 # parameters cannot be set
-FMOD.play_one_shot("event:/Footstep", self)
+FMOD.playOneShot("event:/Footstep", self)
 
 # same as play_one_shot but lets you set initial parameters
 # subsequent parameters cannot be set
-FMOD.play_one_shot_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
+FMOD.playOneShotWithParams("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
 
 # play an event attached to this Node
 # 3D attributes are automatically set every frame (when update is called)
 # parameters cannot be set
-FMOD.play_one_shot_attached("event:/Footstep", self)
+FMOD.playOneShotAttached("event:/Footstep", self)
 
 # same as play_one_shot_attached but lets you set initial parameters
 # subsequent parameters cannot be set
-FMOD.play_one_shot_attached_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
+FMOD.playOneShotAttachedWithParams("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
 
 # attaches a manually called instance to a Node
 # once attached 3D attributes are automatically set every frame (when update is called)
-FMOD.attach_instance_to_node(uuid, self)
+FMOD.attachInstanceToNode(uuid, self)
 
 # detaches the instance from its Node
-FMOD.detach_instance_from_node(uuid)
+FMOD.detachInstanceFromNode(uuid)
+```
+
+### Playing sounds using FMOD Core / Low Level API
+
+You can load and play any sound file in your project directory by using the FMOD Low Level API bindings. Similar to Studio Events these instances are identified by a UUID generated in script. Any instances you create must be released manually. Refer to FMOD's documentation pages for a list of compatible sound formats.
+
+```gdscript
+func _ready():
+	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.addListener(self)
+	var my_sound = Fmod.loadSound("intro", "./main/sound/20-Title_Gym.wav", FmodFlags.fmodSoundConstants.FMOD_DEFAULT)
+	Fmod.playSound(my_sound)
+	var t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.stopSound(my_sound)
+	Fmod.releaseSound(my_sound)
 ```
 
 ## Issues
 
-This project is still a work in progress and is probably not yet ready for use in full-blown production. If you run into issues (crashes, memory leaks, broken 3D sound etc.) open a issue or submit a PR with your fix.
+This is a work in progress project, forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
+from [alexfonseka](https://github.com/alexfonseka). We'd like to thank him for the work he did, we simply adapted his
+work to GDNative.  
+This is currently not available to be putted in production environment, but we'll improve the driver with time. Feel free
+to propose any modification using github's *pull request*. We hope you'll enjoy this driver.
 
 
 [wowmeme]: .README/wowmeme.png
