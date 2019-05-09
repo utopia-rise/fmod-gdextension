@@ -57,7 +57,7 @@ before_install:
 install:
   - if [[ "$PLATFORM" == "android" ]]; then scons platform=android generate_bindings=True bits=64 target=release android-abi=arm && scons platform=android generate_bindings=True bits=64 target=release android-abi=arm64 && cd ../fmod-gdnative; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$PLATFORM" != "android" ]]; then scons $BINDINGS_ARGS && cd ../fmod-gdnative; fi
-script: if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; elif [[ "$PLATFORM" == "android" ]]; then $ANDROID_NDK_ROOT/ndk-build $DRIVER_ARGS; else scons $DRIVER_ARGS; fi
+script: if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; elif [[ "$PLATFORM" == "android" ]]; then $ANDROID_NDK_ROOT/ndk-build $DRIVER_ARGS && tar zcvf libandroid_fmod_gdnative.tar.gz libs/; else scons $DRIVER_ARGS; fi
 deploy:
   provider: releases
   api_key:
@@ -68,8 +68,7 @@ deploy:
     - "bin/libGodotFmod.windows.dll"
     - "bin/libGodotFmod.ios.a"
     - "../godot-cpp/bin/libgodot-cpp.ios.release.a"
-    - "libs/armeabi-v7a/libandroid_fmod_gdnative.so"
-    - "libs/arm64-v8a/libandroid_fmod_gdnative.so"
+    - "libandroid_fmod_gdnative.tar.gz"
   skip_cleanup: true
   on:
     tags: true
