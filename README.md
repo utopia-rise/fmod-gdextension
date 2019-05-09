@@ -214,6 +214,16 @@ iOS.armv7=[ "res://lib/iOS/libcryptopp.ios.64.a", "res://lib/iOS/libgodot-cpp.io
 iOS.arm64=[ "res://lib/iOS/libcryptopp.ios.64.a", "res://lib/iOS/libgodot-cpp.ios.64.a" ]
 ```
 
+#### Android specificity
+
+In order to tell godot where to look for dependencies of the driver, you need to add them in gdnlib that way :
+```
+[dependencies]
+
+Android.armeabi-v7a=[ "res://lib/android/armeabi-v7a/libfmod.so", "res://lib/android/armeabi-v7a/libfmodstudio.so" ]
+Android.arm64-v8a=[ "res://lib/android/arm64-v8a/libfmod.so", "res://lib/android/arm64-v8a/libfmodstudio.so" ]
+```
+
 ### Create the gdns
 
 To create the gdns, you still should go on [the same part of documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
