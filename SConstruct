@@ -13,6 +13,7 @@ godot_bindings_path = ARGUMENTS.get("cpp_bindings", "../godot-cpp/")
 dynamic = ARGUMENTS.get("dynamic", "yes")
 ndk_path = ARGUMENTS.get("ndk-path", "/Users/piertho/Library/android-sdks/ndk-bundle/")
 ndk_toolchain = ARGUMENTS.get("ndk-toolchain", "/tmp/android-21-toolchain/")
+fmodLibInstallPath = ARGUMENTS.get("fmod-lib-install-path", "libs")
 
 clang_path = ARGUMENTS.get("clang-path", "")
 
@@ -26,7 +27,7 @@ if platform == "windows":
 elif platform == "ios":
     SDK_MIN_VERSION = "8.0"
     # we could do better to automatically find the right sdk version
-    SDK_VERSION = "12.1"
+    SDK_VERSION = "12.2"
     IOS_PLATFORM_SDK = sys_exec(["xcode-select", "-p"]) + "/Platforms"
     env["CXX"] = sys_exec(["xcrun", "-sdk", "iphoneos", "-find", "clang++"])
 elif platform == "android":
@@ -58,7 +59,7 @@ elif platform == "android":
 elif platform == "linux":
     env.Append(CCFLAGS = ['-fPIC', '-g','-O3', '-std=c++14'])
     env.Append(LINKFLAGS=[
-        '-Wl,-rpath,\'$$ORIGIN\'/libs'
+        '-Wl,-rpath,\'$$ORIGIN\'/%s' % fmodLibInstallPath
     ])
 elif platform == "windows":
     if target == "debug":
@@ -100,15 +101,24 @@ elif platform == "windows":
                         godot_bindings_path + 'include/gen/', '../libs/fmod/windows/lowlevel/inc/', '../libs/fmod/windows/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/windows/lowlevel/lib/', '../libs/fmod/windows/studio/lib/' ])
+elif platform == "ios":
+    libfmod = 'libfmod%s_iphoneos.a' % lfix
+    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
+    env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
+                        godot_bindings_path + 'include/gen/', '../libs/fmod/ios/lowlevel/inc/', '../libs/fmod/ios/studio/inc/'])
+    env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/ios/lowlevel/lib/', '../libs/fmod/ios/studio/lib/' ])
 
 sources = []
 add_sources(sources, "./")
 
 def change_id(self, arg, env):
     sys_exec(["install_name_tool", "-id", "@rpath/libGodotFmod.%s.dylib" % platform, "bin/libGodotFmod.%s.dylib" % platform])
+    sys_exec(["install_name_tool", "-change", "@rpath/libfmodstudio.dylib", "@loader_path/%s/libfmodstudio.dylib" % fmodLibInstallPath, "bin/libGodotFmod.%s.dylib" % platform])
+    sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/%s/libfmod.dylib" % fmodLibInstallPath, "bin/libGodotFmod.%s.dylib" % platform])
 
 # determine to link as shared or static library
-if dynamic == "yes":
+if dynamic == "yes" and platform != "ios":
     if platform == "osx":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.dylib' % platform, source=sources)
         change_id_action = Action('', change_id)
@@ -119,6 +129,7 @@ if dynamic == "yes":
         library = env.SharedLibrary(target='bin/libGodotFmod.%s.dll' % platform, source=sources)
 else:
     library = env.StaticLibrary(target="bin/libGodotFmod.%s.a" % platform, source=sources)
+
 # can't figure it out what type of parameter should be at 1st one
 # send in '' and it works
 if dynamic == "yes":
