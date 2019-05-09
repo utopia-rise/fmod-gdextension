@@ -61,17 +61,19 @@ This project uses Travis-CI to continuously deploy released drivers. If you use 
 api and driver. Installing is still necessary.  
 This project uses [SEMVER](https://semver.org/).
 
-#### Currently supported OS :
+#### OS Compatibility matrix :
 
-- Windows
-- Linux
-- OSX
-- iOS
-- Android
+| Driver Version | Windows | Linux | OSX | Android | iOS |
+|----------------|---------|-------|-----|---------|-----|
+|      0.0.0     |    X    |   X   |  X  |         |     |
+|      1.0.0     |    X    |   X   |  X  |    X    |  X  |
 
 #### Godot compatibility matrix
 
-TODO
+| Driver Version | Godot 3.0 | Godot 3.1-stable |
+|----------------|-----------|------------------|
+|      0.0.0     |           |         X        |
+|      1.0.0     |           |         X        |
 
 ### Building GDNative API bindings
 
