@@ -295,7 +295,7 @@ You should not add fmod .so to export template, those lines will use GDNative dr
 
 ### Basic usage
 
-```
+```gdscript
 extends Node
 
 func _ready():
