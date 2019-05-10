@@ -178,7 +178,7 @@ project, with `libGodotFmod.ios.a`.
 
 ## Installing the GDNative in your project
 
-In order to understand how to link thé driver you built to your game, you can read the [official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
+In order to understand how to link the driver you built to your game, you can read the [official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
 
 ### Example project
 
@@ -354,6 +354,7 @@ func _ready():
 	# set up FMOD
 	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
 	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
@@ -413,6 +414,45 @@ FMOD.attachInstanceToNode(uuid, self)
 FMOD.detachInstanceFromNode(uuid)
 ```
 
+### Attach to existing event, 3D positioning
+
+Here is an example where we attach event and listener to instances. In the [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project)
+you have a scene `AttachToInstanceTest` where you can play with listener position, using mouse cursor.
+
+```gdscript
+func _ready():
+	# set up FMOD
+	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	
+	# load banks
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/SFX.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	# register listener
+	Fmod.addListener($Listener)
+	
+	# Create event instance
+	var my_music_event = Fmod.createEventInstance("my_music_event", "event:/Weapons/Machine Gun")
+	
+	Fmod.startEvent(my_music_event)
+	
+	# attach instance to node
+	Fmod.attachInstanceToNode(my_music_event, $NodeToAttach)
+	
+	var t = Timer.new()
+	t.set_wait_time(10)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	
+	Fmod.detachInstanceFromNode(my_music_event)
+	Fmod.stopEvent(my_music_event, FmodFlags.fmodStudioStopModes.FMOD_STUDIO_STOP_IMMEDIATE)
+```
+
 ### Playing sounds using FMOD Core / Low Level API
 
 You can load and play any sound file in your project directory by using the FMOD Low Level API bindings. Similar to Studio Events these instances are identified by a UUID generated in script. Any instances you create must be released manually. Refer to FMOD's documentation pages for a list of compatible sound formats.
@@ -421,6 +461,7 @@ You can load and play any sound file in your project directory by using the FMOD
 func _ready():
 	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	Fmod.addListener(self)
 	var my_sound = Fmod.loadSound("intro", "./main/sound/20-Title_Gym.wav", FmodFlags.fmodSoundConstants.FMOD_DEFAULT)
 	Fmod.playSound(my_sound)
