@@ -69,6 +69,7 @@ void GodotFmod::_register_methods() {
     register_method("getSoundVolume", &GodotFmod::getSoundVolume);
     register_method("setSoundPitch", &GodotFmod::setSoundPitch);
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
+    register_method("setSound3DSettings", &GodotFmod::setSound3DSettings);
 }
 
 void GodotFmod::init(int numOfChannels, String studioFlags, String flags) {
@@ -84,13 +85,13 @@ void GodotFmod::init(int numOfChannels, String studioFlags, String flags) {
             Godot::print("FMOD Sound System: Live update enabled!");
         }
     } else {
-        Godot::print_error("FMOD Sound System: Failed to initialize :|", "checkErrors", "godot_fmod.cpp", 33);
+        Godot::print_error("FMOD Sound System: Failed to initialize :|", "init", __FILE__, __LINE__);
     }
 }
 
 int GodotFmod::checkErrors(FMOD_RESULT result) {
     if (result != FMOD_OK) {
-        Godot::print_error(FMOD_ErrorString(result), "checkErrors", "godot_fmod.cpp", 39);
+        Godot::print_error(FMOD_ErrorString(result), "checkErrors", __FILE__, __LINE__);
         return 0;
     }
     return 1;
@@ -141,7 +142,7 @@ void GodotFmod::update() {
 void GodotFmod::setListenerAttributes() {
     if (isNull(listener)) {
         if (nullListenerWarning) {
-            Godot::print_error("FMOD Sound System: Listener not set!", "setListenerAttributes", "godot_fmod.cpp", 90);
+            Godot::print_error("FMOD Sound System: Listener not set!", "setListenerAttributes", __FILE__, __LINE__);
             nullListenerWarning = false;
         }
         return;
@@ -149,7 +150,8 @@ void GodotFmod::setListenerAttributes() {
     auto *ci = Object::cast_to<CanvasItem>(listener);
     if (ci != nullptr) {
         Transform2D t2d = ci->get_transform();
-        Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
+        Vector2 posVector = t2d.get_origin() / distanceScale;
+        Vector3 pos(posVector.x, posVector.y, 0.0f),
                 up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
         const FMOD_VECTOR &posFmodVector = toFmodVector(pos);
         auto attr = get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
@@ -159,7 +161,7 @@ void GodotFmod::setListenerAttributes() {
         // needs testing
         auto *s = Object::cast_to<Spatial>(listener);
         Transform t = s->get_transform();
-        Vector3 pos = t.get_origin();
+        Vector3 pos = t.get_origin() / distanceScale;
         Vector3 up = t.get_basis().elements[1];
         Vector3 forward = t.get_basis().elements[2];
         Vector3 vel(0, 0, 0);
@@ -198,7 +200,8 @@ void GodotFmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance
         auto *ci = Object::cast_to<CanvasItem>(o);
         if (ci != nullptr) {
             Transform2D t2d = ci->get_transform();
-            Vector3 pos(t2d.get_origin().x, t2d.get_origin().y, 0.0f),
+            Vector2 posVector = t2d.get_origin() / distanceScale;
+            Vector3 pos(posVector.x, posVector.y, 0.0f),
                     up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
             FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
             checkErrors(instance->set3DAttributes(&attr));
@@ -206,7 +209,7 @@ void GodotFmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance
             // needs testing
             auto *s = Object::cast_to<Spatial>(o);
             Transform t = s->get_transform();
-            Vector3 pos = t.get_origin();
+            Vector3 pos = t.get_origin() / distanceScale;
             Vector3 up = t.get_basis().elements[1];
             Vector3 forward = t.get_basis().elements[2];
             Vector3 vel(0, 0, 0);
@@ -741,6 +744,15 @@ void GodotFmod::releaseSound(const String path) {
     if (sound->second) checkErrors(sound->second->release());
 }
 
+void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
+    if (checkErrors(lowLevelSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+        distanceScale = distanceFactor;
+        Godot::print("Successfully set global 3D settings");
+    } else {
+        Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "GodotFmod::setSound3DSettings", __FILE__, __LINE__);
+    }
+}
+
 void GodotFmod::_init() {
     fmodInitFlags = {
             {"FMOD_INIT_NORMAL", FMOD_INIT_NORMAL},
@@ -823,4 +835,5 @@ void GodotFmod::_init() {
     listener = nullptr;
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getLowLevelSystem(&lowLevelSystem));
+    distanceScale = 0;
 }
