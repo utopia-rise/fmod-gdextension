@@ -745,7 +745,7 @@ void GodotFmod::releaseSound(const String path) {
 }
 
 void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
-    if (checkErrors(lowLevelSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+    if (distanceFactor > 0 && checkErrors(lowLevelSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
         Godot::print("Successfully set global 3D settings");
     } else {
@@ -835,5 +835,5 @@ void GodotFmod::_init() {
     listener = nullptr;
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getLowLevelSystem(&lowLevelSystem));
-    distanceScale = 0;
+    distanceScale = 1.0;
 }
