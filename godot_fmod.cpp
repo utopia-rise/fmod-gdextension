@@ -71,16 +71,11 @@ void GodotFmod::_register_methods() {
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
 }
 
-void GodotFmod::init(int numOfChannels, String studioFlags, String flags) {
+void GodotFmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
     // initialize FMOD Studio and FMOD Low Level System with provided flags
-    auto initFlagsItr = fmodInitFlags.find(flags.alloc_c_string());
-    auto initStudioFlagsItr = fmodStudioInitFlags.find(studioFlags.alloc_c_string());
-    if (checkErrors(system->initialize(numOfChannels,
-                                       initStudioFlagsItr != fmodStudioInitFlags.end() ? initStudioFlagsItr->second : FMOD_STUDIO_INIT_NORMAL,
-                                       initFlagsItr != fmodInitFlags.end() ? initFlagsItr->second : FMOD_INIT_NORMAL,
-                                       nullptr))) {
+    if (checkErrors(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
         Godot::print("FMOD Sound System: Successfully initialized");
-        if (studioFlags == FMOD_STUDIO_INIT_LIVEUPDATE) {
+        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) {
             Godot::print("FMOD Sound System: Live update enabled!");
         }
     } else {
@@ -225,19 +220,14 @@ void GodotFmod::addListener(Object *gameObj) {
     listener = gameObj;
 }
 
-void GodotFmod::setSoftwareFormat(int sampleRate, const String speakerMode, int numRawSpeakers) {
-    auto speakerModeItr = fmodSpeakerModeFlags.find(speakerMode.alloc_c_string());
-    auto m = speakerModeItr != fmodSpeakerModeFlags.end() ? speakerModeItr->second : FMOD_SPEAKERMODE_DEFAULT;
-    checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, m, numRawSpeakers));
+void GodotFmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
+    checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
-String GodotFmod::loadbank(const String pathToBank, const String flags) {
+String GodotFmod::loadbank(const String pathToBank, const unsigned int flag) {
     if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
-    auto flagsItr = fmodLoadBankFlags.find(flags.alloc_c_string());
     FMOD::Studio::Bank *bank = nullptr;
-    checkErrors(system->loadBankFile(pathToBank.alloc_c_string(),
-                                     flagsItr != fmodLoadBankFlags.end() ? flagsItr->second : FMOD_STUDIO_LOAD_BANK_NORMAL,
-                                     &bank));
+    checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
         banks[pathToBank] = bank;
         return pathToBank;
@@ -345,12 +335,11 @@ void GodotFmod::startEvent(const String uuid) {
     if (i != unmanagedEvents.end()) checkErrors(i->second->start());
 }
 
-void GodotFmod::stopEvent(const String uuid, const String stopModeStr) {
+void GodotFmod::stopEvent(const String uuid, const int stopMode) {
     if (!unmanagedEvents.count(uuid)) return;
     auto i = unmanagedEvents.find(uuid);
     if (i != unmanagedEvents.end()) {
-        auto m = static_cast<FMOD_STUDIO_STOP_MODE>(fmodStudioStopModes.find(stopModeStr.alloc_c_string())->second);
-        checkErrors(i->second->stop(m));
+        checkErrors(i->second->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
     }
 }
 
@@ -503,9 +492,7 @@ void GodotFmod::setBusVolume(const String busPath, float volume) {
 void GodotFmod::stopAllBusEvents(const String busPath, int stopMode) {
     loadBus(busPath);
     if (!buses.count(busPath)) return;
-    auto bus = buses.find(busPath);
-    auto m = static_cast<FMOD_STUDIO_STOP_MODE>(stopMode);
-    checkErrors(bus->second->stopAllEvents(m));
+    checkErrors(buses.find(busPath)->second->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void GodotFmod::loadBus(const String &busPath) {
@@ -720,11 +707,10 @@ void GodotFmod::setSoundPitch(const String uuid, float pitch) {
     }
 }
 
-String GodotFmod::loadSound(const String uuid, const String path, const String modeStr) {
+String GodotFmod::loadSound(const String uuid, const String path, const int mode) {
     if (!sounds.count(path)) {
-        auto mode = fmodSoundConstants.find(modeStr.alloc_c_string())->second;
         FMOD::Sound *sound = nullptr;
-        checkErrors(lowLevelSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
+        checkErrors(lowLevelSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
         if (sound) {
             sounds[uuid] = sound;
             FMOD::Channel *channel = nullptr;
@@ -742,82 +728,6 @@ void GodotFmod::releaseSound(const String path) {
 }
 
 void GodotFmod::_init() {
-    fmodInitFlags = {
-            {"FMOD_INIT_NORMAL", FMOD_INIT_NORMAL},
-            {"FMOD_INIT_STREAM_FROM_UPDATE", FMOD_INIT_STREAM_FROM_UPDATE},
-            {"FMOD_INIT_MIX_FROM_UPDATE", FMOD_INIT_MIX_FROM_UPDATE},
-            {"FMOD_INIT_3D_RIGHTHANDED", FMOD_INIT_3D_RIGHTHANDED},
-            {"FMOD_INIT_CHANNEL_LOWPASS", FMOD_INIT_CHANNEL_LOWPASS},
-            {"FMOD_INIT_CHANNEL_DISTANCEFILTER", FMOD_INIT_CHANNEL_DISTANCEFILTER},
-            {"FMOD_INIT_PROFILE_ENABLE", FMOD_INIT_PROFILE_ENABLE},
-            {"FMOD_INIT_VOL0_BECOMES_VIRTUAL", FMOD_INIT_VOL0_BECOMES_VIRTUAL},
-            {"FMOD_INIT_GEOMETRY_USECLOSEST", FMOD_INIT_GEOMETRY_USECLOSEST},
-            {"FMOD_INIT_PREFER_DOLBY_DOWNMIX", FMOD_INIT_PREFER_DOLBY_DOWNMIX},
-            {"FMOD_INIT_THREAD_UNSAFE", FMOD_INIT_THREAD_UNSAFE},
-            {"FMOD_INIT_PROFILE_METER_ALL", FMOD_INIT_PROFILE_METER_ALL},
-            {"FMOD_INIT_DISABLE_SRS_HIGHPASSFILTER", FMOD_INIT_DISABLE_SRS_HIGHPASSFILTER},
-    };
-    fmodStudioInitFlags = {
-            {"FMOD_STUDIO_INIT_NORMAL", FMOD_STUDIO_INIT_NORMAL},
-            {"FMOD_STUDIO_INIT_LIVEUPDATE", FMOD_STUDIO_INIT_LIVEUPDATE},
-            {"FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS", FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS},
-            {"FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS", FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE},
-            {"FMOD_STUDIO_INIT_DEFERRED_CALLBACKS", FMOD_STUDIO_INIT_DEFERRED_CALLBACKS},
-            {"FMOD_STUDIO_INIT_LOAD_FROM_UPDATE", FMOD_STUDIO_INIT_LOAD_FROM_UPDATE},
-    };
-    fmodSpeakerModeFlags = {
-            {"FMOD_SPEAKERMODE_DEFAULT", FMOD_SPEAKERMODE_DEFAULT},
-            {"FMOD_SPEAKERMODE_RAW", FMOD_SPEAKERMODE_RAW},
-            {"FMOD_SPEAKERMODE_MONO", FMOD_SPEAKERMODE_MONO},
-            {"FMOD_SPEAKERMODE_STEREO", FMOD_SPEAKERMODE_STEREO},
-            {"FMOD_SPEAKERMODE_QUAD", FMOD_SPEAKERMODE_QUAD},
-            {"FMOD_SPEAKERMODE_SURROUND", FMOD_SPEAKERMODE_SURROUND},
-            {"FMOD_SPEAKERMODE_5POINT1", FMOD_SPEAKERMODE_5POINT1},
-            {"FMOD_SPEAKERMODE_7POINT1", FMOD_SPEAKERMODE_7POINT1},
-            {"FMOD_SPEAKERMODE_7POINT1POINT4", FMOD_SPEAKERMODE_7POINT1POINT4},
-            {"FMOD_SPEAKERMODE_MAX", FMOD_SPEAKERMODE_MAX},
-    };
-    fmodLoadBankFlags = {
-            {"FMOD_STUDIO_LOAD_BANK_NORMAL", FMOD_STUDIO_LOAD_BANK_NORMAL},
-            {"FMOD_STUDIO_LOAD_BANK_NONBLOCKING", FMOD_STUDIO_LOAD_BANK_NONBLOCKING},
-            {"FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES", FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES}
-    };
-    fmodSoundConstants = {
-            {"FMOD_DEFAULT", FMOD_DEFAULT},
-            {"FMOD_LOOP_OFF", FMOD_LOOP_OFF},
-            {"FMOD_LOOP_NORMAL", FMOD_LOOP_NORMAL},
-            {"FMOD_LOOP_BIDI", FMOD_LOOP_BIDI},
-            {"FMOD_2D", FMOD_2D},
-            {"FMOD_3D", FMOD_3D},
-            {"FMOD_CREATESTREAM", FMOD_CREATESTREAM},
-            {"FMOD_CREATESAMPLE", FMOD_CREATESAMPLE},
-            {"FMOD_CREATECOMPRESSEDSAMPLE", FMOD_CREATECOMPRESSEDSAMPLE},
-            {"FMOD_OPENUSER", FMOD_OPENUSER},
-            {"FMOD_OPENMEMORY", FMOD_OPENMEMORY},
-            {"FMOD_OPENMEMORY_POINT", FMOD_OPENMEMORY_POINT},
-            {"FMOD_OPENRAW", FMOD_OPENRAW},
-            {"FMOD_OPENONLY", FMOD_OPENONLY},
-            {"FMOD_ACCURATETIME", FMOD_ACCURATETIME},
-            {"FMOD_MPEGSEARCH", FMOD_MPEGSEARCH},
-            {"FMOD_NONBLOCKING", FMOD_NONBLOCKING},
-            {"FMOD_UNIQUE", FMOD_UNIQUE},
-            {"FMOD_3D_HEADRELATIVE", FMOD_3D_HEADRELATIVE},
-            {"FMOD_3D_WORLDRELATIVE", FMOD_3D_WORLDRELATIVE},
-            {"FMOD_3D_INVERSEROLLOFF", FMOD_3D_INVERSEROLLOFF},
-            {"FMOD_3D_LINEARROLLOFF", FMOD_3D_LINEARROLLOFF},
-            {"FMOD_3D_LINEARSQUAREROLLOFF", FMOD_3D_LINEARSQUAREROLLOFF},
-            {"FMOD_3D_INVERSETAPEREDROLLOFF", FMOD_3D_INVERSETAPEREDROLLOFF},
-            {"FMOD_3D_CUSTOMROLLOFF", FMOD_3D_CUSTOMROLLOFF},
-            {"FMOD_3D_IGNOREGEOMETRY", FMOD_3D_IGNOREGEOMETRY},
-            {"FMOD_IGNORETAGS", FMOD_IGNORETAGS},
-            {"FMOD_LOWMEM", FMOD_LOWMEM},
-            {"FMOD_VIRTUAL_PLAYFROMSTART", FMOD_VIRTUAL_PLAYFROMSTART}
-    };
-    fmodStudioStopModes = {
-            {"FMOD_STUDIO_STOP_ALLOWFADEOUT", FMOD_STUDIO_STOP_ALLOWFADEOUT},
-            {"FMOD_STUDIO_STOP_IMMEDIATE", FMOD_STUDIO_STOP_IMMEDIATE},
-            {"FMOD_STUDIO_STOP_FORCEINT", FMOD_STUDIO_STOP_FORCEINT}
-    };
     system = nullptr;
     lowLevelSystem = nullptr;
     listener = nullptr;
