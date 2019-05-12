@@ -34,13 +34,6 @@ namespace godot {
         std::map<String, FMOD::Sound *> sounds;
         std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
-        std::map<std::string, FMOD_INITFLAGS> fmodInitFlags;
-        std::map<std::string, FMOD_STUDIO_INITFLAGS > fmodStudioInitFlags;
-        std::map<std::string, FMOD_SPEAKERMODE> fmodSpeakerModeFlags;
-        std::map<std::string, FMOD_STUDIO_LOAD_BANK_FLAGS> fmodLoadBankFlags;
-        std::map<std::string, int > fmodSoundConstants;
-        std::map<std::string, FMOD_STUDIO_STOP_MODE> fmodStudioStopModes;
-
         // keep track of one shot instances internally
         std::vector<FMOD::Studio::EventInstance *> oneShotInstances;
         struct AttachedOneShot {
@@ -73,13 +66,13 @@ namespace godot {
 
         static void _register_methods();
         void _init();
-        void init(int numOfChannels, String studioFlags, String flags);
+        void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void update();
         void shutdown();
         void addListener(Object *gameObj);
-        void setSoftwareFormat(int sampleRate, String speakerMode, int numRawSpeakers);
-        String loadbank(String pathToBank, String flags);
+        void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
+        String loadbank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
         int getBankLoadingState(String pathToBank);
         int getBankBusCount(String pathToBank);
@@ -91,7 +84,7 @@ namespace godot {
         void setEventParameter(String uuid, String parameterName, float value);
         void releaseEvent(String uuid);
         void startEvent(String uuid);
-        void stopEvent(String uuid, String stopModeStr);
+        void stopEvent(String uuid, int stopMode);
         void triggerEventCue(String uuid);
         int getEventPlaybackState(String uuid);
         bool getEventPaused(String uuid);
@@ -126,7 +119,7 @@ namespace godot {
         void detachInstanceFromNode(String uuid);
 
         void playSound(String uuid);
-        String loadSound(String uuid, String path, String modeStr);
+        String loadSound(String uuid, String path, int mode);
         void releaseSound(String path);
         void setSoundPaused(String uuid, bool paused);
         void stopSound(String uuid);

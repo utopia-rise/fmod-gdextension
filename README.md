@@ -67,7 +67,7 @@ This project uses [SEMVER](https://semver.org/).
 |----------------|---------|-------|-----|---------|-----|
 |      0.0.0     |    X    |   X   |  X  |         |     |
 |      1.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      1.1.0     |    X    |   X   |  X  |    X    |  X  |
+|      2.0.0     |    X    |   X   |  X  |    X    |  X  |
 
 #### Godot compatibility matrix
 
@@ -75,7 +75,7 @@ This project uses [SEMVER](https://semver.org/).
 |----------------|-----------|------------------|
 |      0.0.0     |           |         X        |
 |      1.0.0     |           |         X        |
-|      1.1.0     |           |         X        |
+|      2.0.0     |           |         X        |
 
 ### Building GDNative API bindings
 
@@ -313,36 +313,20 @@ You should not add fmod .so to export template, those lines will use GDNative dr
 extends Node
 
 func _ready():
-
 	# set up FMOD
-
-	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
-
-	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
-
+	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
 	
-
 	# load banks
-
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-
-	
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 	# register listener
-
 	Fmod.addListener(self)
 
-	
-
 	# play some events
-
 	Fmod.playOneShot("event:/Music/Level 02", self)
-
-
 ```
 
 You can look at test scenes in POC folder of [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to find how to use the provided methods.
@@ -354,14 +338,14 @@ Following is an example of an event instance called manually (ie. not directly m
 ```gdscript
 func _ready():
 	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
 	Fmod.addListener(self)
@@ -375,7 +359,7 @@ func _ready():
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.stopEvent(my_music_event, FmodFlags.fmodStudioStopModes.FMOD_STUDIO_STOP_ALLOWFADEOUT)
+	Fmod.stopEvent(my_music_event, FmodFlags.FMOD_STUDIO_STOP_MODES.FMOD_STUDIO_STOP_ALLOWFADEOUT)
 	t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
@@ -461,11 +445,12 @@ You can load and play any sound file in your project directory by using the FMOD
 
 ```gdscript
 func _ready():
-	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	# set up FMOD
+	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	Fmod.addListener(self)
-	var my_sound = Fmod.loadSound("intro", "./main/sound/20-Title_Gym.wav", FmodFlags.fmodSoundConstants.FMOD_DEFAULT)
+	var my_sound = Fmod.loadSound("intro", "./main/sound/20-Title_Gym.wav", FmodFlags.FMOD_SOUND_CONSTANTS.FMOD_DEFAULT)
 	Fmod.playSound(my_sound)
 	var t = Timer.new()
 	t.set_wait_time(3)
