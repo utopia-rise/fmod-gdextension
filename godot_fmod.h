@@ -21,6 +21,8 @@ namespace godot {
         FMOD::Studio::System *system;
         FMOD::System *lowLevelSystem;
 
+        float distanceScale;
+
         Object *listener;
 
         bool nullListenerWarning = true;
@@ -72,6 +74,7 @@ namespace godot {
         static void _register_methods();
         void _init();
         void init(int numOfChannels, String studioFlags, String flags);
+        void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void update();
         void shutdown();
         void addListener(Object *gameObj);
