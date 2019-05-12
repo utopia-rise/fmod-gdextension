@@ -67,6 +67,7 @@ This project uses [SEMVER](https://semver.org/).
 |----------------|---------|-------|-----|---------|-----|
 |      0.0.0     |    X    |   X   |  X  |         |     |
 |      1.0.0     |    X    |   X   |  X  |    X    |  X  |
+|      1.1.0     |    X    |   X   |  X  |    X    |  X  |
 
 #### Godot compatibility matrix
 
@@ -74,6 +75,7 @@ This project uses [SEMVER](https://semver.org/).
 |----------------|-----------|------------------|
 |      0.0.0     |           |         X        |
 |      1.0.0     |           |         X        |
+|      1.1.0     |           |         X        |
 
 ### Building GDNative API bindings
 
