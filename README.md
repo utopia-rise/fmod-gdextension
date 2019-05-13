@@ -71,11 +71,11 @@ This project uses [SEMVER](https://semver.org/).
 
 #### Godot compatibility matrix
 
-| Driver Version | Godot 3.0 | Godot 3.1-stable |
-|----------------|-----------|------------------|
-|      0.0.0     |           |         X        |
-|      1.0.0     |           |         X        |
-|      2.0.0     |           |         X        |
+| Driver Version | Godot 3.0 | Godot 3.1-stable | Godot 3.1.1-stable |
+|----------------|-----------|------------------|--------------------|
+|      0.0.0     |           |         X        |                    |
+|      1.0.0     |           |         X        |                    |
+|      2.0.0     |           |         X        |          X         |
 
 ### Building GDNative API bindings
 
