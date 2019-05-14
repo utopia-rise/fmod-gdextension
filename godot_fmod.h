@@ -1,7 +1,3 @@
-//
-// Created by ptmeisels on 27/02/19.
-//
-
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
