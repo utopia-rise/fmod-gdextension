@@ -3,13 +3,13 @@
 A Godot C++ GDNative that provides an integration for the FMOD Studio API.
 
 FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many
-titles such as Transistor, Pyre and Celeste. [More on FMOD's website](https://www.fmod.com/).
+titles such as Transistor, Into the Breach and Celeste. [More on FMOD's website](https://www.fmod.com/).
 
 This GDNative exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
 common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a
 work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
 
-**Note:** FMOD provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
+**Note:** FMOD also provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
 same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
 as C# support is required and performance might not be on the same level as a C++ integration. 
 
@@ -341,7 +341,8 @@ You can look at test scenes in POC folder of [example project](https://github.co
 
 ### Calling Studio events
 
-Following is an example of an event instance called manually (ie. not directly managed by the integration). These instances are identified by a unique ID in the form of a string that you must generate in script ideally through a UUID generator. You could write one yourself or use something like [UUID for Godot](https://github.com/binogure-studio/godot-uuid). Note that the string could be anything as long as it is unique within the current instance pool. Remember to release the instance once you're done with it.
+Following is an example of an event instance called manually (ie. not directly managed by the integration). 
+These instances are refered by an int id, returned when created. Remember to release the instance once you're done with it.
 
 ```gdscript
 func _ready():
@@ -359,7 +360,7 @@ func _ready():
 	Fmod.addListener(self)
 	
 	# play some events
-	var my_music_event = Fmod.createEventInstance("my_music_event", "event:/Music/Level 02")
+	var my_music_event = Fmod.createEventInstance("event:/Music/Level 02")
 	Fmod.startEvent(my_music_event)
 	var t = Timer.new()
 	t.set_wait_time(3)
@@ -402,10 +403,10 @@ FMOD.playOneShotAttachedWithParams("event:/Footstep", self, { "Surface": 1.0, "S
 
 # attaches a manually called instance to a Node
 # once attached 3D attributes are automatically set every frame (when update is called)
-FMOD.attachInstanceToNode(uuid, self)
+FMOD.attachInstanceToNode(instanceId, self)
 
 # detaches the instance from its Node
-FMOD.detachInstanceFromNode(uuid)
+FMOD.detachInstanceFromNode(instanceId)
 ```
 
 ### Attach to existing event, 3D positioning
@@ -429,7 +430,7 @@ func _ready():
 	Fmod.addListener($Listener)
 	
 	# Create event instance
-	var my_music_event = Fmod.createEventInstance("my_music_event", "event:/Weapons/Machine Gun")
+	var my_music_event = Fmod.createEventInstance("event:/Weapons/Machine Gun")
 	
 	Fmod.startEvent(my_music_event)
 	
@@ -458,7 +459,7 @@ func _ready():
 	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	Fmod.addListener(self)
-	var my_sound = Fmod.loadSound("intro", "./main/sound/20-Title_Gym.wav", FmodFlags.FMOD_SOUND_CONSTANTS.FMOD_DEFAULT)
+	var my_sound = Fmod.loadSound("./main/sound/20-Title_Gym.wav", FmodFlags.FMOD_SOUND_CONSTANTS.FMOD_DEFAULT)
 	Fmod.playSound(my_sound)
 	var t = Timer.new()
 	t.set_wait_time(3)
