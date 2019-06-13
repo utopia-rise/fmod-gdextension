@@ -220,8 +220,8 @@ In order to tell godot where to look for static dependencies of the driver, you 
 ```
 [dependencies]
 ...
-iOS.armv7=[ "res://lib/iOS/libcryptopp.ios.64.a", "res://lib/iOS/libgodot-cpp.ios.64.a" ]
-iOS.arm64=[ "res://lib/iOS/libcryptopp.ios.64.a", "res://lib/iOS/libgodot-cpp.ios.64.a" ]
+iOS.armv7=[ "res://lib/iOS/libfmodstudio_iphoneos.a", "res://lib/iOS/libfmod_iphoneos.a", "res://lib/iOS/libgodot-cpp.ios.release.a" ]
+iOS.arm64=[ "res://lib/iOS/libfmodstudio_iphoneos.a", "res://lib/iOS/libfmod_iphoneos.a", "res://lib/iOS/libgodot-cpp.ios.release.a" ]
 ```
 
 #### Android specificity
