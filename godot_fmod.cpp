@@ -330,7 +330,10 @@ void GodotFmod::setEventParameter(const unsigned int instanceId, const String pa
 void GodotFmod::releaseEvent(const unsigned int instanceId) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->release());
+    if (i != unmanagedEvents.end()) {
+        checkErrors(i->second->release());
+        unmanagedEvents.erase(instanceId);
+    }
 }
 
 void GodotFmod::startEvent(const unsigned int instanceId) {
@@ -730,7 +733,10 @@ unsigned int GodotFmod::loadSound(const String path, const int mode) {
 void GodotFmod::releaseSound(const unsigned int instanceId) {
     if (!sounds.count(instanceId)) return; // sound is not loaded
     auto sound = sounds.find(instanceId);
-    if (sound->second) checkErrors(sound->second->release());
+    if (sound->second) {
+        checkErrors(sound->second->release());
+        sounds.erase(instanceId);
+    }
 }
 
 void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
