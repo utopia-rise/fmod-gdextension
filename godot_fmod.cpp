@@ -224,7 +224,7 @@ void GodotFmod::addListener(Object *gameObj) {
 }
 
 void GodotFmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
-    checkErrors(lowLevelSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
+    checkErrors(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
 String GodotFmod::loadbank(const String pathToBank, const unsigned int flag) {
@@ -317,14 +317,14 @@ float GodotFmod::getEventParameter(const unsigned int instanceId, const String p
     if (!unmanagedEvents.count(instanceId)) return p;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end())
-        checkErrors(i->second->getParameterValue(parameterName.ascii().get_data(), &p));
+        checkErrors(i->second->getParameterByName(parameterName.ascii().get_data(), &p));
     return p;
 }
 
 void GodotFmod::setEventParameter(const unsigned int instanceId, const String parameterName, const float value) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setParameterValue(parameterName.ascii().get_data(), value));
+    if (i != unmanagedEvents.end()) checkErrors(i->second->setParameterByName(parameterName.ascii().get_data(), value));
 }
 
 void GodotFmod::releaseEvent(const unsigned int instanceId) {
@@ -553,7 +553,7 @@ void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, c
         for (int i = 0; i < keys.size(); i++) {
             String k = keys[i];
             float v = parameters[keys[i]];
-            checkErrors(instance->setParameterValue(k.ascii().get_data(), v));
+            checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
         }
         checkErrors(instance->start());
         oneShotInstances.push_back(instance);
@@ -593,7 +593,7 @@ void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *ga
         for (int i = 0; i < keys.size(); i++) {
             String k = keys[i];
             float v = parameters[keys[i]];
-            checkErrors(instance->setParameterValue(k.ascii().get_data(), v));
+            checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
         }
         checkErrors(instance->start());
     }
@@ -713,12 +713,12 @@ void GodotFmod::setSoundPitch(const unsigned int instanceId, const float pitch) 
 
 unsigned int GodotFmod::loadSound(const String path, const int mode) {
     FMOD::Sound *sound = nullptr;
-    checkErrors(lowLevelSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
+    checkErrors(coreSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
     if (sound) {
         unsigned int instanceId = ++instanceIdCount;
         sounds[instanceId] = sound;
         FMOD::Channel *channel = nullptr;
-        checkErrors(lowLevelSystem->playSound(sound, nullptr, true, &channel));
+        checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
         if (channel) {
             channels[sound] = channel;
             return instanceId;
@@ -734,7 +734,7 @@ void GodotFmod::releaseSound(const unsigned int instanceId) {
 }
 
 void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
-    if (distanceFactor > 0 && checkErrors(lowLevelSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+    if (distanceFactor > 0 && checkErrors(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
         Godot::print("Successfully set global 3D settings");
     } else {
@@ -744,10 +744,10 @@ void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, flo
 
 void GodotFmod::_init() {
     system = nullptr;
-    lowLevelSystem = nullptr;
+    coreSystem = nullptr;
     listener = nullptr;
     instanceIdCount = 0;
     checkErrors(FMOD::Studio::System::create(&system));
-    checkErrors(system->getLowLevelSystem(&lowLevelSystem));
+    checkErrors(system->getCoreSystem(&coreSystem));
     distanceScale = 1.0;
 }

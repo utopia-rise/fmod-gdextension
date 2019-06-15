@@ -39,17 +39,17 @@ before_install:
   - if [[ "$PLATFORM" == "android" ]]; then sh fmod-gdnative/.travis/download-ndk.sh; fi
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
-  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/1586aff48a646b2f4309a8fd4d4eea431f342ebe/getFmodAPI.sh
+  - wget https://gist.githubusercontent.com/piiertho/b2521d95965297422888b113dbb3aa5a/raw/20e6498950eded070af35153c7b2ea443ce3ffe5/getFmod2.sh
   - chmod +x getFmodAPI.sh
   - ./getFmodAPI.sh $FMODUSER $FMODPASS $PLATFORM
-  - if [[ "$PLATFORM" == "linux" ]]; then tar -xvf fmodstudioapi11012linux.tar.gz; fi
-  - if [[ "$PLATFORM" == "osx" ]]; then hdiutil attach fmodstudioapi11012osx.dmg; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then 7z x fmodstudioapi11012win-installer.exe; fi
-  - if [[ "$PLATFORM" == "ios" ]]; then hdiutil attach fmodstudioapi11012ios.dmg; fi
-  - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi11012android.tar.gz; fi
-  - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi11012linux/api linux; fi
+  - if [[ "$PLATFORM" == "linux" ]]; then tar -xvf fmodstudioapi20001linux.tar.gz; fi
+  - if [[ "$PLATFORM" == "osx" ]]; then hdiutil attach fmodstudioapi20001osx.dmg; fi
+  - if [[ "$PLATFORM" == "windows" ]]; then 7z x fmodstudioapi20001win-installer.exe; fi
+  - if [[ "$PLATFORM" == "ios" ]]; then hdiutil attach fmodstudioapi20001ios.dmg; fi
+  - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi20001android.tar.gz; fi
+  - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi20001linux/api linux; fi
   - if [[ "$PLATFORM" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/lowlevel/lib/fmod_vc.lib windows/lowlevel/lib/fmod.lib && mv windows/lowlevel/lib/fmod64_vc.lib windows/lowlevel/lib/fmod64.lib && mv windows/studio/lib/fmodstudio_vc.lib windows/studio/lib/fmodstudio.lib && mv windows/studio/lib/fmodstudio64_vc.lib windows/studio/lib/fmodstudio64.lib; fi
+  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/core/lib/fmod_vc.lib windows/core/lib/fmod.lib && mv windows/core/lib/fmod64_vc.lib windows/core/lib/fmod64.lib && mv windows/studio/lib/fmodstudio_vc.lib windows/studio/lib/fmodstudio.lib && mv windows/studio/lib/fmodstudio64_vc.lib windows/studio/lib/fmodstudio64.lib; fi
   - if [[ "$PLATFORM" == "ios" ]]; then cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios; fi
   - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi11012android/api android; fi
   - cd ../../
