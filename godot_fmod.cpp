@@ -295,7 +295,7 @@ int GodotFmod::getBankVCACount(const String pathToBank) {
     return -1;
 }
 
-unsigned int GodotFmod::createEventInstance(const String eventPath) {
+const uint64_t GodotFmod::createEventInstance(String eventPath) {
     if (!eventDescriptions.count(eventPath)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventPath.alloc_c_string(), &desc));
@@ -305,14 +305,14 @@ unsigned int GodotFmod::createEventInstance(const String eventPath) {
     FMOD::Studio::EventInstance *instance;
     checkErrors(descIt->second->createInstance(&instance));
     if (instance) {
-        unsigned int instanceId = ++instanceIdCount;
+        const auto instanceId = (uint64_t)instance;
         unmanagedEvents[instanceId] = instance;
         return instanceId;
     }
     return 0;
 }
 
-float GodotFmod::getEventParameter(const unsigned int instanceId, const String parameterName) {
+float GodotFmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
     if (!unmanagedEvents.count(instanceId)) return p;
     auto i = unmanagedEvents.find(instanceId);
@@ -321,25 +321,25 @@ float GodotFmod::getEventParameter(const unsigned int instanceId, const String p
     return p;
 }
 
-void GodotFmod::setEventParameter(const unsigned int instanceId, const String parameterName, const float value) {
+void GodotFmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setParameterValue(parameterName.ascii().get_data(), value));
 }
 
-void GodotFmod::releaseEvent(const unsigned int instanceId) {
+void GodotFmod::releaseEvent(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->release());
 }
 
-void GodotFmod::startEvent(const unsigned int instanceId) {
+void GodotFmod::startEvent(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->start());
 }
 
-void GodotFmod::stopEvent(const unsigned int instanceId, const int stopMode) {
+void GodotFmod::stopEvent(const uint64_t instanceId, int stopMode) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) {
@@ -347,13 +347,13 @@ void GodotFmod::stopEvent(const unsigned int instanceId, const int stopMode) {
     }
 }
 
-void GodotFmod::triggerEventCue(const unsigned int instanceId) {
+void GodotFmod::triggerEventCue(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->triggerCue());
 }
 
-int GodotFmod::getEventPlaybackState(const unsigned int instanceId) {
+int GodotFmod::getEventPlaybackState(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId))
         return -1;
     else {
@@ -367,7 +367,7 @@ int GodotFmod::getEventPlaybackState(const unsigned int instanceId) {
     }
 }
 
-bool GodotFmod::getEventPaused(const unsigned int instanceId) {
+bool GodotFmod::getEventPaused(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return false;
     auto i = unmanagedEvents.find(instanceId);
     bool paused = false;
@@ -375,13 +375,13 @@ bool GodotFmod::getEventPaused(const unsigned int instanceId) {
     return paused;
 }
 
-void GodotFmod::setEventPaused(const unsigned int instanceId, const bool paused) {
+void GodotFmod::setEventPaused(const uint64_t instanceId, bool paused) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setPaused(paused));
 }
 
-float GodotFmod::getEventPitch(const unsigned int instanceId) {
+float GodotFmod::getEventPitch(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return 0.0f;
     auto i = unmanagedEvents.find(instanceId);
     float pitch = 0.0f;
@@ -389,13 +389,13 @@ float GodotFmod::getEventPitch(const unsigned int instanceId) {
     return pitch;
 }
 
-void GodotFmod::setEventPitch(const unsigned int instanceId, const float pitch) {
+void GodotFmod::setEventPitch(const uint64_t instanceId, float pitch) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setPitch(pitch));
 }
 
-float GodotFmod::getEventVolume(const unsigned int instanceId) {
+float GodotFmod::getEventVolume(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return 0.0f;
     auto i = unmanagedEvents.find(instanceId);
     float volume = 0.0f;
@@ -403,13 +403,13 @@ float GodotFmod::getEventVolume(const unsigned int instanceId) {
     return volume;
 }
 
-void GodotFmod::setEventVolume(const unsigned int instanceId, const float volume) {
+void GodotFmod::setEventVolume(const uint64_t instanceId, float volume) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setVolume(volume));
 }
 
-int GodotFmod::getEventTimelinePosition(const unsigned int instanceId) {
+int GodotFmod::getEventTimelinePosition(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return 0;
     auto i = unmanagedEvents.find(instanceId);
     int tp = 0;
@@ -417,13 +417,13 @@ int GodotFmod::getEventTimelinePosition(const unsigned int instanceId) {
     return tp;
 }
 
-void GodotFmod::setEventTimelinePosition(const unsigned int instanceId, const int position) {
+void GodotFmod::setEventTimelinePosition(const uint64_t instanceId, int position) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setTimelinePosition(position));
 }
 
-float GodotFmod::getEventReverbLevel(const unsigned int instanceId, const int index) {
+float GodotFmod::getEventReverbLevel(const uint64_t instanceId, int index) {
     if (!unmanagedEvents.count(instanceId)) return 0.0f;
     auto i = unmanagedEvents.find(instanceId);
     float rvl = 0.0f;
@@ -431,13 +431,13 @@ float GodotFmod::getEventReverbLevel(const unsigned int instanceId, const int in
     return rvl;
 }
 
-void GodotFmod::setEventReverbLevel(const unsigned int instanceId, const int index, const float level) {
+void GodotFmod::setEventReverbLevel(const uint64_t instanceId, int index, float level) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) checkErrors(i->second->setReverbLevel(index, level));
 }
 
-bool GodotFmod::isEventVirtual(const unsigned int instanceId) {
+bool GodotFmod::isEventVirtual(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return false;
     auto i = unmanagedEvents.find(instanceId);
     bool v = false;
@@ -599,7 +599,7 @@ void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *ga
     }
 }
 
-void GodotFmod::attachInstanceToNode(const unsigned int instanceId, Object *gameObj) {
+void GodotFmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
     if (!unmanagedEvents.count(instanceId) || isNull(gameObj)) return;
     auto i = unmanagedEvents.find(instanceId);
     if (i != unmanagedEvents.end()) {
@@ -608,7 +608,7 @@ void GodotFmod::attachInstanceToNode(const unsigned int instanceId, Object *game
     }
 }
 
-void GodotFmod::detachInstanceFromNode(const unsigned int instanceId) {
+void GodotFmod::detachInstanceFromNode(const uint64_t instanceId) {
     if (!unmanagedEvents.count(instanceId)) return;
     auto instance = unmanagedEvents.find(instanceId);
     if (instance != unmanagedEvents.end()) {
@@ -638,7 +638,7 @@ void GodotFmod::setVCAVolume(const String VCAPath, float volume) {
     checkErrors(vca->second->setVolume(volume));
 }
 
-void GodotFmod::playSound(const unsigned int instanceId) {
+void GodotFmod::playSound(const uint64_t instanceId) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -646,7 +646,7 @@ void GodotFmod::playSound(const unsigned int instanceId) {
     }
 }
 
-void GodotFmod::setSoundPaused(const unsigned int instanceId, const bool paused) {
+void GodotFmod::setSoundPaused(const uint64_t instanceId, bool paused) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -654,7 +654,7 @@ void GodotFmod::setSoundPaused(const unsigned int instanceId, const bool paused)
     }
 }
 
-void GodotFmod::stopSound(const unsigned int instanceId) {
+void GodotFmod::stopSound(const uint64_t instanceId) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -662,7 +662,7 @@ void GodotFmod::stopSound(const unsigned int instanceId) {
     }
 }
 
-bool GodotFmod::isSoundPlaying(const unsigned int instanceId) {
+bool GodotFmod::isSoundPlaying(const uint64_t instanceId) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -673,7 +673,7 @@ bool GodotFmod::isSoundPlaying(const unsigned int instanceId) {
     return false;
 }
 
-void GodotFmod::setSoundVolume(const unsigned int instanceId, const float volume) {
+void GodotFmod::setSoundVolume(const uint64_t instanceId, float volume) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -681,7 +681,7 @@ void GodotFmod::setSoundVolume(const unsigned int instanceId, const float volume
     }
 }
 
-float GodotFmod::getSoundVolume(const unsigned int instanceId) {
+float GodotFmod::getSoundVolume(const uint64_t instanceId) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -692,7 +692,7 @@ float GodotFmod::getSoundVolume(const unsigned int instanceId) {
     return 0.f;
 }
 
-float GodotFmod::getSoundPitch(const unsigned int instanceId) {
+float GodotFmod::getSoundPitch(const uint64_t instanceId) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -703,7 +703,7 @@ float GodotFmod::getSoundPitch(const unsigned int instanceId) {
     return 0.f;
 }
 
-void GodotFmod::setSoundPitch(const unsigned int instanceId, const float pitch) {
+void GodotFmod::setSoundPitch(const uint64_t instanceId, float pitch) {
     if (sounds.count(instanceId)) {
         auto s = sounds.find(instanceId)->second;
         auto c = channels.find(s)->second;
@@ -711,11 +711,11 @@ void GodotFmod::setSoundPitch(const unsigned int instanceId, const float pitch) 
     }
 }
 
-unsigned int GodotFmod::loadSound(const String path, const int mode) {
+const uint64_t GodotFmod::loadSound(String path, int mode) {
     FMOD::Sound *sound = nullptr;
     checkErrors(lowLevelSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
     if (sound) {
-        unsigned int instanceId = ++instanceIdCount;
+        const auto instanceId = (uint64_t)sound;
         sounds[instanceId] = sound;
         FMOD::Channel *channel = nullptr;
         checkErrors(lowLevelSystem->playSound(sound, nullptr, true, &channel));
@@ -727,7 +727,7 @@ unsigned int GodotFmod::loadSound(const String path, const int mode) {
     return 0;
 }
 
-void GodotFmod::releaseSound(const unsigned int instanceId) {
+void GodotFmod::releaseSound(const uint64_t instanceId) {
     if (!sounds.count(instanceId)) return; // sound is not loaded
     auto sound = sounds.find(instanceId);
     if (sound->second) checkErrors(sound->second->release());
@@ -746,7 +746,6 @@ void GodotFmod::_init() {
     system = nullptr;
     lowLevelSystem = nullptr;
     listener = nullptr;
-    instanceIdCount = 0;
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getLowLevelSystem(&lowLevelSystem));
     distanceScale = 1.0;
