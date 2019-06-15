@@ -40,8 +40,8 @@ before_install:
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
   - wget https://gist.githubusercontent.com/piiertho/b2521d95965297422888b113dbb3aa5a/raw/20e6498950eded070af35153c7b2ea443ce3ffe5/getFmod2.sh
-  - chmod +x getFmodAPI.sh
-  - ./getFmodAPI.sh $FMODUSER $FMODPASS $PLATFORM
+  - chmod +x getFmod2.sh
+  - ./getFmod2.sh $FMODUSER $FMODPASS $PLATFORM
   - if [[ "$PLATFORM" == "linux" ]]; then tar -xvf fmodstudioapi20001linux.tar.gz; fi
   - if [[ "$PLATFORM" == "osx" ]]; then hdiutil attach fmodstudioapi20001osx.dmg; fi
   - if [[ "$PLATFORM" == "windows" ]]; then 7z x fmodstudioapi20001win-installer.exe; fi
