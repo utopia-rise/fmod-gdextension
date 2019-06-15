@@ -27,7 +27,7 @@ namespace godot {
         std::map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         std::map<String, FMOD::Studio::Bus *> buses;
         std::map<String, FMOD::Studio::VCA *> VCAs;
-        std::map<unsigned int, FMOD::Sound *> sounds;
+        std::map<const uint64_t, FMOD::Sound *> sounds;
         std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
         // keep track of one shot instances internally
@@ -40,9 +40,7 @@ namespace godot {
 
         // events not directly managed by the integration
         // referenced through uuids generated in script
-        std::map<unsigned int, FMOD::Studio::EventInstance *> unmanagedEvents;
-
-        unsigned int instanceIdCount;
+        std::map<const uint64_t, FMOD::Studio::EventInstance *> unmanagedEvents;
 
     GODOT_CLASS(GodotFmod, Node)
 
@@ -77,25 +75,25 @@ namespace godot {
         int getBankEventCount(String pathToBank);
         int getBankStringCount(String pathToBank);
         int getBankVCACount(String pathToBank);
-        unsigned int createEventInstance(String eventPath);
-        float getEventParameter(unsigned int instanceId, String parameterName);
-        void setEventParameter(unsigned int instanceId, String parameterName, float value);
-        void releaseEvent(unsigned int instanceId);
-        void startEvent(unsigned int instanceId);
-        void stopEvent(unsigned int instanceId, int stopMode);
-        void triggerEventCue(unsigned int instanceId);
-        int getEventPlaybackState(unsigned int instanceId);
-        bool getEventPaused(unsigned int instanceId);
-        void setEventPaused(unsigned int instanceId, bool paused);
-        float getEventPitch(unsigned int instanceId);
-        void setEventPitch(unsigned int instanceId, float pitch);
-        float getEventVolume(unsigned int instanceId);
-        void setEventVolume(unsigned int instanceId, float volume);
-        int getEventTimelinePosition(unsigned int instanceId);
-        void setEventTimelinePosition(unsigned int instanceId, int position);
-        float getEventReverbLevel(unsigned int instanceId, int index);
-        void setEventReverbLevel(unsigned int instanceId, int index, float level);
-        bool isEventVirtual(unsigned int instanceId);
+        const uint64_t createEventInstance(String eventPath);
+        float getEventParameter(uint64_t instanceId, String parameterName);
+        void setEventParameter(uint64_t instanceId, String parameterName, float value);
+        void releaseEvent(uint64_t instanceId);
+        void startEvent(uint64_t instanceId);
+        void stopEvent(uint64_t instanceId, int stopMode);
+        void triggerEventCue(uint64_t instanceId);
+        int getEventPlaybackState(uint64_t instanceId);
+        bool getEventPaused(uint64_t instanceId);
+        void setEventPaused(uint64_t instanceId, bool paused);
+        float getEventPitch(uint64_t instanceId);
+        void setEventPitch(uint64_t instanceId, float pitch);
+        float getEventVolume(uint64_t instanceId);
+        void setEventVolume(uint64_t instanceId, float volume);
+        int getEventTimelinePosition(uint64_t instanceId);
+        void setEventTimelinePosition(uint64_t instanceId, int position);
+        float getEventReverbLevel(uint64_t instanceId, int index);
+        void setEventReverbLevel(uint64_t instanceId, int index, float level);
+        bool isEventVirtual(uint64_t instanceId);
 
         /* bus functions */
         bool getBusMute(String busPath);
@@ -113,19 +111,19 @@ namespace godot {
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
-        void attachInstanceToNode(unsigned int instanceId, Object *gameObj);
-        void detachInstanceFromNode(unsigned int instanceId);
+        void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
+        void detachInstanceFromNode(uint64_t instanceId);
 
-        void playSound(unsigned int instanceId);
-        unsigned int loadSound(String path, int mode);
-        void releaseSound(unsigned int instanceId);
-        void setSoundPaused(unsigned int instanceId, bool paused);
-        void stopSound(unsigned int instanceId);
-        bool isSoundPlaying(unsigned int instanceId);
-        void setSoundVolume(unsigned int instanceId, float volume);
-        float getSoundVolume(unsigned int instanceId);
-        float getSoundPitch(unsigned int instanceId);
-        void setSoundPitch(unsigned int instanceId, float pitch);
+        void playSound(uint64_t instanceId);
+        const uint64_t loadSound(String path, int mode);
+        void releaseSound(uint64_t instanceId);
+        void setSoundPaused(uint64_t instanceId, bool paused);
+        void stopSound(uint64_t instanceId);
+        bool isSoundPlaying(uint64_t instanceId);
+        void setSoundVolume(uint64_t instanceId, float volume);
+        float getSoundVolume(uint64_t instanceId);
+        float getSoundPitch(uint64_t instanceId);
+        void setSoundPitch(uint64_t instanceId, float pitch);
 
     };
 }
