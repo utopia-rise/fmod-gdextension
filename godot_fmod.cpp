@@ -146,7 +146,7 @@ void GodotFmod::setListenerAttributes() {
     if (ci != nullptr) {
         Transform2D t2d = ci->get_transform();
         Vector2 posVector = t2d.get_origin() / distanceScale;
-        Vector3 pos(posVector.x, posVector.y, 0.0f),
+        Vector3 pos(posVector.x, 0.0f, posVector.y),
                 up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
         const FMOD_VECTOR &posFmodVector = toFmodVector(pos);
         auto attr = get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
@@ -196,7 +196,7 @@ void GodotFmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance
         if (ci != nullptr) {
             Transform2D t2d = ci->get_transform();
             Vector2 posVector = t2d.get_origin() / distanceScale;
-            Vector3 pos(posVector.x, posVector.y, 0.0f),
+            Vector3 pos(posVector.x, 0.0f, posVector.y),
                     up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
             FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
             checkErrors(instance->set3DAttributes(&attr));
