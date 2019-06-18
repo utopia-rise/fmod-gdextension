@@ -49,9 +49,9 @@ before_install:
   - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi20001android.tar.gz; fi
   - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi20001linux/api linux; fi
   - if [[ "$PLATFORM" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/core/lib/fmod_vc.lib windows/core/lib/fmod.lib && mv windows/core/lib/fmod64_vc.lib windows/core/lib/fmod64.lib && mv windows/studio/lib/fmodstudio_vc.lib windows/studio/lib/fmodstudio.lib && mv windows/studio/lib/fmodstudio64_vc.lib windows/studio/lib/fmodstudio64.lib; fi
+  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/core/lib/x86/fmod_vc.lib windows/core/lib/x86/fmod.lib && mv windows/core/lib/x64/fmod_vc.lib windows/core/lib/x64/fmod.lib && mv windows/studio/lib/x86/fmodstudio_vc.lib windows/studio/lib/x86/fmodstudio.lib && mv windows/studio/lib/x64/fmodstudio_vc.lib windows/studio/lib/x64/fmodstudio.lib; fi
   - if [[ "$PLATFORM" == "ios" ]]; then cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios; fi
-  - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi11012android/api android; fi
+  - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi20001android/api android; fi
   - cd ../../
   - if [[ "$PLATFORM" == "linux" || "$PLATFORM" == "android" ]]; then sudo apt-get install -y p7zip-full && wget https://downloads.tuxfamily.org/godotengine/3.1.1/Godot_v3.1.1-stable_x11.64.zip && 7z x Godot_v3.1.1-stable_x11.64.zip; fi
   - if [[ "$PLATFORM" == "osx" || "$PLATFORM" == "ios" ]]; then wget https://downloads.tuxfamily.org/godotengine/3.1.1/Godot_v3.1.1-stable_osx.64.zip && 7z x Godot_v3.1.1-stable_osx.64.zip; fi
