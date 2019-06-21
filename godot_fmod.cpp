@@ -241,7 +241,10 @@ String GodotFmod::loadbank(const String pathToBank, const unsigned int flag) {
 void GodotFmod::unloadBank(const String pathToBank) {
     if (!banks.count(pathToBank)) return; // bank is not loaded
     auto bankIt = banks.find(pathToBank);
-    if (bankIt != banks.end()) checkErrors(bankIt->second->unload());
+    if (bankIt != banks.end()) {
+        checkErrors(bankIt->second->unload());
+        banks.erase(pathToBank);
+    }
 }
 
 int GodotFmod::getBankLoadingState(const String pathToBank) {
