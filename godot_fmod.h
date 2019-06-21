@@ -41,6 +41,11 @@ namespace godot {
         // events not directly managed by the integration
         // referenced through uuids generated in script
         std::map<const uint64_t, FMOD::Studio::EventInstance *> unmanagedEvents;
+        struct MutedEvent {
+            FMOD::Studio::EventInstance *instance;
+            float volume;
+        };
+        std::map<const uint64_t, MutedEvent> mutedEvents;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -57,6 +62,9 @@ namespace godot {
         void loadBus(const String &busPath);
         void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
+
+        void muteOneEvent(FMOD::Studio::EventInstance *instance);
+        void unmuteOneEvent(MutedEvent mutedEvent);
 
     public:
         GodotFmod();
@@ -110,12 +118,19 @@ namespace godot {
         /* VCA functions */
         float getVCAVolume(String VCAPath);
         void setVCAVolume(String VCAPath, float volume);
+        /* Helper methods */
         void playOneShot(String eventName, Object *gameObj);
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
+        void pauseAllEvents(bool pause);
+        void muteAllEvents();
+        void unmuteAllEvents();
+        void muteEvent(uint64_t instanceId);
+        void unmuteEvent(uint64_t instanceId);
+        bool banksStillLoading();
 
         void playSound(uint64_t instanceId);
         const uint64_t loadSound(String path, int mode);

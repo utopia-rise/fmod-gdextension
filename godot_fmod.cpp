@@ -59,6 +59,12 @@ void GodotFmod::_register_methods() {
     register_method("playOneShotAttachedWithParams", &GodotFmod::playOneShotAttachedWithParams);
     register_method("attachInstanceToNode", &GodotFmod::attachInstanceToNode);
     register_method("detachInstanceFromNode", &GodotFmod::detachInstanceFromNode);
+    register_method("pauseAllEvents", &GodotFmod::pauseAllEvents);
+    register_method("muteAllEvents", &GodotFmod::muteAllEvents);
+    register_method("unmuteAllEvents", &GodotFmod::unmuteAllEvents);
+    register_method("muteEvent", &GodotFmod::muteEvent);
+    register_method("unmuteEvent", &GodotFmod::unmuteEvent);
+    register_method("banksStillLoading", &GodotFmod::banksStillLoading);
     register_method("loadSound", &GodotFmod::loadSound);
     register_method("playSound", &GodotFmod::playSound);
     register_method("stopSound", &GodotFmod::stopSound);
@@ -632,6 +638,86 @@ void GodotFmod::detachInstanceFromNode(const uint64_t instanceId) {
                 break;
             }
         }
+    }
+}
+
+void GodotFmod::pauseAllEvents(const bool pause) {
+    // pause one shot instances
+    for (auto instance : oneShotInstances) {
+        checkErrors(instance->setPaused(pause));
+    }
+    // pause attached one shot instances
+    for (auto aShot : attachedOneShots) {
+        checkErrors(aShot.instance->setPaused(pause));
+    }
+    // pause unmanaged events
+    for (auto &it : unmanagedEvents) {
+        checkErrors(it.second->setPaused(pause));
+    }
+}
+
+void GodotFmod::muteAllEvents() {
+    // mute one shot instances
+    for (auto oneShot : oneShotInstances) {
+        muteOneEvent(oneShot);
+    }
+    // mute attached one shot instances
+    for (auto aShot : attachedOneShots) {
+        muteOneEvent(aShot.instance);
+    }
+    // mute unmanaged events
+    for (auto &it : unmanagedEvents) {
+        muteOneEvent(it.second);
+    }
+}
+
+void GodotFmod::unmuteAllEvents() {
+    for (auto it : mutedEvents) {
+        unmuteOneEvent(it.second);
+    }
+}
+
+void GodotFmod::muteEvent(const uint64_t instanceId) {
+    if (unmanagedEvents.find(instanceId) != unmanagedEvents.end()) {
+        muteOneEvent(unmanagedEvents[instanceId]);
+    } else {
+        Godot::print_error("FMOD Sound System: Unable to find event", "GodotFmod::muteEvent", __FILE__, __LINE__);
+    }
+}
+
+void GodotFmod::unmuteEvent(const uint64_t instanceId) {
+    if (mutedEvents.find(instanceId) != mutedEvents.end()) {
+        unmuteOneEvent(mutedEvents[instanceId]);
+    } else {
+        Godot::print_error("FMOD Sound System: This event is not muted", "GodotFmod::unmuteEvent", __FILE__, __LINE__);
+    }
+}
+
+bool GodotFmod::banksStillLoading() {
+    for (auto &it : banks) {
+        FMOD::Studio::Bank *bank = it.second;
+        FMOD_STUDIO_LOADING_STATE loadingState;
+        checkErrors(bank->getLoadingState(&loadingState));
+        if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void GodotFmod::muteOneEvent(FMOD::Studio::EventInstance *instance) {
+    auto instanceId = (uint64_t) instance;
+    float volume = 0.f;
+    if (checkErrors(instance->getVolume(&volume)) && checkErrors(instance->setVolume(0.f))) {
+        mutedEvents[instanceId] = { instance, volume };
+    } else {
+        Godot::print_error("FMOD Sound System: Failed to mute event", "GodotFmod::muteOneEvent", __FILE__, __LINE__);
+    }
+}
+
+void GodotFmod::unmuteOneEvent(MutedEvent mutedEvent) {
+    if (!checkErrors(mutedEvent.instance->setVolume(mutedEvent.volume))) {
+        Godot::print_error("FMOD Sound System: Failed to unmute event", "GodotFmod::unmuteOneEvent", __FILE__, __LINE__);
     }
 }
 
