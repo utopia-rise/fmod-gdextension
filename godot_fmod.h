@@ -127,8 +127,8 @@ namespace godot {
         float getSoundPitch(unsigned int instanceId);
         void setSoundPitch(unsigned int instanceId, float pitch);
 
-        void setGlobalParameter(const String &parameterName, float value);
-        float getGlobalParameter(const String &parameterName);
+        void setGlobalParameter(String parameterName, float value);
+        float getGlobalParameter(String parameterName);
 
     };
 }
