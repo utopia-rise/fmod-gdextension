@@ -30,22 +30,16 @@ namespace godot {
         std::map<const uint64_t, FMOD::Sound *> sounds;
         std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
-        // keep track of one shot instances internally
-        std::vector<FMOD::Studio::EventInstance *> oneShotInstances;
-        struct AttachedOneShot {
-            FMOD::Studio::EventInstance *instance;
-            Object *gameObj;
+        std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
+        struct EventInfo {
+            //old volume when muted
+            float oldVolume = 0.f;
+            bool isMuted = false;
+            //One shot events are managed by integration
+            bool isOneShot = false;
+            //GameObject to which this event is attached
+            Object *gameObj = nullptr;
         };
-        std::vector<AttachedOneShot> attachedOneShots;
-
-        // events not directly managed by the integration
-        // referenced through uuids generated in script
-        std::map<const uint64_t, FMOD::Studio::EventInstance *> unmanagedEvents;
-        struct MutedEvent {
-            FMOD::Studio::EventInstance *instance;
-            float volume;
-        };
-        std::map<const uint64_t, MutedEvent> mutedEvents;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -64,7 +58,11 @@ namespace godot {
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
 
         void muteOneEvent(FMOD::Studio::EventInstance *instance);
-        void unmuteOneEvent(MutedEvent mutedEvent);
+        void unmuteOneEvent(FMOD::Studio::EventInstance *instance);
+        FMOD::Studio::EventInstance *
+        createInstance(const String eventName, const bool isOneShot, const bool isAttached, Object *gameObject);
+        EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
+        void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
 
     public:
         GodotFmod();
