@@ -70,6 +70,7 @@ void GodotFmod::_register_methods() {
     register_method("setSoundPitch", &GodotFmod::setSoundPitch);
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
     register_method("setSound3DSettings", &GodotFmod::setSound3DSettings);
+    register_method("getPerformanceData", &GodotFmod::getPerformanceData);
 }
 
 void GodotFmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
@@ -749,6 +750,43 @@ void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, flo
     } else {
         Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "GodotFmod::setSound3DSettings", __FILE__, __LINE__);
     }
+}
+
+Dictionary GodotFmod::getPerformanceData() {
+    Dictionary performanceData;
+
+    // get the CPU usage
+    FMOD_STUDIO_CPU_USAGE cpuUsage;
+    checkErrors(system->getCPUUsage(&cpuUsage));
+    Dictionary cpuPerfData;
+    cpuPerfData["dsp"] = cpuUsage.dspusage;
+    cpuPerfData["geometry"] = cpuUsage.geometryusage;
+    cpuPerfData["stream"] = cpuUsage.streamusage;
+    cpuPerfData["studio"] = cpuUsage.studiousage;
+    cpuPerfData["update"] = cpuUsage.updateusage;
+    performanceData["CPU"] = cpuPerfData;
+
+    // get the memory usage
+    int currentAlloc = 0;
+    int maxAlloc = 0;
+    checkErrors(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
+    Dictionary memPerfData;
+    memPerfData["currently_allocated"] = currentAlloc;
+    memPerfData["max_allocated"] = maxAlloc;
+    performanceData["memory"] = memPerfData;
+
+    // get the file usage
+    int64_t sampleBytesRead = 0;
+    int64_t streamBytesRead = 0;
+    int64_t otherBytesRead = 0;
+    checkErrors(lowLevelSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
+    Dictionary filePerfData;
+    filePerfData["sample_bytes_read"] = sampleBytesRead;
+    filePerfData["stream_bytes_read"] = streamBytesRead;
+    filePerfData["other_bytes_read"] = otherBytesRead;
+    performanceData["file"] = filePerfData;
+
+    return performanceData;
 }
 
 void GodotFmod::_init() {
