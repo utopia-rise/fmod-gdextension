@@ -70,6 +70,9 @@ void GodotFmod::_register_methods() {
     register_method("setSoundPitch", &GodotFmod::setSoundPitch);
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
     register_method("setSound3DSettings", &GodotFmod::setSound3DSettings);
+    register_method("getAvailableDrivers", &GodotFmod::getAvailableDrivers);
+    register_method("getDriver", &GodotFmod::getDriver);
+    register_method("setDriver", &GodotFmod::setDriver);
 }
 
 void GodotFmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
@@ -749,6 +752,42 @@ void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, flo
     } else {
         Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "GodotFmod::setSound3DSettings", __FILE__, __LINE__);
     }
+}
+
+Array GodotFmod::getAvailableDrivers() {
+    Array driverList;
+    int numDrivers = 0;
+
+    checkErrors(lowLevelSystem->getNumDrivers(&numDrivers));
+
+    for (int i = 0; i < numDrivers; i++) {
+        char name[256];
+        int sampleRate;
+        FMOD_SPEAKERMODE speakerMode;
+        int speakerModeChannels;
+        checkErrors(lowLevelSystem->getDriverInfo(i, name, 256, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
+        String nameStr(name);
+
+        Dictionary driverInfo;
+        driverInfo["id"] = i;
+        driverInfo["name"] = nameStr;
+        driverInfo["sample_rate"] = sampleRate;
+        driverInfo["speaker_mode"] = (int)speakerMode;
+        driverInfo["number_of_channels"] = speakerModeChannels;
+        driverList.push_back(driverInfo);
+    }
+
+    return driverList;
+}
+
+int GodotFmod::getDriver() {
+    int driverId = -1;
+    checkErrors(lowLevelSystem->getDriver(&driverId));
+    return driverId;
+}
+
+void GodotFmod::setDriver(const int id) {
+    checkErrors(lowLevelSystem->setDriver(id));
 }
 
 void GodotFmod::_init() {
