@@ -776,14 +776,14 @@ Dictionary GodotFmod::getPerformanceData() {
     performanceData["memory"] = memPerfData;
 
     // get the file usage
-    int64_t sampleBytesRead = 0;
-    int64_t streamBytesRead = 0;
-    int64_t otherBytesRead = 0;
+    long long sampleBytesRead = 0;
+    long long streamBytesRead = 0;
+    long long otherBytesRead = 0;
     checkErrors(lowLevelSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
     Dictionary filePerfData;
-    filePerfData["sample_bytes_read"] = sampleBytesRead;
-    filePerfData["stream_bytes_read"] = streamBytesRead;
-    filePerfData["other_bytes_read"] = otherBytesRead;
+    filePerfData["sample_bytes_read"] = static_cast<int64_t >(sampleBytesRead);
+    filePerfData["stream_bytes_read"] = static_cast<int64_t >(streamBytesRead);
+    filePerfData["other_bytes_read"] = static_cast<int64_t >(otherBytesRead);
     performanceData["file"] = filePerfData;
 
     return performanceData;
