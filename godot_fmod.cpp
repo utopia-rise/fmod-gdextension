@@ -107,7 +107,6 @@ int GodotFmod::checkErrors(FMOD_RESULT result) {
 
 void GodotFmod::update() {
     for (auto i : events) {
-        bool isReleased = false;
         FMOD::Studio::EventInstance *eventInstance = i.second;
         EventInfo *eventInfo = getEventInfo(eventInstance);
         if (eventInfo->isOneShot) {
@@ -115,16 +114,16 @@ void GodotFmod::update() {
             checkErrors(eventInstance->getPlaybackState(&s));
             if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
                 releaseOneEvent(eventInstance);
-                isReleased = true;
+                continue;
             }
         }
-        if (!isReleased && eventInfo->gameObj && isNull(eventInfo->gameObj)) {
+        if (eventInfo->gameObj && isNull(eventInfo->gameObj)) {
             FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
             checkErrors(eventInstance->stop(m));
             releaseOneEvent(eventInstance);
-            isReleased = true;
+            continue;
         }
-        if (!isReleased) {
+        else {
             updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
         }
     }
@@ -335,6 +334,7 @@ void GodotFmod::releaseEvent(const uint64_t instanceId) {
 
 void GodotFmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
     EventInfo *eventInfo = getEventInfo(eventInstance);
+    eventInstance->setUserData(nullptr);
     checkErrors(eventInstance->release());
     events.erase((uint64_t) eventInstance);
     delete &eventInfo;
