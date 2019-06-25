@@ -124,6 +124,8 @@ namespace godot {
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
         void pauseAllEvents(bool pause);
+        void muteMasterBus();
+        void unmuteMasterBus();
         void muteAllEvents();
         void unmuteAllEvents();
         void muteEvent(uint64_t instanceId);

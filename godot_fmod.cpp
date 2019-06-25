@@ -62,6 +62,8 @@ void GodotFmod::_register_methods() {
     register_method("pauseAllEvents", &GodotFmod::pauseAllEvents);
     register_method("muteAllEvents", &GodotFmod::muteAllEvents);
     register_method("unmuteAllEvents", &GodotFmod::unmuteAllEvents);
+    register_method("muteMasterBus", &GodotFmod::muteMasterBus);
+    register_method("unmuteMasterBus", &GodotFmod::unmuteMasterBus);
     register_method("muteEvent", &GodotFmod::muteEvent);
     register_method("unmuteEvent", &GodotFmod::unmuteEvent);
     register_method("banksStillLoading", &GodotFmod::banksStillLoading);
@@ -643,6 +645,24 @@ void GodotFmod::pauseAllEvents(const bool pause) {
     }
 }
 
+void GodotFmod::muteMasterBus() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus *masterBus = nullptr;
+        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(true);
+        }
+    }
+}
+
+void GodotFmod::unmuteMasterBus() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus *masterBus = nullptr;
+        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(false);
+        }
+    }
+}
+
 void GodotFmod::muteAllEvents() {
     for (auto &it : events) {
         muteOneEvent(it.second);
@@ -651,7 +671,7 @@ void GodotFmod::muteAllEvents() {
 
 void GodotFmod::unmuteAllEvents() {
     for (auto it : events) {
-        unmuteOneEvent(nullptr);
+        unmuteOneEvent(it.second);
     }
 }
 
