@@ -755,38 +755,34 @@ void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, flo
 }
 
 Dictionary GodotFmod::getPerformanceData() {
-    Dictionary performanceData;
 
     // get the CPU usage
     FMOD_STUDIO_CPU_USAGE cpuUsage;
     checkErrors(system->getCPUUsage(&cpuUsage));
-    Dictionary cpuPerfData;
+    Dictionary cpuPerfData = performanceData["CPU"];
     cpuPerfData["dsp"] = cpuUsage.dspusage;
     cpuPerfData["geometry"] = cpuUsage.geometryusage;
     cpuPerfData["stream"] = cpuUsage.streamusage;
     cpuPerfData["studio"] = cpuUsage.studiousage;
     cpuPerfData["update"] = cpuUsage.updateusage;
-    performanceData["CPU"] = cpuPerfData;
 
     // get the memory usage
     int currentAlloc = 0;
     int maxAlloc = 0;
     checkErrors(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
-    Dictionary memPerfData;
+    Dictionary memPerfData = performanceData["memory"];
     memPerfData["currently_allocated"] = currentAlloc;
     memPerfData["max_allocated"] = maxAlloc;
-    performanceData["memory"] = memPerfData;
 
     // get the file usage
     long long sampleBytesRead = 0;
     long long streamBytesRead = 0;
     long long otherBytesRead = 0;
     checkErrors(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
-    Dictionary filePerfData;
+    Dictionary filePerfData = performanceData["file"];
     filePerfData["sample_bytes_read"] = static_cast<int64_t >(sampleBytesRead);
     filePerfData["stream_bytes_read"] = static_cast<int64_t >(streamBytesRead);
     filePerfData["other_bytes_read"] = static_cast<int64_t >(otherBytesRead);
-    performanceData["file"] = filePerfData;
 
     return performanceData;
 }
@@ -805,6 +801,12 @@ void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
+    auto *cpuPerfData = new Dictionary();
+    auto *memPerfData = new Dictionary();
+    auto *filePerfData = new Dictionary();
+    performanceData["CPU"] = *cpuPerfData;
+    performanceData["memory"] = *memPerfData;
+    performanceData["file"] = *filePerfData;
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getCoreSystem(&coreSystem));
     distanceScale = 1.0;
