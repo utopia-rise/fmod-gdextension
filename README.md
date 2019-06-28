@@ -471,6 +471,19 @@ func _ready():
 	Fmod.releaseSound(my_sound)
 ```
 
+### Profiling & querying performance data
+
+`getPerformanceData` returns an object which contains current performance stats for CPU, Memory and File Streaming usage of both FMOD Studio and the Core System.
+
+```gdscript
+# called every frame
+var perf_data = FMOD.getPerformanceData()
+
+print(perf_data.CPU)
+print(perf_data.memory)
+print(perf_data.file)
+```
+
 ## Issues
 
 This is a work in progress project, forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
