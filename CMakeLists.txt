@@ -3,6 +3,10 @@ project(GodotFmod)
 
 set(CMAKE_CXX_STANDARD 14)
 
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+    set(APPLE TRUE)
+endif()
+
 link_directories("../godot-cpp/bin/")
 include_directories("../godot-cpp/include/")
 include_directories("../godot-cpp/include/core")
