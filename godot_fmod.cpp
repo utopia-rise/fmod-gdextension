@@ -74,6 +74,7 @@ void GodotFmod::_register_methods() {
     register_method("getAvailableDrivers", &GodotFmod::getAvailableDrivers);
     register_method("getDriver", &GodotFmod::getDriver);
     register_method("setDriver", &GodotFmod::setDriver);
+    register_method("getPerformanceData", &GodotFmod::getPerformanceData);
     register_method("setGlobalParameter", &GodotFmod::setGlobalParameter);
     register_method("getGlobalParameter", &GodotFmod::getGlobalParameter);
 }
@@ -797,6 +798,39 @@ void GodotFmod::setDriver(const int id) {
     checkErrors(coreSystem->setDriver(id));
 }
 
+Dictionary GodotFmod::getPerformanceData() {
+
+    // get the CPU usage
+    FMOD_STUDIO_CPU_USAGE cpuUsage;
+    checkErrors(system->getCPUUsage(&cpuUsage));
+    Dictionary cpuPerfData = performanceData["CPU"];
+    cpuPerfData["dsp"] = cpuUsage.dspusage;
+    cpuPerfData["geometry"] = cpuUsage.geometryusage;
+    cpuPerfData["stream"] = cpuUsage.streamusage;
+    cpuPerfData["studio"] = cpuUsage.studiousage;
+    cpuPerfData["update"] = cpuUsage.updateusage;
+
+    // get the memory usage
+    int currentAlloc = 0;
+    int maxAlloc = 0;
+    checkErrors(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
+    Dictionary memPerfData = performanceData["memory"];
+    memPerfData["currently_allocated"] = currentAlloc;
+    memPerfData["max_allocated"] = maxAlloc;
+
+    // get the file usage
+    long long sampleBytesRead = 0;
+    long long streamBytesRead = 0;
+    long long otherBytesRead = 0;
+    checkErrors(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
+    Dictionary filePerfData = performanceData["file"];
+    filePerfData["sample_bytes_read"] = static_cast<int64_t >(sampleBytesRead);
+    filePerfData["stream_bytes_read"] = static_cast<int64_t >(streamBytesRead);
+    filePerfData["other_bytes_read"] = static_cast<int64_t >(otherBytesRead);
+
+    return performanceData;
+}
+
 void GodotFmod::setGlobalParameter(const String parameterName, float value) {
     checkErrors(system->setParameterByName(parameterName.ascii().get_data(), value));
 }
@@ -811,6 +845,9 @@ void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
+    performanceData["CPU"] = Dictionary();
+    performanceData["memory"] = Dictionary();
+    performanceData["file"] = Dictionary();
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getCoreSystem(&coreSystem));
     distanceScale = 1.0;

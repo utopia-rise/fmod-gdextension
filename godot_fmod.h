@@ -42,6 +42,9 @@ namespace godot {
         // referenced through uuids generated in script
         std::map<const uint64_t, FMOD::Studio::EventInstance *> unmanagedEvents;
 
+        //Store disctionnary of performance data
+        Dictionary performanceData;
+
     GODOT_CLASS(GodotFmod, Node)
 
     private:
@@ -129,6 +132,7 @@ namespace godot {
         Array getAvailableDrivers();
         int getDriver();
         void setDriver(int id);
+        Dictionary getPerformanceData();
         void setGlobalParameter(String parameterName, float value);
         float getGlobalParameter(String parameterName);
 
