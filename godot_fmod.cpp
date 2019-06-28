@@ -70,6 +70,7 @@ void GodotFmod::_register_methods() {
     register_method("setSoundPitch", &GodotFmod::setSoundPitch);
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
     register_method("setSound3DSettings", &GodotFmod::setSound3DSettings);
+    register_method("waitForAllLoads", &GodotFmod::waitForAllLoads);
     register_method("getAvailableDrivers", &GodotFmod::getAvailableDrivers);
     register_method("getDriver", &GodotFmod::getDriver);
     register_method("setDriver", &GodotFmod::setDriver);
@@ -755,6 +756,10 @@ void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, flo
     } else {
         Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "GodotFmod::setSound3DSettings", __FILE__, __LINE__);
     }
+}
+
+void GodotFmod::waitForAllLoads() {
+    checkErrors(system->flushSampleLoading());
 }
 
 Array GodotFmod::getAvailableDrivers() {

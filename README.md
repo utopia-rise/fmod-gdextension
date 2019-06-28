@@ -416,6 +416,9 @@ FMOD.attachInstanceToNode(instanceId, self)
 
 # detaches the instance from its Node
 FMOD.detachInstanceFromNode(instanceId)
+
+# blocks the calling thread until all sample loading is done
+FMOD.waitForAllLoads()
 ```
 
 ### Attach to existing event, 3D positioning

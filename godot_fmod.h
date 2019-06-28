@@ -127,6 +127,8 @@ namespace godot {
         float getSoundVolume(uint64_t instanceId);
         float getSoundPitch(uint64_t instanceId);
         void setSoundPitch(uint64_t instanceId, float pitch);
+        void waitForAllLoads();
+
         Array getAvailableDrivers();
         int getDriver();
         void setDriver(int id);
