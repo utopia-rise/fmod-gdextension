@@ -126,6 +126,9 @@ namespace godot {
         void setSoundPitch(uint64_t instanceId, float pitch);
         void waitForAllLoads();
 
+        Array getAvailableDrivers();
+        int getDriver();
+        void setDriver(int id);
         void setGlobalParameter(String parameterName, float value);
         float getGlobalParameter(String parameterName);
 
