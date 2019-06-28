@@ -480,6 +480,23 @@ func _ready():
 	Fmod.releaseSound(my_sound)
 ```
 
+### Changing the default audio output device
+
+By default, FMOD will use the primary audio output device as determined by the operating system. This can be changed at runtime, ideally through your game's Options Menu.
+
+Here, `getAvailableDrivers()` returns an Array which contains a Dictionary for every audio driver found. Each Dictionary contains fields such as the name, sample rate
+and speaker config of the respective driver. Most importantly, it contains the id for that driver.
+
+ ```gdscript
+# retrieve all available audio drivers
+var drivers = Fmod.getAvailableDrivers()
+ # change the audio driver
+# you must pass in the id of the respective driver
+Fmod.setDriver(id)
+ # retrieve the id of the currently set driver
+var id = Fmod.getDriver()
+```
+
 ## Issues
 
 This is a work in progress project, forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
