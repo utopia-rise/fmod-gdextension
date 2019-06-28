@@ -801,12 +801,9 @@ void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
-    auto *cpuPerfData = new Dictionary();
-    auto *memPerfData = new Dictionary();
-    auto *filePerfData = new Dictionary();
-    performanceData["CPU"] = *cpuPerfData;
-    performanceData["memory"] = *memPerfData;
-    performanceData["file"] = *filePerfData;
+    performanceData["CPU"] = Dictionary();
+    performanceData["memory"] = Dictionary();
+    performanceData["file"] = Dictionary();
     checkErrors(FMOD::Studio::System::create(&system));
     checkErrors(system->getCoreSystem(&coreSystem));
     distanceScale = 1.0;
