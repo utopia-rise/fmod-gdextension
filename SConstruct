@@ -84,30 +84,30 @@ if platform == "osx":
     libfmod = 'libfmod%s.dylib' % lfix
     libfmodstudio = 'libfmodstudio%s.dylib' % lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
-               godot_bindings_path + 'include/gen/', '../libs/fmod/osx/lowlevel/inc/', '../libs/fmod/osx/studio/inc/'])
+               godot_bindings_path + 'include/gen/', '../libs/fmod/osx/core/inc/', '../libs/fmod/osx/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/osx/lowlevel/lib/', '../libs/fmod/osx/studio/lib/' ])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/osx/core/lib/', '../libs/fmod/osx/studio/lib/' ])
 elif platform == "linux":
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
-               godot_bindings_path + 'include/gen/', '../libs/fmod/linux/lowlevel/inc/', '../libs/fmod/linux/studio/inc/'])
+               godot_bindings_path + 'include/gen/', '../libs/fmod/linux/core/inc/', '../libs/fmod/linux/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/linux/lowlevel/lib/x86_64', '../libs/fmod/linux/studio/lib/x86_64' ])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/linux/core/lib/x86_64', '../libs/fmod/linux/studio/lib/x86_64' ])
 elif platform == "windows":
-    libfmod = 'fmod%s64'% lfix
-    libfmodstudio = 'fmodstudio%s64'% lfix
+    libfmod = 'fmod%s'% lfix
+    libfmodstudio = 'fmodstudio%s'% lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
-                        godot_bindings_path + 'include/gen/', '../libs/fmod/windows/lowlevel/inc/', '../libs/fmod/windows/studio/inc/'])
+                        godot_bindings_path + 'include/gen/', '../libs/fmod/windows/core/inc/', '../libs/fmod/windows/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/windows/lowlevel/lib/', '../libs/fmod/windows/studio/lib/' ])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/windows/core/lib/x64/', '../libs/fmod/windows/studio/lib/x64/' ])
 elif platform == "ios":
     libfmod = 'libfmod%s_iphoneos.a' % lfix
     libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
     env.Append(CPPPATH=[godot_headers_path, godot_bindings_path + 'include/', godot_bindings_path + 'include/core/',
-                        godot_bindings_path + 'include/gen/', '../libs/fmod/ios/lowlevel/inc/', '../libs/fmod/ios/studio/inc/'])
+                        godot_bindings_path + 'include/gen/', '../libs/fmod/ios/core/inc/', '../libs/fmod/ios/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/ios/lowlevel/lib/', '../libs/fmod/ios/studio/lib/' ])
+    env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/ios/core/lib/', '../libs/fmod/ios/studio/lib/' ])
 
 sources = []
 add_sources(sources, "./")
