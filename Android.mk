@@ -2,8 +2,8 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := fmod-lowlevel-prebuilt
-LOCAL_SRC_FILES := ../libs/fmod/android/lowlevel/lib/$(TARGET_ARCH_ABI)/libfmod.so
+LOCAL_MODULE := fmod-core-prebuilt
+LOCAL_SRC_FILES := ../libs/fmod/android/core/lib/$(TARGET_ARCH_ABI)/libfmod.so
 include $(PREBUILT_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -35,7 +35,7 @@ godot_fmod.cpp \
 gdlibrary.cpp \
 
 LOCAL_SHARED_LIBRARIES := \
-fmod-lowlevel-prebuilt \
+fmod-core-prebuilt \
 fmod-studio-prebuilt
 
 LOCAL_C_INCLUDES := \
@@ -44,7 +44,7 @@ LOCAL_C_INCLUDES := \
 ../godot-cpp/include/core \
 ../godot-cpp/include/gen \
 ../libs/fmod/android/studio/inc \
-../libs/fmod/android/lowlevel/inc
+../libs/fmod/android/core/inc
 
 LOCAL_STATIC_LIBRARIES := godot-prebuilt
 
