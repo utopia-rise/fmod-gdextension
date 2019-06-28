@@ -39,19 +39,19 @@ before_install:
   - if [[ "$PLATFORM" == "android" ]]; then sh fmod-gdnative/.travis/download-ndk.sh; fi
   - mkdir libs && cd libs
   - mkdir fmod && cd fmod
-  - wget https://gist.githubusercontent.com/piiertho/cfa1d9820f149b612dd60ec642ccb137/raw/1586aff48a646b2f4309a8fd4d4eea431f342ebe/getFmodAPI.sh
-  - chmod +x getFmodAPI.sh
-  - ./getFmodAPI.sh $FMODUSER $FMODPASS $PLATFORM
-  - if [[ "$PLATFORM" == "linux" ]]; then tar -xvf fmodstudioapi11012linux.tar.gz; fi
-  - if [[ "$PLATFORM" == "osx" ]]; then hdiutil attach fmodstudioapi11012osx.dmg; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then 7z x fmodstudioapi11012win-installer.exe; fi
-  - if [[ "$PLATFORM" == "ios" ]]; then hdiutil attach fmodstudioapi11012ios.dmg; fi
-  - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi11012android.tar.gz; fi
-  - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi11012linux/api linux; fi
+  - wget https://gist.githubusercontent.com/piiertho/b2521d95965297422888b113dbb3aa5a/raw/e8b5097c36efff34940011ccbcb3fd414fc11074/getFmod2.sh
+  - chmod +x getFmod2.sh
+  - ./getFmod2.sh $FMODUSER $FMODPASS $PLATFORM
+  - if [[ "$PLATFORM" == "linux" ]]; then tar -xvf fmodstudioapi20002linux.tar.gz; fi
+  - if [[ "$PLATFORM" == "osx" ]]; then hdiutil attach fmodstudioapi20002osx.dmg; fi
+  - if [[ "$PLATFORM" == "windows" ]]; then 7z x fmodstudioapi20002win-installer.exe; fi
+  - if [[ "$PLATFORM" == "ios" ]]; then hdiutil attach fmodstudioapi20002ios.dmg; fi
+  - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi20002android.tar.gz; fi
+  - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi20002linux/api linux; fi
   - if [[ "$PLATFORM" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/lowlevel/lib/fmod_vc.lib windows/lowlevel/lib/fmod.lib && mv windows/lowlevel/lib/fmod64_vc.lib windows/lowlevel/lib/fmod64.lib && mv windows/studio/lib/fmodstudio_vc.lib windows/studio/lib/fmodstudio.lib && mv windows/studio/lib/fmodstudio64_vc.lib windows/studio/lib/fmodstudio64.lib; fi
+  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/core/lib/x86/fmod_vc.lib windows/core/lib/x86/fmod.lib && mv windows/core/lib/x64/fmod_vc.lib windows/core/lib/x64/fmod.lib && mv windows/studio/lib/x86/fmodstudio_vc.lib windows/studio/lib/x86/fmodstudio.lib && mv windows/studio/lib/x64/fmodstudio_vc.lib windows/studio/lib/x64/fmodstudio.lib; fi
   - if [[ "$PLATFORM" == "ios" ]]; then cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios; fi
-  - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi11012android/api android; fi
+  - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi20002android/api android; fi
   - cd ../../
   - if [[ "$PLATFORM" == "linux" || "$PLATFORM" == "android" ]]; then sudo apt-get install -y p7zip-full && wget https://downloads.tuxfamily.org/godotengine/3.1.1/Godot_v3.1.1-stable_x11.64.zip && 7z x Godot_v3.1.1-stable_x11.64.zip; fi
   - if [[ "$PLATFORM" == "osx" || "$PLATFORM" == "ios" ]]; then wget https://downloads.tuxfamily.org/godotengine/3.1.1/Godot_v3.1.1-stable_osx.64.zip && 7z x Godot_v3.1.1-stable_osx.64.zip; fi

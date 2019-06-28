@@ -68,6 +68,9 @@ This project uses [SEMVER](https://semver.org/).
 |      0.0.0     |    X    |   X   |  X  |         |     |
 |      1.0.0     |    X    |   X   |  X  |    X    |  X  |
 |      2.0.0     |    X    |   X   |  X  |    X    |  X  |
+|      2.0.1     |    X    |   X   |  X  |    X    |  X  |
+|      2.0.2     |    X    |   X   |  X  |    X    |  X  |
+|      3.0.0     |    X    |   X   |  X  |    X    |  X  |
 
 #### Godot compatibility matrix
 
@@ -76,14 +79,20 @@ This project uses [SEMVER](https://semver.org/).
 |      0.0.0     |           |         X        |                    |
 |      1.0.0     |           |         X        |                    |
 |      2.0.0     |           |         X        |          X         |
+|      2.0.1     |           |         X        |          X         |
+|      2.0.2     |           |         X        |          X         |
+|      3.0.0     |           |         X        |          X         |
 
 #### Fmod compatibility matrix
 
-| Driver Version | 1.10.13 | 2.00.00 | 2.00.01 |
-|----------------|---------|---------|---------|
-|      0.0.0     |    X    |         |         |
-|      1.0.0     |    X    |         |         |
-|      2.0.0     |    X    |         |         |
+| Driver Version | 1.10.13 | 2.00.00 | 2.00.01 | 2.00.02 |
+|----------------|---------|---------|---------|---------|
+|      0.0.0     |    X    |         |         |         |
+|      1.0.0     |    X    |         |         |         |
+|      2.0.0     |    X    |         |         |         |
+|      2.0.1     |    X    |         |         |         |
+|      2.0.2     |    X    |         |         |         |
+|      3.0.0     |         |    X    |    X    |    X    |
 
 ### Building GDNative API bindings
 

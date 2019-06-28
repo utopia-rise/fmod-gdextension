@@ -15,7 +15,7 @@
 namespace godot {
     class GodotFmod : public Node {
         FMOD::Studio::System *system;
-        FMOD::System *lowLevelSystem;
+        FMOD::System *coreSystem;
 
         float distanceScale;
 
@@ -124,6 +124,9 @@ namespace godot {
         float getSoundVolume(uint64_t instanceId);
         float getSoundPitch(uint64_t instanceId);
         void setSoundPitch(uint64_t instanceId, float pitch);
+
+        void setGlobalParameter(String parameterName, float value);
+        float getGlobalParameter(String parameterName);
 
     };
 }
