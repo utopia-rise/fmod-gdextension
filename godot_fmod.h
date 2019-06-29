@@ -32,11 +32,6 @@ namespace godot {
 
         std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
         struct EventInfo {
-            //old volume when muted
-            float oldVolume = 0.f;
-            bool isMuted = false;
-            //One shot events are managed by integration
-            bool isOneShot = false;
             //GameObject to which this event is attached
             Object *gameObj = nullptr;
         };
@@ -57,10 +52,7 @@ namespace godot {
         void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
 
-        void muteOneEvent(FMOD::Studio::EventInstance *instance);
-        void unmuteOneEvent(FMOD::Studio::EventInstance *instance);
-        FMOD::Studio::EventInstance *
-        createInstance(const String eventName, const bool isOneShot, const bool isAttached, Object *gameObject);
+        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
 
@@ -124,12 +116,8 @@ namespace godot {
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
         void pauseAllEvents(bool pause);
-        void muteMasterBus();
-        void unmuteMasterBus();
         void muteAllEvents();
         void unmuteAllEvents();
-        void muteEvent(uint64_t instanceId);
-        void unmuteEvent(uint64_t instanceId);
         bool banksStillLoading();
 
         void playSound(uint64_t instanceId);

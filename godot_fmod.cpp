@@ -62,10 +62,6 @@ void GodotFmod::_register_methods() {
     register_method("pauseAllEvents", &GodotFmod::pauseAllEvents);
     register_method("muteAllEvents", &GodotFmod::muteAllEvents);
     register_method("unmuteAllEvents", &GodotFmod::unmuteAllEvents);
-    register_method("muteMasterBus", &GodotFmod::muteMasterBus);
-    register_method("unmuteMasterBus", &GodotFmod::unmuteMasterBus);
-    register_method("muteEvent", &GodotFmod::muteEvent);
-    register_method("unmuteEvent", &GodotFmod::unmuteEvent);
     register_method("banksStillLoading", &GodotFmod::banksStillLoading);
     register_method("loadSound", &GodotFmod::loadSound);
     register_method("playSound", &GodotFmod::playSound);
@@ -111,14 +107,6 @@ void GodotFmod::update() {
     for (auto i : events) {
         FMOD::Studio::EventInstance *eventInstance = i.second;
         EventInfo *eventInfo = getEventInfo(eventInstance);
-        if (eventInfo->isOneShot) {
-            FMOD_STUDIO_PLAYBACK_STATE s;
-            checkErrors(eventInstance->getPlaybackState(&s));
-            if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
-                releaseOneEvent(eventInstance);
-                continue;
-            }
-        }
         if (eventInfo->gameObj && isNull(eventInfo->gameObj)) {
             FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
             checkErrors(eventInstance->stop(m));
@@ -302,7 +290,7 @@ int GodotFmod::getBankVCACount(const String pathToBank) {
 }
 
 const uint64_t GodotFmod::createEventInstance(String eventPath) {
-    FMOD::Studio::EventInstance *instance = createInstance(eventPath, false, false, nullptr);
+    FMOD::Studio::EventInstance *instance = createInstance(eventPath, false, nullptr);
     if (instance) {
         const auto instanceId = (uint64_t)instance;
         events[instanceId] = instance;
@@ -410,12 +398,7 @@ float GodotFmod::getEventVolume(const uint64_t instanceId) {
     float volume = 0.0f;
     if (i != events.end()) {
         FMOD::Studio::EventInstance *event = i->second;
-        EventInfo *eventInfo = getEventInfo(event);
-        if (eventInfo->isMuted) {
-            return eventInfo->oldVolume;
-        } else {
-            checkErrors(event->getVolume(&volume));
-        }
+        checkErrors(event->getVolume(&volume));
     }
     return volume;
 }
@@ -425,12 +408,7 @@ void GodotFmod::setEventVolume(const uint64_t instanceId, float volume) {
     auto i = events.find(instanceId);
     if (i != events.end()) {
         FMOD::Studio::EventInstance *event = i->second;
-        EventInfo *eventInfo = getEventInfo(event);
-        if (eventInfo->isMuted) {
-            eventInfo->oldVolume = volume;
-        } else {
-            checkErrors(event->setVolume(volume));
-        }
+        checkErrors(event->setVolume(volume));
     }
 }
 
@@ -540,8 +518,7 @@ void GodotFmod::loadVCA(const String &VCAPath) {
     }
 }
 
-FMOD::Studio::EventInstance *GodotFmod::createInstance(const String eventName, const bool isOneShot,
-                                                       const bool isAttached, Object *gameObject) {
+FMOD::Studio::EventInstance *GodotFmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
@@ -550,9 +527,8 @@ FMOD::Studio::EventInstance *GodotFmod::createInstance(const String eventName, c
     auto descIt = eventDescriptions.find(eventName);
     FMOD::Studio::EventInstance *instance;
     checkErrors(descIt->second->createInstance(&instance));
-    if (instance) {
+    if (instance && !isOneShot) {
         auto *eventInfo = new EventInfo();
-        eventInfo->isOneShot = isOneShot;
         eventInfo->gameObj = gameObject;
         instance->setUserData(eventInfo);
         auto instanceId = (uint64_t)instance;
@@ -568,18 +544,19 @@ GodotFmod::EventInfo *GodotFmod::getEventInfo(FMOD::Studio::EventInstance * even
 }
 
 void GodotFmod::playOneShot(const String eventName, Object *gameObj) {
-    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, false, nullptr);
+    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
         if (!isNull(gameObj)) {
             updateInstance3DAttributes(instance, gameObj);
         }
         checkErrors(instance->start());
+        checkErrors(instance->release());
     }
 }
 
 void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
-    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, false, nullptr);
+    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
         if (!isNull(gameObj)) {
@@ -593,21 +570,23 @@ void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, c
             checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
         }
         checkErrors(instance->start());
+        checkErrors(instance->release());
     }
 }
 
 void GodotFmod::playOneShotAttached(const String eventName, Object *gameObj) {
     if (!isNull(gameObj)) {
-        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, true, gameObj);
+        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
             checkErrors(instance->start());
+            checkErrors(instance->release());
         }
     }
 }
 
 void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
     if (!isNull(gameObj)) {
-        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, true, gameObj);
+        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
             // set the initial parameter values
             auto keys = parameters.keys();
@@ -617,6 +596,7 @@ void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *ga
                 checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
             }
             checkErrors(instance->start());
+            checkErrors(instance->release());
         }
     }
 }
@@ -645,7 +625,7 @@ void GodotFmod::pauseAllEvents(const bool pause) {
     }
 }
 
-void GodotFmod::muteMasterBus() {
+void GodotFmod::muteAllEvents() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
         if (checkErrors(system->getBus("bus:/", &masterBus))) {
@@ -654,59 +634,12 @@ void GodotFmod::muteMasterBus() {
     }
 }
 
-void GodotFmod::unmuteMasterBus() {
+void GodotFmod::unmuteAllEvents() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
         if (checkErrors(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(false);
         }
-    }
-}
-
-void GodotFmod::muteAllEvents() {
-    for (auto &it : events) {
-        muteOneEvent(it.second);
-    }
-}
-
-void GodotFmod::unmuteAllEvents() {
-    for (auto it : events) {
-        unmuteOneEvent(it.second);
-    }
-}
-
-void GodotFmod::muteEvent(const uint64_t instanceId) {
-    if (events.find(instanceId) != events.end()) {
-        muteOneEvent(events[instanceId]);
-    } else {
-        Godot::print_error("FMOD Sound System: Unable to find event", "GodotFmod::muteEvent", __FILE__, __LINE__);
-    }
-}
-
-void GodotFmod::unmuteEvent(const uint64_t instanceId) {
-    if (events.find(instanceId) != events.end()) {
-        unmuteOneEvent(events[instanceId]);
-    } else {
-        Godot::print_error("FMOD Sound System: This event is not muted", "GodotFmod::unmuteEvent", __FILE__, __LINE__);
-    }
-}
-
-void GodotFmod::muteOneEvent(FMOD::Studio::EventInstance *instance) {
-    float volume = 0.f;
-    if (checkErrors(instance->getVolume(&volume)) && checkErrors(instance->setVolume(0.f))) {
-        EventInfo *eventInfo = getEventInfo(instance);
-        eventInfo->oldVolume = volume;
-        eventInfo->isMuted = true;
-    } else {
-        Godot::print_error("FMOD Sound System: Failed to mute event", "GodotFmod::muteOneEvent", __FILE__, __LINE__);
-    }
-}
-
-void GodotFmod::unmuteOneEvent(FMOD::Studio::EventInstance *instance) {
-    EventInfo *eventInfo = getEventInfo(instance);
-    if (!checkErrors(instance->setVolume(eventInfo->oldVolume))) {
-        eventInfo->isMuted = false;
-        Godot::print_error("FMOD Sound System: Failed to unmute event", "GodotFmod::unmuteOneEvent", __FILE__, __LINE__);
     }
 }
 
