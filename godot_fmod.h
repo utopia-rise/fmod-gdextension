@@ -32,6 +32,8 @@ namespace godot {
 
         std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
         struct EventInfo {
+            //Is the event oneshot
+            bool isOneShot = false;
             //GameObject to which this event is attached
             Object *gameObj = nullptr;
         };

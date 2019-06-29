@@ -107,13 +107,22 @@ void GodotFmod::update() {
     for (auto i : events) {
         FMOD::Studio::EventInstance *eventInstance = i.second;
         EventInfo *eventInfo = getEventInfo(eventInstance);
-        if (eventInfo->gameObj && isNull(eventInfo->gameObj)) {
-            FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-            checkErrors(eventInstance->stop(m));
-            releaseOneEvent(eventInstance);
-            continue;
-        }
-        else {
+        if (eventInfo->gameObj) {
+            if (isNull(eventInfo->gameObj)) {
+                FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+                checkErrors(eventInstance->stop(m));
+                releaseOneEvent(eventInstance);
+                continue;
+            }
+            if (eventInfo->isOneShot) {
+                FMOD_STUDIO_PLAYBACK_STATE s;
+                checkErrors(eventInstance->getPlaybackState(&s));
+                if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+                    releaseOneEvent(eventInstance);
+                    continue;
+                }
+            }
+        } else {
             updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
         }
     }
@@ -527,9 +536,10 @@ FMOD::Studio::EventInstance *GodotFmod::createInstance(const String eventName, c
     auto descIt = eventDescriptions.find(eventName);
     FMOD::Studio::EventInstance *instance;
     checkErrors(descIt->second->createInstance(&instance));
-    if (instance && !isOneShot) {
+    if (instance && (!isOneShot || gameObject)) {
         auto *eventInfo = new EventInfo();
         eventInfo->gameObj = gameObject;
+        eventInfo->isOneShot = isOneShot;
         instance->setUserData(eventInfo);
         auto instanceId = (uint64_t)instance;
         events[instanceId] = instance;
