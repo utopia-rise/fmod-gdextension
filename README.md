@@ -460,6 +460,34 @@ func _ready():
 	Fmod.stopEvent(my_music_event, FmodFlags.fmodStudioStopModes.FMOD_STUDIO_STOP_IMMEDIATE)
 ```
 
+### Timeline marker & music beat callbacks
+
+You can have events subscribe to Studio callbacks to implement rhythm based game mechanics. Event callbacks leverage Godot's signal system and you can connect your callback functions through the integration.
+
+```gdscript
+# create a new event instance
+var my_music_event = Fmod.create_event_instance("event:/schmid - 140 Part 2B")
+
+# request callbacks from this instance
+# in this case request both Marker and Beat callbacks
+Fmod.event_set_callback(my_music_event,
+	Fmod.FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER | Fmod.FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT)
+
+# hook up our signals
+Fmod.connect("timeline_beat", self, "_on_beat")
+Fmod.connect("timeline_marker", self, "_on_marker")
+
+# will be called on every musical beat
+func _on_beat(params):
+	print(params)
+
+# will be called whenever a new marker is encountered
+func _on_marker(params):
+	print(params)
+```
+
+In the above example, `params` is a Dictionary which contains parameters passed in by FMOD. These vary from each callback. For beat callbacks it will contain fields such as the current beat, current bar, time signature etc. For marker callbacks it will contain the marker name etc. The event_id of the instance that triggered the callback will also be passed in. You can use this to filter out individual callbacks if multiple events are subscribed.
+
 ### Playing sounds using FMOD Core / Low Level API
 
 You can load and play any sound file in your project directory by using the FMOD Low Level API bindings. Similar to Studio Events these instances are identified by a UUID generated in script. Any instances you create must be released manually. Refer to FMOD's documentation pages for a list of compatible sound formats.
