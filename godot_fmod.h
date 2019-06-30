@@ -30,17 +30,13 @@ namespace godot {
         std::map<const uint64_t, FMOD::Sound *> sounds;
         std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
-        // keep track of one shot instances internally
-        std::vector<FMOD::Studio::EventInstance *> oneShotInstances;
-        struct AttachedOneShot {
-            FMOD::Studio::EventInstance *instance;
-            Object *gameObj;
+        std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
+        struct EventInfo {
+            //Is the event oneshot
+            bool isOneShot = false;
+            //GameObject to which this event is attached
+            Object *gameObj = nullptr;
         };
-        std::vector<AttachedOneShot> attachedOneShots;
-
-        // events not directly managed by the integration
-        // referenced through uuids generated in script
-        std::map<const uint64_t, FMOD::Studio::EventInstance *> unmanagedEvents;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -57,6 +53,10 @@ namespace godot {
         void loadBus(const String &busPath);
         void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
+
+        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
+        EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
+        void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
 
     public:
         GodotFmod();
@@ -110,12 +110,17 @@ namespace godot {
         /* VCA functions */
         float getVCAVolume(String VCAPath);
         void setVCAVolume(String VCAPath, float volume);
+        /* Helper methods */
         void playOneShot(String eventName, Object *gameObj);
         void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void playOneShotAttached(String eventName, Object *gameObj);
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
+        void pauseAllEvents(bool pause);
+        void muteAllEvents();
+        void unmuteAllEvents();
+        bool banksStillLoading();
 
         void playSound(uint64_t instanceId);
         const uint64_t loadSound(String path, int mode);

@@ -483,6 +483,82 @@ func _ready():
 	Fmod.releaseSound(my_sound)
 ```
 
+### Muting all event
+
+You can mute all event using `muteAllEvents`. This will mute the master bus.
+
+```gdscript
+func _ready():
+	# set up FMOD
+	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	
+	# load banks
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	# register listener
+	Fmod.addListener(self)
+	
+	# play some events
+	Fmod.playOneShot("event:/Music/Level 02", self)
+	var my_music_event = Fmod.createEventInstance("event:/Music/Level 01")
+	Fmod.startEvent(my_music_event)
+	var t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.muteAllEvents();
+	t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.unmuteAllEvents()
+```
+
+### Pausing all events
+
+```gdscript
+func _ready():
+	# set up FMOD
+	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	
+	# load banks
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	# register listener
+	Fmod.addListener(self)
+	
+	# play some events
+	Fmod.playOneShot("event:/Music/Level 02", self)
+	var my_music_event = Fmod.createEventInstance("event:/Music/Level 01")
+	Fmod.startEvent(my_music_event)
+	var t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.pauseAllEvents(true)
+	t = Timer.new()
+	t.set_wait_time(3)
+	t.set_one_shot(true)
+	self.add_child(t)
+	t.start()
+	yield(t, "timeout")
+	Fmod.pauseAllEvents(false)
+```
+
 ### Changing the default audio output device
 
 By default, FMOD will use the primary audio output device as determined by the operating system. This can be changed at runtime, ideally through your game's Options Menu.

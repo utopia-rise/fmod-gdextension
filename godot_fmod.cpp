@@ -59,6 +59,10 @@ void GodotFmod::_register_methods() {
     register_method("playOneShotAttachedWithParams", &GodotFmod::playOneShotAttachedWithParams);
     register_method("attachInstanceToNode", &GodotFmod::attachInstanceToNode);
     register_method("detachInstanceFromNode", &GodotFmod::detachInstanceFromNode);
+    register_method("pauseAllEvents", &GodotFmod::pauseAllEvents);
+    register_method("muteAllEvents", &GodotFmod::muteAllEvents);
+    register_method("unmuteAllEvents", &GodotFmod::unmuteAllEvents);
+    register_method("banksStillLoading", &GodotFmod::banksStillLoading);
     register_method("loadSound", &GodotFmod::loadSound);
     register_method("playSound", &GodotFmod::playSound);
     register_method("stopSound", &GodotFmod::stopSound);
@@ -100,38 +104,27 @@ int GodotFmod::checkErrors(FMOD_RESULT result) {
 }
 
 void GodotFmod::update() {
-    // clean up one shots
-    for (int i = 0; i < oneShotInstances.size(); i++) {
-        auto instance = oneShotInstances[i];
-        FMOD_STUDIO_PLAYBACK_STATE s;
-        checkErrors(instance->getPlaybackState(&s));
-        if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
-            checkErrors(instance->release());
-            oneShotInstances.erase(oneShotInstances.begin() + i);
-            i--;
+    for (auto i : events) {
+        FMOD::Studio::EventInstance *eventInstance = i.second;
+        EventInfo *eventInfo = getEventInfo(eventInstance);
+        if (eventInfo->gameObj) {
+            if (isNull(eventInfo->gameObj)) {
+                FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+                checkErrors(eventInstance->stop(m));
+                releaseOneEvent(eventInstance);
+                continue;
+            }
+            if (eventInfo->isOneShot) {
+                FMOD_STUDIO_PLAYBACK_STATE s;
+                checkErrors(eventInstance->getPlaybackState(&s));
+                if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+                    releaseOneEvent(eventInstance);
+                    continue;
+                }
+            }
+        } else {
+            updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
         }
-    }
-
-    // update and clean up attached one shots
-    for (int i = 0; i < attachedOneShots.size(); i++) {
-        auto aShot = attachedOneShots[i];
-        if (isNull(aShot.gameObj)) {
-            FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-            checkErrors(aShot.instance->stop(m));
-            checkErrors(aShot.instance->release());
-            attachedOneShots.erase(attachedOneShots.begin() + i);
-            i--;
-            continue;
-        }
-        FMOD_STUDIO_PLAYBACK_STATE s;
-        checkErrors(aShot.instance->getPlaybackState(&s));
-        if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
-            checkErrors(aShot.instance->release());
-            attachedOneShots.erase(attachedOneShots.begin() + i);
-            i--;
-            continue;
-        }
-        updateInstance3DAttributes(aShot.instance, aShot.gameObj);
     }
 
     // update listener position
@@ -306,17 +299,10 @@ int GodotFmod::getBankVCACount(const String pathToBank) {
 }
 
 const uint64_t GodotFmod::createEventInstance(String eventPath) {
-    if (!eventDescriptions.count(eventPath)) {
-        FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventPath.alloc_c_string(), &desc));
-        eventDescriptions[eventPath] = desc;
-    }
-    auto descIt = eventDescriptions.find(eventPath);
-    FMOD::Studio::EventInstance *instance;
-    checkErrors(descIt->second->createInstance(&instance));
+    FMOD::Studio::EventInstance *instance = createInstance(eventPath, false, nullptr);
     if (instance) {
         const auto instanceId = (uint64_t)instance;
-        unmanagedEvents[instanceId] = instance;
+        events[instanceId] = instance;
         return instanceId;
     }
     return 0;
@@ -324,54 +310,61 @@ const uint64_t GodotFmod::createEventInstance(String eventPath) {
 
 float GodotFmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
-    if (!unmanagedEvents.count(instanceId)) return p;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end())
+    if (!events.count(instanceId)) return p;
+    auto i = events.find(instanceId);
+    if (i != events.end())
         checkErrors(i->second->getParameterByName(parameterName.ascii().get_data(), &p));
     return p;
 }
 
 void GodotFmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setParameterByName(parameterName.ascii().get_data(), value));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->setParameterByName(parameterName.ascii().get_data(), value));
 }
 
 void GodotFmod::releaseEvent(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) {
-        checkErrors(i->second->release());
-        unmanagedEvents.erase(instanceId);
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) {
+        releaseOneEvent(i->second);
     }
 }
 
+void GodotFmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
+    EventInfo *eventInfo = getEventInfo(eventInstance);
+    eventInstance->setUserData(nullptr);
+    checkErrors(eventInstance->release());
+    events.erase((uint64_t) eventInstance);
+    delete &eventInfo;
+}
+
 void GodotFmod::startEvent(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->start());
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->start());
 }
 
 void GodotFmod::stopEvent(const uint64_t instanceId, int stopMode) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) {
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) {
         checkErrors(i->second->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
     }
 }
 
 void GodotFmod::triggerEventCue(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->triggerCue());
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->triggerCue());
 }
 
 int GodotFmod::getEventPlaybackState(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId))
+    if (!events.count(instanceId))
         return -1;
     else {
-        auto i = unmanagedEvents.find(instanceId);
-        if (i != unmanagedEvents.end()) {
+        auto i = events.find(instanceId);
+        if (i != events.end()) {
             FMOD_STUDIO_PLAYBACK_STATE s;
             checkErrors(i->second->getPlaybackState(&s));
             return s;
@@ -381,80 +374,86 @@ int GodotFmod::getEventPlaybackState(const uint64_t instanceId) {
 }
 
 bool GodotFmod::getEventPaused(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return false;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return false;
+    auto i = events.find(instanceId);
     bool paused = false;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->getPaused(&paused));
+    if (i != events.end()) checkErrors(i->second->getPaused(&paused));
     return paused;
 }
 
 void GodotFmod::setEventPaused(const uint64_t instanceId, bool paused) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setPaused(paused));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->setPaused(paused));
 }
 
 float GodotFmod::getEventPitch(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return 0.0f;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return 0.0f;
+    auto i = events.find(instanceId);
     float pitch = 0.0f;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->getPitch(&pitch));
+    if (i != events.end()) checkErrors(i->second->getPitch(&pitch));
     return pitch;
 }
 
 void GodotFmod::setEventPitch(const uint64_t instanceId, float pitch) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setPitch(pitch));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->setPitch(pitch));
 }
 
 float GodotFmod::getEventVolume(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return 0.0f;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return 0.0f;
+    auto i = events.find(instanceId);
     float volume = 0.0f;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->getVolume(&volume));
+    if (i != events.end()) {
+        FMOD::Studio::EventInstance *event = i->second;
+        checkErrors(event->getVolume(&volume));
+    }
     return volume;
 }
 
 void GodotFmod::setEventVolume(const uint64_t instanceId, float volume) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setVolume(volume));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) {
+        FMOD::Studio::EventInstance *event = i->second;
+        checkErrors(event->setVolume(volume));
+    }
 }
 
 int GodotFmod::getEventTimelinePosition(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return 0;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return 0;
+    auto i = events.find(instanceId);
     int tp = 0;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->getTimelinePosition(&tp));
+    if (i != events.end()) checkErrors(i->second->getTimelinePosition(&tp));
     return tp;
 }
 
 void GodotFmod::setEventTimelinePosition(const uint64_t instanceId, int position) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setTimelinePosition(position));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->setTimelinePosition(position));
 }
 
 float GodotFmod::getEventReverbLevel(const uint64_t instanceId, int index) {
-    if (!unmanagedEvents.count(instanceId)) return 0.0f;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return 0.0f;
+    auto i = events.find(instanceId);
     float rvl = 0.0f;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->getReverbLevel(index, &rvl));
+    if (i != events.end()) checkErrors(i->second->getReverbLevel(index, &rvl));
     return rvl;
 }
 
 void GodotFmod::setEventReverbLevel(const uint64_t instanceId, int index, float level) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) checkErrors(i->second->setReverbLevel(index, level));
+    if (!events.count(instanceId)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) checkErrors(i->second->setReverbLevel(index, level));
 }
 
 bool GodotFmod::isEventVirtual(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return false;
-    auto i = unmanagedEvents.find(instanceId);
+    if (!events.count(instanceId)) return false;
+    auto i = events.find(instanceId);
     bool v = false;
-    if (i != unmanagedEvents.end()) checkErrors(i->second->isVirtual(&v));
+    if (i != events.end()) checkErrors(i->second->isVirtual(&v));
     return v;
 }
 
@@ -528,34 +527,46 @@ void GodotFmod::loadVCA(const String &VCAPath) {
     }
 }
 
-void GodotFmod::playOneShot(const String eventName, Object *gameObj) {
+FMOD::Studio::EventInstance *GodotFmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
     if (!eventDescriptions.count(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
         eventDescriptions[eventName] = desc;
     }
-    auto desc = eventDescriptions.find(eventName);
+    auto descIt = eventDescriptions.find(eventName);
     FMOD::Studio::EventInstance *instance;
-    checkErrors(desc->second->createInstance(&instance));
+    checkErrors(descIt->second->createInstance(&instance));
+    if (instance && (!isOneShot || gameObject)) {
+        auto *eventInfo = new EventInfo();
+        eventInfo->gameObj = gameObject;
+        eventInfo->isOneShot = isOneShot;
+        instance->setUserData(eventInfo);
+        auto instanceId = (uint64_t)instance;
+        events[instanceId] = instance;
+    }
+    return instance;
+}
+
+GodotFmod::EventInfo *GodotFmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
+    EventInfo *eventInfo;
+    eventInstance->getUserData((void **)&eventInfo);
+    return eventInfo;
+}
+
+void GodotFmod::playOneShot(const String eventName, Object *gameObj) {
+    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
         if (!isNull(gameObj)) {
             updateInstance3DAttributes(instance, gameObj);
         }
         checkErrors(instance->start());
-        oneShotInstances.push_back(instance);
+        checkErrors(instance->release());
     }
 }
 
 void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
-    if (!eventDescriptions.count(eventName)) {
-        FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
-        eventDescriptions[eventName] = desc;
-    }
-    auto desc = eventDescriptions.find(eventName);
-    FMOD::Studio::EventInstance *instance;
-    checkErrors(desc->second->createInstance(&instance));
+    FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
         if (!isNull(gameObj)) {
@@ -569,70 +580,89 @@ void GodotFmod::playOneShotWithParams(const String eventName, Object *gameObj, c
             checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
         }
         checkErrors(instance->start());
-        oneShotInstances.push_back(instance);
+        checkErrors(instance->release());
     }
 }
 
 void GodotFmod::playOneShotAttached(const String eventName, Object *gameObj) {
-    if (!eventDescriptions.count(eventName)) {
-        FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
-        eventDescriptions[eventName] = desc;
-    }
-    auto desc = eventDescriptions.find(eventName);
-    FMOD::Studio::EventInstance *instance;
-    checkErrors(desc->second->createInstance(&instance));
-    if (instance && !isNull(gameObj)) {
-        AttachedOneShot aShot = { instance, gameObj };
-        attachedOneShots.push_back(aShot);
-        checkErrors(instance->start());
+    if (!isNull(gameObj)) {
+        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
+        if (instance) {
+            checkErrors(instance->start());
+            checkErrors(instance->release());
+        }
     }
 }
 
 void GodotFmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
-    if (!eventDescriptions.count(eventName)) {
-        FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventName.ascii().get_data(), &desc));
-        eventDescriptions[eventName] = desc;
-    }
-    auto desc = eventDescriptions.find(eventName);
-    FMOD::Studio::EventInstance *instance;
-    checkErrors(desc->second->createInstance(&instance));
-    if (instance && !isNull(gameObj)) {
-        AttachedOneShot aShot = { instance, gameObj };
-        attachedOneShots.push_back(aShot);
-        // set the initial parameter values
-        auto keys = parameters.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            String k = keys[i];
-            float v = parameters[keys[i]];
-            checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
+    if (!isNull(gameObj)) {
+        FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
+        if (instance) {
+            // set the initial parameter values
+            auto keys = parameters.keys();
+            for (int i = 0; i < keys.size(); i++) {
+                String k = keys[i];
+                float v = parameters[keys[i]];
+                checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
+            }
+            checkErrors(instance->start());
+            checkErrors(instance->release());
         }
-        checkErrors(instance->start());
     }
 }
 
 void GodotFmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
-    if (!unmanagedEvents.count(instanceId) || isNull(gameObj)) return;
-    auto i = unmanagedEvents.find(instanceId);
-    if (i != unmanagedEvents.end()) {
-        AttachedOneShot aShot = { i->second, gameObj };
-        attachedOneShots.push_back(aShot);
+    if (!events.count(instanceId) || isNull(gameObj)) return;
+    auto i = events.find(instanceId);
+    if (i != events.end()) {
+        EventInfo *eventInfo = getEventInfo(i->second);
+        eventInfo->gameObj = gameObj;
     }
 }
 
 void GodotFmod::detachInstanceFromNode(const uint64_t instanceId) {
-    if (!unmanagedEvents.count(instanceId)) return;
-    auto instance = unmanagedEvents.find(instanceId);
-    if (instance != unmanagedEvents.end()) {
-        for (int i = 0; attachedOneShots.size(); i++) {
-            auto attachedInstance = attachedOneShots[i].instance;
-            if (attachedInstance == instance->second) {
-                attachedOneShots.erase(attachedOneShots.begin() + i);
-                break;
-            }
+    if (!events.count(instanceId)) return;
+    auto iterator = events.find(instanceId);
+    if (iterator != events.end()) {
+        EventInfo *eventInfo = getEventInfo(iterator->second);
+        eventInfo->gameObj = nullptr;
+    }
+}
+
+void GodotFmod::pauseAllEvents(const bool pause) {
+    for (auto &it : events) {
+        checkErrors(it.second->setPaused(pause));
+    }
+}
+
+void GodotFmod::muteAllEvents() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus *masterBus = nullptr;
+        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(true);
         }
     }
+}
+
+void GodotFmod::unmuteAllEvents() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus *masterBus = nullptr;
+        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(false);
+        }
+    }
+}
+
+bool GodotFmod::banksStillLoading() {
+    for (auto &it : banks) {
+        FMOD::Studio::Bank *bank = it.second;
+        FMOD_STUDIO_LOADING_STATE loadingState;
+        checkErrors(bank->getLoadingState(&loadingState));
+        if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
+            return true;
+        }
+    }
+    return false;
 }
 
 float GodotFmod::getVCAVolume(const String VCAPath) {
