@@ -11,9 +11,21 @@
 #include <Node.hpp>
 #include <vector>
 #include <map>
+#include <gen/Mutex.hpp>
+#include "callbacks.h"
 
 namespace godot {
     class GodotFmod : public Node {
+    public:
+        struct EventInfo {
+            //Is the event oneshot
+            bool isOneShot = false;
+            //GameObject to which this event is attached
+            Object *gameObj = nullptr;
+            // Callback info associated with this event
+            Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
+        };
+    private:
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
 
@@ -31,12 +43,6 @@ namespace godot {
         std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
         std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
-        struct EventInfo {
-            //Is the event oneshot
-            bool isOneShot = false;
-            //GameObject to which this event is attached
-            Object *gameObj = nullptr;
-        };
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -53,6 +59,7 @@ namespace godot {
         void loadBus(const String &busPath);
         void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
+        void runCallbacks();
 
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
@@ -141,6 +148,7 @@ namespace godot {
         void setGlobalParameter(String parameterName, float value);
         float getGlobalParameter(String parameterName);
 
+        void setCallback(uint64_t instanceId, int callbackMask);
     };
 }
 

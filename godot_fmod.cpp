@@ -6,10 +6,14 @@
 
 using namespace godot;
 
+Mutex *Callbacks::mut;
+
 GodotFmod::GodotFmod() = default;
 
 GodotFmod::~GodotFmod() {
     GodotFmod::shutdown();
+    delete Callbacks::mut;
+    Callbacks::mut = nullptr;
 }
 
 void GodotFmod::_register_methods() {
@@ -73,6 +77,7 @@ void GodotFmod::_register_methods() {
     register_method("getSoundVolume", &GodotFmod::getSoundVolume);
     register_method("setSoundPitch", &GodotFmod::setSoundPitch);
     register_method("getSoundPitch", &GodotFmod::getSoundPitch);
+    register_method("setCallback", &GodotFmod::setCallback);
     register_method("setSound3DSettings", &GodotFmod::setSound3DSettings);
     register_method("waitForAllLoads", &GodotFmod::waitForAllLoads);
     register_method("getAvailableDrivers", &GodotFmod::getAvailableDrivers);
@@ -81,6 +86,9 @@ void GodotFmod::_register_methods() {
     register_method("getPerformanceData", &GodotFmod::getPerformanceData);
     register_method("setGlobalParameter", &GodotFmod::setGlobalParameter);
     register_method("getGlobalParameter", &GodotFmod::getGlobalParameter);
+
+    register_signal<GodotFmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
+    register_signal<GodotFmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
 }
 
 void GodotFmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
@@ -129,6 +137,9 @@ void GodotFmod::update() {
 
     // update listener position
     setListenerAttributes();
+
+    //run callback events
+    runCallbacks();
 
     // dispatch update to FMOD
     checkErrors(system->update());
@@ -260,7 +271,7 @@ int GodotFmod::getBankLoadingState(const String pathToBank) {
 
 int GodotFmod::getBankBusCount(const String pathToBank) {
     if (banks.count(pathToBank)) {
-        int count;
+        int count = -1;
         auto bankIt = banks.find(pathToBank);
         if (bankIt != banks.end()) checkErrors(bankIt->second->getBusCount(&count));
         return count;
@@ -270,7 +281,7 @@ int GodotFmod::getBankBusCount(const String pathToBank) {
 
 int GodotFmod::getBankEventCount(const String pathToBank) {
     if (banks.count(pathToBank)) {
-        int count;
+        int count = -1;
         auto bankIt = banks.find(pathToBank);
         if (bankIt != banks.end()) checkErrors(bankIt->second->getEventCount(&count));
         return count;
@@ -280,7 +291,7 @@ int GodotFmod::getBankEventCount(const String pathToBank) {
 
 int GodotFmod::getBankStringCount(const String pathToBank) {
     if (banks.count(pathToBank)) {
-        int count;
+        int count = -1;
         auto bankIt = banks.find(pathToBank);
         if (bankIt != banks.end()) checkErrors(bankIt->second->getStringCount(&count));
         return count;
@@ -290,7 +301,7 @@ int GodotFmod::getBankStringCount(const String pathToBank) {
 
 int GodotFmod::getBankVCACount(const String pathToBank) {
     if (banks.count(pathToBank)) {
-        int count;
+        int count = -1;
         auto bankIt = banks.find(pathToBank);
         if (bankIt != banks.end()) checkErrors(bankIt->second->getVCACount(&count));
         return count;
@@ -332,11 +343,13 @@ void GodotFmod::releaseEvent(const uint64_t instanceId) {
 }
 
 void GodotFmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
+    Callbacks::mut->lock();
     EventInfo *eventInfo = getEventInfo(eventInstance);
     eventInstance->setUserData(nullptr);
     checkErrors(eventInstance->release());
     events.erase((uint64_t) eventInstance);
     delete &eventInfo;
+    Callbacks::mut->unlock();
 }
 
 void GodotFmod::startEvent(const uint64_t instanceId) {
@@ -782,7 +795,7 @@ void GodotFmod::releaseSound(const uint64_t instanceId) {
 void GodotFmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
     if (distanceFactor > 0 && checkErrors(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
-        Godot::print("Successfully set global 3D settings");
+        Godot::print("FMOD Sound System: Successfully set global 3D settings");
     } else {
         Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "GodotFmod::setSound3DSettings", __FILE__, __LINE__);
     }
@@ -871,10 +884,90 @@ float GodotFmod::getGlobalParameter(const String parameterName) {
     return value;
 }
 
+void GodotFmod::setCallback(const uint64_t instanceId, int callbackMask) {
+    if (!events.count(instanceId)) return;
+    FMOD::Studio::EventInstance *event = events.find(instanceId)->second;
+    if (event) {
+        checkErrors(event->setCallback(Callbacks::eventCallback, callbackMask));
+    }
+}
+
+FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
+    auto *instance = (FMOD::Studio::EventInstance *)event;
+    auto instanceId = (uint64_t)instance;
+    GodotFmod::EventInfo *eventInfo;
+    mut->lock();
+    instance->getUserData((void **)&eventInfo);
+    if (eventInfo) {
+        Callbacks::CallbackInfo callbackInfo = eventInfo->callbackInfo;
+
+        if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
+            auto *props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES *)parameters;
+            callbackInfo.markerCallbackInfo["event_id"] = instanceId;
+            callbackInfo.markerCallbackInfo["name"] = props->name;
+            callbackInfo.markerCallbackInfo["position"] = props->position;
+            callbackInfo.markerSignalEmitted = false;
+        } else if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT) {
+            auto *props = (FMOD_STUDIO_TIMELINE_BEAT_PROPERTIES *)parameters;
+            callbackInfo.beatCallbackInfo["event_id"] = instanceId;
+            callbackInfo.beatCallbackInfo["beat"] = props->beat;
+            callbackInfo.beatCallbackInfo["bar"] = props->bar;
+            callbackInfo.beatCallbackInfo["tempo"] = props->tempo;
+            callbackInfo.beatCallbackInfo["time_signature_upper"] = props->timesignatureupper;
+            callbackInfo.beatCallbackInfo["time_signature_lower"] = props->timesignaturelower;
+            callbackInfo.beatCallbackInfo["position"] = props->position;
+            callbackInfo.beatSignalEmitted = false;
+        }
+        else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED || type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
+            auto *sound = (FMOD::Sound *)parameters;
+            char n[256];
+            sound->getName(n, 256);
+            String name(n);
+            String mType = type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ? "played" : "stopped";
+            callbackInfo.soundCallbackInfo["name"] = name;
+            callbackInfo.soundCallbackInfo["type"] = mType;
+            callbackInfo.soundSignalEmitted = false;
+        }
+    }
+    mut->unlock();
+    return FMOD_OK;
+}
+
+// runs on the game thread
+void GodotFmod::runCallbacks() {
+    Callbacks::mut->lock();
+    for (auto e : events) {
+        FMOD::Studio::EventInstance *eventInstance = e.second;
+        Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
+        // check for Marker callbacks
+        if (!cbInfo.markerSignalEmitted) {
+            emit_signal("timeline_marker", cbInfo.markerCallbackInfo);
+            cbInfo.markerSignalEmitted = true;
+        }
+
+        // check for Beat callbacks
+        if (!cbInfo.beatSignalEmitted) {
+            emit_signal("timeline_beat", cbInfo.beatCallbackInfo);
+            cbInfo.beatSignalEmitted = true;
+        }
+
+        // check for Sound callbacks
+        if (!cbInfo.soundSignalEmitted) {
+            if (cbInfo.soundCallbackInfo["type"] == String("played"))
+                emit_signal("sound_played", cbInfo.soundCallbackInfo);
+            else
+                emit_signal("sound_stopped", cbInfo.soundCallbackInfo);
+            cbInfo.soundSignalEmitted = true;
+        }
+    }
+    Callbacks::mut->unlock();
+}
+
 void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
+    Callbacks::mut = Mutex::_new();
     performanceData["CPU"] = Dictionary();
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
