@@ -6,13 +6,10 @@
 
 using namespace godot;
 
-Mutex *Callbacks::mut;
-
 GodotFmod::GodotFmod() = default;
 
 GodotFmod::~GodotFmod() {
     GodotFmod::shutdown();
-    Callbacks::mut->~Mutex();
 }
 
 void GodotFmod::_register_methods() {
@@ -966,7 +963,6 @@ void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
-    Callbacks::mut = new Mutex();
     performanceData["CPU"] = Dictionary();
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();

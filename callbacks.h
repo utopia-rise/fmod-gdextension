@@ -1,14 +1,10 @@
-//
-// Created by Pierre-Thomas Meisels on 2019-06-18.
-//
-
 #ifndef GODOTFMOD_GODOT_FMOD_CALLBACK_H
 #define GODOTFMOD_GODOT_FMOD_CALLBACK_H
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
 #include <core/Dictionary.hpp>
-#include <gen/Mutex.hpp>
+#include <Mutex.hpp>
 
 namespace Callbacks {
     struct CallbackInfo {
