@@ -94,6 +94,7 @@ void GodotFmod::_register_methods() {
 void GodotFmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
     // initialize FMOD Studio and FMOD Low Level System with provided flags
     if (checkErrors(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
+        isInitialized = true;
         Godot::print("FMOD Sound System: Successfully initialized");
         if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) {
             Godot::print("FMOD Sound System: Live update enabled!");
@@ -112,6 +113,13 @@ int GodotFmod::checkErrors(FMOD_RESULT result) {
 }
 
 void GodotFmod::update() {
+    if (!isInitialized) {
+        if (!isNotinitPrinted) {
+            Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "update", __FILE__, __LINE__);
+            isNotinitPrinted = true;
+        }
+        return;
+    }
     for (auto i : events) {
         FMOD::Studio::EventInstance *eventInstance = i.second;
         EventInfo *eventInfo = getEventInfo(eventInstance);
@@ -966,6 +974,8 @@ void GodotFmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
     listener = nullptr;
+    isInitialized = false;
+    isNotinitPrinted = false;
     Callbacks::mut = Mutex::_new();
     performanceData["CPU"] = Dictionary();
     performanceData["memory"] = Dictionary();

@@ -29,6 +29,9 @@ namespace godot {
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
 
+        bool isInitialized;
+        bool isNotinitPrinted;
+
         float distanceScale;
 
         Object *listener;
