@@ -15,7 +15,7 @@
 #include "callbacks.h"
 
 namespace godot {
-    class GodotFmod : public Node {
+    class Fmod : public Node {
     public:
         struct EventInfo {
             //Is the event oneshot
@@ -50,7 +50,7 @@ namespace godot {
         //Store disctionnary of performance data
         Dictionary performanceData;
 
-    GODOT_CLASS(GodotFmod, Node)
+    GODOT_CLASS(Fmod, Node)
 
     private:
         int checkErrors(FMOD_RESULT result);
@@ -69,15 +69,15 @@ namespace godot {
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
 
     public:
-        GodotFmod();
+        Fmod();
 
-        ~GodotFmod();
+        ~Fmod();
 
         static void _register_methods();
         void _init();
+        void _process(float delta);
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void update();
         void shutdown();
         void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
