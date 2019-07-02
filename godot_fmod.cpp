@@ -130,7 +130,6 @@ void GodotFmod::update() {
                     continue;
                 }
             }
-        } else {
             updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
         }
     }
