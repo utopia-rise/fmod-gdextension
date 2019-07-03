@@ -9,9 +9,9 @@
 #include <Object.hpp>
 #include <CanvasItem.hpp>
 #include <Node.hpp>
-#include <vector>
 #include <map>
 #include <gen/Mutex.hpp>
+#include <set>
 #include "callbacks.h"
 
 namespace godot {
@@ -42,10 +42,14 @@ namespace godot {
         std::map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         std::map<String, FMOD::Studio::Bus *> buses;
         std::map<String, FMOD::Studio::VCA *> VCAs;
-        std::map<const uint64_t, FMOD::Sound *> sounds;
-        std::map<FMOD::Sound *, FMOD::Channel *> channels;
 
-        std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
+        struct SoundPair{
+            FMOD::Sound *sound;
+            FMOD::Channel *channel;
+        };
+        std::set<SoundPair *> sounds;
+
+        std::set<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
