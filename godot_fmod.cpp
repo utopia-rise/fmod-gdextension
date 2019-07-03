@@ -85,7 +85,7 @@ void Fmod::_register_methods() {
     register_method("getPerformanceData", &Fmod::getPerformanceData);
     register_method("setGlobalParameter", &Fmod::setGlobalParameter);
     register_method("getGlobalParameter", &Fmod::getGlobalParameter);
-    register_method("_process", &Fmod::_process);
+    register_method("_process", &Fmod::update);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -945,7 +945,7 @@ void Fmod::_init() {
     distanceScale = 1.0;
 }
 
-void Fmod::_process(const float delta) {
+void Fmod::update() {
     if (!isInitialized) {
         if (!isNotinitPrinted) {
             Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "update", __FILE__, __LINE__);

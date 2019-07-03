@@ -75,7 +75,7 @@ namespace godot {
 
         static void _register_methods();
         void _init();
-        void _process(float delta);
+        void update();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void shutdown();
