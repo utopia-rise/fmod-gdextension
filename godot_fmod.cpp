@@ -93,8 +93,11 @@ void Fmod::_register_methods() {
 
 void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
     // initialize FMOD Studio and FMOD Core System with provided flags
-    checkErrors(FMOD::Studio::System::create(&system));
-    checkErrors(system->getCoreSystem(&coreSystem));
+    if(system == nullptr && coreSystem == nullptr){
+        checkErrors(FMOD::Studio::System::create(&system));
+        checkErrors(system->getCoreSystem(&coreSystem));
+    }
+    
     if (checkErrors(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
         isInitialized = true;
         Godot::print("FMOD Sound System: Successfully initialized");
@@ -208,6 +211,10 @@ void Fmod::addListener(Object *gameObj) {
 }
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
+    if(system == nullptr && coreSystem == nullptr){
+        checkErrors(FMOD::Studio::System::create(&system));
+        checkErrors(system->getCoreSystem(&coreSystem));
+    }
     checkErrors(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
