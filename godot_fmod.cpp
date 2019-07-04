@@ -105,13 +105,13 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
             Godot::print("FMOD Sound System: Live update enabled!");
         }
     } else {
-        Godot::print_error("FMOD Sound System: Failed to initialize :|", "init", __FILE__, __LINE__);
+        Godot::print_error("FMOD Sound System: Failed to initialize :|", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
     }
 }
 
 int Fmod::checkErrors(FMOD_RESULT result) {
     if (result != FMOD_OK) {
-        Godot::print_error(FMOD_ErrorString(result), "checkErrors", __FILE__, __LINE__);
+        Godot::print_error(FMOD_ErrorString(result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         return 0;
     }
     return 1;
@@ -159,7 +159,7 @@ void Fmod::update() {
 void Fmod::setListenerAttributes() {
     if (isNull(listener)) {
         if (nullListenerWarning) {
-            Godot::print_error("FMOD Sound System: Listener not set!", "setListenerAttributes", __FILE__, __LINE__);
+            Godot::print_error("FMOD Sound System: Listener not set!", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
             nullListenerWarning = false;
         }
         return;
@@ -745,7 +745,7 @@ void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float ro
         distanceScale = distanceFactor;
         Godot::print("FMOD Sound System: Successfully set global 3D settings");
     } else {
-        Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", "Fmod::setSound3DSettings", __FILE__, __LINE__);
+        Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
     }
 }
 
