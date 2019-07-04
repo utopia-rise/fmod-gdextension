@@ -13,6 +13,18 @@
 #include <gen/Mutex.hpp>
 #include <set>
 #include "callbacks.h"
+#include "current_function.h"
+
+#define FIND_AND_CHECK(instanceId, type, set, defaultReturn) \
+auto it = set.find((type *)instanceId); \
+type *instance = nullptr; \
+if (it == set.end()) { \
+    Godot::print_error("FMOD Sound System: cannot find " + String(#instanceId) + " in " + String(#set), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    return defaultReturn;\
+}\
+else { \
+    instance = *it;\
+}\
 
 namespace godot {
     class Fmod : public Node {

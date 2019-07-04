@@ -8,13 +8,6 @@ using namespace godot;
 
 Mutex *Callbacks::mut;
 
-#define CHECK_AND_CALL(instanceId, type, set, function) \
-auto it = set.find((type *)instanceId); \
-if (it != set.end()) { \
-auto *instance = *it; \
-function; \
-}\
-
 Fmod::Fmod() = default;
 
 Fmod::~Fmod() {
@@ -347,22 +340,19 @@ const uint64_t Fmod::createEventInstance(String eventPath) {
 
 float Fmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance,
-                   events,
-                   checkErrors(instance->getParameterByName(parameterName.ascii().get_data(), &p)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, p)
+    checkErrors(instance->getParameterByName(parameterName.ascii().get_data(), &p));
     return p;
 }
 
 void Fmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance,
-                   events,
-                   checkErrors(instance->setParameterByName(parameterName.ascii().get_data(), value)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setParameterByName(parameterName.ascii().get_data(), value));
 }
 
 void Fmod::releaseEvent(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId, FMOD::Studio::EventInstance, events, releaseOneEvent(instance))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    releaseOneEvent(instance);
 }
 
 void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
@@ -376,102 +366,91 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
 }
 
 void Fmod::startEvent(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId, FMOD::Studio::EventInstance, events, checkErrors(instance->start()))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->start());
 }
 
 void Fmod::stopEvent(const uint64_t instanceId, int stopMode) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode))))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void Fmod::triggerEventCue(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId, FMOD::Studio::EventInstance, events, checkErrors(instance->triggerCue()))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->triggerCue());
 }
 
 int Fmod::getEventPlaybackState(const uint64_t instanceId) {
     int s = -1;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE *) &s)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, s)
+    checkErrors(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE *) &s));
     return s;
 }
 
 bool Fmod::getEventPaused(const uint64_t instanceId) {
     bool paused = false;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getPaused(&paused)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, paused)
+    checkErrors(instance->getPaused(&paused));
     return paused;
 }
 
 void Fmod::setEventPaused(const uint64_t instanceId, bool paused) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setPaused(paused)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setPaused(paused));
 }
 
 float Fmod::getEventPitch(const uint64_t instanceId) {
     float pitch = 0.0f;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getPitch(&pitch)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, pitch)
+    checkErrors(instance->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setEventPitch(const uint64_t instanceId, float pitch) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setPitch(pitch)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setPitch(pitch));
 }
 
 float Fmod::getEventVolume(const uint64_t instanceId) {
     float volume = 0.0f;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getVolume(&volume)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, volume)
+    checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setEventVolume(const uint64_t instanceId, float volume) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setVolume(volume)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setVolume(volume));
 }
 
 int Fmod::getEventTimelinePosition(const uint64_t instanceId) {
     int tp = 0;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getTimelinePosition(&tp)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, tp)
+    checkErrors(instance->getTimelinePosition(&tp));
     return tp;
 }
 
 void Fmod::setEventTimelinePosition(const uint64_t instanceId, int position) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setTimelinePosition(position)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setTimelinePosition(position));
 }
 
 float Fmod::getEventReverbLevel(const uint64_t instanceId, int index) {
     float rvl = 0.0f;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->getReverbLevel(index, &rvl)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, rvl)
+    checkErrors(instance->getReverbLevel(index, &rvl));
     return rvl;
 }
 
 void Fmod::setEventReverbLevel(const uint64_t instanceId, int index, float level) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setReverbLevel(index, level)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setReverbLevel(index, level));
 }
 
 bool Fmod::isEventVirtual(const uint64_t instanceId) {
     bool v = false;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->isVirtual(&v)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, v)
+    checkErrors(instance->isVirtual(&v));
     return v;
 }
 
@@ -630,15 +609,13 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
 
 void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
     if (isNull(gameObj)) return;
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   getEventInfo(instance)->gameObj = gameObj)
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    getEventInfo(instance)->gameObj = gameObj;
 }
 
 void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId,
-                   FMOD::Studio::EventInstance, events,
-                   getEventInfo(instance)->gameObj = nullptr)
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    getEventInfo(instance)->gameObj = nullptr;
 }
 
 void Fmod::pauseAllEvents(const bool pause) {
@@ -694,45 +671,49 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId,
-                   SoundPair, sounds,
-                   checkErrors(instance->channel->setPaused(false)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->channel->setPaused(false));
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    CHECK_AND_CALL(instanceId,
-                   SoundPair, sounds,
-                   checkErrors(instance->channel->setPaused(paused)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->stop()))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->isPlaying(&isPlaying)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, isPlaying)
+    checkErrors(instance->channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->setVolume(volume)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->getVolume(&volume)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, volume)
+    checkErrors(instance->channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->getPitch(&pitch)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, pitch)
+    checkErrors(instance->channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    CHECK_AND_CALL(instanceId, SoundPair, sounds, checkErrors(instance->channel->setPitch(pitch)))
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->channel->setPitch(pitch));
 }
 
 const uint64_t Fmod::loadSound(String path, int mode) {
@@ -753,10 +734,10 @@ const uint64_t Fmod::loadSound(String path, int mode) {
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
-    CHECK_AND_CALL(instanceId, SoundPair, sounds,
-                   checkErrors(instance->sound->release());
-                           sounds.erase(instance);
-                           delete instance)
+    FIND_AND_CHECK(instanceId, SoundPair, sounds, )
+    checkErrors(instance->sound->release());
+    sounds.erase(instance);
+    delete instance;
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
@@ -852,8 +833,8 @@ float Fmod::getGlobalParameter(const String parameterName) {
 }
 
 void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
-    CHECK_AND_CALL(instanceId, FMOD::Studio::EventInstance, events,
-                   checkErrors(instance->setCallback(Callbacks::eventCallback, callbackMask)))
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance, events, )
+    checkErrors(instance->setCallback(Callbacks::eventCallback, callbackMask));
 }
 
 FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
