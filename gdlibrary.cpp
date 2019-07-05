@@ -12,6 +12,6 @@ extern "C" void GDN_EXPORT fmod_gdnative_terminate(godot_gdnative_terminate_opti
 
 extern "C" void GDN_EXPORT fmod_nativescript_init(void *handle){
     Godot::nativescript_init(handle);
-    register_class<GodotFmod>();
+    register_class<Fmod>();
 }
 
