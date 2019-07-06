@@ -14,31 +14,41 @@
 #include <set>
 #include "callbacks.h"
 #include "current_function.h"
- 
+
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, defaultReturn) \
 auto it = set.find((type)instanceId); \
 if (it == set.end()) { \
     Godot::print_error("FMOD Sound System: cannot find instanceId in set", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn;\
 }\
-type instance = *it;\
+auto instance = *it;\
 
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set,)
-#define FIND_AND_CHECK_CHOOSER(A,B,C,D,FUNC, ...)  FUNC  
+#define FIND_AND_CHECK_CHOOSER(A,B,C,D,FUNC, ...)  FUNC
 #define FIND_AND_CHECK(...) \
 FIND_AND_CHECK_CHOOSER(__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN(__VA_ARGS__), FIND_AND_CHECK_WITHOUT_RETURN(__VA_ARGS__)) \
 
 namespace godot {
+
+    struct EventInfo {
+        //Is the event oneshot
+        bool isOneShot = false;
+        //GameObject to which this event is attached
+        Object *gameObj = nullptr;
+        // Callback info associated with this event
+        Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
+    };
+
+    struct SoundPair {
+        FMOD::Sound *sound;
+        FMOD::Channel *channel;
+    };
+    bool operator<(const SoundPair &pair1, const SoundPair &pair2);
+    bool operator<(uint64_t ptr, const SoundPair &pair);
+    bool operator<(const SoundPair &pair, uint64_t ptr);
+
     class Fmod : public Node {
-    public:
-        struct EventInfo {
-            //Is the event oneshot
-            bool isOneShot = false;
-            //GameObject to which this event is attached
-            Object *gameObj = nullptr;
-            // Callback info associated with this event
-            Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
-        };
+
     private:
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
@@ -57,11 +67,7 @@ namespace godot {
         std::map<String, FMOD::Studio::Bus *> buses;
         std::map<String, FMOD::Studio::VCA *> VCAs;
 
-        struct SoundPair{
-            FMOD::Sound *sound;
-            FMOD::Channel *channel;
-        };
-        std::set<SoundPair*> sounds;
+        std::set<SoundPair, std::less<>> sounds;
 
         std::set<FMOD::Studio::EventInstance *> events;
 

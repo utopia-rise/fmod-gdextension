@@ -543,7 +543,7 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
     return instance;
 }
 
-Fmod::EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
+EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
     EventInfo *eventInfo;
     eventInstance->getUserData((void **)&eventInfo);
     return eventInfo;
@@ -671,49 +671,49 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->channel->setPaused(false));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.channel->setPaused(false));
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->channel->setPaused(paused));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->channel->stop());
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, isPlaying)
-    checkErrors(instance->channel->isPlaying(&isPlaying));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds, isPlaying)
+    checkErrors(instance.channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->channel->setVolume(volume));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, volume)
-    checkErrors(instance->channel->getVolume(&volume));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds, volume)
+    checkErrors(instance.channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, pitch)
-    checkErrors(instance->channel->getPitch(&pitch));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds, pitch)
+    checkErrors(instance.channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->channel->setPitch(pitch));
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.channel->setPitch(pitch));
 }
 
 const uint64_t Fmod::loadSound(String path, int mode) {
@@ -723,21 +723,20 @@ const uint64_t Fmod::loadSound(String path, int mode) {
         FMOD::Channel *channel = nullptr;
         checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
         if (channel) {
-            auto *soundPair = new SoundPair();
-            soundPair->sound = sound;
-            soundPair->channel = channel;
+            auto soundPair = SoundPair();
+            soundPair.sound = sound;
+            soundPair.channel = channel;
             sounds.insert(soundPair);
-            return (uint64_t)soundPair;
+            return (uint64_t)soundPair.sound;
         }
     }
     return 0;
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
-    checkErrors(instance->sound->release());
+    FIND_AND_CHECK(instanceId, uint64_t, sounds)
+    checkErrors(instance.sound->release());
     sounds.erase(instance);
-    delete instance;
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
@@ -840,7 +839,7 @@ void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
 FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
     auto *instance = (FMOD::Studio::EventInstance *)event;
     auto instanceId = (uint64_t)instance;
-    Fmod::EventInfo *eventInfo;
+    EventInfo *eventInfo;
     mut->lock();
     instance->getUserData((void **)&eventInfo);
     if (eventInfo) {
@@ -918,4 +917,14 @@ void Fmod::_init() {
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
     distanceScale = 1.0;
+}
+
+bool operator<(const SoundPair &pair1, const SoundPair &pair2) {
+    return ((uint64_t) pair1.sound) < ((uint64_t) pair2.sound);
+}
+bool operator<(uint64_t ptr, const SoundPair &pair) {
+    return ptr < ((uint64_t) pair.sound);
+}
+bool operator<(const SoundPair &pair, uint64_t ptr) {
+    return ((uint64_t) pair.sound) < ptr;
 }
