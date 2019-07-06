@@ -14,17 +14,19 @@
 #include <set>
 #include "callbacks.h"
 #include "current_function.h"
-
-#define FIND_AND_CHECK(instanceId, type, set, defaultReturn) \
-auto it = set.find((type *)instanceId); \
-type *instance = nullptr; \
+ 
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, defaultReturn) \
+auto it = set.find((type)instanceId); \
 if (it == set.end()) { \
-    Godot::print_error("FMOD Sound System: cannot find " + String(#instanceId) + " in " + String(#set), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    Godot::print_error("FMOD Sound System: cannot find instanceId in set", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn;\
 }\
-else { \
-    instance = *it;\
-}\
+type instance = *it;\
+
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set,)
+#define FIND_AND_CHECK_CHOOSER(A,B,C,D,FUNC, ...)  FUNC  
+#define FIND_AND_CHECK(...) \
+FIND_AND_CHECK_CHOOSER(##__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN(__VA_ARGS__), FIND_AND_CHECK_WITHOUT_RETURN(__VA_ARGS__)) \
 
 namespace godot {
     class Fmod : public Node {
@@ -59,7 +61,7 @@ namespace godot {
             FMOD::Sound *sound;
             FMOD::Channel *channel;
         };
-        std::set<SoundPair *> sounds;
+        std::set<SoundPair*>> sounds;
 
         std::set<FMOD::Studio::EventInstance *> events;
 
