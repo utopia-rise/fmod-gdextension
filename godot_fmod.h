@@ -26,7 +26,7 @@ type instance = *it;\
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set,)
 #define FIND_AND_CHECK_CHOOSER(A,B,C,D,FUNC, ...)  FUNC  
 #define FIND_AND_CHECK(...) \
-FIND_AND_CHECK_CHOOSER(##__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN(__VA_ARGS__), FIND_AND_CHECK_WITHOUT_RETURN(__VA_ARGS__)) \
+FIND_AND_CHECK_CHOOSER(__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN(__VA_ARGS__), FIND_AND_CHECK_WITHOUT_RETURN(__VA_ARGS__)) \
 
 namespace godot {
     class Fmod : public Node {
@@ -61,7 +61,7 @@ namespace godot {
             FMOD::Sound *sound;
             FMOD::Channel *channel;
         };
-        std::set<SoundPair*>> sounds;
+        std::set<SoundPair*> sounds;
 
         std::set<FMOD::Studio::EventInstance *> events;
 

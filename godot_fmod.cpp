@@ -366,7 +366,7 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
 }
 
 void Fmod::startEvent(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, )
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
     checkErrors(instance->start());
 }
 
@@ -833,7 +833,7 @@ float Fmod::getGlobalParameter(const String parameterName) {
 }
 
 void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events
+    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
     checkErrors(instance->setCallback(Callbacks::eventCallback, callbackMask));
 }
 
