@@ -23,10 +23,16 @@ if (it == set.end()) { \
 }\
 auto instance = *it;\
 
-#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set,)
-#define FIND_AND_CHECK_CHOOSER(A,B,C,D,FUNC, ...)  FUNC
-#define FIND_AND_CHECK(...) \
-FIND_AND_CHECK_CHOOSER(__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN(__VA_ARGS__), FIND_AND_CHECK_WITHOUT_RETURN(__VA_ARGS__)) \
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, void())
+//#define FUNC_CHOOSER(A,B,C,D,FUNC,...)  FUNC
+//#define FIND_AND_CHECK_CHOOSER(...) FUNC_CHOOSER(__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN,)
+//#define FIND_AND_CHECK(...) FIND_AND_CHECK_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, _f5, ...) _f5
+#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
+#define CHOOSE_FROM_ARG_COUNT(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
+#define MACRO_CHOOSER(...) CHOOSE_FROM_ARG_COUNT(__VA_ARGS__ ())
+#define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 namespace godot {
 
