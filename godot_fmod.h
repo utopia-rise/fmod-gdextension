@@ -9,39 +9,24 @@
 #include <Object.hpp>
 #include <CanvasItem.hpp>
 #include <Node.hpp>
-#include <map>
 #include <gen/Mutex.hpp>
-#include <set>
 #include "callbacks.h"
 #include "current_function.h"
 
-#define FIND_AND_CHECK_IN_DICT_WITH_RETURN(path, type, dict, defaultReturn) \
-if (!dict.has(path)) return defaultReturn; \
-auto instance = (type) (uint64_t) dict[path]; \
+
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, type, coll, defaultReturn) \
+if (!coll.has(instanceId)) return defaultReturn; \
+auto instance = (type) (uint64_t) coll[instanceId]; \
 if (!instance) { \
-    Godot::print_error("FMOD Sound System: cannot find path in dict", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    Godot::print_error("FMOD Sound System: cannot find instanceId in coll", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn; \
 } \
 
-#define FIND_AND_CHECK_IN_DICT_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_IN_DICT_WITH_RETURN(instanceId, type, set, void())
-
-#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, _f5, ...) _f5
-#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
-#define CHOOSE_FROM_ARG_COUNT_DICT(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_IN_DICT_WITH_RETURN, FIND_AND_CHECK_IN_DICT_WITHOUT_RETURN, ))
-#define MACRO_CHOOSER_DICT(...) CHOOSE_FROM_ARG_COUNT_DICT(__VA_ARGS__ ())
-#define FIND_AND_CHECK_IN_DICT(...) MACRO_CHOOSER_DICT(__VA_ARGS__)(__VA_ARGS__)
-
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, defaultReturn) \
-auto it = set.find((type)instanceId); \
-if (it == set.end()) { \
-    Godot::print_error("FMOD Sound System: cannot find instanceId in set", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
-    return defaultReturn;\
-}\
-auto instance = *it;\
-
-#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, void())
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, coll) FIND_AND_CHECK_WITH_RETURN(instanceId, type, coll, void())
 
 #define CHOOSE_FROM_ARG_COUNT(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
+#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, _f5, ...) _f5
+#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
 #define MACRO_CHOOSER(...) CHOOSE_FROM_ARG_COUNT(__VA_ARGS__ ())
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
@@ -60,9 +45,6 @@ namespace godot {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
     };
-    bool operator<(const SoundPair &pair1, const SoundPair &pair2);
-    bool operator<(uint64_t ptr, const SoundPair &pair);
-    bool operator<(const SoundPair &pair, uint64_t ptr);
 
     class Fmod : public Node {
 
@@ -84,9 +66,8 @@ namespace godot {
         Dictionary buses;
         Dictionary VCAs;
 
-        std::set<SoundPair, std::less<>> sounds;
-
-        std::set<FMOD::Studio::EventInstance *> events;
+        Array sounds;
+        Array events;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -129,7 +110,7 @@ namespace godot {
         int getBankEventCount(String pathToBank);
         int getBankStringCount(String pathToBank);
         int getBankVCACount(String pathToBank);
-        const uint64_t createEventInstance(String eventPath);
+        const int createEventInstance(String eventPath);
         float getEventParameter(uint64_t instanceId, String parameterName);
         void setEventParameter(uint64_t instanceId, String parameterName, float value);
         void releaseEvent(uint64_t instanceId);
@@ -173,8 +154,8 @@ namespace godot {
         void unmuteAllEvents();
         bool banksStillLoading();
 
-        void playSound(uint64_t instanceId);
-        const uint64_t loadSound(String path, int mode);
+        void playSound(int instanceId);
+        const int loadSound(String path, int mode);
         void releaseSound(uint64_t instanceId);
         void setSoundPaused(uint64_t instanceId, bool paused);
         void stopSound(uint64_t instanceId);

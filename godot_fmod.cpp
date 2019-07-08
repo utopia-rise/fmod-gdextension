@@ -125,24 +125,27 @@ void Fmod::update() {
         }
         return;
     }
-    for (auto *eventInstance : events) {
-        EventInfo *eventInfo = getEventInfo(eventInstance);
-        if (eventInfo->gameObj) {
-            if (isNull(eventInfo->gameObj)) {
-                FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-                checkErrors(eventInstance->stop(m));
-                releaseOneEvent(eventInstance);
-                continue;
-            }
-            if (eventInfo->isOneShot) {
-                FMOD_STUDIO_PLAYBACK_STATE s;
-                checkErrors(eventInstance->getPlaybackState(&s));
-                if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+    for (int i = 0; i < events.size(); i++) {
+        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        if (eventInstance) {
+            EventInfo *eventInfo = getEventInfo(eventInstance);
+            if (eventInfo->gameObj) {
+                if (isNull(eventInfo->gameObj)) {
+                    FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+                    checkErrors(eventInstance->stop(m));
                     releaseOneEvent(eventInstance);
                     continue;
                 }
+                if (eventInfo->isOneShot) {
+                    FMOD_STUDIO_PLAYBACK_STATE s;
+                    checkErrors(eventInstance->getPlaybackState(&s));
+                    if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+                        releaseOneEvent(eventInstance);
+                        continue;
+                    }
+                }
+                updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
             }
-            updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
         }
     }
 
@@ -269,52 +272,50 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
 }
 
 void Fmod::unloadBank(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks)
     checkErrors(instance->unload());
     banks.erase(pathToBank);
 }
 
 int Fmod::getBankLoadingState(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
     FMOD_STUDIO_LOADING_STATE state;
     checkErrors(instance->getLoadingState(&state));
     return state;
 }
 
 int Fmod::getBankBusCount(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
     int count = -1;
     checkErrors(instance->getBusCount(&count));
     return count;
 }
 
 int Fmod::getBankEventCount(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
     int count = -1;
     checkErrors(instance->getEventCount(&count));
     return count;
 }
 
 int Fmod::getBankStringCount(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
     int count = -1;
     checkErrors(instance->getStringCount(&count));
     return count;
 }
 
 int Fmod::getBankVCACount(const String pathToBank) {
-    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
     int count = -1;
     checkErrors(instance->getVCACount(&count));
     return count;
 }
 
-const uint64_t Fmod::createEventInstance(String eventPath) {
+const int Fmod::createEventInstance(String eventPath) {
     FMOD::Studio::EventInstance *instance = createInstance(eventPath, false, nullptr);
     if (instance) {
-        const auto instanceId = (uint64_t)instance;
-        events.insert(instance);
-        return instanceId;
+        return events.size() -1;
     }
     return 0;
 }
@@ -438,7 +439,7 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
 bool Fmod::getBusMute(const String busPath) {
     loadBus(busPath);
     bool mute = false;
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, mute)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, mute)
     checkErrors(instance->getMute(&mute));
     return mute;
 }
@@ -446,7 +447,7 @@ bool Fmod::getBusMute(const String busPath) {
 bool Fmod::getBusPaused(const String busPath) {
     loadBus(busPath);
     bool paused = false;
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, paused)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, paused)
     checkErrors(instance->getPaused(&paused));
     return paused;
 }
@@ -454,32 +455,32 @@ bool Fmod::getBusPaused(const String busPath) {
 float Fmod::getBusVolume(const String busPath) {
     loadBus(busPath);
     float volume = 0.0f;
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, volume)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, volume)
     checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setBusMute(const String busPath, bool mute) {
     loadBus(busPath);
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
     checkErrors(instance->setMute(mute));
 }
 
 void Fmod::setBusPaused(const String busPath, bool paused) {
     loadBus(busPath);
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
     checkErrors(instance->setPaused(paused));
 }
 
 void Fmod::setBusVolume(const String busPath, float volume) {
     loadBus(busPath);
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
     checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     loadBus(busPath);
-    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
     checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
@@ -506,7 +507,7 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
         eventDescriptions[eventName] = desc;
     }
     auto eventDescription = (FMOD::Studio::EventDescription *) (uint64_t) eventDescriptions[eventName];
-    FMOD::Studio::EventInstance *instance;
+    FMOD::Studio::EventInstance *instance = nullptr;
     if (eventDescription) {
         checkErrors(eventDescription->createInstance(&instance));
         if (instance && (!isOneShot || gameObject)) {
@@ -514,7 +515,7 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
             eventInfo->gameObj = gameObject;
             eventInfo->isOneShot = isOneShot;
             instance->setUserData(eventInfo);
-            events.insert(instance);
+            events.append(instance);
         }
     }
     return instance;
@@ -596,8 +597,11 @@ void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
 }
 
 void Fmod::pauseAllEvents(const bool pause) {
-    for (auto eventInstance : events) {
-        checkErrors(eventInstance->setPaused(pause));
+    for (int i = 0; i < events.size(); i++) {
+        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        if (eventInstance) {
+            checkErrors(eventInstance->setPaused(pause));
+        }
     }
 }
 
@@ -634,84 +638,85 @@ bool Fmod::banksStillLoading() {
 float Fmod::getVCAVolume(const String VCAPath) {
     loadVCA(VCAPath);
     float volume = 0.0f;
-    FIND_AND_CHECK_IN_DICT(VCAs, FMOD::Studio::VCA *, buses, volume)
+    FIND_AND_CHECK(VCAPath, FMOD::Studio::VCA *, VCAs, volume)
     checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setVCAVolume(const String VCAPath, float volume) {
     loadVCA(VCAPath);
-    FIND_AND_CHECK_IN_DICT(VCAs, FMOD::Studio::VCA *, buses)
+    FIND_AND_CHECK(VCAPath, FMOD::Studio::VCA *, VCAs)
     checkErrors(instance->setVolume(volume));
 }
 
-void Fmod::playSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.channel->setPaused(false));
+void Fmod::playSound(const int instanceId) {
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->channel->setPaused(false));
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.channel->setPaused(paused));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.channel->stop());
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, uint64_t, sounds, isPlaying)
-    checkErrors(instance.channel->isPlaying(&isPlaying));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds, isPlaying)
+    checkErrors(instance->channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.channel->setVolume(volume));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, uint64_t, sounds, volume)
-    checkErrors(instance.channel->getVolume(&volume));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds, volume)
+    checkErrors(instance->channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, uint64_t, sounds, pitch)
-    checkErrors(instance.channel->getPitch(&pitch));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds, pitch)
+    checkErrors(instance->channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.channel->setPitch(pitch));
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->channel->setPitch(pitch));
 }
 
-const uint64_t Fmod::loadSound(String path, int mode) {
+const int Fmod::loadSound(String path, int mode) {
     FMOD::Sound *sound = nullptr;
     checkErrors(coreSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
     if (sound) {
         FMOD::Channel *channel = nullptr;
         checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
         if (channel) {
-            auto soundPair = SoundPair();
-            soundPair.sound = sound;
-            soundPair.channel = channel;
-            sounds.insert(soundPair);
-            return (uint64_t)soundPair.sound;
+            auto soundPair = new SoundPair();
+            soundPair->sound = sound;
+            soundPair->channel = channel;
+            sounds.append(soundPair);
+            return sounds.size() - 1;
         }
     }
     return 0;
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, uint64_t, sounds)
-    checkErrors(instance.sound->release());
+    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    checkErrors(instance->sound->release());
     sounds.erase(instance);
+    delete instance;
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
@@ -855,27 +860,30 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
 // runs on the game thread
 void Fmod::runCallbacks() {
     Callbacks::mut->lock();
-    for (auto *eventInstance : events) {
-        Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
-        // check for Marker callbacks
-        if (!cbInfo.markerSignalEmitted) {
-            emit_signal("timeline_marker", cbInfo.markerCallbackInfo);
-            cbInfo.markerSignalEmitted = true;
-        }
+    for (int i = 0; i < events.size(); i++) {
+        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        if (eventInstance) {
+            Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
+            // check for Marker callbacks
+            if (!cbInfo.markerSignalEmitted) {
+                emit_signal("timeline_marker", cbInfo.markerCallbackInfo);
+                cbInfo.markerSignalEmitted = true;
+            }
 
-        // check for Beat callbacks
-        if (!cbInfo.beatSignalEmitted) {
-            emit_signal("timeline_beat", cbInfo.beatCallbackInfo);
-            cbInfo.beatSignalEmitted = true;
-        }
+            // check for Beat callbacks
+            if (!cbInfo.beatSignalEmitted) {
+                emit_signal("timeline_beat", cbInfo.beatCallbackInfo);
+                cbInfo.beatSignalEmitted = true;
+            }
 
-        // check for Sound callbacks
-        if (!cbInfo.soundSignalEmitted) {
-            if (cbInfo.soundCallbackInfo["type"] == String("played"))
-                emit_signal("sound_played", cbInfo.soundCallbackInfo);
-            else
-                emit_signal("sound_stopped", cbInfo.soundCallbackInfo);
-            cbInfo.soundSignalEmitted = true;
+            // check for Sound callbacks
+            if (!cbInfo.soundSignalEmitted) {
+                if (cbInfo.soundCallbackInfo["type"] == String("played"))
+                    emit_signal("sound_played", cbInfo.soundCallbackInfo);
+                else
+                    emit_signal("sound_stopped", cbInfo.soundCallbackInfo);
+                cbInfo.soundSignalEmitted = true;
+            }
         }
     }
     Callbacks::mut->unlock();
@@ -892,14 +900,4 @@ void Fmod::_init() {
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
     distanceScale = 1.0;
-}
-
-bool operator<(const SoundPair &pair1, const SoundPair &pair2) {
-    return ((uint64_t) pair1.sound) < ((uint64_t) pair2.sound);
-}
-bool operator<(uint64_t ptr, const SoundPair &pair) {
-    return ptr < ((uint64_t) pair.sound);
-}
-bool operator<(const SoundPair &pair, uint64_t ptr) {
-    return ((uint64_t) pair.sound) < ptr;
 }
