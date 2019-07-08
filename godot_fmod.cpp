@@ -196,7 +196,7 @@ FMOD_VECTOR Fmod::toFmodVector(Vector3 &vec) {
 }
 
 FMOD_3D_ATTRIBUTES Fmod::get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
-                                              const FMOD_VECTOR &vel) {
+                                         const FMOD_VECTOR &vel) {
     FMOD_3D_ATTRIBUTES f3d;
     f3d.forward = forward;
     f3d.position = pos;
@@ -258,7 +258,7 @@ void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSp
 }
 
 String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
-    if (banks.count(pathToBank)) return pathToBank; // bank is already loaded
+    if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
@@ -269,63 +269,44 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
 }
 
 void Fmod::unloadBank(const String pathToBank) {
-    if (!banks.count(pathToBank)) return; // bank is not loaded
-    auto bankIt = banks.find(pathToBank);
-    if (bankIt != banks.end()) {
-        checkErrors(bankIt->second->unload());
-        banks.erase(pathToBank);
-    }
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks)
+    checkErrors(instance->unload());
+    banks.erase(pathToBank);
 }
 
 int Fmod::getBankLoadingState(const String pathToBank) {
-    if (!banks.count(pathToBank)) return -1; // bank is not loaded
-    auto bankIt = banks.find(pathToBank);
-    if (bankIt != banks.end()) {
-        FMOD_STUDIO_LOADING_STATE state;
-        checkErrors(bankIt->second->getLoadingState(&state));
-        return state;
-    }
-    return -1;
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FMOD_STUDIO_LOADING_STATE state;
+    checkErrors(instance->getLoadingState(&state));
+    return state;
 }
 
 int Fmod::getBankBusCount(const String pathToBank) {
-    if (banks.count(pathToBank)) {
-        int count = -1;
-        auto bankIt = banks.find(pathToBank);
-        if (bankIt != banks.end()) checkErrors(bankIt->second->getBusCount(&count));
-        return count;
-    }
-    return -1;
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    int count = -1;
+    checkErrors(instance->getBusCount(&count));
+    return count;
 }
 
 int Fmod::getBankEventCount(const String pathToBank) {
-    if (banks.count(pathToBank)) {
-        int count = -1;
-        auto bankIt = banks.find(pathToBank);
-        if (bankIt != banks.end()) checkErrors(bankIt->second->getEventCount(&count));
-        return count;
-    }
-    return -1;
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    int count = -1;
+    checkErrors(instance->getEventCount(&count));
+    return count;
 }
 
 int Fmod::getBankStringCount(const String pathToBank) {
-    if (banks.count(pathToBank)) {
-        int count = -1;
-        auto bankIt = banks.find(pathToBank);
-        if (bankIt != banks.end()) checkErrors(bankIt->second->getStringCount(&count));
-        return count;
-    }
-    return -1;
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    int count = -1;
+    checkErrors(instance->getStringCount(&count));
+    return count;
 }
 
 int Fmod::getBankVCACount(const String pathToBank) {
-    if (banks.count(pathToBank)) {
-        int count = -1;
-        auto bankIt = banks.find(pathToBank);
-        if (bankIt != banks.end()) checkErrors(bankIt->second->getVCACount(&count));
-        return count;
-    }
-    return -1;
+    FIND_AND_CHECK_IN_DICT(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    int count = -1;
+    checkErrors(instance->getVCACount(&count));
+    return count;
 }
 
 const uint64_t Fmod::createEventInstance(String eventPath) {
@@ -456,60 +437,54 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
 
 bool Fmod::getBusMute(const String busPath) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return false;
     bool mute = false;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->getMute(&mute));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, mute)
+    checkErrors(instance->getMute(&mute));
     return mute;
 }
 
 bool Fmod::getBusPaused(const String busPath) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return false;
     bool paused = false;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->getPaused(&paused));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, paused)
+    checkErrors(instance->getPaused(&paused));
     return paused;
 }
 
 float Fmod::getBusVolume(const String busPath) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return 0.0f;
     float volume = 0.0f;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->getVolume(&volume));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses, volume)
+    checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setBusMute(const String busPath, bool mute) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->setMute(mute));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    checkErrors(instance->setMute(mute));
 }
 
 void Fmod::setBusPaused(const String busPath, bool paused) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->setPaused(paused));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    checkErrors(instance->setPaused(paused));
 }
 
 void Fmod::setBusVolume(const String busPath, float volume) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return;
-    auto bus = buses.find(busPath);
-    checkErrors(bus->second->setVolume(volume));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     loadBus(busPath);
-    if (!buses.count(busPath)) return;
-    checkErrors(buses.find(busPath)->second->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
+    FIND_AND_CHECK_IN_DICT(busPath, FMOD::Studio::Bus *, buses)
+    checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void Fmod::loadBus(const String &busPath) {
-    if (!buses.count(busPath)) {
+    if (!buses.has(busPath)) {
         FMOD::Studio::Bus *b = nullptr;
         checkErrors(system->getBus(busPath.ascii().get_data(), &b));
         if (b) buses[busPath] = b;
@@ -517,7 +492,7 @@ void Fmod::loadBus(const String &busPath) {
 }
 
 void Fmod::loadVCA(const String &VCAPath) {
-    if (!VCAs.count(VCAPath)) {
+    if (!VCAs.has(VCAPath)) {
         FMOD::Studio::VCA *vca = nullptr;
         checkErrors(system->getVCA(VCAPath.ascii().get_data(), &vca));
         if (vca) VCAs[VCAPath] = vca;
@@ -525,20 +500,22 @@ void Fmod::loadVCA(const String &VCAPath) {
 }
 
 FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
-    if (!eventDescriptions.count(eventName)) {
+    if (!eventDescriptions.has(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
         eventDescriptions[eventName] = desc;
     }
-    auto descIt = eventDescriptions.find(eventName);
+    auto eventDescription = (FMOD::Studio::EventDescription *) (uint64_t) eventDescriptions[eventName];
     FMOD::Studio::EventInstance *instance;
-    checkErrors(descIt->second->createInstance(&instance));
-    if (instance && (!isOneShot || gameObject)) {
-        auto *eventInfo = new EventInfo();
-        eventInfo->gameObj = gameObject;
-        eventInfo->isOneShot = isOneShot;
-        instance->setUserData(eventInfo);
-        events.insert(instance);
+    if (eventDescription) {
+        checkErrors(eventDescription->createInstance(&instance));
+        if (instance && (!isOneShot || gameObject)) {
+            auto *eventInfo = new EventInfo();
+            eventInfo->gameObj = gameObject;
+            eventInfo->isOneShot = isOneShot;
+            instance->setUserData(eventInfo);
+            events.insert(instance);
+        }
     }
     return instance;
 }
@@ -643,8 +620,8 @@ void Fmod::unmuteAllEvents() {
 }
 
 bool Fmod::banksStillLoading() {
-    for (auto &it : banks) {
-        FMOD::Studio::Bank *bank = it.second;
+    for (int i = 0; i < banks.size(); i++) {
+        FMOD::Studio::Bank *bank = (FMOD::Studio::Bank *) (uint64_t) banks.values()[i];
         FMOD_STUDIO_LOADING_STATE loadingState;
         checkErrors(bank->getLoadingState(&loadingState));
         if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
@@ -656,18 +633,16 @@ bool Fmod::banksStillLoading() {
 
 float Fmod::getVCAVolume(const String VCAPath) {
     loadVCA(VCAPath);
-    if (!VCAs.count(VCAPath)) return 0.0f;
-    auto vca = VCAs.find(VCAPath);
     float volume = 0.0f;
-    checkErrors(vca->second->getVolume(&volume));
+    FIND_AND_CHECK_IN_DICT(VCAs, FMOD::Studio::VCA *, buses, volume)
+    checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setVCAVolume(const String VCAPath, float volume) {
     loadVCA(VCAPath);
-    if (!VCAs.count(VCAPath)) return;
-    auto vca = VCAs.find(VCAPath);
-    checkErrors(vca->second->setVolume(volume));
+    FIND_AND_CHECK_IN_DICT(VCAs, FMOD::Studio::VCA *, buses)
+    checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
