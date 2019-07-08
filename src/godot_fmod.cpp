@@ -85,7 +85,7 @@ void Fmod::_register_methods() {
     register_method("getPerformanceData", &Fmod::getPerformanceData);
     register_method("setGlobalParameter", &Fmod::setGlobalParameter);
     register_method("getGlobalParameter", &Fmod::getGlobalParameter);
-    register_method("_process", &Fmod::update);
+    register_method("update", &Fmod::update);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -126,7 +126,7 @@ void Fmod::update() {
         return;
     }
     for (int i = 0; i < events.size(); i++) {
-        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        FMOD::Studio::EventInstance * eventInstance = events[i];
         if (eventInstance) {
             EventInfo *eventInfo = getEventInfo(eventInstance);
             if (eventInfo->gameObj) {
@@ -265,7 +265,7 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
-        banks[pathToBank] = bank;
+        banks[pathToBank] = (uint64_t) bank;
         return pathToBank;
     }
     return pathToBank;
@@ -312,10 +312,10 @@ int Fmod::getBankVCACount(const String pathToBank) {
     return count;
 }
 
-const int Fmod::createEventInstance(String eventPath) {
+const uint64_t Fmod::createEventInstance(String eventPath) {
     FMOD::Studio::EventInstance *instance = createInstance(eventPath, false, nullptr);
     if (instance) {
-        return events.size() -1;
+        return (uint64_t) instance;
     }
     return 0;
 }
@@ -488,7 +488,7 @@ void Fmod::loadBus(const String &busPath) {
     if (!buses.has(busPath)) {
         FMOD::Studio::Bus *b = nullptr;
         checkErrors(system->getBus(busPath.ascii().get_data(), &b));
-        if (b) buses[busPath] = b;
+        if (b) buses[busPath] = (uint64_t) b;
     }
 }
 
@@ -496,7 +496,7 @@ void Fmod::loadVCA(const String &VCAPath) {
     if (!VCAs.has(VCAPath)) {
         FMOD::Studio::VCA *vca = nullptr;
         checkErrors(system->getVCA(VCAPath.ascii().get_data(), &vca));
-        if (vca) VCAs[VCAPath] = vca;
+        if (vca) VCAs[VCAPath] = (uint64_t) vca;
     }
 }
 
@@ -504,7 +504,7 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
     if (!eventDescriptions.has(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
-        eventDescriptions[eventName] = desc;
+        eventDescriptions[eventName] = (uint64_t) desc;
     }
     auto eventDescription = (FMOD::Studio::EventDescription *) (uint64_t) eventDescriptions[eventName];
     FMOD::Studio::EventInstance *instance = nullptr;
@@ -649,7 +649,7 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
     checkErrors(instance->setVolume(volume));
 }
 
-void Fmod::playSound(const int instanceId) {
+void Fmod::playSound(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, SoundPair *, sounds)
     checkErrors(instance->channel->setPaused(false));
 }
@@ -695,7 +695,7 @@ void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
     checkErrors(instance->channel->setPitch(pitch));
 }
 
-const int Fmod::loadSound(String path, int mode) {
+const uint64_t Fmod::loadSound(String path, int mode) {
     FMOD::Sound *sound = nullptr;
     checkErrors(coreSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
     if (sound) {
@@ -706,7 +706,7 @@ const int Fmod::loadSound(String path, int mode) {
             soundPair->sound = sound;
             soundPair->channel = channel;
             sounds.append(soundPair);
-            return sounds.size() - 1;
+            return (uint64_t) soundPair;
         }
     }
     return 0;
@@ -861,7 +861,7 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
 void Fmod::runCallbacks() {
     Callbacks::mut->lock();
     for (int i = 0; i < events.size(); i++) {
-        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        FMOD::Studio::EventInstance *eventInstance = events[i];
         if (eventInstance) {
             Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
             // check for Marker callbacks

@@ -110,7 +110,7 @@ elif platform == "ios":
     env.Append(LIBPATH=[ godot_bindings_path + 'bin/', '../libs/fmod/ios/core/lib/', '../libs/fmod/ios/studio/lib/' ])
 
 sources = []
-add_sources(sources, "./")
+add_sources(sources, "./src")
 
 def change_id(self, arg, env):
     sys_exec(["install_name_tool", "-id", "@rpath/libGodotFmod.%s.dylib" % platform, "bin/libGodotFmod.%s.dylib" % platform])

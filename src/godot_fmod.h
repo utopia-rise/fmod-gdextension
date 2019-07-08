@@ -11,7 +11,7 @@
 #include <Node.hpp>
 #include <gen/Mutex.hpp>
 #include "callbacks.h"
-#include "current_function.h"
+#include "pointer_array.h"
 
 
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, type, coll, defaultReturn) \
@@ -66,8 +66,8 @@ namespace godot {
         Dictionary buses;
         Dictionary VCAs;
 
-        Array sounds;
-        Array events;
+        PointerArray<SoundPair *> sounds;
+        PointerArray<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
@@ -110,7 +110,7 @@ namespace godot {
         int getBankEventCount(String pathToBank);
         int getBankStringCount(String pathToBank);
         int getBankVCACount(String pathToBank);
-        const int createEventInstance(String eventPath);
+        const uint64_t createEventInstance(String eventPath);
         float getEventParameter(uint64_t instanceId, String parameterName);
         void setEventParameter(uint64_t instanceId, String parameterName, float value);
         void releaseEvent(uint64_t instanceId);
@@ -154,8 +154,8 @@ namespace godot {
         void unmuteAllEvents();
         bool banksStillLoading();
 
-        void playSound(int instanceId);
-        const int loadSound(String path, int mode);
+        void playSound(uint64_t instanceId);
+        const uint64_t loadSound(String path, int mode);
         void releaseSound(uint64_t instanceId);
         void setSoundPaused(uint64_t instanceId, bool paused);
         void stopSound(uint64_t instanceId);

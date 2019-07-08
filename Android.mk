@@ -31,8 +31,8 @@ LOCAL_CPP_FEATURES := rtti exceptions
 LOCAL_LDLIBS := -llog
 
 LOCAL_SRC_FILES := \
-godot_fmod.cpp \
-gdlibrary.cpp \
+src/godot_fmod.cpp \
+src/gdlibrary.cpp \
 
 LOCAL_SHARED_LIBRARIES := \
 fmod-core-prebuilt \
