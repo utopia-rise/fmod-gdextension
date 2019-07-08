@@ -24,9 +24,6 @@ if (it == set.end()) { \
 auto instance = *it;\
 
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, void())
-//#define FUNC_CHOOSER(A,B,C,D,FUNC,...)  FUNC
-//#define FIND_AND_CHECK_CHOOSER(...) FUNC_CHOOSER(__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN,)
-//#define FIND_AND_CHECK(...) FIND_AND_CHECK_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 #define FUNC_CHOOSER(_f1, _f2, _f3, _f4, _f5, ...) _f5
 #define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
@@ -73,7 +70,7 @@ namespace godot {
         std::map<String, FMOD::Studio::Bus *> buses;
         std::map<String, FMOD::Studio::VCA *> VCAs;
 
-        std::set<SoundPair, std::less<>> sounds;
+        std::set<SoundPair, std::less<void>> sounds;
 
         std::set<FMOD::Studio::EventInstance *> events;
 
