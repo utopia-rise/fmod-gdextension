@@ -126,7 +126,7 @@ void Fmod::update() {
         return;
     }
     for (int i = 0; i < events.size(); i++) {
-        FMOD::Studio::EventInstance * eventInstance = events[i];
+        FMOD::Studio::EventInstance * eventInstance = events.get(i);
         if (eventInstance) {
             EventInfo *eventInfo = getEventInfo(eventInstance);
             if (eventInfo->gameObj) {
@@ -650,48 +650,48 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->channel->setPaused(false));
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, isPlaying)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, isPlaying)
     checkErrors(instance->channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, volume)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, volume)
     checkErrors(instance->channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds, pitch)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, pitch)
     checkErrors(instance->channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->channel->setPitch(pitch));
 }
 
@@ -702,7 +702,7 @@ const uint64_t Fmod::loadSound(String path, int mode) {
         FMOD::Channel *channel = nullptr;
         checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
         if (channel) {
-            auto soundPair = new SoundPair();
+            auto soundPair = new SoundChannel();
             soundPair->sound = sound;
             soundPair->channel = channel;
             sounds.append(soundPair);
@@ -713,7 +713,7 @@ const uint64_t Fmod::loadSound(String path, int mode) {
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundPair *, sounds)
+    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
     checkErrors(instance->sound->release());
     sounds.erase(instance);
     delete instance;
@@ -861,7 +861,7 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
 void Fmod::runCallbacks() {
     Callbacks::mut->lock();
     for (int i = 0; i < events.size(); i++) {
-        FMOD::Studio::EventInstance *eventInstance = events[i];
+        FMOD::Studio::EventInstance *eventInstance = events.get(i);
         if (eventInstance) {
             Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
             // check for Marker callbacks

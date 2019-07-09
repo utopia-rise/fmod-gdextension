@@ -10,24 +10,22 @@
 #include <CanvasItem.hpp>
 #include <Node.hpp>
 #include <gen/Mutex.hpp>
-#include "callbacks.h"
-#include "pointer_array.h"
+#include "callback/callbacks.h"
+#include "helpers/containers.h"
 
 
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, type, coll, defaultReturn) \
-if (!coll.has(instanceId)) return defaultReturn; \
-auto instance = (type) (uint64_t) coll[instanceId]; \
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, type, cont, defaultReturn) \
+type instance = cont.get(instanceId); \
 if (!instance) { \
     Godot::print_error("FMOD Sound System: cannot find instanceId in coll", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn; \
 } \
 
-#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, coll) FIND_AND_CHECK_WITH_RETURN(instanceId, type, coll, void())
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, type, set) FIND_AND_CHECK_WITH_RETURN(instanceId, type, set, void())
 
-#define CHOOSE_FROM_ARG_COUNT(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
 #define FUNC_CHOOSER(_f1, _f2, _f3, _f4, _f5, ...) _f5
 #define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
-#define MACRO_CHOOSER(...) CHOOSE_FROM_ARG_COUNT(__VA_ARGS__ ())
+#define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 namespace godot {
@@ -41,7 +39,8 @@ namespace godot {
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
-    struct SoundPair {
+
+    struct SoundChannel {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
     };
@@ -61,13 +60,13 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
-        Dictionary banks;
-        Dictionary eventDescriptions;
-        Dictionary buses;
-        Dictionary VCAs;
+        Map<String, FMOD::Studio::Bank *> banks;
+        Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
+        Map<String, FMOD::Studio::Bus *> buses;
+        Map<String, FMOD::Studio::VCA *> VCAs;
 
-        PointerArray<SoundPair *> sounds;
-        PointerArray<FMOD::Studio::EventInstance *> events;
+        Vector<SoundChannel *> sounds;
+        Vector<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
