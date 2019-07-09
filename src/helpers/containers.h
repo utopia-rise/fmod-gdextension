@@ -23,26 +23,23 @@ namespace godot {
 
         T get(const T value) {
             if(this->find((uint64_t) value) > -1) {
-                return T;
+                return value;
             }
             return nullptr;
         }
 
         T get(const int id) {
-            if(this->find(id) > -1) {
-                return (T) ((uint64_t) Array::operator[](id));
-            }
-            return nullptr;
+            return (T) ((uint64_t) Array::operator[](id));
         }
 
         uint64_t append(const T value){
-            const uint64_t var = (uint64_t) value;
+            const auto var = (uint64_t) value;
             Array::append(var);
             return var;
         }
 
         uint64_t erase(const T value){
-            const uint64_t var = (uint64_t) value;
+            const auto var = (uint64_t) value;
             Array::erase(var);
             return var;
         }

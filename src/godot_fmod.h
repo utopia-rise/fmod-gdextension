@@ -17,7 +17,7 @@
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
 auto instance = cont.get(instanceId); \
 if (!instance) { \
-    Godot::print_error("FMOD Sound System: cannot find instanceId in coll", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    Godot::print_error("FMOD Sound System: cannot find instanceId in cont", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn; \
 } \
 
@@ -40,7 +40,7 @@ namespace godot {
     };
 
 
-    struct SoundChannel: Object {
+    struct SoundChannel {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
     };
