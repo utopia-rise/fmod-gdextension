@@ -40,13 +40,13 @@ namespace godot {
     };
 
 
-    struct SoundChannel {
+    struct SoundChannel: Object {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
     };
 
     class Fmod : public Node {
-
+    GODOT_CLASS(Fmod, Node)
     private:
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
@@ -70,8 +70,6 @@ namespace godot {
 
         //Store disctionnary of performance data
         Dictionary performanceData;
-
-    GODOT_CLASS(Fmod, Node)
 
     private:
         int checkErrors(FMOD_RESULT result);

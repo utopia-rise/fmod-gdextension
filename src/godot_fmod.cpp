@@ -265,7 +265,7 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
-        banks[pathToBank] = (uint64_t) bank;
+        banks[pathToBank] << bank;
         return pathToBank;
     }
     return pathToBank;
@@ -488,7 +488,7 @@ void Fmod::loadBus(const String &busPath) {
     if (!buses.has(busPath)) {
         FMOD::Studio::Bus *b = nullptr;
         checkErrors(system->getBus(busPath.ascii().get_data(), &b));
-        if (b) buses[busPath] = (uint64_t) b;
+        if (b) buses[busPath] <<  b;
     }
 }
 
@@ -496,7 +496,7 @@ void Fmod::loadVCA(const String &VCAPath) {
     if (!VCAs.has(VCAPath)) {
         FMOD::Studio::VCA *vca = nullptr;
         checkErrors(system->getVCA(VCAPath.ascii().get_data(), &vca));
-        if (vca) VCAs[VCAPath] = (uint64_t) vca;
+        if (vca) VCAs[VCAPath] <<  vca;
     }
 }
 
@@ -504,9 +504,9 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
     if (!eventDescriptions.has(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
-        eventDescriptions[eventName] = (uint64_t) desc;
+        eventDescriptions[eventName] << desc;
     }
-    auto eventDescription = (FMOD::Studio::EventDescription *) (uint64_t) eventDescriptions[eventName];
+    auto eventDescription = (FMOD::Studio::EventDescription *) eventDescriptions.get(eventName);
     FMOD::Studio::EventInstance *instance = nullptr;
     if (eventDescription) {
         checkErrors(eventDescription->createInstance(&instance));
@@ -598,7 +598,7 @@ void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
 
 void Fmod::pauseAllEvents(const bool pause) {
     for (int i = 0; i < events.size(); i++) {
-        auto eventInstance = (FMOD::Studio::EventInstance *) (uint64_t) events[i];
+        auto eventInstance = (FMOD::Studio::EventInstance *) events.get(i);
         if (eventInstance) {
             checkErrors(eventInstance->setPaused(pause));
         }
@@ -625,7 +625,7 @@ void Fmod::unmuteAllEvents() {
 
 bool Fmod::banksStillLoading() {
     for (int i = 0; i < banks.size(); i++) {
-        FMOD::Studio::Bank *bank = (FMOD::Studio::Bank *) (uint64_t) banks.values()[i];
+        FMOD::Studio::Bank *bank = (FMOD::Studio::Bank *) banks.get(i);
         FMOD_STUDIO_LOADING_STATE loadingState;
         checkErrors(bank->getLoadingState(&loadingState));
         if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
@@ -702,11 +702,10 @@ const uint64_t Fmod::loadSound(String path, int mode) {
         FMOD::Channel *channel = nullptr;
         checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
         if (channel) {
-            auto soundPair = new SoundChannel();
-            soundPair->sound = sound;
-            soundPair->channel = channel;
-            sounds.append(soundPair);
-            return (uint64_t) soundPair;
+            auto soundChannel = new SoundChannel();
+            soundChannel->sound = sound;
+            soundChannel->channel = channel;
+            return sounds.append(soundChannel);
         }
     }
     return 0;
@@ -818,7 +817,7 @@ void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
 
 FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
     auto *instance = (FMOD::Studio::EventInstance *)event;
-    auto instanceId = (uint64_t)instance;
+    auto instanceId = (uint64_t) instance;
     EventInfo *eventInfo;
     mut->lock();
     instance->getUserData((void **)&eventInfo);

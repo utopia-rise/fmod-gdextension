@@ -21,13 +21,37 @@ namespace godot {
             return nullptr;
         }
 
+        T get(const T value) {
+            if(this->find((uint64_t) value) > -1) {
+                return T;
+            }
+            return nullptr;
+        }
+
         T get(const int id) {
             if(this->find(id) > -1) {
                 return (T) ((uint64_t) Array::operator[](id));
             }
             return nullptr;
         }
+
+        uint64_t append(const T value){
+            const uint64_t var = (uint64_t) value;
+            Array::append(var);
+            return var;
+        }
+
+        uint64_t erase(const T value){
+            const uint64_t var = (uint64_t) value;
+            Array::erase(var);
+            return var;
+        }
+
     };
+
+    template <typename V> void operator<<(Variant &var, V &value){
+        var = (uint64_t) value;
+    }
 
     template <typename K, typename V>
     class Map: public Dictionary{
@@ -38,7 +62,10 @@ namespace godot {
             }
             return nullptr;
         }
+
+        friend void  operator<<<V>(Variant &var, V &value);
     };
+
 }
 
 #endif //GODOTFMOD_POINTERARRAY_H
