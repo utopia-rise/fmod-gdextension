@@ -272,41 +272,41 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
 }
 
 void Fmod::unloadBank(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks)
+    FIND_AND_CHECK(pathToBank, banks)
     checkErrors(instance->unload());
     banks.erase(pathToBank);
 }
 
 int Fmod::getBankLoadingState(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, banks, -1)
     FMOD_STUDIO_LOADING_STATE state;
     checkErrors(instance->getLoadingState(&state));
     return state;
 }
 
 int Fmod::getBankBusCount(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
     checkErrors(instance->getBusCount(&count));
     return count;
 }
 
 int Fmod::getBankEventCount(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
     checkErrors(instance->getEventCount(&count));
     return count;
 }
 
 int Fmod::getBankStringCount(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
     checkErrors(instance->getStringCount(&count));
     return count;
 }
 
 int Fmod::getBankVCACount(const String pathToBank) {
-    FIND_AND_CHECK(pathToBank, FMOD::Studio::Bank *, banks, -1)
+    FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
     checkErrors(instance->getVCACount(&count));
     return count;
@@ -322,18 +322,18 @@ const uint64_t Fmod::createEventInstance(String eventPath) {
 
 float Fmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, p)
+    FIND_AND_CHECK(instanceId, events, p)
     checkErrors(instance->getParameterByName(parameterName.ascii().get_data(), &p));
     return p;
 }
 
 void Fmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setParameterByName(parameterName.ascii().get_data(), value));
 }
 
 void Fmod::releaseEvent(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     releaseOneEvent(instance);
 }
 
@@ -348,90 +348,90 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
 }
 
 void Fmod::startEvent(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->start());
 }
 
 void Fmod::stopEvent(const uint64_t instanceId, int stopMode) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void Fmod::triggerEventCue(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->triggerCue());
 }
 
 int Fmod::getEventPlaybackState(const uint64_t instanceId) {
     int s = -1;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, s)
+    FIND_AND_CHECK(instanceId, events, s)
     checkErrors(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE *) &s));
     return s;
 }
 
 bool Fmod::getEventPaused(const uint64_t instanceId) {
     bool paused = false;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, paused)
+    FIND_AND_CHECK(instanceId, events, paused)
     checkErrors(instance->getPaused(&paused));
     return paused;
 }
 
 void Fmod::setEventPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setPaused(paused));
 }
 
 float Fmod::getEventPitch(const uint64_t instanceId) {
     float pitch = 0.0f;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, pitch)
+    FIND_AND_CHECK(instanceId, events, pitch)
     checkErrors(instance->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setEventPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setPitch(pitch));
 }
 
 float Fmod::getEventVolume(const uint64_t instanceId) {
     float volume = 0.0f;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, volume)
+    FIND_AND_CHECK(instanceId, events, volume)
     checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setEventVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setVolume(volume));
 }
 
 int Fmod::getEventTimelinePosition(const uint64_t instanceId) {
     int tp = 0;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, tp)
+    FIND_AND_CHECK(instanceId, events, tp)
     checkErrors(instance->getTimelinePosition(&tp));
     return tp;
 }
 
 void Fmod::setEventTimelinePosition(const uint64_t instanceId, int position) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setTimelinePosition(position));
 }
 
 float Fmod::getEventReverbLevel(const uint64_t instanceId, int index) {
     float rvl = 0.0f;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, rvl)
+    FIND_AND_CHECK(instanceId, events, rvl)
     checkErrors(instance->getReverbLevel(index, &rvl));
     return rvl;
 }
 
 void Fmod::setEventReverbLevel(const uint64_t instanceId, int index, float level) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setReverbLevel(index, level));
 }
 
 bool Fmod::isEventVirtual(const uint64_t instanceId) {
     bool v = false;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events, v)
+    FIND_AND_CHECK(instanceId, events, v)
     checkErrors(instance->isVirtual(&v));
     return v;
 }
@@ -439,7 +439,7 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
 bool Fmod::getBusMute(const String busPath) {
     loadBus(busPath);
     bool mute = false;
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, mute)
+    FIND_AND_CHECK(busPath, buses, mute)
     checkErrors(instance->getMute(&mute));
     return mute;
 }
@@ -447,7 +447,7 @@ bool Fmod::getBusMute(const String busPath) {
 bool Fmod::getBusPaused(const String busPath) {
     loadBus(busPath);
     bool paused = false;
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, paused)
+    FIND_AND_CHECK(busPath, buses, paused)
     checkErrors(instance->getPaused(&paused));
     return paused;
 }
@@ -455,32 +455,32 @@ bool Fmod::getBusPaused(const String busPath) {
 float Fmod::getBusVolume(const String busPath) {
     loadBus(busPath);
     float volume = 0.0f;
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses, volume)
+    FIND_AND_CHECK(busPath, buses, volume)
     checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setBusMute(const String busPath, bool mute) {
     loadBus(busPath);
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setMute(mute));
 }
 
 void Fmod::setBusPaused(const String busPath, bool paused) {
     loadBus(busPath);
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setPaused(paused));
 }
 
 void Fmod::setBusVolume(const String busPath, float volume) {
     loadBus(busPath);
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     loadBus(busPath);
-    FIND_AND_CHECK(busPath, FMOD::Studio::Bus *, buses)
+    FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
@@ -587,12 +587,12 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
 
 void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
     if (isNull(gameObj)) return;
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     getEventInfo(instance)->gameObj = gameObj;
 }
 
 void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     getEventInfo(instance)->gameObj = nullptr;
 }
 
@@ -638,60 +638,60 @@ bool Fmod::banksStillLoading() {
 float Fmod::getVCAVolume(const String VCAPath) {
     loadVCA(VCAPath);
     float volume = 0.0f;
-    FIND_AND_CHECK(VCAPath, FMOD::Studio::VCA *, VCAs, volume)
+    FIND_AND_CHECK(VCAPath, VCAs, volume)
     checkErrors(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setVCAVolume(const String VCAPath, float volume) {
     loadVCA(VCAPath);
-    FIND_AND_CHECK(VCAPath, FMOD::Studio::VCA *, VCAs)
+    FIND_AND_CHECK(VCAPath, VCAs)
     checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->channel->setPaused(false));
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, isPlaying)
+    FIND_AND_CHECK(instanceId, sounds, isPlaying)
     checkErrors(instance->channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, volume)
+    FIND_AND_CHECK(instanceId, sounds, volume)
     checkErrors(instance->channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds, pitch)
+    FIND_AND_CHECK(instanceId, sounds, pitch)
     checkErrors(instance->channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->channel->setPitch(pitch));
 }
 
@@ -712,7 +712,7 @@ const uint64_t Fmod::loadSound(String path, int mode) {
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, SoundChannel *, sounds)
+    FIND_AND_CHECK(instanceId, sounds)
     checkErrors(instance->sound->release());
     sounds.erase(instance);
     delete instance;
@@ -811,7 +811,7 @@ float Fmod::getGlobalParameter(const String parameterName) {
 }
 
 void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
-    FIND_AND_CHECK(instanceId, FMOD::Studio::EventInstance *, events)
+    FIND_AND_CHECK(instanceId, events)
     checkErrors(instance->setCallback(Callbacks::eventCallback, callbackMask));
 }
 
