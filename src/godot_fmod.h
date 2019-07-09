@@ -9,22 +9,44 @@
 #include <Object.hpp>
 #include <CanvasItem.hpp>
 #include <Node.hpp>
-#include <vector>
-#include <map>
 #include <gen/Mutex.hpp>
-#include "callbacks.h"
+#include "callback/callbacks.h"
+#include "helpers/containers.h"
+
+
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
+auto instance = cont.get(instanceId); \
+if (!instance) { \
+    Godot::print_error("FMOD Sound System: cannot find instanceId in cont", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    return defaultReturn; \
+} \
+
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
+
+#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
+#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
+#define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
+#define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 namespace godot {
+
+    struct EventInfo {
+        //Is the event oneshot
+        bool isOneShot = false;
+        //GameObject to which this event is attached
+        Object *gameObj = nullptr;
+        // Callback info associated with this event
+        Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
+    };
+
+
+    struct SoundChannel {
+        FMOD::Sound *sound;
+        FMOD::Channel *channel;
+    };
+
     class Fmod : public Node {
-    public:
-        struct EventInfo {
-            //Is the event oneshot
-            bool isOneShot = false;
-            //GameObject to which this event is attached
-            Object *gameObj = nullptr;
-            // Callback info associated with this event
-            Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
-        };
+    GODOT_CLASS(Fmod, Node)
     private:
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
@@ -38,19 +60,16 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
-        std::map<String, FMOD::Studio::Bank *> banks;
-        std::map<String, FMOD::Studio::EventDescription *> eventDescriptions;
-        std::map<String, FMOD::Studio::Bus *> buses;
-        std::map<String, FMOD::Studio::VCA *> VCAs;
-        std::map<const uint64_t, FMOD::Sound *> sounds;
-        std::map<FMOD::Sound *, FMOD::Channel *> channels;
+        Map<String, FMOD::Studio::Bank *> banks;
+        Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
+        Map<String, FMOD::Studio::Bus *> buses;
+        Map<String, FMOD::Studio::VCA *> VCAs;
 
-        std::map<const uint64_t, FMOD::Studio::EventInstance *> events;
+        Vector<SoundChannel *> sounds;
+        Vector<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
         Dictionary performanceData;
-
-    GODOT_CLASS(Fmod, Node)
 
     private:
         int checkErrors(FMOD_RESULT result);
