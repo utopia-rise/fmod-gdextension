@@ -39,7 +39,6 @@ namespace godot {
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
-
     struct SoundChannel {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
@@ -60,6 +59,7 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
+        Vector<FMOD::Studio::Bank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         Map<String, FMOD::Studio::Bus *> buses;
@@ -73,6 +73,7 @@ namespace godot {
 
     private:
         int checkErrors(FMOD_RESULT result);
+        void checkLoadingBanks();
         void setListenerAttributes();
         FMOD_VECTOR toFmodVector(Vector3 &vec);
         FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
@@ -86,6 +87,9 @@ namespace godot {
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
+        void loadAllVCAs(FMOD::Studio::Bank *bank);
+        void loadAllBuses(FMOD::Studio::Bank *bank);
+        void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
 
     public:
         Fmod();

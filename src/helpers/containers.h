@@ -60,7 +60,7 @@ namespace godot {
             return nullptr;
         }
 
-        friend void  operator<<<V>(Variant &var, V &value);
+        friend void operator<<<V>(Variant &var, V &value);
     };
 
 }

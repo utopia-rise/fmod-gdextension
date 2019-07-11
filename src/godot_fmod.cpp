@@ -125,6 +125,10 @@ void Fmod::update() {
         }
         return;
     }
+
+    //Check if bank are loaded, load buses, vca and event descriptions.
+    checkLoadingBanks();
+
     for (int i = 0; i < events.size(); i++) {
         FMOD::Studio::EventInstance * eventInstance = events.get(i);
         if (eventInstance) {
@@ -157,6 +161,28 @@ void Fmod::update() {
 
     // dispatch update to FMOD
     checkErrors(system->update());
+}
+
+void Fmod::checkLoadingBanks() {
+    for (int i = 0; i < loadingBanks.size(); i++) {
+        auto bank = (FMOD::Studio::Bank *) (uint64_t) loadingBanks.pop_front();
+        FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
+        checkErrors(bank->getLoadingState(loading_state));
+        if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
+            int size = 0;
+            checkErrors(bank->getPath(nullptr, 0, &size));
+            char path[size];
+            checkErrors(bank->getPath(path, size, nullptr));
+            loadAllBuses(bank);
+            loadAllVCAs(bank);
+            loadAllEventDescriptions(bank);
+            banks[path] << bank;
+        } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
+            loadingBanks.push_back((uint64_t) bank);
+        } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
+            Godot::print_error("Fmod Sound System: Error loading bank.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        }
+    }
 }
 
 void Fmod::setListenerAttributes() {
@@ -265,7 +291,7 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
-        banks[pathToBank] << bank;
+        loadingBanks.append(bank);
         return pathToBank;
     }
     return pathToBank;
@@ -500,13 +526,64 @@ void Fmod::loadVCA(const String &VCAPath) {
     }
 }
 
+void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
+    int count = 0;
+    if (checkErrors(bank->getVCACount(&count))) {
+        FMOD::Studio::VCA *array[count];
+        if (checkErrors(bank->getVCAList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::VCA *vca = array[i];
+                int size = 0;
+                checkErrors(vca->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(vca->getPath(path, size, nullptr));
+                VCAs[path] << vca;
+            }
+        }
+    }
+}
+
+void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
+    int count = -1;
+    if (checkErrors(bank->getBusCount(&count))) {
+        FMOD::Studio::Bus *array[count];
+        if (checkErrors(bank->getBusList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::Bus *bus = array[i];
+                int size = 0;
+                checkErrors(bus->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(bus->getPath(path, size, nullptr));
+                buses[path] << bus;
+            }
+        }
+    }
+}
+
+void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
+    int count = -1;
+    if (checkErrors(bank->getEventCount(&count))) {
+        FMOD::Studio::EventDescription *array[count];
+        if (checkErrors(bank->getEventList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::EventDescription *eventDescription = array[i];
+                int size = 0;
+                checkErrors(eventDescription->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(eventDescription->getPath(path, size, nullptr));
+                eventDescriptions[path] << eventDescription;
+            }
+        }
+    }
+}
+
 FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
     if (!eventDescriptions.has(eventName)) {
         FMOD::Studio::EventDescription *desc = nullptr;
         checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
         eventDescriptions[eventName] << desc;
     }
-    auto eventDescription = (FMOD::Studio::EventDescription *) eventDescriptions.get(eventName);
+    auto eventDescription = eventDescriptions.get(eventName);
     FMOD::Studio::EventInstance *instance = nullptr;
     if (eventDescription) {
         checkErrors(eventDescription->createInstance(&instance));
