@@ -172,10 +172,8 @@ void Fmod::checkLoadingBanks() {
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
         checkErrors(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
-            int size = 0;
-            checkErrors(bank->getPath(nullptr, 0, &size));
-            char path[size];
-            checkErrors(bank->getPath(path, size, nullptr));
+            char path[MAX_BANK_PATH_SIZE];
+            checkErrors(bank->getPath(path, MAX_BANK_PATH_SIZE, nullptr));
             loadAllBuses(bank);
             loadAllVCAs(bank);
             loadAllEventDescriptions(bank);
@@ -510,86 +508,67 @@ void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
 }
 
 void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
-    int count = 0;
-    if (checkErrors(bank->getVCACount(&count))) {
-        FMOD::Studio::VCA *array[count];
-        if (checkErrors(bank->getVCAList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::VCA *vca = array[i];
-                int size = 0;
-                checkErrors(vca->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(vca->getPath(path, size, nullptr));
-                VCAs[path] << vca;
-            }
+    FMOD::Studio::VCA *array[MAX_VCA_PATH_COUNT];
+    if (checkErrors(bank->getVCAList(array, MAX_VCA_PATH_COUNT, nullptr))) {
+        for (auto vca : array) {
+            char path[MAX_VCA_PATH_SIZE];
+            checkErrors(vca->getPath(path, MAX_VCA_PATH_SIZE, nullptr));
+            VCAs[path] << vca;
         }
     }
 }
 
 void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
-    int count = -1;
-    if (checkErrors(bank->getBusCount(&count))) {
-        FMOD::Studio::Bus *array[count];
-        if (checkErrors(bank->getBusList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::Bus *bus = array[i];
-                int size = 0;
-                checkErrors(bus->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(bus->getPath(path, size, nullptr));
-                buses[path] << bus;
-            }
+    FMOD::Studio::Bus *array[MAX_BUS_PATH_COUNT];
+    if (checkErrors(bank->getBusList(array, MAX_BUS_PATH_COUNT, nullptr))) {
+        for (auto bus : array) {
+            char path[MAX_BUS_PATH_SIZE];
+            checkErrors(bus->getPath(path, MAX_BUS_PATH_SIZE, nullptr));
+            buses[path] << bus;
         }
     }
 }
 
 void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
-    int count = -1;
-    if (checkErrors(bank->getEventCount(&count))) {
-        FMOD::Studio::EventDescription *array[count];
-        if (checkErrors(bank->getEventList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::EventDescription *eventDescription = array[i];
-                int size = 0;
-                checkErrors(eventDescription->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(eventDescription->getPath(path, size, nullptr));
-                eventDescriptions[path] << eventDescription;
-            }
+    FMOD::Studio::EventDescription *array[MAX_EVENT_PATH_COUNT];
+    if (checkErrors(bank->getEventList(array, MAX_EVENT_PATH_COUNT, nullptr))) {
+        for (auto eventDescription : array) {
+            char path[MAX_EVENT_PATH_SIZE];
+            checkErrors(eventDescription->getPath(path, MAX_EVENT_PATH_SIZE, nullptr));
+            eventDescriptions[path] << eventDescription;
         }
     }
 }
 
 void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
-    int count = -1;
-    if (checkErrors(bank->getVCACount(&count))) {
-        FMOD::Studio::VCA *array[count];
-        if (checkErrors(bank->getVCAList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::VCA *vca = array[i];
-                int size = 0;
-                checkErrors(vca->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(vca->getPath(path, size, nullptr));
-                VCAs.erase(path);
-            }
+    FMOD::Studio::VCA *array[MAX_VCA_PATH_COUNT];
+    if (checkErrors(bank->getVCAList(array, MAX_VCA_PATH_COUNT, nullptr))) {
+        for (auto vca : array) {
+            char path[MAX_VCA_PATH_SIZE];
+            checkErrors(vca->getPath(path, MAX_VCA_PATH_SIZE, nullptr));
+            VCAs.erase(path);
         }
     }
 }
 
 void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
-    int count = -1;
-    if (checkErrors(bank->getBusCount(&count))) {
-        FMOD::Studio::Bus *array[count];
-        if (checkErrors(bank->getBusList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::Bus *bus = array[i];
-                int size = 0;
-                checkErrors(bus->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(bus->getPath(path, size, nullptr));
-                VCAs.erase(path);
-            }
+    FMOD::Studio::Bus *array[MAX_BUS_PATH_COUNT];
+    if (checkErrors(bank->getBusList(array, MAX_BUS_PATH_COUNT, nullptr))) {
+        for (auto bus : array) {
+            char path[MAX_BUS_PATH_SIZE];
+            checkErrors(bus->getPath(path, MAX_BUS_PATH_SIZE, nullptr));
+            buses.erase(path);
+        }
+    }
+}
+
+void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
+    FMOD::Studio::EventDescription *array[MAX_EVENT_PATH_COUNT];
+    if (checkErrors(bank->getEventList(array, MAX_EVENT_PATH_COUNT, nullptr))) {
+        for (auto eventDescription : array) {
+            char path[MAX_EVENT_PATH_SIZE];
+            checkErrors(eventDescription->getPath(path, MAX_EVENT_PATH_SIZE, nullptr));
+            eventDescriptions.erase(path);
         }
     }
 }
@@ -602,25 +581,8 @@ bool Fmod::checkBusPath(const String busPath) {
     return buses.has(busPath);
 }
 
-bool Fmod::checkEventPath(String eventPath) {
+bool Fmod::checkEventPath(const String eventPath) {
     return eventDescriptions.has(eventPath);
-}
-
-void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
-    int count = -1;
-    if (checkErrors(bank->getEventCount(&count))) {
-        FMOD::Studio::EventDescription *array[count];
-        if (checkErrors(bank->getEventList(array, count, &count))) {
-            for (int i = 0; i < count; i++) {
-                FMOD::Studio::EventDescription *eventDescription = array[i];
-                int size = 0;
-                checkErrors(eventDescription->getPath(nullptr, 0, &size));
-                char path[size];
-                checkErrors(eventDescription->getPath(path, size, nullptr));
-                eventDescriptions.erase(path);
-            }
-        }
-    }
 }
 
 FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {

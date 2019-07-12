@@ -28,6 +28,14 @@ if (!instance) { \
 #define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
+#define MAX_BANK_PATH_SIZE 512
+#define MAX_VCA_PATH_SIZE 512
+#define MAX_BUS_PATH_SIZE 512
+#define MAX_EVENT_PATH_SIZE 512
+#define MAX_VCA_PATH_COUNT 64
+#define MAX_BUS_PATH_COUNT 64
+#define MAX_EVENT_PATH_COUNT 256
+
 namespace godot {
 
     struct EventInfo {
