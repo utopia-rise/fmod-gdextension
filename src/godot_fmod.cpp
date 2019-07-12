@@ -23,6 +23,9 @@ void Fmod::_register_methods() {
     register_method("setSoftwareFormat", &Fmod::setSoftwareFormat);
     register_method("loadbank", &Fmod::loadbank);
     register_method("unloadBank", &Fmod::unloadBank);
+    register_method("checkVCAPath", &Fmod::checkVCAPath);
+    register_method("checkBusPath", &Fmod::checkBusPath);
+    register_method("checkEventPath", &Fmod::checkEventPath);
     register_method("getBankLoadingState", &Fmod::getBankLoadingState);
     register_method("getBankBusCount", &Fmod::getBankBusCount);
     register_method("getBankEventCount", &Fmod::getBankEventCount);
@@ -299,6 +302,9 @@ String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
 
 void Fmod::unloadBank(const String pathToBank) {
     FIND_AND_CHECK(pathToBank, banks)
+    unloadAllBuses(instance);
+    unloadAllVCAs(instance);
+    unloadAllEventDescriptions(instance);
     checkErrors(instance->unload());
     banks.erase(pathToBank);
 }
@@ -463,7 +469,6 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
 }
 
 bool Fmod::getBusMute(const String busPath) {
-    loadBus(busPath);
     bool mute = false;
     FIND_AND_CHECK(busPath, buses, mute)
     checkErrors(instance->getMute(&mute));
@@ -471,7 +476,6 @@ bool Fmod::getBusMute(const String busPath) {
 }
 
 bool Fmod::getBusPaused(const String busPath) {
-    loadBus(busPath);
     bool paused = false;
     FIND_AND_CHECK(busPath, buses, paused)
     checkErrors(instance->getPaused(&paused));
@@ -479,7 +483,6 @@ bool Fmod::getBusPaused(const String busPath) {
 }
 
 float Fmod::getBusVolume(const String busPath) {
-    loadBus(busPath);
     float volume = 0.0f;
     FIND_AND_CHECK(busPath, buses, volume)
     checkErrors(instance->getVolume(&volume));
@@ -487,43 +490,23 @@ float Fmod::getBusVolume(const String busPath) {
 }
 
 void Fmod::setBusMute(const String busPath, bool mute) {
-    loadBus(busPath);
     FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setMute(mute));
 }
 
 void Fmod::setBusPaused(const String busPath, bool paused) {
-    loadBus(busPath);
     FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setPaused(paused));
 }
 
 void Fmod::setBusVolume(const String busPath, float volume) {
-    loadBus(busPath);
     FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->setVolume(volume));
 }
 
 void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
-    loadBus(busPath);
     FIND_AND_CHECK(busPath, buses)
     checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
-}
-
-void Fmod::loadBus(const String &busPath) {
-    if (!buses.has(busPath)) {
-        FMOD::Studio::Bus *b = nullptr;
-        checkErrors(system->getBus(busPath.ascii().get_data(), &b));
-        if (b) buses[busPath] <<  b;
-    }
-}
-
-void Fmod::loadVCA(const String &VCAPath) {
-    if (!VCAs.has(VCAPath)) {
-        FMOD::Studio::VCA *vca = nullptr;
-        checkErrors(system->getVCA(VCAPath.ascii().get_data(), &vca));
-        if (vca) VCAs[VCAPath] <<  vca;
-    }
 }
 
 void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
@@ -572,6 +555,69 @@ void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
                 char path[size];
                 checkErrors(eventDescription->getPath(path, size, nullptr));
                 eventDescriptions[path] << eventDescription;
+            }
+        }
+    }
+}
+
+void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
+    int count = -1;
+    if (checkErrors(bank->getVCACount(&count))) {
+        FMOD::Studio::VCA *array[count];
+        if (checkErrors(bank->getVCAList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::VCA *vca = array[i];
+                int size = 0;
+                checkErrors(vca->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(vca->getPath(path, size, nullptr));
+                VCAs.erase(path);
+            }
+        }
+    }
+}
+
+void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
+    int count = -1;
+    if (checkErrors(bank->getBusCount(&count))) {
+        FMOD::Studio::Bus *array[count];
+        if (checkErrors(bank->getBusList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::Bus *bus = array[i];
+                int size = 0;
+                checkErrors(bus->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(bus->getPath(path, size, nullptr));
+                VCAs.erase(path);
+            }
+        }
+    }
+}
+
+bool Fmod::checkVCAPath(const String vcaPath) {
+    return VCAs.has(vcaPath);
+}
+
+bool Fmod::checkBusPath(const String busPath) {
+    return buses.has(busPath);
+}
+
+bool Fmod::checkEventPath(String eventPath) {
+    return eventDescriptions.has(eventPath);
+}
+
+void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
+    int count = -1;
+    if (checkErrors(bank->getEventCount(&count))) {
+        FMOD::Studio::EventDescription *array[count];
+        if (checkErrors(bank->getEventList(array, count, &count))) {
+            for (int i = 0; i < count; i++) {
+                FMOD::Studio::EventDescription *eventDescription = array[i];
+                int size = 0;
+                checkErrors(eventDescription->getPath(nullptr, 0, &size));
+                char path[size];
+                checkErrors(eventDescription->getPath(path, size, nullptr));
+                eventDescriptions.erase(path);
             }
         }
     }
@@ -675,7 +721,7 @@ void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
 
 void Fmod::pauseAllEvents(const bool pause) {
     for (int i = 0; i < events.size(); i++) {
-        auto eventInstance = (FMOD::Studio::EventInstance *) events.get(i);
+        auto eventInstance = events.get(i);
         if (eventInstance) {
             checkErrors(eventInstance->setPaused(pause));
         }
@@ -702,7 +748,7 @@ void Fmod::unmuteAllEvents() {
 
 bool Fmod::banksStillLoading() {
     for (int i = 0; i < banks.size(); i++) {
-        FMOD::Studio::Bank *bank = (FMOD::Studio::Bank *) banks.get(i);
+        FMOD::Studio::Bank *bank = banks.get(i);
         FMOD_STUDIO_LOADING_STATE loadingState;
         checkErrors(bank->getLoadingState(&loadingState));
         if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
@@ -713,7 +759,6 @@ bool Fmod::banksStillLoading() {
 }
 
 float Fmod::getVCAVolume(const String VCAPath) {
-    loadVCA(VCAPath);
     float volume = 0.0f;
     FIND_AND_CHECK(VCAPath, VCAs, volume)
     checkErrors(instance->getVolume(&volume));
@@ -721,7 +766,6 @@ float Fmod::getVCAVolume(const String VCAPath) {
 }
 
 void Fmod::setVCAVolume(const String VCAPath, float volume) {
-    loadVCA(VCAPath);
     FIND_AND_CHECK(VCAPath, VCAs)
     checkErrors(instance->setVolume(volume));
 }

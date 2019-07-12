@@ -79,8 +79,6 @@ namespace godot {
         FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                            const FMOD_VECTOR &vel);
         bool isNull(Object *o);
-        void loadBus(const String &busPath);
-        void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
 
@@ -90,6 +88,9 @@ namespace godot {
         void loadAllVCAs(FMOD::Studio::Bank *bank);
         void loadAllBuses(FMOD::Studio::Bank *bank);
         void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
+        void unloadAllVCAs(FMOD::Studio::Bank *bank);
+        void unloadAllBuses(FMOD::Studio::Bank *bank);
+        void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
 
     public:
         Fmod();
@@ -106,6 +107,9 @@ namespace godot {
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
         String loadbank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
+        bool checkVCAPath(String vcaPath);
+        bool checkBusPath(String busPath);
+        bool checkEventPath(String eventPath);
         int getBankLoadingState(String pathToBank);
         int getBankBusCount(String pathToBank);
         int getBankEventCount(String pathToBank);
