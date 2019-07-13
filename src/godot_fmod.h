@@ -28,6 +28,18 @@ if (!instance) { \
 #define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
+#define MAX_PATH_SIZE 512
+#define MAX_VCA_COUNT 64
+#define MAX_BUS_COUNT 64
+#define MAX_EVENT_COUNT 256
+#define MAX_DRIVER_NAME_SIZE 256
+
+#define CHECK_SIZE(maxSize, actualSize, type) \
+if(actualSize > maxSize){\
+    Godot::print_error("FMOD Sound System: type maximum size is maxSize but the bank contains actualSize entries", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+    actualSize = maxSize;\
+}\
+
 namespace godot {
 
     struct EventInfo {
@@ -38,7 +50,6 @@ namespace godot {
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
-
 
     struct SoundChannel {
         FMOD::Sound *sound;
@@ -60,6 +71,7 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
+        Vector<FMOD::Studio::Bank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         Map<String, FMOD::Studio::Bus *> buses;
@@ -73,19 +85,24 @@ namespace godot {
 
     private:
         int checkErrors(FMOD_RESULT result);
+        void checkLoadingBanks();
         void setListenerAttributes();
         FMOD_VECTOR toFmodVector(Vector3 &vec);
         FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                            const FMOD_VECTOR &vel);
         bool isNull(Object *o);
-        void loadBus(const String &busPath);
-        void loadVCA(const String &VCAPath);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
 
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
+        void loadAllVCAs(FMOD::Studio::Bank *bank);
+        void loadAllBuses(FMOD::Studio::Bank *bank);
+        void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
+        void unloadAllVCAs(FMOD::Studio::Bank *bank);
+        void unloadAllBuses(FMOD::Studio::Bank *bank);
+        void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
 
     public:
         Fmod();
@@ -100,8 +117,11 @@ namespace godot {
         void shutdown();
         void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
-        String loadbank(String pathToBank, unsigned int flag);
+        String loadBank(const String pathToBank, const unsigned int flag);
         void unloadBank(String pathToBank);
+        bool checkVCAPath(String vcaPath);
+        bool checkBusPath(String busPath);
+        bool checkEventPath(String eventPath);
         int getBankLoadingState(String pathToBank);
         int getBankBusCount(String pathToBank);
         int getBankEventCount(String pathToBank);
