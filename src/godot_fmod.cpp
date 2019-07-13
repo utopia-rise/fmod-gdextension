@@ -52,6 +52,8 @@ void Fmod::_register_methods() {
     register_method("get_event_reverb_level", &Fmod::getEventReverbLevel);
     register_method("set_event_reverb_level", &Fmod::setEventReverbLevel);
     register_method("is_event_virtual", &Fmod::isEventVirtual);
+    register_method("set_event_3d_attributes", &Fmod::setEvent3DAttributes);
+    register_method("get_event_3d_attributes", &Fmod::getEvent3DAttributes);
     register_method("desc_get_length", &Fmod::descGetLength);
     register_method("desc_get_instance_list", &Fmod::descGetInstanceList);
     register_method("desc_get_instance_count", &Fmod::descGetInstanceCount);
@@ -536,6 +538,32 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events, v)
     ERROR_CHECK(instance->isVirtual(&v));
     return v;
+}
+
+void Fmod::setEvent3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity) {
+    FIND_AND_CHECK(instanceId, events)
+    FMOD_3D_ATTRIBUTES attr;
+    attr.forward = toFmodVector(forward);
+    attr.position = toFmodVector(position);
+    attr.up = toFmodVector(up);
+    attr.velocity = toFmodVector(velocity);
+    ERROR_CHECK(instance->set3DAttributes(&attr));
+}
+
+Dictionary Fmod::getEvent3DAttributes(uint64_t instanceId) {
+    Dictionary _3Dattr;
+    FIND_AND_CHECK(instanceId, events, _3Dattr)
+    FMOD_3D_ATTRIBUTES attr;
+    ERROR_CHECK(instance->get3DAttributes(&attr));
+    Vector3 forward(attr.forward.x, attr.forward.y, attr.forward.z);
+    Vector3 up(attr.up.x, attr.up.y, attr.up.z);
+    Vector3 position(attr.position.x, attr.position.y, attr.position.z);
+    Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
+    _3Dattr["forward"] = forward;
+    _3Dattr["position"] = position;
+    _3Dattr["up"] = up;
+    _3Dattr["velocity"] = velocity;
+    return _3Dattr;
 }
 
 int Fmod::descGetLength(const String eventPath) {

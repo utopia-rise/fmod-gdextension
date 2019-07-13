@@ -174,6 +174,8 @@ namespace godot {
         float getEventReverbLevel(uint64_t instanceId, int index);
         void setEventReverbLevel(uint64_t instanceId, int index, float level);
         bool isEventVirtual(uint64_t instanceId);
+        void setEvent3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity);
+        Dictionary getEvent3DAttributes(uint64_t instanceId);
 
         /* event descriptions functions */
         int descGetLength(String eventPath);
