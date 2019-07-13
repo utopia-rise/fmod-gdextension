@@ -218,6 +218,10 @@ namespace godot {
         float getGlobalParameterByName(String parameterName);
         void setGlobalParameterByID(Array idPair, float value);
         float getGlobalParameterByID(Array idPair);
+        Dictionary getGlobalParameterDescByName(String parameterName);
+        Dictionary getGlobalParameterDescByID(Array idPair);
+        int getGlobalParameterDescCount();
+        Array getGlobalParameterDescList();
 
         void setCallback(uint64_t instanceId, int callbackMask);
     };

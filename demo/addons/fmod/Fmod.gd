@@ -144,10 +144,25 @@ func get_global_parameter_by_name(parameterName: String) -> float:
 	return godot_fmod.get_global_parameter_by_name(parameterName)
 
 func set_global_parameter_by_id(idPair: Array, value: float) -> void:
-	godot_fmod.set_global_parameter_by_id(parameterName, value)
+	godot_fmod.set_global_parameter_by_id(idPair, value)
 		
 func get_global_parameter_by_id(idPair: Array) -> float:
-	return godot_fmod.get_global_parameter_by_id(parameterName)
+	return godot_fmod.get_global_parameter_by_id(idPair)
+
+func set_global_parameter_by_id(idPair: Array, value: float) -> void:
+	godot_fmod.set_global_parameter_by_id(idPair, value)
+
+func get_global_parameter_desc_by_name(parameterName: String) -> Dictionary:
+	return godot_fmod.get_global_parameter_desc_by_name(parameterName)
+
+func get_global_parameter_desc_by_id(idPair: Array) -> Dictionary:
+	return godot_fmod.get_global_parameter_desc_by_id(idPair)
+
+func get_global_parameter_desc_count() -> int:
+	return godot_fmod.get_global_parameter_desc_count()
+
+func get_global_parameter_desc_list() -> Array:
+	return godot_fmod.get_global_parameter_desc_list()
 
 
 ##########
