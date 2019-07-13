@@ -88,8 +88,10 @@ void Fmod::_register_methods() {
     register_method("get_driver", &Fmod::getDriver);
     register_method("set_driver", &Fmod::setDriver);
     register_method("get_performance_data", &Fmod::getPerformanceData);
-    register_method("set_global_parameter", &Fmod::setGlobalParameter);
-    register_method("get_global_parameter", &Fmod::getGlobalParameter);
+    register_method("set_global_parameter_by_name", &Fmod::setGlobalParameterByName);
+    register_method("get_global_parameter_by_name", &Fmod::getGlobalParameterByName);
+    register_method("set_global_parameter_by_id", &Fmod::setGlobalParameterByID);
+    register_method("get_global_parameter_by_id", &Fmod::getGlobalParameterByID);
     register_method("_process", &Fmod::_process);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -970,13 +972,37 @@ Dictionary Fmod::getPerformanceData() {
     return performanceData;
 }
 
-void Fmod::setGlobalParameter(const String parameterName, float value) {
+void Fmod::setGlobalParameterByName(const String parameterName, float value) {
     ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
-float Fmod::getGlobalParameter(const String parameterName) {
+float Fmod::getGlobalParameterByName(String parameterName) {
     float value = 0.f;
     ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
+    return value;
+}
+
+void Fmod::setGlobalParameterByID(const Array idPair, const float value) {
+    if (idPair.size() != 2) {
+        Godot::print_error("Invalid parameter ID", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        return;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    ERROR_CHECK(system->setParameterByID(id, value));
+}
+
+float Fmod::getGlobalParameterByID(const Array idPair) {
+    if (idPair.size() != 2) {
+        Godot::print_error("Invalid parameter ID", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        return -1.f;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    float value = -1.f;
+    ERROR_CHECK(system->getParameterByID(id, &value));
     return value;
 }
 
