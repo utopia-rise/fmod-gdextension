@@ -241,7 +241,9 @@ void Fmod::setListenerAttributes() {
 
     for (int i = 0; i < listeners.size(); i++) {
         auto listener = listeners.get(i);
+        int index = listener->internalFmodIndex == -1 ? i : listener->internalFmodIndex;
         auto *ci = Object::cast_to<CanvasItem>(listener->gameObj);
+        int noError;
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(0, &attr));
@@ -357,6 +359,22 @@ void Fmod::removeListener(const uint64_t listenerId) {
     FIND_AND_CHECK(listenerId, listeners)
     listeners.erase(instance);
     checkErrors(system->setNumListeners(listeners.empty() ? 1 : listeners.size()));
+}
+
+int Fmod::getSystemNumListeners() {
+    return listeners.size();
+}
+
+float Fmod::getSystemListenerWeight(const int instanceId) {
+    float weight = 0;
+    FIND_AND_CHECK(instanceId, listeners, weight)
+    checkErrors(system->getListenerWeight(instance->internalFmodIndex, &weight));
+    return weight;
+}
+
+void Fmod::setSystemListenerWeight(const int instanceId, float weight) {
+    FIND_AND_CHECK(instanceId, listeners)
+    checkErrors(system->setListenerWeight(instance->internalFmodIndex, weight));
 }
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {

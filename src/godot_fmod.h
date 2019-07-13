@@ -77,6 +77,7 @@ namespace godot {
     };
 
     struct Listener {
+        int internalFmodIndex = -1;
         Object *gameObj = nullptr;
         bool listenerLock = false;
     };
@@ -146,11 +147,14 @@ namespace godot {
 
         void _init();
         void _process(float delta);
+        void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void shutdown();
         const uint64_t addListener(Object *gameObj);
         void removeListener(uint64_t listenerId);
+        int getSystemNumListeners();
+        float getSystemListenerWeight(int instanceId);
+        void setSystemListenerWeight(int instanceId, float weight);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
