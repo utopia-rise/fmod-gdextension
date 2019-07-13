@@ -7,7 +7,7 @@ var id: int = 0
 func _ready():
 	id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 	Fmod.attach_instance_to_node(id, self)
-	Fmod.set_event_parameter(id, "RPM", 600)
+	Fmod.set_event_parameter_by_name(id, "RPM", 600)
 	Fmod.set_event_volume(id, 2)
 	Fmod.start_event(id)
 	print("Event Started.")

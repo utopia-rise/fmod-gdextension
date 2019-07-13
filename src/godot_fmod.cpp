@@ -32,8 +32,10 @@ void Fmod::_register_methods() {
     register_method("get_bank_string_count", &Fmod::getBankStringCount);
     register_method("get_bank_VCA_count", &Fmod::getBankVCACount);
     register_method("create_event_instance", &Fmod::createEventInstance);
-    register_method("get_event_parameter", &Fmod::getEventParameter);
-    register_method("set_event_parameter", &Fmod::setEventParameter);
+    register_method("get_event_parameter_by_name", &Fmod::getEventParameterByName);
+    register_method("set_event_parameter_by_name", &Fmod::setEventParameterByName);
+    register_method("get_event_parameter_by_id", &Fmod::getEventParameterByID);
+    register_method("set_event_parameter_by_id", &Fmod::setEventParameterByID);
     register_method("release_event", &Fmod::releaseEvent);
     register_method("start_event", &Fmod::startEvent);
     register_method("stop_event", &Fmod::stopEvent);
@@ -375,16 +377,34 @@ const uint64_t Fmod::createEventInstance(String eventPath) {
     return 0;
 }
 
-float Fmod::getEventParameter(const uint64_t instanceId, String parameterName) {
+float Fmod::getEventParameterByName(uint64_t instanceId, String parameterName) {
     float p = -1;
     FIND_AND_CHECK(instanceId, events, p)
     ERROR_CHECK(instance->getParameterByName(parameterName.utf8().get_data(), &p));
     return p;
 }
 
-void Fmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
+void Fmod::setEventParameterByName(const uint64_t instanceId, String parameterName, float value) {
     FIND_AND_CHECK(instanceId, events)
     ERROR_CHECK(instance->setParameterByName(parameterName.utf8().get_data(), value));
+}
+
+float Fmod::getEventParameterByID(const uint64_t instanceId, const Array idPair) {
+    float value = -1.0f;
+    FIND_AND_CHECK(instanceId, events, value)
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    ERROR_CHECK(instance->getParameterByID(id, &value));
+    return value;
+}
+
+void Fmod::setEventParameterByID(uint64_t instanceId, const Array idPair, const float value) {
+    FIND_AND_CHECK(instanceId, events)
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    ERROR_CHECK(instance->setParameterByID(id, value));
 }
 
 void Fmod::releaseEvent(const uint64_t instanceId) {

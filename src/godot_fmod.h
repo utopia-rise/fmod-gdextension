@@ -16,7 +16,6 @@
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
 
-#define DRIVE_PATH(path)\
 
 #ifdef __ANDROID__
 #define DRIVE_PATH(path)\
@@ -143,7 +142,7 @@ namespace godot {
         void shutdown();
         void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
-        String loadBank(const String pathToBank, const unsigned int flag);
+        String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
         bool checkVCAPath(String vcaPath);
         bool checkBusPath(String busPath);
@@ -154,8 +153,10 @@ namespace godot {
         int getBankStringCount(String pathToBank);
         int getBankVCACount(String pathToBank);
         const uint64_t createEventInstance(String eventPath);
-        float getEventParameter(uint64_t instanceId, String parameterName);
-        void setEventParameter(uint64_t instanceId, String parameterName, float value);
+        float getEventParameterByName(uint64_t instanceId, String parameterName);
+        void setEventParameterByName(uint64_t instanceId, String parameterName, float value);
+        float getEventParameterByID(uint64_t instanceId, Array idPair);
+        void setEventParameterByID(uint64_t instanceId, Array idPair, float value);
         void releaseEvent(uint64_t instanceId);
         void startEvent(uint64_t instanceId);
         void stopEvent(uint64_t instanceId, int stopMode);

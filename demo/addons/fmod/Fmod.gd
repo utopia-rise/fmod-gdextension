@@ -214,11 +214,17 @@ func attach_instance_to_node(instanceId: int, object: Object) -> void:
 func detach_instance_from_node(instanceId: int) -> void:
 	godot_fmod.detach_instance_from_node(instanceId)
 
-func get_event_parameter(instanceId: int, parameterName: String) -> float:
-	return godot_fmod.get_event_parameter(instanceId, parameterName)
+func get_event_parameter_by_name(instanceId: int, parameterName: String) -> float:
+	return godot_fmod.get_event_parameter_by_name(instanceId, parameterName)
 	
-func set_event_parameter(instanceId: int, parameterName: String, value: float) -> void:
-	godot_fmod.set_event_parameter(instanceId, parameterName, value)
+func set_event_parameter_by_name(instanceId: int, parameterName: String, value: float) -> void:
+	godot_fmod.set_event_parameter_by_name(instanceId, parameterName, value)
+
+func get_event_parameter_by_id(instanceId: int, idPair: Array) -> float:
+	return godot_fmod.get_event_parameter_by_id(instanceId, idPair)
+
+func set_event_parameter_by_id(instanceId: int, idPair: Array, value: float) -> void:
+	godot_fmod.set_event_parameter_by_id(instanceId, idPair, value)
 	
 func trigger_event_cue(instanceId: int) -> void:
 	godot_fmod.trigger_event_cue(instanceId)
