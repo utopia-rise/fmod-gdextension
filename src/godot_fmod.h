@@ -155,6 +155,8 @@ namespace godot {
         int getSystemNumListeners();
         float getSystemListenerWeight(int instanceId);
         void setSystemListenerWeight(int instanceId, float weight);
+        Dictionary getSystemListener3DAttributes(uint64_t instanceId);
+        void setSystemListener3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);

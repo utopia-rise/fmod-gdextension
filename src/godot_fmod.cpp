@@ -377,6 +377,33 @@ void Fmod::setSystemListenerWeight(const int instanceId, float weight) {
     checkErrors(system->setListenerWeight(instance->internalFmodIndex, weight));
 }
 
+Dictionary Fmod::getSystemListener3DAttributes(const uint64_t instanceId) {
+    Dictionary _3Dattr = Dictionary();
+    FIND_AND_CHECK(instanceId, listeners, _3Dattr)
+    FMOD_3D_ATTRIBUTES attr;
+    checkErrors(system->getListenerAttributes(instance->internalFmodIndex, &attr));
+    Vector3 forward(attr.forward.x, attr.forward.y, attr.forward.z);
+    Vector3 up(attr.up.x, attr.up.y, attr.up.z);
+    Vector3 position(attr.position.x, attr.position.y, attr.position.z);
+    Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
+    _3Dattr["forward"] = forward;
+    _3Dattr["position"] = position;
+    _3Dattr["up"] = up;
+    _3Dattr["velocity"] = velocity;
+    return _3Dattr;
+}
+
+void Fmod::setSystemListener3DAttributes(const uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up,
+                                         Vector3 velocity) {
+    FIND_AND_CHECK(instanceId, listeners)
+    FMOD_3D_ATTRIBUTES attr;
+    attr.forward = toFmodVector(forward);
+    attr.position = toFmodVector(position);
+    attr.up = toFmodVector(up);
+    attr.velocity = toFmodVector(velocity);
+    checkErrors(system->setListenerAttributes(instance->internalFmodIndex, &attr));
+}
+
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
     if(system == nullptr && coreSystem == nullptr){
         ERROR_CHECK(FMOD::Studio::System::create(&system));
