@@ -404,6 +404,16 @@ void Fmod::setSystemListener3DAttributes(const uint64_t instanceId, Vector3 forw
     checkErrors(system->setListenerAttributes(instance->internalFmodIndex, &attr));
 }
 
+void Fmod::setListenerLock(const uint64_t instanceId, bool isLocked) {
+    FIND_AND_CHECK(instanceId, listeners)
+    instance->listenerLock = isLocked;
+}
+
+bool Fmod::getListenerLock(const uint64_t instanceId) {
+    FIND_AND_CHECK(instanceId, listeners, false)
+    return instance->listenerLock;
+}
+
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
     if(system == nullptr && coreSystem == nullptr){
         ERROR_CHECK(FMOD::Studio::System::create(&system));

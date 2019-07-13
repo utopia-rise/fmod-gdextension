@@ -159,6 +159,9 @@ namespace godot {
         void setSystemListener3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
         String loadBank(String pathToBank, unsigned int flag);
+        void setListenerLock(uint64_t instanceId, bool isLocked);
+        bool getListenerLock(uint64_t instanceId);
+        String loadBank(const String pathToBank, const unsigned int flag);
         void unloadBank(String pathToBank);
         bool checkVCAPath(String vcaPath);
         bool checkBusPath(String busPath);
