@@ -21,7 +21,7 @@ void Fmod::_register_methods() {
     register_method("shutdown", &Fmod::shutdown);
     register_method("addListener", &Fmod::addListener);
     register_method("setSoftwareFormat", &Fmod::setSoftwareFormat);
-    register_method("loadbank", &Fmod::loadbank);
+    register_method("loadBank", &Fmod::loadBank);
     register_method("unloadBank", &Fmod::unloadBank);
     register_method("checkVCAPath", &Fmod::checkVCAPath);
     register_method("checkBusPath", &Fmod::checkBusPath);
@@ -172,8 +172,8 @@ void Fmod::checkLoadingBanks() {
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
         checkErrors(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
-            char path[MAX_BANK_PATH_SIZE];
-            checkErrors(bank->getPath(path, MAX_BANK_PATH_SIZE, nullptr));
+            char path[MAX_PATH_SIZE];
+            checkErrors(bank->getPath(path, MAX_PATH_SIZE, nullptr));
             loadAllBuses(bank);
             loadAllVCAs(bank);
             loadAllEventDescriptions(bank);
@@ -287,7 +287,7 @@ void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSp
     checkErrors(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
-String Fmod::loadbank(const String pathToBank, const unsigned int flag) {
+String Fmod::loadBank(const String pathToBank, const unsigned int flag) {
     if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
@@ -353,13 +353,13 @@ const uint64_t Fmod::createEventInstance(String eventPath) {
 float Fmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
     FIND_AND_CHECK(instanceId, events, p)
-    checkErrors(instance->getParameterByName(parameterName.ascii().get_data(), &p));
+    checkErrors(instance->getParameterByName(parameterName.utf8().get_data(), &p));
     return p;
 }
 
 void Fmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setParameterByName(parameterName.ascii().get_data(), value));
+    checkErrors(instance->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
 void Fmod::releaseEvent(const uint64_t instanceId) {
@@ -508,66 +508,84 @@ void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
 }
 
 void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::VCA *array[MAX_VCA_PATH_COUNT];
-    if (checkErrors(bank->getVCAList(array, MAX_VCA_PATH_COUNT, nullptr))) {
-        for (auto vca : array) {
-            char path[MAX_VCA_PATH_SIZE];
-            checkErrors(vca->getPath(path, MAX_VCA_PATH_SIZE, nullptr));
+    FMOD::Studio::VCA *array[MAX_VCA_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
+        CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
+        for (int i = 0; i < size; i++) {
+            auto vca = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
             VCAs[path] << vca;
         }
     }
 }
 
-void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::Bus *array[MAX_BUS_PATH_COUNT];
-    if (checkErrors(bank->getBusList(array, MAX_BUS_PATH_COUNT, nullptr))) {
-        for (auto bus : array) {
-            char path[MAX_BUS_PATH_SIZE];
-            checkErrors(bus->getPath(path, MAX_BUS_PATH_SIZE, nullptr));
-            buses[path] << bus;
-        }
-    }
-}
-
-void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::EventDescription *array[MAX_EVENT_PATH_COUNT];
-    if (checkErrors(bank->getEventList(array, MAX_EVENT_PATH_COUNT, nullptr))) {
-        for (auto eventDescription : array) {
-            char path[MAX_EVENT_PATH_SIZE];
-            checkErrors(eventDescription->getPath(path, MAX_EVENT_PATH_SIZE, nullptr));
-            eventDescriptions[path] << eventDescription;
-        }
-    }
-}
-
 void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::VCA *array[MAX_VCA_PATH_COUNT];
-    if (checkErrors(bank->getVCAList(array, MAX_VCA_PATH_COUNT, nullptr))) {
-        for (auto vca : array) {
-            char path[MAX_VCA_PATH_SIZE];
-            checkErrors(vca->getPath(path, MAX_VCA_PATH_SIZE, nullptr));
+    FMOD::Studio::VCA *array[MAX_VCA_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
+        CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
+        for (int i = 0; i < size; i++) {
+            auto vca = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
             VCAs.erase(path);
         }
     }
 }
 
+void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
+    FMOD::Studio::Bus *array[MAX_BUS_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
+        CHECK_SIZE(MAX_BUS_COUNT, size, buses)
+        for (int i = 0; i < size; i++) {
+            auto bus = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
+            buses[path] << bus;
+        }
+    }
+}
+
 void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::Bus *array[MAX_BUS_PATH_COUNT];
-    if (checkErrors(bank->getBusList(array, MAX_BUS_PATH_COUNT, nullptr))) {
-        for (auto bus : array) {
-            char path[MAX_BUS_PATH_SIZE];
-            checkErrors(bus->getPath(path, MAX_BUS_PATH_SIZE, nullptr));
+    FMOD::Studio::Bus *array[MAX_BUS_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
+        CHECK_SIZE(MAX_BUS_COUNT, size, buses)
+        for (int i = 0; i < size; i++) {
+            auto bus = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
             buses.erase(path);
         }
     }
 }
 
+void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
+    FMOD::Studio::EventDescription *array[MAX_EVENT_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
+        CHECK_SIZE(MAX_EVENT_COUNT, size, Events)
+        for (int i = 0; i < size; i++) {
+            auto eventDescription = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
+            eventDescriptions[path] << eventDescription;
+        }
+    }
+}
+
 void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::EventDescription *array[MAX_EVENT_PATH_COUNT];
-    if (checkErrors(bank->getEventList(array, MAX_EVENT_PATH_COUNT, nullptr))) {
-        for (auto eventDescription : array) {
-            char path[MAX_EVENT_PATH_SIZE];
-            checkErrors(eventDescription->getPath(path, MAX_EVENT_PATH_SIZE, nullptr));
+    FMOD::Studio::EventDescription *array[MAX_EVENT_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
+        CHECK_SIZE(MAX_EVENT_COUNT, size, Events)
+        for (int i = 0; i < size; i++) {
+            auto eventDescription = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
             eventDescriptions.erase(path);
         }
     }
@@ -636,7 +654,7 @@ void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const 
         for (int i = 0; i < keys.size(); i++) {
             String k = keys[i];
             float v = parameters[keys[i]];
-            checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
+            checkErrors(instance->setParameterByName(k.utf8().get_data(), v));
         }
         checkErrors(instance->start());
         checkErrors(instance->release());
@@ -662,7 +680,7 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
             for (int i = 0; i < keys.size(); i++) {
                 String k = keys[i];
                 float v = parameters[keys[i]];
-                checkErrors(instance->setParameterByName(k.ascii().get_data(), v));
+                checkErrors(instance->setParameterByName(k.utf8().get_data(), v));
             }
             checkErrors(instance->start());
             checkErrors(instance->release());
@@ -796,6 +814,10 @@ const uint64_t Fmod::loadSound(String path, int mode) {
 
 void Fmod::releaseSound(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, sounds)
+    FMOD::Channel *channel = instance->channel;
+    checkErrors(instance->channel->setPaused(true));
+    checkErrors(instance->channel->setVolume(1));
+    checkErrors(instance->channel->setPitch(1));
     checkErrors(instance->sound->release());
     sounds.erase(instance);
     delete instance;
@@ -884,12 +906,12 @@ Dictionary Fmod::getPerformanceData() {
 }
 
 void Fmod::setGlobalParameter(const String parameterName, float value) {
-    checkErrors(system->setParameterByName(parameterName.ascii().get_data(), value));
+    checkErrors(system->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
 float Fmod::getGlobalParameter(const String parameterName) {
     float value = 0.f;
-    checkErrors(system->getParameterByName(parameterName.ascii().get_data(), &value));
+    checkErrors(system->getParameterByName(parameterName.utf8().get_data(), &value));
     return value;
 }
 
