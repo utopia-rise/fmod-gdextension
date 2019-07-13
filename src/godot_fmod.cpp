@@ -229,23 +229,27 @@ void Fmod::checkLoadingBanks() {
 }
 
 void Fmod::setListenerAttributes() {
-    if (isNull(listener)) {
-        if (nullListenerWarning) {
-            GODOT_ERROR("FMOD Sound System: Listener not set!")
-            nullListenerWarning = false;
+    if (listeners.empty()) {
+        if (listenerWarning) {
+            Godot::print_error("FMOD Sound System: No listeners are set!", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+            listenerWarning = false;
         }
         return;
     }
-    auto *ci = Object::cast_to<CanvasItem>(listener);
-    if (ci != nullptr) {
-        auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
-        ERROR_CHECK(system->setListenerAttributes(0, &attr));
 
-    } else {
-        // needs testing
-        auto *s = Object::cast_to<Spatial>(listener);
-        auto attr = get3DAttributesFromTransform(s->get_global_transform());
-        ERROR_CHECK(system->setListenerAttributes(0, &attr));
+    for (int i = 0; i < listeners.size(); i++) {
+        auto listener = listeners.get(i);
+        auto *ci = Object::cast_to<CanvasItem>(listener);
+        if (ci != nullptr) {
+            auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
+            ERROR_CHECK(system->setListenerAttributes(0, &attr));
+
+        } else {
+            // needs testing
+            auto *s = Object::cast_to<Spatial>(listener);
+            auto attr = get3DAttributesFromTransform(s->get_global_transform());
+            ERROR_CHECK(system->setListenerAttributes(0, &attr));
+        }
     }
 }
 
@@ -318,8 +322,25 @@ void Fmod::shutdown() {
 
 }
 
-void Fmod::addListener(Object *gameObj) {
-    listener = gameObj;
+const uint64_t Fmod::addListener(Object *gameObj) {
+    int size = listeners.size();
+    if (size >= FMOD_MAX_LISTENERS) {
+        Godot::print_error("FMOD Sound System: Could not add listener. System already at max listeners.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        return 0;
+    }
+    listeners.append(gameObj);
+    checkErrors(system->setNumListeners(listeners.size()));
+    return (uint64_t) gameObj;
+}
+
+void Fmod::removeListener(const uint64_t listenerId) {
+    if (!listeners.has(listenerId)) {
+        Godot::print_error("FMOD Sound System: Invalid listener ID", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        return;
+    }
+    FIND_AND_CHECK(listenerId, listeners)
+    listeners.erase(instance);
+    checkErrors(system->setNumListeners(listeners.empty() ? 1 : listeners.size()));
 }
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
@@ -1447,7 +1468,6 @@ void Fmod::runCallbacks() {
 void Fmod::_init() {
     system = nullptr;
     coreSystem = nullptr;
-    listener = nullptr;
     isInitialized = false;
     isNotinitPrinted = false;
     Callbacks::mut = Mutex::_new();

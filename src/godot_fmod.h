@@ -89,9 +89,9 @@ namespace godot {
 
         float distanceScale;
 
-        Object *listener;
+        Vector<Object *> listeners;
 
-        bool nullListenerWarning = true;
+        bool listenerWarning = true;
 
         Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
@@ -143,7 +143,8 @@ namespace godot {
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void shutdown();
-        void addListener(Object *gameObj);
+        const uint64_t addListener(Object *gameObj);
+        void removeListener(uint64_t listenerId);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
