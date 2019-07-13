@@ -265,6 +265,12 @@ func set_event_reverb_level(instanceId: int, index: int, level: float) -> void:
 func is_event_virtual(instanceId: int) -> bool:
 	return godot_fmod.is_event_virtual(instanceId)
 
+func set_event_listener_mask(instanceId: int, mask: int) -> void:
+	godot_fmod.set_event_listener_mask(instanceId, mask)
+
+func get_event_listener_mask(instanceId: int) -> int:
+	return godot_fmod.get_event_listener_mask(instanceId)
+
 func set_event_2d_attributes(instanceId: int, pos: Transform2D) -> void:
 	godot_fmod.set_event_2d_attributes(instanceId, pos)
 
