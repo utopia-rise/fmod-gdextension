@@ -76,6 +76,11 @@ namespace godot {
         FMOD::Channel *channel;
     };
 
+    struct Listener {
+        Object *gameObj = nullptr;
+        bool listenerLock = false;
+    };
+
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
     DECLARE_ALL_CONSTANTS
@@ -89,7 +94,7 @@ namespace godot {
 
         float distanceScale;
 
-        Vector<Object *> listeners;
+        Vector<Listener *> listeners;
 
         bool listenerWarning = true;
 
@@ -117,6 +122,7 @@ namespace godot {
         FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
         FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(const Transform2D transform);
         bool isNull(Object *o);
+        void clearNullListeners();
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
 

@@ -237,9 +237,11 @@ void Fmod::setListenerAttributes() {
         return;
     }
 
+    clearNullListeners();
+
     for (int i = 0; i < listeners.size(); i++) {
         auto listener = listeners.get(i);
-        auto *ci = Object::cast_to<CanvasItem>(listener);
+        auto *ci = Object::cast_to<CanvasItem>(listener->gameObj);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(0, &attr));
@@ -250,6 +252,18 @@ void Fmod::setListenerAttributes() {
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(0, &attr));
         }
+    }
+}
+
+void Fmod::clearNullListeners() {
+    Vector<Listener> queue;
+    for (int i = 0; i < listeners.size(); i++) {
+        Listener *listener = listeners.get(i);
+        if (isNull(listener->gameObj))
+            queue.push_back(listener);
+    }
+    for (int i = 0; i < queue.size(); i++) {
+        removeListener(queue[i]);
     }
 }
 
@@ -328,7 +342,9 @@ const uint64_t Fmod::addListener(Object *gameObj) {
         Godot::print_error("FMOD Sound System: Could not add listener. System already at max listeners.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         return 0;
     }
-    listeners.append(gameObj);
+    Listener listener = Listener();
+    listener.gameObj = gameObj;
+    listeners.append(&listener);
     checkErrors(system->setNumListeners(listeners.size()));
     return (uint64_t) gameObj;
 }
