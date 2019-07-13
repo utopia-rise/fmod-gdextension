@@ -174,6 +174,31 @@ namespace godot {
         void setEventReverbLevel(uint64_t instanceId, int index, float level);
         bool isEventVirtual(uint64_t instanceId);
 
+        /* event descriptions functions */
+        int descGetLength(String eventPath);
+        String descGetPath(String eventPath);
+        Array descGetInstanceList(String eventPath);
+        int descGetInstanceCount(String eventPath);
+        void descReleaseAllInstances(String eventPath);
+        void descLoadSampleData(String eventPath);
+        void descUnloadSampleData(String eventPath);
+        int descGetSampleLoadingState(String eventPath);
+        bool descIs3D(String eventPath);
+        bool descIsOneShot(String eventPath);
+        bool descIsSnapshot(String eventPath);
+        bool descIsStream(String eventPath);
+        bool descHasCue(String eventPath);
+        float descGetMaximumDistance(String eventPath);
+        float descGetMinimumDistance(String eventPath);
+        float descGetSoundSize(String eventPath);
+        Dictionary descGetParameterDescriptionByName(String eventPath, String name);
+        Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);
+        int descGetParameterDescriptionCount(String eventPath);
+        Dictionary descGetParameterDescriptionByIndex(String eventPath, int index);
+        Dictionary descGetUserProperty(String eventPath, String name);
+        int descGetUserPropertyCount(String eventPath);
+        Dictionary descUserPropertyByIndex(String eventPath, int index);
+
         /* bus functions */
         bool getBusMute(String busPath);
         bool getBusPaused(String busPath);
