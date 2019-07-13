@@ -32,6 +32,7 @@ if (!instance) { \
 #define MAX_VCA_COUNT 64
 #define MAX_BUS_COUNT 64
 #define MAX_EVENT_COUNT 256
+#define MAX_DRIVER_NAME_SIZE 256
 
 #define CHECK_SIZE(maxSize, actualSize, type) \
 if(actualSize > maxSize){\

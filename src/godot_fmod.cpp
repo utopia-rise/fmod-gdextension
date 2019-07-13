@@ -168,7 +168,7 @@ void Fmod::update() {
 
 void Fmod::checkLoadingBanks() {
     for (int i = 0; i < loadingBanks.size(); i++) {
-        auto bank = (FMOD::Studio::Bank *) (uint64_t) loadingBanks.pop_front();
+        auto bank = loadingBanks.pop_front_value();
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
         checkErrors(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
@@ -179,7 +179,7 @@ void Fmod::checkLoadingBanks() {
             loadAllEventDescriptions(bank);
             banks[path] << bank;
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
-            loadingBanks.push_back((uint64_t) bank);
+            loadingBanks.push_back_value(bank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             Godot::print_error("Fmod Sound System: Error loading bank.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         }
@@ -834,6 +834,7 @@ void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float ro
 
 void Fmod::waitForAllLoads() {
     checkErrors(system->flushSampleLoading());
+    checkLoadingBanks();
 }
 
 Array Fmod::getAvailableDrivers() {
@@ -843,11 +844,11 @@ Array Fmod::getAvailableDrivers() {
     checkErrors(coreSystem->getNumDrivers(&numDrivers));
 
     for (int i = 0; i < numDrivers; i++) {
-        char name[256];
+        char name[MAX_DRIVER_NAME_SIZE];
         int sampleRate;
         FMOD_SPEAKERMODE speakerMode;
         int speakerModeChannels;
-        checkErrors(coreSystem->getDriverInfo(i, name, 256, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
+        checkErrors(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
         String nameStr(name);
 
         Dictionary driverInfo;

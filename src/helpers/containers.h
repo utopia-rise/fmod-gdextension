@@ -38,10 +38,17 @@ namespace godot {
             return var;
         }
 
-        uint64_t erase(const T value){
+        void erase(const T value){
             const auto var = (uint64_t) value;
             Array::erase(var);
-            return var;
+        }
+
+        T pop_front_value(){
+            return (T) ((uint64_t) Array::pop_front());
+        }
+
+        void push_back_value(const T &v){
+            Array::push_back((uint64_t) v);
         }
 
     };
