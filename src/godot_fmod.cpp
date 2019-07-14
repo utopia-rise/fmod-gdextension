@@ -136,22 +136,28 @@ void Fmod::update() {
         FMOD::Studio::EventInstance * eventInstance = events.get(i);
         if (eventInstance) {
             EventInfo *eventInfo = getEventInfo(eventInstance);
-            if (eventInfo->gameObj) {
-                if (isNull(eventInfo->gameObj)) {
-                    FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-                    checkErrors(eventInstance->stop(m));
-                    releaseOneEvent(eventInstance);
-                    continue;
-                }
-                if (eventInfo->isOneShot) {
-                    FMOD_STUDIO_PLAYBACK_STATE s;
-                    checkErrors(eventInstance->getPlaybackState(&s));
-                    if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+            if(eventInfo){
+                if (eventInfo->gameObj) {
+                    if (isNull(eventInfo->gameObj)) {
+                        FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+                        checkErrors(eventInstance->stop(m));
                         releaseOneEvent(eventInstance);
                         continue;
                     }
+                    if (eventInfo->isOneShot) {
+                        FMOD_STUDIO_PLAYBACK_STATE s;
+                        checkErrors(eventInstance->getPlaybackState(&s));
+                        if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+                            releaseOneEvent(eventInstance);
+                            continue;
+                        }
+                    }
+                    updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
                 }
-                updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
+            }
+            else {
+                Godot::print_error("A managed event doesn't have an EventInfoStructure",
+                        BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
             }
         }
     }
@@ -172,15 +178,11 @@ void Fmod::checkLoadingBanks() {
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
         checkErrors(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
-            char path[MAX_PATH_SIZE];
-            checkErrors(bank->getPath(path, MAX_PATH_SIZE, nullptr));
-            loadAllBuses(bank);
-            loadAllVCAs(bank);
-            loadAllEventDescriptions(bank);
-            banks[path] << bank;
+            loadBankData(bank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
             loadingBanks.push_back_value(bank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
+            bank->unload();
             Godot::print_error("Fmod Sound System: Error loading bank.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         }
     }
@@ -273,6 +275,8 @@ void Fmod::shutdown() {
     coreSystem = nullptr;
     checkErrors(system->unloadAll());
     checkErrors(system->release());
+    Godot::print("FMOD Sound System: System released");
+
 }
 
 void Fmod::addListener(Object *gameObj) {
@@ -292,8 +296,13 @@ String Fmod::loadBank(const String pathToBank, const unsigned int flag) {
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
-        loadingBanks.append(bank);
-        return pathToBank;
+        Godot::print("FMOD Sound System: LOADING BANK " + String(pathToBank));
+        if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING){
+            loadBankData(bank);
+        }
+        else{
+            loadingBanks.append(bank);
+        }
     }
     return pathToBank;
 }
@@ -304,6 +313,7 @@ void Fmod::unloadBank(const String pathToBank) {
     unloadAllVCAs(instance);
     unloadAllEventDescriptions(instance);
     checkErrors(instance->unload());
+    Godot::print("FMOD Sound System: BANK " + String(pathToBank) + " UNLOADED");
     banks.erase(pathToBank);
 }
 
@@ -507,6 +517,27 @@ void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
+void Fmod::loadBankData(FMOD::Studio::Bank *bank){
+    char path[MAX_PATH_SIZE];
+    FMOD_RESULT  result = bank->getPath(path, MAX_PATH_SIZE, nullptr);
+    if( result == FMOD_OK){
+        Godot::print("FMOD Sound System: BANK " + String(path) + " LOADED");
+        loadAllBuses(bank);
+        loadAllVCAs(bank);
+        loadAllEventDescriptions(bank);
+        banks[path] << bank;
+    }
+    else{
+        if(result == FMOD_ERR_EVENT_NOTFOUND){
+            Godot::print("FMOD Sound System: BANK " + String(path) + " COULDN'T BE LOADED. Path incorrect or MasterBank not loaded yet.");
+        }
+        else{
+            checkErrors(result);
+        }
+    bank->unload();
+    }
+}
+
 void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
     FMOD::Studio::VCA *array[MAX_VCA_COUNT];
     int size = 0;
@@ -516,21 +547,8 @@ void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
             auto vca = array[i];
             char path[MAX_PATH_SIZE];
             checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " added to VCAs");
             VCAs[path] << vca;
-        }
-    }
-}
-
-void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::VCA *array[MAX_VCA_COUNT];
-    int size = 0;
-    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
-        CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
-        for (int i = 0; i < size; i++) {
-            auto vca = array[i];
-            char path[MAX_PATH_SIZE];
-            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
-            VCAs.erase(path);
         }
     }
 }
@@ -544,21 +562,8 @@ void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
             auto bus = array[i];
             char path[MAX_PATH_SIZE];
             checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " added to buses");
             buses[path] << bus;
-        }
-    }
-}
-
-void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
-    FMOD::Studio::Bus *array[MAX_BUS_COUNT];
-    int size = 0;
-    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
-        CHECK_SIZE(MAX_BUS_COUNT, size, buses)
-        for (int i = 0; i < size; i++) {
-            auto bus = array[i];
-            char path[MAX_PATH_SIZE];
-            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
-            buses.erase(path);
         }
     }
 }
@@ -572,7 +577,38 @@ void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
             auto eventDescription = array[i];
             char path[MAX_PATH_SIZE];
             checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " added to eventDescriptions");
             eventDescriptions[path] << eventDescription;
+        }
+    }
+}
+
+void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
+    FMOD::Studio::VCA *array[MAX_VCA_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
+        CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
+        for (int i = 0; i < size; i++) {
+            auto vca = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " removed from VCAs");
+            VCAs.erase(path);
+        }
+    }
+}
+
+void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
+    FMOD::Studio::Bus *array[MAX_BUS_COUNT];
+    int size = 0;
+    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
+        CHECK_SIZE(MAX_BUS_COUNT, size, buses)
+        for (int i = 0; i < size; i++) {
+            auto bus = array[i];
+            char path[MAX_PATH_SIZE];
+            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " removed from buses");
+            buses.erase(path);
         }
     }
 }
@@ -586,6 +622,7 @@ void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
             auto eventDescription = array[i];
             char path[MAX_PATH_SIZE];
             checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
+            Godot::print("FMOD Sound System: " + String(path) + " removed from eventDescriptions");
             eventDescriptions.erase(path);
         }
     }
@@ -604,29 +641,22 @@ bool Fmod::checkEventPath(const String eventPath) {
 }
 
 FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
-    if (!eventDescriptions.has(eventName)) {
-        FMOD::Studio::EventDescription *desc = nullptr;
-        checkErrors(system->getEvent(eventName.alloc_c_string(), &desc));
-        eventDescriptions[eventName] << desc;
+    FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
+    FMOD::Studio::EventInstance *eventInstance = nullptr;
+    checkErrors(instance->createInstance(&eventInstance));
+    if (eventInstance && (!isOneShot || gameObject)) {
+        auto *eventInfo = new EventInfo();
+        eventInfo->gameObj = gameObject;
+        eventInfo->isOneShot = isOneShot;
+        eventInstance->setUserData(eventInfo);
+        events.append(eventInstance);
     }
-    auto eventDescription = eventDescriptions.get(eventName);
-    FMOD::Studio::EventInstance *instance = nullptr;
-    if (eventDescription) {
-        checkErrors(eventDescription->createInstance(&instance));
-        if (instance && (!isOneShot || gameObject)) {
-            auto *eventInfo = new EventInfo();
-            eventInfo->gameObj = gameObject;
-            eventInfo->isOneShot = isOneShot;
-            instance->setUserData(eventInfo);
-            events.append(instance);
-        }
-    }
-    return instance;
+    return eventInstance;
 }
 
 EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
     EventInfo *eventInfo;
-    eventInstance->getUserData((void **)&eventInfo);
+    checkErrors(eventInstance->getUserData((void **)&eventInfo));
     return eventInfo;
 }
 
@@ -666,7 +696,6 @@ void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
             checkErrors(instance->start());
-            checkErrors(instance->release());
         }
     }
 }
@@ -683,7 +712,6 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
                 checkErrors(instance->setParameterByName(k.utf8().get_data(), v));
             }
             checkErrors(instance->start());
-            checkErrors(instance->release());
         }
     }
 }
@@ -967,8 +995,9 @@ void Fmod::runCallbacks() {
     Callbacks::mut->lock();
     for (int i = 0; i < events.size(); i++) {
         FMOD::Studio::EventInstance *eventInstance = events.get(i);
-        if (eventInstance) {
-            Callbacks::CallbackInfo cbInfo = getEventInfo(eventInstance)->callbackInfo;
+        auto eventInfo = getEventInfo(eventInstance);
+        if (eventInstance &&  eventInfo) {
+            Callbacks::CallbackInfo cbInfo = eventInfo->callbackInfo;
             // check for Marker callbacks
             if (!cbInfo.markerSignalEmitted) {
                 emit_signal("timeline_marker", cbInfo.markerCallbackInfo);
@@ -989,6 +1018,10 @@ void Fmod::runCallbacks() {
                     emit_signal("sound_stopped", cbInfo.soundCallbackInfo);
                 cbInfo.soundSignalEmitted = true;
             }
+        }
+        else{
+            Godot::print_error("A managed event doesn't have an EventInfoStructure",
+                               BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         }
     }
     Callbacks::mut->unlock();

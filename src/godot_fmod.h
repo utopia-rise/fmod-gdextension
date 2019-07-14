@@ -17,7 +17,7 @@
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
 auto instance = cont.get(instanceId); \
 if (!instance) { \
-    Godot::print_error("FMOD Sound System: cannot find instanceId in cont", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+    Godot::print_error("FMOD Sound System: cannot find " + String(instanceId) + " in " #cont " collection.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
     return defaultReturn; \
 } \
 
@@ -36,7 +36,7 @@ if (!instance) { \
 
 #define CHECK_SIZE(maxSize, actualSize, type) \
 if(actualSize > maxSize){\
-    Godot::print_error("FMOD Sound System: type maximum size is maxSize but the bank contains actualSize entries", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+    Godot::print_error("FMOD Sound System: type maximum size is " #maxSize " but the bank contains " #actualSize " entries", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
     actualSize = maxSize;\
 }\
 
@@ -97,6 +97,7 @@ namespace godot {
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
+        void loadBankData(FMOD::Studio::Bank *bank);
         void loadAllVCAs(FMOD::Studio::Bank *bank);
         void loadAllBuses(FMOD::Studio::Bank *bank);
         void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
