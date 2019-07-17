@@ -157,7 +157,7 @@ void Fmod::update() {
             }
             else {
                 Godot::print_error("A managed event doesn't have an EventInfoStructure",
-                        BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+                                   BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
             }
         }
     }
@@ -174,15 +174,17 @@ void Fmod::update() {
 
 void Fmod::checkLoadingBanks() {
     for (int i = 0; i < loadingBanks.size(); i++) {
-        auto bank = loadingBanks.pop_front_value();
+        auto loadingBank = loadingBanks.pop_front_value();
+        auto bank = loadingBank->bank;
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
         checkErrors(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
-            loadBankData(bank);
+            loadBankData(loadingBank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
-            loadingBanks.push_back_value(bank);
+            loadingBanks.push_back_value(loadingBank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             bank->unload();
+            delete loadingBank;
             Godot::print_error("Fmod Sound System: Error loading bank.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
         }
     }
@@ -297,11 +299,14 @@ String Fmod::loadBank(const String pathToBank, const unsigned int flag) {
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
         Godot::print("FMOD Sound System: LOADING BANK " + String(pathToBank));
+        auto *loadingBank = new LoadingBank();
+        loadingBank->bank = bank;
+        loadingBank->hdPath = pathToBank;
         if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING){
-            loadBankData(bank);
+            loadBankData(loadingBank);
         }
         else{
-            loadingBanks.append(bank);
+            loadingBanks.append(loadingBank);
         }
     }
     return pathToBank;
@@ -517,15 +522,17 @@ void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
-void Fmod::loadBankData(FMOD::Studio::Bank *bank){
+void Fmod::loadBankData(LoadingBank *loadingBank){
     char path[MAX_PATH_SIZE];
-    FMOD_RESULT  result = bank->getPath(path, MAX_PATH_SIZE, nullptr);
+    auto bank = loadingBank->bank;
+    FMOD_RESULT result = bank->getPath(path, MAX_PATH_SIZE, nullptr);
     if( result == FMOD_OK){
         Godot::print("FMOD Sound System: BANK " + String(path) + " LOADED");
         loadAllBuses(bank);
         loadAllVCAs(bank);
         loadAllEventDescriptions(bank);
-        banks[path] << bank;
+        banks[loadingBank->hdPath] << bank;
+        delete loadingBank;
     }
     else{
         if(result == FMOD_ERR_EVENT_NOTFOUND){
@@ -534,7 +541,8 @@ void Fmod::loadBankData(FMOD::Studio::Bank *bank){
         else{
             checkErrors(result);
         }
-    bank->unload();
+        bank->unload();
+        delete loadingBank;
     }
 }
 

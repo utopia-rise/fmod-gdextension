@@ -56,6 +56,11 @@ namespace godot {
         FMOD::Channel *channel;
     };
 
+    struct LoadingBank {
+        FMOD::Studio::Bank * bank;
+        String hdPath;
+    };
+
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
     private:
@@ -71,7 +76,7 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
-        Vector<FMOD::Studio::Bank *> loadingBanks;
+        Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         Map<String, FMOD::Studio::Bus *> buses;
@@ -97,7 +102,7 @@ namespace godot {
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
-        void loadBankData(FMOD::Studio::Bank *bank);
+        void loadBankData(LoadingBank *loadingBank);
         void loadAllVCAs(FMOD::Studio::Bank *bank);
         void loadAllBuses(FMOD::Studio::Bank *bank);
         void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
