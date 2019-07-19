@@ -88,7 +88,7 @@ void Fmod::_register_methods() {
     register_method("get_performance_data", &Fmod::getPerformanceData);
     register_method("set_global_parameter", &Fmod::setGlobalParameter);
     register_method("get_global_parameter", &Fmod::getGlobalParameter);
-    register_method("update", &Fmod::update);
+    register_method("_process", &Fmod::_process);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -120,7 +120,7 @@ int Fmod::checkErrors(FMOD_RESULT result) {
     return 1;
 }
 
-void Fmod::update() {
+void Fmod::_process(float delta){
     if (!isInitialized) {
         if (!isNotinitPrinted) {
             Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "update", __FILE__, __LINE__);
@@ -291,7 +291,8 @@ void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSp
     checkErrors(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
-String Fmod::loadBank(const String pathToBank, const unsigned int flag) {
+String Fmod::loadBank(String pathToBank, const unsigned int flag) {
+    DRIVE_PATH(pathToBank)
     if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
     FMOD::Studio::Bank *bank = nullptr;
     checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));

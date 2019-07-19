@@ -10,17 +10,17 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
-"class": "GodotFmod",
+"class": "Fmod",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
 } ]
 _global_script_class_icons={
-"GodotFmod": ""
+"Fmod": ""
 }
 
 [application]
 
-config/name="Fmod Test Demo"
+config/name="FMOD Gdnative Integration Demo"
 run/main_scene="res://Scenes/FmodTest.tscn"
 config/icon="res://icon.png"
 

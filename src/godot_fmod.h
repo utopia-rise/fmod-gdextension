@@ -12,6 +12,7 @@
 #include <gen/Mutex.hpp>
 #include "callback/callbacks.h"
 #include "helpers/containers.h"
+#include "helpers/constants.h"
 
 
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
@@ -40,6 +41,11 @@ if(actualSize > maxSize){\
     actualSize = maxSize;\
 }\
 
+#define DRIVE_PATH(path)
+#ifdef __ANDROID__
+#define DRIVE_PATH(path)\
+path = path.replace("./", "file:///android_asset/");
+#endif
 namespace godot {
 
     struct EventInfo {
@@ -59,6 +65,7 @@ namespace godot {
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
     private:
+
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
 
@@ -83,7 +90,6 @@ namespace godot {
         //Store disctionnary of performance data
         Dictionary performanceData;
 
-    private:
         int checkErrors(FMOD_RESULT result);
         void checkLoadingBanks();
         void setListenerAttributes();
@@ -111,8 +117,9 @@ namespace godot {
         ~Fmod();
 
         static void _register_methods();
+
         void _init();
-        void update();
+        void _process(float delta);
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void shutdown();

@@ -1,7 +1,6 @@
 extends Node
 
 var godot_fmod = preload("res://addons/fmod/Fmod.gdns").new()
-var local_path_prefix = "./"
 
 ############
 ###UTILS###
@@ -10,7 +9,6 @@ var local_path_prefix = "./"
 const FMOD_INIT_3D_RIGHTHANDED = 4
 const FMOD_INIT_CHANNEL_DISTANCEFILTER = 512
 const FMOD_INIT_CHANNEL_LOWPASS = 256
-const FMOD_INIT_DISABLE_SRS_HIGHPASSFILTER = 4194304
 const FMOD_INIT_GEOMETRY_USECLOSEST = 262144
 const FMOD_INIT_MIX_FROM_UPDATE = 2
 const FMOD_INIT_NORMAL = 0
@@ -76,23 +74,20 @@ const FMOD_STUDIO_STOP_ALLOWFADEOUT = 0
 const FMOD_STUDIO_STOP_IMMEDIATE = 1
 const FMOD_STUDIO_STOP_FORCEINT = 65536
 
-func get_fmod_path(path: String) -> String:
-	if path.left(2) == "./":
-		return path.replace("./", local_path_prefix)
-	return path
-
 ############
 ###SYSTEM###
 ############
 func _init() -> void:
-	if OS.get_name() == "Android":
-		local_path_prefix = "file:///android_asset/"
+	pass
+
+func _process(delta):
+	godot_fmod._process(delta)
 
 func init(numOfChannels: int, studioFlag: int, fmodFlag: int) -> void:
 	godot_fmod.init(1024, studioFlag, fmodFlag)
 	
-func _process(delta):
-	godot_fmod.update()
+func shutdown() -> void:
+	godot_fmod.shutdown()
 
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
 	godot_fmod.set_software_format(sampleRate, speakerMode, numRowSpeakers)
@@ -104,10 +99,10 @@ func add_listener(object) -> void:
 ###BANK###
 ##########
 func load_bank(pathToBank: String, loadBankFlag: int) -> String:
-	return godot_fmod.load_bank(get_fmod_path(pathToBank), loadBankFlag)
+	return godot_fmod.load_bank(pathToBank, loadBankFlag)
 
 func unload_bank(pathToBank: String) -> void:
-	godot_fmod.unload_bank(get_fmod_path(pathToBank))
+	godot_fmod.unload_bank(pathToBank)
 
 
 ###########
@@ -157,7 +152,7 @@ func detach_instance_from_node(instanceId: int) -> void:
 ###SOUND###
 ###########
 func load_sound(path: String, mode: int) -> int:
-	return godot_fmod.load_sound(get_fmod_path(path), mode)
+	return godot_fmod.load_sound(path, mode)
 
 func play_sound(instanceId: int) -> void:
 	godot_fmod.play_sound(instanceId)
@@ -179,4 +174,3 @@ func set_sound_pitch(instanceId: int, pitch: float) -> void:
 
 func set_sound_3D_settings(dopplerScale: float, distanceFactor: float, rollOffScale: float) -> void:
 	godot_fmod.set_sound_3D_settings(dopplerScale, distanceFactor, rollOffScale)
-

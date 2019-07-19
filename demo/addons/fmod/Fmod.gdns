@@ -6,4 +6,4 @@
 resource_name = "Fmod"
 class_name = "Fmod"
 library = ExtResource( 1 )
-script_class_name = "GodotFmod"
+script_class_name = "Fmod"
