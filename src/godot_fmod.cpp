@@ -92,38 +92,40 @@ void Fmod::_register_methods() {
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
+    register_signal<Fmod>("sound_played", "params", GODOT_VARIANT_TYPE_DICTIONARY);
+    register_signal<Fmod>("sound_stopped", "params", GODOT_VARIANT_TYPE_DICTIONARY);
+
+    REGISTER_ALL_CONSTANTS
+}
+
+bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *file, int line){
+    if (result != FMOD_OK) {
+        godot::Godot::print_error(FMOD_ErrorString(result), function, file, line);
+        return false;
+    }
+    return true;
 }
 
 void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
     // initialize FMOD Studio and FMOD Core System with provided flags
     if(system == nullptr && coreSystem == nullptr){
-        checkErrors(FMOD::Studio::System::create(&system));
-        checkErrors(system->getCoreSystem(&coreSystem));
+        ERROR_CHECK(FMOD::Studio::System::create(&system));
+        ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
 
-    if (checkErrors(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
+    if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
         isInitialized = true;
         Godot::print("FMOD Sound System: Successfully initialized");
         if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) {
             Godot::print("FMOD Sound System: Live update enabled!");
         }
-    } else {
-        Godot::print_error("FMOD Sound System: Failed to initialize :|", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
     }
-}
-
-int Fmod::checkErrors(FMOD_RESULT result) {
-    if (result != FMOD_OK) {
-        Godot::print_error(FMOD_ErrorString(result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
-        return 0;
-    }
-    return 1;
 }
 
 void Fmod::_process(float delta){
     if (!isInitialized) {
         if (!isNotinitPrinted) {
-            Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "update", __FILE__, __LINE__);
+            Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "_process", __FILE__, __LINE__);
             isNotinitPrinted = true;
         }
         return;
@@ -140,13 +142,13 @@ void Fmod::_process(float delta){
                 if (eventInfo->gameObj) {
                     if (isNull(eventInfo->gameObj)) {
                         FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-                        checkErrors(eventInstance->stop(m));
+                        ERROR_CHECK(eventInstance->stop(m));
                         releaseOneEvent(eventInstance);
                         continue;
                     }
                     if (eventInfo->isOneShot) {
                         FMOD_STUDIO_PLAYBACK_STATE s;
-                        checkErrors(eventInstance->getPlaybackState(&s));
+                        ERROR_CHECK(eventInstance->getPlaybackState(&s));
                         if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
                             releaseOneEvent(eventInstance);
                             continue;
@@ -169,14 +171,14 @@ void Fmod::_process(float delta){
     runCallbacks();
 
     // dispatch update to FMOD
-    checkErrors(system->update());
+    ERROR_CHECK(system->update());
 }
 
 void Fmod::checkLoadingBanks() {
     for (int i = 0; i < loadingBanks.size(); i++) {
         auto bank = loadingBanks.pop_front_value();
         FMOD_STUDIO_LOADING_STATE *loading_state = nullptr;
-        checkErrors(bank->getLoadingState(loading_state));
+        ERROR_CHECK(bank->getLoadingState(loading_state));
         if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
             loadBankData(bank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
@@ -204,7 +206,7 @@ void Fmod::setListenerAttributes() {
                 up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0); // TODO: add doppler
         const FMOD_VECTOR &posFmodVector = toFmodVector(pos);
         auto attr = get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-        checkErrors(system->setListenerAttributes(0, &attr));
+        ERROR_CHECK(system->setListenerAttributes(0, &attr));
 
     } else {
         // needs testing
@@ -215,7 +217,7 @@ void Fmod::setListenerAttributes() {
         Vector3 forward = t.get_basis().elements[2];
         Vector3 vel(0, 0, 0);
         auto attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-        checkErrors(system->setListenerAttributes(0, &attr));
+        ERROR_CHECK(system->setListenerAttributes(0, &attr));
     }
 }
 
@@ -253,7 +255,7 @@ void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Obj
             Vector3 pos(posVector.x, 0.0f, posVector.y),
                     up(0, 1, 0), forward(0, 0, 1), vel(0, 0, 0);
             FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-            checkErrors(instance->set3DAttributes(&attr));
+            ERROR_CHECK(instance->set3DAttributes(&attr));
         } else {
             // needs testing
             auto *s = Object::cast_to<Spatial>(o);
@@ -263,7 +265,7 @@ void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Obj
             Vector3 forward = t.get_basis().elements[2];
             Vector3 vel(0, 0, 0);
             FMOD_3D_ATTRIBUTES attr = get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
-            checkErrors(instance->set3DAttributes(&attr));
+            ERROR_CHECK(instance->set3DAttributes(&attr));
         }
     }
 }
@@ -273,8 +275,8 @@ void Fmod::shutdown() {
     isNotinitPrinted = false;
     system = nullptr;
     coreSystem = nullptr;
-    checkErrors(system->unloadAll());
-    checkErrors(system->release());
+    ERROR_CHECK(system->unloadAll());
+    ERROR_CHECK(system->release());
     Godot::print("FMOD Sound System: System released");
 
 }
@@ -285,17 +287,17 @@ void Fmod::addListener(Object *gameObj) {
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
     if(system == nullptr && coreSystem == nullptr){
-        checkErrors(FMOD::Studio::System::create(&system));
-        checkErrors(system->getCoreSystem(&coreSystem));
+        ERROR_CHECK(FMOD::Studio::System::create(&system));
+        ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
-    checkErrors(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
+    ERROR_CHECK(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
 String Fmod::loadBank(String pathToBank, const unsigned int flag) {
     DRIVE_PATH(pathToBank)
     if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
     FMOD::Studio::Bank *bank = nullptr;
-    checkErrors(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
+    ERROR_CHECK(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
         Godot::print("FMOD Sound System: LOADING BANK " + String(pathToBank));
         if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING){
@@ -309,47 +311,53 @@ String Fmod::loadBank(String pathToBank, const unsigned int flag) {
 }
 
 void Fmod::unloadBank(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks)
     unloadAllBuses(instance);
     unloadAllVCAs(instance);
     unloadAllEventDescriptions(instance);
-    checkErrors(instance->unload());
+    ERROR_CHECK(instance->unload());
     Godot::print("FMOD Sound System: BANK " + String(pathToBank) + " UNLOADED");
     banks.erase(pathToBank);
 }
 
 int Fmod::getBankLoadingState(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     FMOD_STUDIO_LOADING_STATE state;
-    checkErrors(instance->getLoadingState(&state));
+    ERROR_CHECK(instance->getLoadingState(&state));
     return state;
 }
 
 int Fmod::getBankBusCount(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
-    checkErrors(instance->getBusCount(&count));
+    ERROR_CHECK(instance->getBusCount(&count));
     return count;
 }
 
 int Fmod::getBankEventCount(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
-    checkErrors(instance->getEventCount(&count));
+    ERROR_CHECK(instance->getEventCount(&count));
     return count;
 }
 
 int Fmod::getBankStringCount(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
-    checkErrors(instance->getStringCount(&count));
+    ERROR_CHECK(instance->getStringCount(&count));
     return count;
 }
 
 int Fmod::getBankVCACount(const String pathToBank) {
+    DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
-    checkErrors(instance->getVCACount(&count));
+    ERROR_CHECK(instance->getVCACount(&count));
     return count;
 }
 
@@ -364,13 +372,13 @@ const uint64_t Fmod::createEventInstance(String eventPath) {
 float Fmod::getEventParameter(const uint64_t instanceId, String parameterName) {
     float p = -1;
     FIND_AND_CHECK(instanceId, events, p)
-    checkErrors(instance->getParameterByName(parameterName.utf8().get_data(), &p));
+    ERROR_CHECK(instance->getParameterByName(parameterName.utf8().get_data(), &p));
     return p;
 }
 
 void Fmod::setEventParameter(const uint64_t instanceId, String parameterName, float value) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setParameterByName(parameterName.utf8().get_data(), value));
+    ERROR_CHECK(instance->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
 void Fmod::releaseEvent(const uint64_t instanceId) {
@@ -382,7 +390,7 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
     Callbacks::mut->lock();
     EventInfo *eventInfo = getEventInfo(eventInstance);
     eventInstance->setUserData(nullptr);
-    checkErrors(eventInstance->release());
+    ERROR_CHECK(eventInstance->release());
     events.erase(eventInstance);
     delete &eventInfo;
     Callbacks::mut->unlock();
@@ -390,132 +398,132 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
 
 void Fmod::startEvent(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->start());
+    ERROR_CHECK(instance->start());
 }
 
 void Fmod::stopEvent(const uint64_t instanceId, int stopMode) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
+    ERROR_CHECK(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void Fmod::triggerEventCue(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->triggerCue());
+    ERROR_CHECK(instance->triggerCue());
 }
 
 int Fmod::getEventPlaybackState(const uint64_t instanceId) {
     int s = -1;
     FIND_AND_CHECK(instanceId, events, s)
-    checkErrors(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE *) &s));
+    ERROR_CHECK(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE *) &s));
     return s;
 }
 
 bool Fmod::getEventPaused(const uint64_t instanceId) {
     bool paused = false;
     FIND_AND_CHECK(instanceId, events, paused)
-    checkErrors(instance->getPaused(&paused));
+    ERROR_CHECK(instance->getPaused(&paused));
     return paused;
 }
 
 void Fmod::setEventPaused(const uint64_t instanceId, bool paused) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setPaused(paused));
+    ERROR_CHECK(instance->setPaused(paused));
 }
 
 float Fmod::getEventPitch(const uint64_t instanceId) {
     float pitch = 0.0f;
     FIND_AND_CHECK(instanceId, events, pitch)
-    checkErrors(instance->getPitch(&pitch));
+    ERROR_CHECK(instance->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setEventPitch(const uint64_t instanceId, float pitch) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setPitch(pitch));
+    ERROR_CHECK(instance->setPitch(pitch));
 }
 
 float Fmod::getEventVolume(const uint64_t instanceId) {
     float volume = 0.0f;
     FIND_AND_CHECK(instanceId, events, volume)
-    checkErrors(instance->getVolume(&volume));
+    ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setEventVolume(const uint64_t instanceId, float volume) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setVolume(volume));
+    ERROR_CHECK(instance->setVolume(volume));
 }
 
 int Fmod::getEventTimelinePosition(const uint64_t instanceId) {
     int tp = 0;
     FIND_AND_CHECK(instanceId, events, tp)
-    checkErrors(instance->getTimelinePosition(&tp));
+    ERROR_CHECK(instance->getTimelinePosition(&tp));
     return tp;
 }
 
 void Fmod::setEventTimelinePosition(const uint64_t instanceId, int position) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setTimelinePosition(position));
+    ERROR_CHECK(instance->setTimelinePosition(position));
 }
 
 float Fmod::getEventReverbLevel(const uint64_t instanceId, int index) {
     float rvl = 0.0f;
     FIND_AND_CHECK(instanceId, events, rvl)
-    checkErrors(instance->getReverbLevel(index, &rvl));
+    ERROR_CHECK(instance->getReverbLevel(index, &rvl));
     return rvl;
 }
 
 void Fmod::setEventReverbLevel(const uint64_t instanceId, int index, float level) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setReverbLevel(index, level));
+    ERROR_CHECK(instance->setReverbLevel(index, level));
 }
 
 bool Fmod::isEventVirtual(const uint64_t instanceId) {
     bool v = false;
     FIND_AND_CHECK(instanceId, events, v)
-    checkErrors(instance->isVirtual(&v));
+    ERROR_CHECK(instance->isVirtual(&v));
     return v;
 }
 
 bool Fmod::getBusMute(const String busPath) {
     bool mute = false;
     FIND_AND_CHECK(busPath, buses, mute)
-    checkErrors(instance->getMute(&mute));
+    ERROR_CHECK(instance->getMute(&mute));
     return mute;
 }
 
 bool Fmod::getBusPaused(const String busPath) {
     bool paused = false;
     FIND_AND_CHECK(busPath, buses, paused)
-    checkErrors(instance->getPaused(&paused));
+    ERROR_CHECK(instance->getPaused(&paused));
     return paused;
 }
 
 float Fmod::getBusVolume(const String busPath) {
     float volume = 0.0f;
     FIND_AND_CHECK(busPath, buses, volume)
-    checkErrors(instance->getVolume(&volume));
+    ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setBusMute(const String busPath, bool mute) {
     FIND_AND_CHECK(busPath, buses)
-    checkErrors(instance->setMute(mute));
+    ERROR_CHECK(instance->setMute(mute));
 }
 
 void Fmod::setBusPaused(const String busPath, bool paused) {
     FIND_AND_CHECK(busPath, buses)
-    checkErrors(instance->setPaused(paused));
+    ERROR_CHECK(instance->setPaused(paused));
 }
 
 void Fmod::setBusVolume(const String busPath, float volume) {
     FIND_AND_CHECK(busPath, buses)
-    checkErrors(instance->setVolume(volume));
+    ERROR_CHECK(instance->setVolume(volume));
 }
 
 void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     FIND_AND_CHECK(busPath, buses)
-    checkErrors(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
+    ERROR_CHECK(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
 void Fmod::loadBankData(FMOD::Studio::Bank *bank){
@@ -533,7 +541,7 @@ void Fmod::loadBankData(FMOD::Studio::Bank *bank){
             Godot::print("FMOD Sound System: BANK " + String(path) + " COULDN'T BE LOADED. Path incorrect or MasterBank not loaded yet.");
         }
         else{
-            checkErrors(result);
+            ERROR_CHECK(result);
         }
     bank->unload();
     }
@@ -542,12 +550,12 @@ void Fmod::loadBankData(FMOD::Studio::Bank *bank){
 void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
     FMOD::Studio::VCA *array[MAX_VCA_COUNT];
     int size = 0;
-    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
         CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
         for (int i = 0; i < size; i++) {
             auto vca = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(vca->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " added to VCAs");
             VCAs[path] << vca;
         }
@@ -557,12 +565,12 @@ void Fmod::loadAllVCAs(FMOD::Studio::Bank *bank) {
 void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
     FMOD::Studio::Bus *array[MAX_BUS_COUNT];
     int size = 0;
-    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
         CHECK_SIZE(MAX_BUS_COUNT, size, buses)
         for (int i = 0; i < size; i++) {
             auto bus = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(bus->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " added to buses");
             buses[path] << bus;
         }
@@ -572,12 +580,12 @@ void Fmod::loadAllBuses(FMOD::Studio::Bank *bank) {
 void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
     FMOD::Studio::EventDescription *array[MAX_EVENT_COUNT];
     int size = 0;
-    if (checkErrors(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
         CHECK_SIZE(MAX_EVENT_COUNT, size, Events)
         for (int i = 0; i < size; i++) {
             auto eventDescription = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " added to eventDescriptions");
             eventDescriptions[path] << eventDescription;
         }
@@ -587,12 +595,12 @@ void Fmod::loadAllEventDescriptions(FMOD::Studio::Bank *bank) {
 void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
     FMOD::Studio::VCA *array[MAX_VCA_COUNT];
     int size = 0;
-    if (checkErrors(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
         CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
         for (int i = 0; i < size; i++) {
             auto vca = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(vca->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(vca->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " removed from VCAs");
             VCAs.erase(path);
         }
@@ -602,12 +610,12 @@ void Fmod::unloadAllVCAs(FMOD::Studio::Bank *bank) {
 void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
     FMOD::Studio::Bus *array[MAX_BUS_COUNT];
     int size = 0;
-    if (checkErrors(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
         CHECK_SIZE(MAX_BUS_COUNT, size, buses)
         for (int i = 0; i < size; i++) {
             auto bus = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(bus->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(bus->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " removed from buses");
             buses.erase(path);
         }
@@ -617,12 +625,12 @@ void Fmod::unloadAllBuses(FMOD::Studio::Bank *bank) {
 void Fmod::unloadAllEventDescriptions(FMOD::Studio::Bank *bank) {
     FMOD::Studio::EventDescription *array[MAX_EVENT_COUNT];
     int size = 0;
-    if (checkErrors(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
+    if (ERROR_CHECK(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
         CHECK_SIZE(MAX_EVENT_COUNT, size, Events)
         for (int i = 0; i < size; i++) {
             auto eventDescription = array[i];
             char path[MAX_PATH_SIZE];
-            checkErrors(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
+            ERROR_CHECK(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
             Godot::print("FMOD Sound System: " + String(path) + " removed from eventDescriptions");
             eventDescriptions.erase(path);
         }
@@ -644,7 +652,7 @@ bool Fmod::checkEventPath(const String eventPath) {
 FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
     FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
     FMOD::Studio::EventInstance *eventInstance = nullptr;
-    checkErrors(instance->createInstance(&eventInstance));
+    ERROR_CHECK(instance->createInstance(&eventInstance));
     if (eventInstance && (!isOneShot || gameObject)) {
         auto *eventInfo = new EventInfo();
         eventInfo->gameObj = gameObject;
@@ -657,7 +665,7 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
 
 EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
     EventInfo *eventInfo;
-    checkErrors(eventInstance->getUserData((void **)&eventInfo));
+    ERROR_CHECK(eventInstance->getUserData((void **)&eventInfo));
     return eventInfo;
 }
 
@@ -668,8 +676,8 @@ void Fmod::playOneShot(const String eventName, Object *gameObj) {
         if (!isNull(gameObj)) {
             updateInstance3DAttributes(instance, gameObj);
         }
-        checkErrors(instance->start());
-        checkErrors(instance->release());
+        ERROR_CHECK(instance->start());
+        ERROR_CHECK(instance->release());
     }
 }
 
@@ -685,10 +693,10 @@ void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const 
         for (int i = 0; i < keys.size(); i++) {
             String k = keys[i];
             float v = parameters[keys[i]];
-            checkErrors(instance->setParameterByName(k.utf8().get_data(), v));
+            ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
         }
-        checkErrors(instance->start());
-        checkErrors(instance->release());
+        ERROR_CHECK(instance->start());
+        ERROR_CHECK(instance->release());
     }
 }
 
@@ -696,7 +704,7 @@ void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
     if (!isNull(gameObj)) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
-            checkErrors(instance->start());
+            ERROR_CHECK(instance->start());
         }
     }
 }
@@ -710,9 +718,9 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
             for (int i = 0; i < keys.size(); i++) {
                 String k = keys[i];
                 float v = parameters[keys[i]];
-                checkErrors(instance->setParameterByName(k.utf8().get_data(), v));
+                ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
             }
-            checkErrors(instance->start());
+            ERROR_CHECK(instance->start());
         }
     }
 }
@@ -732,7 +740,7 @@ void Fmod::pauseAllEvents(const bool pause) {
     for (int i = 0; i < events.size(); i++) {
         auto eventInstance = events.get(i);
         if (eventInstance) {
-            checkErrors(eventInstance->setPaused(pause));
+            ERROR_CHECK(eventInstance->setPaused(pause));
         }
     }
 }
@@ -740,7 +748,7 @@ void Fmod::pauseAllEvents(const bool pause) {
 void Fmod::muteAllEvents() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(true);
         }
     }
@@ -749,7 +757,7 @@ void Fmod::muteAllEvents() {
 void Fmod::unmuteAllEvents() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (checkErrors(system->getBus("bus:/", &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(false);
         }
     }
@@ -759,7 +767,7 @@ bool Fmod::banksStillLoading() {
     for (int i = 0; i < banks.size(); i++) {
         FMOD::Studio::Bank *bank = banks.get(i);
         FMOD_STUDIO_LOADING_STATE loadingState;
-        checkErrors(bank->getLoadingState(&loadingState));
+        ERROR_CHECK(bank->getLoadingState(&loadingState));
         if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
             return true;
         }
@@ -770,90 +778,90 @@ bool Fmod::banksStillLoading() {
 float Fmod::getVCAVolume(const String VCAPath) {
     float volume = 0.0f;
     FIND_AND_CHECK(VCAPath, VCAs, volume)
-    checkErrors(instance->getVolume(&volume));
+    ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
 void Fmod::setVCAVolume(const String VCAPath, float volume) {
     FIND_AND_CHECK(VCAPath, VCAs)
-    checkErrors(instance->setVolume(volume));
+    ERROR_CHECK(instance->setVolume(volume));
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, sounds)
-    checkErrors(instance->channel->setPaused(false));
+    FMOD::Channel *channel = instance->channel;
+    FMOD::Sound *sound = instance->sound;
+    ERROR_CHECK(instance->channel->setPaused(false));
+    ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
+    if (channel) {
+        instance->channel = channel;
+    }
 }
 
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
     FIND_AND_CHECK(instanceId, sounds)
-    checkErrors(instance->channel->setPaused(paused));
+    ERROR_CHECK(instance->channel->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, sounds)
-    checkErrors(instance->channel->stop());
+    ERROR_CHECK(instance->channel->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
     FIND_AND_CHECK(instanceId, sounds, isPlaying)
-    checkErrors(instance->channel->isPlaying(&isPlaying));
+    ERROR_CHECK(instance->channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
     FIND_AND_CHECK(instanceId, sounds)
-    checkErrors(instance->channel->setVolume(volume));
+    ERROR_CHECK(instance->channel->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
     FIND_AND_CHECK(instanceId, sounds, volume)
-    checkErrors(instance->channel->getVolume(&volume));
+    ERROR_CHECK(instance->channel->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
     FIND_AND_CHECK(instanceId, sounds, pitch)
-    checkErrors(instance->channel->getPitch(&pitch));
+    ERROR_CHECK(instance->channel->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
     FIND_AND_CHECK(instanceId, sounds)
-    checkErrors(instance->channel->setPitch(pitch));
+    ERROR_CHECK(instance->channel->setPitch(pitch));
 }
 
 const uint64_t Fmod::loadSound(String path, int mode) {
     FMOD::Sound *sound = nullptr;
-    checkErrors(coreSystem->createSound(path.alloc_c_string(), static_cast<FMOD_MODE>(mode), nullptr, &sound));
+    ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
     if (sound) {
         FMOD::Channel *channel = nullptr;
-        checkErrors(coreSystem->playSound(sound, nullptr, true, &channel));
-        if (channel) {
-            auto soundChannel = new SoundChannel();
-            soundChannel->sound = sound;
-            soundChannel->channel = channel;
-            return sounds.append(soundChannel);
-        }
+        ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
+        auto soundChannel = new SoundChannel();
+        soundChannel->sound = sound;
+        soundChannel->channel = channel;
+        return sounds.append(soundChannel);
     }
     return 0;
 }
 
 void Fmod::releaseSound(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, sounds)
-    FMOD::Channel *channel = instance->channel;
-    checkErrors(instance->channel->setPaused(true));
-    checkErrors(instance->channel->setVolume(1));
-    checkErrors(instance->channel->setPitch(1));
-    checkErrors(instance->sound->release());
+    ERROR_CHECK(instance->sound->release());
     sounds.erase(instance);
     delete instance;
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
-    if (distanceFactor > 0 && checkErrors(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+    if (distanceFactor > 0 && ERROR_CHECK(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
         Godot::print("FMOD Sound System: Successfully set global 3D settings");
     } else {
@@ -862,7 +870,7 @@ void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float ro
 }
 
 void Fmod::waitForAllLoads() {
-    checkErrors(system->flushSampleLoading());
+    ERROR_CHECK(system->flushSampleLoading());
     checkLoadingBanks();
 }
 
@@ -870,14 +878,14 @@ Array Fmod::getAvailableDrivers() {
     Array driverList;
     int numDrivers = 0;
 
-    checkErrors(coreSystem->getNumDrivers(&numDrivers));
+    ERROR_CHECK(coreSystem->getNumDrivers(&numDrivers));
 
     for (int i = 0; i < numDrivers; i++) {
         char name[MAX_DRIVER_NAME_SIZE];
         int sampleRate;
         FMOD_SPEAKERMODE speakerMode;
         int speakerModeChannels;
-        checkErrors(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
+        ERROR_CHECK(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
         String nameStr(name);
 
         Dictionary driverInfo;
@@ -894,19 +902,19 @@ Array Fmod::getAvailableDrivers() {
 
 int Fmod::getDriver() {
     int driverId = -1;
-    checkErrors(coreSystem->getDriver(&driverId));
+    ERROR_CHECK(coreSystem->getDriver(&driverId));
     return driverId;
 }
 
 void Fmod::setDriver(const int id) {
-    checkErrors(coreSystem->setDriver(id));
+    ERROR_CHECK(coreSystem->setDriver(id));
 }
 
 Dictionary Fmod::getPerformanceData() {
 
     // get the CPU usage
     FMOD_STUDIO_CPU_USAGE cpuUsage;
-    checkErrors(system->getCPUUsage(&cpuUsage));
+    ERROR_CHECK(system->getCPUUsage(&cpuUsage));
     Dictionary cpuPerfData = performanceData["CPU"];
     cpuPerfData["dsp"] = cpuUsage.dspusage;
     cpuPerfData["geometry"] = cpuUsage.geometryusage;
@@ -917,7 +925,7 @@ Dictionary Fmod::getPerformanceData() {
     // get the memory usage
     int currentAlloc = 0;
     int maxAlloc = 0;
-    checkErrors(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
+    ERROR_CHECK(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
     Dictionary memPerfData = performanceData["memory"];
     memPerfData["currently_allocated"] = currentAlloc;
     memPerfData["max_allocated"] = maxAlloc;
@@ -926,7 +934,7 @@ Dictionary Fmod::getPerformanceData() {
     long long sampleBytesRead = 0;
     long long streamBytesRead = 0;
     long long otherBytesRead = 0;
-    checkErrors(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
+    ERROR_CHECK(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
     Dictionary filePerfData = performanceData["file"];
     filePerfData["sample_bytes_read"] = static_cast<int64_t >(sampleBytesRead);
     filePerfData["stream_bytes_read"] = static_cast<int64_t >(streamBytesRead);
@@ -936,18 +944,19 @@ Dictionary Fmod::getPerformanceData() {
 }
 
 void Fmod::setGlobalParameter(const String parameterName, float value) {
-    checkErrors(system->setParameterByName(parameterName.utf8().get_data(), value));
+    ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
 float Fmod::getGlobalParameter(const String parameterName) {
     float value = 0.f;
-    checkErrors(system->getParameterByName(parameterName.utf8().get_data(), &value));
+    ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
     return value;
 }
 
 void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
     FIND_AND_CHECK(instanceId, events)
-    checkErrors(instance->setCallback(Callbacks::eventCallback, callbackMask));
+    ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
+    Godot::print(String("CallBack set on event ") + String::num(instanceId, 0));
 }
 
 FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
@@ -957,24 +966,24 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
     mut->lock();
     instance->getUserData((void **)&eventInfo);
     if (eventInfo) {
-        Callbacks::CallbackInfo callbackInfo = eventInfo->callbackInfo;
+        Callbacks::CallbackInfo *callbackInfo = &eventInfo->callbackInfo;
 
         if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
             auto *props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES *)parameters;
-            callbackInfo.markerCallbackInfo["event_id"] = instanceId;
-            callbackInfo.markerCallbackInfo["name"] = props->name;
-            callbackInfo.markerCallbackInfo["position"] = props->position;
-            callbackInfo.markerSignalEmitted = false;
+            callbackInfo->markerCallbackInfo["event_id"] = instanceId;
+            callbackInfo->markerCallbackInfo["name"] = props->name;
+            callbackInfo->markerCallbackInfo["position"] = props->position;
+            callbackInfo->markerSignalEmitted = false;
         } else if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT) {
             auto *props = (FMOD_STUDIO_TIMELINE_BEAT_PROPERTIES *)parameters;
-            callbackInfo.beatCallbackInfo["event_id"] = instanceId;
-            callbackInfo.beatCallbackInfo["beat"] = props->beat;
-            callbackInfo.beatCallbackInfo["bar"] = props->bar;
-            callbackInfo.beatCallbackInfo["tempo"] = props->tempo;
-            callbackInfo.beatCallbackInfo["time_signature_upper"] = props->timesignatureupper;
-            callbackInfo.beatCallbackInfo["time_signature_lower"] = props->timesignaturelower;
-            callbackInfo.beatCallbackInfo["position"] = props->position;
-            callbackInfo.beatSignalEmitted = false;
+            callbackInfo->beatCallbackInfo["event_id"] = instanceId;
+            callbackInfo->beatCallbackInfo["beat"] = props->beat;
+            callbackInfo->beatCallbackInfo["bar"] = props->bar;
+            callbackInfo->beatCallbackInfo["tempo"] = props->tempo;
+            callbackInfo->beatCallbackInfo["time_signature_upper"] = props->timesignatureupper;
+            callbackInfo->beatCallbackInfo["time_signature_lower"] = props->timesignaturelower;
+            callbackInfo->beatCallbackInfo["position"] = props->position;
+            callbackInfo->beatSignalEmitted = false;
         }
         else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED || type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
             auto *sound = (FMOD::Sound *)parameters;
@@ -982,9 +991,9 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
             sound->getName(n, 256);
             String name(n);
             String mType = type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ? "played" : "stopped";
-            callbackInfo.soundCallbackInfo["name"] = name;
-            callbackInfo.soundCallbackInfo["type"] = mType;
-            callbackInfo.soundSignalEmitted = false;
+            callbackInfo->soundCallbackInfo["name"] = name;
+            callbackInfo->soundCallbackInfo["type"] = mType;
+            callbackInfo->soundSignalEmitted = false;
         }
     }
     mut->unlock();
@@ -997,27 +1006,27 @@ void Fmod::runCallbacks() {
     for (int i = 0; i < events.size(); i++) {
         FMOD::Studio::EventInstance *eventInstance = events.get(i);
         auto eventInfo = getEventInfo(eventInstance);
-        if (eventInstance &&  eventInfo) {
-            Callbacks::CallbackInfo cbInfo = eventInfo->callbackInfo;
+        if (eventInstance && eventInfo) {
+            Callbacks::CallbackInfo *cbInfo = &eventInfo->callbackInfo;
             // check for Marker callbacks
-            if (!cbInfo.markerSignalEmitted) {
-                emit_signal("timeline_marker", cbInfo.markerCallbackInfo);
-                cbInfo.markerSignalEmitted = true;
+            if (!cbInfo->markerSignalEmitted) {
+                emit_signal("timeline_marker", cbInfo->markerCallbackInfo);
+                cbInfo->markerSignalEmitted = true;
             }
 
             // check for Beat callbacks
-            if (!cbInfo.beatSignalEmitted) {
-                emit_signal("timeline_beat", cbInfo.beatCallbackInfo);
-                cbInfo.beatSignalEmitted = true;
+            if (!cbInfo->beatSignalEmitted) {
+                emit_signal("timeline_beat", cbInfo->beatCallbackInfo);
+                cbInfo->beatSignalEmitted = true;
             }
 
             // check for Sound callbacks
-            if (!cbInfo.soundSignalEmitted) {
-                if (cbInfo.soundCallbackInfo["type"] == String("played"))
-                    emit_signal("sound_played", cbInfo.soundCallbackInfo);
+            if (!cbInfo->soundSignalEmitted) {
+                if (cbInfo->soundCallbackInfo["type"] == String("played"))
+                    emit_signal("sound_played", cbInfo->soundCallbackInfo);
                 else
-                    emit_signal("sound_stopped", cbInfo.soundCallbackInfo);
-                cbInfo.soundSignalEmitted = true;
+                    emit_signal("sound_stopped", cbInfo->soundCallbackInfo);
+                cbInfo->soundSignalEmitted = true;
             }
         }
         else{
