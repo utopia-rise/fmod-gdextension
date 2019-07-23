@@ -331,19 +331,19 @@ extends Node
 
 func _ready():
 	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 	# register listener
-	Fmod.addListener(self)
+	Fmod.add_listener(self)
 
 	# play some events
-	Fmod.playOneShot("event:/Music/Level 02", self)
+	Fmod.play_one_shot("event:/Music/Level 02", self)
 ```
 
 You can look at test scenes in POC folder of [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to find how to use the provided methods.
@@ -356,35 +356,35 @@ These instances are refered by an int id, returned when created. Remember to rel
 ```gdscript
 func _ready():
 	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.addListener(self)
+	Fmod.add_listener(self)
 	
 	# play some events
-	var my_music_event = Fmod.createEventInstance("event:/Music/Level 02")
-	Fmod.startEvent(my_music_event)
+	var my_music_event = Fmod.create_event_instance("event:/Music/Level 02")
+	Fmod.start_event(my_music_event)
 	var t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.stopEvent(my_music_event, FmodFlags.FMOD_STUDIO_STOP_MODES.FMOD_STUDIO_STOP_ALLOWFADEOUT)
+	Fmod.stop_event(my_music_event, Fmod.FMOD_STUDIO_STOP_ALLOWFADEOUT)
 	t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.releaseEvent(my_music_event)
+	Fmod.release_event(my_music_event)
 ```
 
 ### Using the integration helpers
@@ -395,30 +395,30 @@ These are helper functions provided by the integration for attaching event insta
 # play an event at this Node's position
 # 3D attributes are only set ONCE
 # parameters cannot be set
-FMOD.playOneShot("event:/Footstep", self)
+FMOD.play_one_shot("event:/Footstep", self)
 
 # same as play_one_shot but lets you set initial parameters
 # subsequent parameters cannot be set
-FMOD.playOneShotWithParams("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
+FMOD.play_one_shot_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
 
 # play an event attached to this Node
 # 3D attributes are automatically set every frame (when update is called)
 # parameters cannot be set
-FMOD.playOneShotAttached("event:/Footstep", self)
+FMOD.play_one_shot_attached("event:/Footstep", self)
 
 # same as play_one_shot_attached but lets you set initial parameters
 # subsequent parameters cannot be set
-FMOD.playOneShotAttachedWithParams("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
+FMOD.play_one_shot_Attached_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
 
 # attaches a manually called instance to a Node
 # once attached 3D attributes are automatically set every frame (when update is called)
-FMOD.attachInstanceToNode(instanceId, self)
+FMOD.attach_instance_to_node(instanceId, self)
 
 # detaches the instance from its Node
-FMOD.detachInstanceFromNode(instanceId)
+FMOD.detach_instance_from_node(instanceId)
 
 # blocks the calling thread until all sample loading is done
-FMOD.waitForAllLoads()
+FMOD.wait_for_all_loads()
 ```
 
 ### Attach to existing event, 3D positioning
@@ -428,26 +428,24 @@ you have a scene `AttachToInstanceTest` where you can play with listener positio
 
 ```gdscript
 func _ready():
-	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FmodSpeakerModeFlags.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FmodStudioInitFlags.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FmodInitFlags.FMOD_INIT_NORMAL)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/SFX.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FmodLoadBankFlags.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.addListener($Listener)
+	Fmod.add_listener($Listener)
 	
 	# Create event instance
-	var my_music_event = Fmod.createEventInstance("event:/Weapons/Machine Gun")
-	
-	Fmod.startEvent(my_music_event)
+	var my_music_event = Fmod.create_event_instance("event:/Weapons/Machine Gun")
+	Fmod.start_event(my_music_event)
 	
 	# attach instance to node
-	Fmod.attachInstanceToNode(my_music_event, $NodeToAttach)
+	Fmod.attach_instance_to_node(my_music_event, $NodeToAttach)
 	
 	var t = Timer.new()
 	t.set_wait_time(10)
@@ -456,8 +454,8 @@ func _ready():
 	t.start()
 	yield(t, "timeout")
 	
-	Fmod.detachInstanceFromNode(my_music_event)
-	Fmod.stopEvent(my_music_event, FmodFlags.fmodStudioStopModes.FMOD_STUDIO_STOP_IMMEDIATE)
+	Fmod.detach_instance_from_node(my_music_event)
+	Fmod.stop_event(my_music_event, Fmods.FMOD_STUDIO_STOP_IMMEDIATE)
 ```
 
 ### Timeline marker & music beat callbacks
@@ -495,20 +493,20 @@ You can load and play any sound file in your project directory by using the FMOD
 ```gdscript
 func _ready():
 	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
-	Fmod.addListener(self)
-	var my_sound = Fmod.loadSound("./main/sound/20-Title_Gym.wav", FmodFlags.FMOD_SOUND_CONSTANTS.FMOD_DEFAULT)
-	Fmod.playSound(my_sound)
+	Fmod.add_listener(self)
+	var my_sound = Fmod.load_sound("./main/sound/20-Title_Gym.wav", Fmod.FMOD_DEFAULT)
+	Fmod.play_sound(my_sound)
 	var t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.stopSound(my_sound)
-	Fmod.releaseSound(my_sound)
+	Fmod.stop_sound(my_sound)
+	Fmod.release_sound(my_sound)
 ```
 
 ### Muting all event
@@ -517,37 +515,36 @@ You can mute all event using `muteAllEvents`. This will mute the master bus.
 
 ```gdscript
 func _ready():
-	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.addListener(self)
+	Fmod.add_listener(self)
 	
 	# play some events
-	Fmod.playOneShot("event:/Music/Level 02", self)
-	var my_music_event = Fmod.createEventInstance("event:/Music/Level 01")
-	Fmod.startEvent(my_music_event)
+	Fmod.play_one_shot("event:/Music/Level 02", self)
+	var my_music_event = Fmod.create_event_instance("event:/Music/Level 01")
+	Fmod.start_event(my_music_event)
 	var t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.muteAllEvents();
+	Fmod.mute_all_events();
 	t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.unmuteAllEvents()
+	Fmod.unmute_all_events()
 ```
 
 ### Pausing all events
@@ -555,21 +552,21 @@ func _ready():
 ```gdscript
 func _ready():
 	# set up FMOD
-	Fmod.setSoftwareFormat(0, FmodFlags.FMOD_SPEAKER_MODE_FLAGS.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, FmodFlags.FMOD_STUDIO_INIT_FLAGS.FMOD_STUDIO_INIT_LIVEUPDATE, FmodFlags.FMOD_INIT_FLAGS.FMOD_INIT_NORMAL)
+	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Music.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.loadbank("./POC/backend/sound/Banks/Desktop/Master Bank.strings.bank", FmodFlags.FMOD_LOAD_BANK_FLAGS.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.addListener(self)
+	Fmod.add_listener(self)
 	
 	# play some events
-	Fmod.playOneShot("event:/Music/Level 02", self)
-	var my_music_event = Fmod.createEventInstance("event:/Music/Level 01")
+	Fmod.play_one_shot("event:/Music/Level 02", self)
+	var my_music_event = Fmod.create_event_instance("event:/Music/Level 01")
 	Fmod.startEvent(my_music_event)
 	var t = Timer.new()
 	t.set_wait_time(3)
@@ -577,14 +574,14 @@ func _ready():
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.pauseAllEvents(true)
+	Fmod.pause_all_events(true)
 	t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
-	Fmod.pauseAllEvents(false)
+	Fmod.pause_all_events(false)
 ```
 
 ### Changing the default audio output device
@@ -596,12 +593,12 @@ and speaker config of the respective driver. Most importantly, it contains the i
 
  ```gdscript
 # retrieve all available audio drivers
-var drivers = Fmod.getAvailableDrivers()
+var drivers = Fmod.get_available_drivers()
  # change the audio driver
 # you must pass in the id of the respective driver
-Fmod.setDriver(id)
+Fmod.set_driver(id)
  # retrieve the id of the currently set driver
-var id = Fmod.getDriver()
+var id = Fmod.get_driver()
 ```
 
 ### Profiling & querying performance data
@@ -610,7 +607,7 @@ var id = Fmod.getDriver()
 
 ```gdscript
 # called every frame
-var perf_data = FMOD.getPerformanceData()
+var perf_data = FMOD.get_performance_data()
 
 print(perf_data.CPU)
 print(perf_data.memory)
