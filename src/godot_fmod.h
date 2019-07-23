@@ -51,7 +51,7 @@ namespace godot {
 
 #define CHECK_SIZE(maxSize, actualSize, type) \
     if(actualSize > maxSize){\
-        String message = "FMOD Sound System: type maximum size is " #maxSize " but the bank contains " #actualSize " entries";\
+        String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries";\
         GODOT_ERROR(message)\
         actualSize = maxSize;\
     }\

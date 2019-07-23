@@ -127,7 +127,7 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
 void Fmod::_process(float delta){
     if (!isInitialized) {
         if (!isNotinitPrinted) {
-            Godot::print_error("FMOD Sound System: Fmod should be initialized before calling update", "_process", __FILE__, __LINE__);
+            GODOT_ERROR("FMOD Sound System: Fmod should be initialized before calling update")
             isNotinitPrinted = true;
         }
         return;
@@ -160,8 +160,7 @@ void Fmod::_process(float delta){
                 }
             }
             else {
-                Godot::print_error("A managed event doesn't have an EventInfoStructure",
-                        BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+                Godot::GODOT_ERROR("A managed event doesn't have an EventInfoStructure")
             }
         }
     }
@@ -190,7 +189,7 @@ void Fmod::checkLoadingBanks() {
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             bank->unload();
             delete loadingBank;
-            Godot::print_error("Fmod Sound System: Error loading bank.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+            GODOT_ERROR("Fmod Sound System: Error loading bank.")
         }
     }
 }
@@ -198,7 +197,7 @@ void Fmod::checkLoadingBanks() {
 void Fmod::setListenerAttributes() {
     if (isNull(listener)) {
         if (nullListenerWarning) {
-            Godot::print_error("FMOD Sound System: Listener not set!", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+            GODOT_ERROR("FMOD Sound System: Listener not set!")
             nullListenerWarning = false;
         }
         return;
@@ -893,7 +892,7 @@ void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float ro
         distanceScale = distanceFactor;
         Godot::print("FMOD Sound System: Successfully set global 3D settings");
     } else {
-        Godot::print_error("FMOD Sound System: Failed to set 3D settings :|", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+        GODOT_ERROR("FMOD Sound System: Failed to set 3D settings :|")
     }
 }
 
@@ -1058,8 +1057,7 @@ void Fmod::runCallbacks() {
             }
         }
         else{
-            Godot::print_error("A managed event doesn't have an EventInfoStructure",
-                               BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+            GODOT_ERROR("A managed event doesn't have an EventInfoStructure")
         }
     }
     Callbacks::mut->unlock();
