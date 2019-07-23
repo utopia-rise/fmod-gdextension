@@ -16,10 +16,14 @@
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
 
-#define DRIVE_PATH(path)
+#define DRIVE_PATH(path)\
+
 #ifdef __ANDROID__
 #define DRIVE_PATH(path)\
-path = path.replace("./", "file:///android_asset/");
+path = path.replace("res://", "file:///android_asset/");
+#else
+#define DRIVE_PATH(path)\
+path = path.replace("res://", "./");
 #endif
 
 #define MAX_PATH_SIZE 512
@@ -62,6 +66,11 @@ namespace godot {
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
+    struct LoadingBank {
+        FMOD::Studio::Bank * bank;
+        String godotPath;
+    };
+
     struct SoundChannel {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
@@ -84,7 +93,7 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
-        Vector<FMOD::Studio::Bank *> loadingBanks;
+        Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         Map<String, FMOD::Studio::Bus *> buses;
@@ -112,7 +121,7 @@ namespace godot {
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
-        void loadBankData(FMOD::Studio::Bank *bank);
+        void loadBankData(LoadingBank *loadingBank);
         void loadAllVCAs(FMOD::Studio::Bank *bank);
         void loadAllBuses(FMOD::Studio::Bank *bank);
         void loadAllEventDescriptions(FMOD::Studio::Bank *bank);

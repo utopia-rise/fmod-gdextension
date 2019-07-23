@@ -7,8 +7,8 @@ var close_sound: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	open_sound = Fmod.load_sound("./assets/Sounds/doorOpen_1.ogg", Fmod.FMOD_DEFAULT)
-	close_sound = Fmod.load_sound("./assets/Sounds/doorClose_1.ogg", Fmod.FMOD_DEFAULT)
+	open_sound = Fmod.load_sound("res://assets/Sounds/doorOpen_1.ogg", Fmod.FMOD_DEFAULT)
+	close_sound = Fmod.load_sound("res://assets/Sounds/doorClose_1.ogg", Fmod.FMOD_DEFAULT)
 # warning-ignore:return_value_discarded
 	connect("body_entered", self, "enter")
 # warning-ignore:return_value_discarded
