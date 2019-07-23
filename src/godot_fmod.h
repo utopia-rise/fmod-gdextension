@@ -2,6 +2,7 @@
 #define GODOTFMOD_GODOT_FMOD_H
 
 #include <Godot.hpp>
+#include <GodotGlobal.hpp>
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
@@ -12,21 +13,18 @@
 #include <gen/Mutex.hpp>
 #include "callback/callbacks.h"
 #include "helpers/containers.h"
+#include "helpers/constants.h"
+#include "helpers/current_function.h"
 
+#define DRIVE_PATH(path)\
 
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
-auto instance = cont.get(instanceId); \
-if (!instance) { \
-    Godot::print_error("FMOD Sound System: cannot find " + String(instanceId) + " in " #cont " collection.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
-    return defaultReturn; \
-} \
-
-#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
-
-#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
-#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
-#define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
-#define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+#ifdef __ANDROID__
+#define DRIVE_PATH(path)\
+path = path.replace("res://", "file:///android_asset/");
+#else
+#define DRIVE_PATH(path)\
+path = path.replace("res://", "./");
+#endif
 
 #define MAX_PATH_SIZE 512
 #define MAX_VCA_COUNT 64
@@ -34,13 +32,30 @@ if (!instance) { \
 #define MAX_EVENT_COUNT 256
 #define MAX_DRIVER_NAME_SIZE 256
 
-#define CHECK_SIZE(maxSize, actualSize, type) \
-if(actualSize > maxSize){\
-    Godot::print_error("FMOD Sound System: type maximum size is " #maxSize " but the bank contains " #actualSize " entries", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
-    actualSize = maxSize;\
-}\
-
 namespace godot {
+
+#define GODOT_ERROR(message)\
+    Godot::print_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
+    auto instance = cont.get(instanceId); \
+    if (!instance) { \
+        String message = String("FMOD Sound System: cannot find " + String(instanceId) + " in ##cont collection.");\
+        GODOT_ERROR(message)\
+        return defaultReturn; \
+    }
+#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
+#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
+#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
+#define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
+#define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
+
+#define CHECK_SIZE(maxSize, actualSize, type) \
+    if(actualSize > maxSize){\
+        String message = "FMOD Sound System: type maximum size is " #maxSize " but the bank contains " #actualSize " entries";\
+        GODOT_ERROR(message)\
+        actualSize = maxSize;\
+    }\
 
     struct EventInfo {
         //Is the event oneshot
@@ -51,6 +66,11 @@ namespace godot {
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
+    struct LoadingBank {
+        FMOD::Studio::Bank * bank;
+        String godotPath;
+    };
+
     struct SoundChannel {
         FMOD::Sound *sound;
         FMOD::Channel *channel;
@@ -58,6 +78,8 @@ namespace godot {
 
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
+    DECLARE_ALL_CONSTANTS
+
     private:
         FMOD::Studio::System *system;
         FMOD::System *coreSystem;
@@ -71,7 +93,7 @@ namespace godot {
 
         bool nullListenerWarning = true;
 
-        Vector<FMOD::Studio::Bank *> loadingBanks;
+        Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
         Map<String, FMOD::Studio::Bus *> buses;
@@ -83,12 +105,14 @@ namespace godot {
         //Store disctionnary of performance data
         Dictionary performanceData;
 
-    private:
-        int checkErrors(FMOD_RESULT result);
         void checkLoadingBanks();
         void setListenerAttributes();
-        FMOD_VECTOR toFmodVector(Vector3 &vec);
-        FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
+
+        static bool checkErrors(FMOD_RESULT result, const char *function, const char *file, int line);
+#define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
+
+        static FMOD_VECTOR toFmodVector(Vector3 &vec);
+        static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                            const FMOD_VECTOR &vel);
         bool isNull(Object *o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
@@ -97,7 +121,7 @@ namespace godot {
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
-        void loadBankData(FMOD::Studio::Bank *bank);
+        void loadBankData(LoadingBank *loadingBank);
         void loadAllVCAs(FMOD::Studio::Bank *bank);
         void loadAllBuses(FMOD::Studio::Bank *bank);
         void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
@@ -111,8 +135,9 @@ namespace godot {
         ~Fmod();
 
         static void _register_methods();
+
         void _init();
-        void update();
+        void _process(float delta);
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void shutdown();

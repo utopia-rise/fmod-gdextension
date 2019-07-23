@@ -1,0 +1,113 @@
+[gd_scene load_steps=10 format=2]
+
+[ext_resource path="res://Script/FmodTest.gd" type="Script" id=1]
+[ext_resource path="res://icon.png" type="Texture" id=2]
+[ext_resource path="res://Script/Emitter.gd" type="Script" id=3]
+[ext_resource path="res://Script/Listener.gd" type="Script" id=4]
+[ext_resource path="res://Script/EnterAndLeave.gd" type="Script" id=5]
+[ext_resource path="res://Script/ChangeColor.gd" type="Script" id=6]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 43.8519, 41.3105 )
+
+[sub_resource type="RectangleShape2D" id=2]
+resource_local_to_scene = true
+extents = Vector2( 142.605, 142.253 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 144.969, 142.48 )
+
+[node name="FmodTest" type="Node2D"]
+position = Vector2( 0, -3 )
+script = ExtResource( 1 )
+
+[node name="Emitter" type="Sprite" parent="."]
+self_modulate = Color( 0.988235, 0, 0, 1 )
+position = Vector2( 500, 400 )
+texture = ExtResource( 2 )
+script = ExtResource( 3 )
+
+[node name="Label" type="Label" parent="Emitter"]
+margin_left = -102.0
+margin_top = 47.0
+margin_right = 136.0
+margin_bottom = 78.0
+size_flags_stretch_ratio = 0.0
+text = "Press Space to pause/unpause
+Come closer to hear it"
+align = 1
+autowrap = true
+
+[node name="Listener" type="KinematicBody2D" parent="."]
+position = Vector2( 500, 150 )
+script = ExtResource( 4 )
+
+[node name="icon" type="Sprite" parent="Listener"]
+position = Vector2( 1.89996, 4.12415 )
+texture = ExtResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Listener"]
+position = Vector2( 0.440125, 0.440125 )
+shape = SubResource( 1 )
+
+[node name="Label" type="Label" parent="Listener"]
+margin_left = -19.0
+margin_top = -16.0
+margin_right = 21.0
+margin_bottom = 15.0
+size_flags_stretch_ratio = 0.0
+text = "Listener"
+align = 1
+autowrap = true
+
+[node name="SoundArea1" type="Area2D" parent="."]
+position = Vector2( 92.5375, 101.535 )
+script = ExtResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea1"]
+position = Vector2( 49.6374, 42.4174 )
+shape = SubResource( 2 )
+
+[node name="icon" type="Sprite" parent="SoundArea1"]
+self_modulate = Color( 0.113725, 0.823529, 0.317647, 1 )
+position = Vector2( 50.5398, 41.5149 )
+scale = Vector2( 3, 3 )
+z_index = -1
+texture = ExtResource( 2 )
+
+[node name="Label2" type="Label" parent="SoundArea1"]
+margin_left = -64.0
+margin_top = -95.0
+margin_right = 160.0
+margin_bottom = -47.0
+size_flags_stretch_ratio = 0.0
+text = "A sound is played when entering and exiting this area
+"
+align = 1
+autowrap = true
+
+[node name="SoundArea2" type="Area2D" parent="."]
+position = Vector2( 818.43, 97.5364 )
+script = ExtResource( 6 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea2"]
+position = Vector2( 52.8021, 45.8286 )
+shape = SubResource( 3 )
+
+[node name="icon" type="Sprite" parent="SoundArea2"]
+self_modulate = Color( 0.0117647, 0.956863, 0.0156863, 1 )
+position = Vector2( 52.3218, 46.0544 )
+scale = Vector2( 3, 3 )
+z_index = -1
+texture = ExtResource( 2 )
+
+[node name="Label3" type="Label" parent="SoundArea2"]
+margin_left = -74.0
+margin_top = -92.0
+margin_right = 176.0
+margin_bottom = -61.0
+size_flags_stretch_ratio = 0.0
+text = "Event is unpaused when entering 
+The color changes every beat"
+align = 1
+autowrap = true
