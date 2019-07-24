@@ -88,8 +88,14 @@ void Fmod::_register_methods() {
     register_method("get_driver", &Fmod::getDriver);
     register_method("set_driver", &Fmod::setDriver);
     register_method("get_performance_data", &Fmod::getPerformanceData);
-    register_method("set_global_parameter", &Fmod::setGlobalParameter);
-    register_method("get_global_parameter", &Fmod::getGlobalParameter);
+    register_method("set_global_parameter_by_name", &Fmod::setGlobalParameterByName);
+    register_method("get_global_parameter_by_name", &Fmod::getGlobalParameterByName);
+    register_method("set_global_parameter_by_id", &Fmod::setGlobalParameterByID);
+    register_method("get_global_parameter_by_id", &Fmod::getGlobalParameterByID);
+    register_method("get_global_parameter_desc_by_name", &Fmod::getGlobalParameterDescByName);
+    register_method("get_global_parameter_desc_by_id", &Fmod::getGlobalParameterDescByID);
+    register_method("get_global_parameter_desc_count", &Fmod::getGlobalParameterDescCount);
+    register_method("get_global_parameter_desc_list", &Fmod::getGlobalParameterDescList);
     register_method("_process", &Fmod::_process);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -970,14 +976,100 @@ Dictionary Fmod::getPerformanceData() {
     return performanceData;
 }
 
-void Fmod::setGlobalParameter(const String parameterName, float value) {
+void Fmod::setGlobalParameterByName(const String parameterName, float value) {
     ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
-float Fmod::getGlobalParameter(const String parameterName) {
+float Fmod::getGlobalParameterByName(String parameterName) {
     float value = 0.f;
     ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
     return value;
+}
+
+void Fmod::setGlobalParameterByID(const Array idPair, const float value) {
+    if (idPair.size() != 2) {
+        GODOT_ERROR("FMOD Sound System: Invalid parameter ID");
+        return;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    ERROR_CHECK(system->setParameterByID(id, value));
+}
+
+float Fmod::getGlobalParameterByID(const Array idPair) {
+    if (idPair.size() != 2) {
+        GODOT_ERROR("FMOD Sound System: Invalid parameter ID");
+        return -1.f;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    float value = -1.f;
+    ERROR_CHECK(system->getParameterByID(id, &value));
+    return value;
+}
+
+Dictionary Fmod::getGlobalParameterDescByName(const String parameterName) {
+    Dictionary paramDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.ascii().get_data(), &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+
+    return paramDesc;
+}
+
+Dictionary Fmod::getGlobalParameterDescByID(const Array idPair) {
+    if (idPair.size() != 2) {
+        GODOT_ERROR("FMOD Sound System: Invalid parameter ID");
+        return Dictionary();
+    }
+    Dictionary paramDesc;
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    if (ERROR_CHECK(system->getParameterDescriptionByID(id, &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+
+    return paramDesc;
+}
+
+int Fmod::getGlobalParameterDescCount() {
+    int count = 0;
+    ERROR_CHECK(system->getParameterDescriptionCount(&count));
+    return count;
+}
+
+Array Fmod::getGlobalParameterDescList() {
+    Array a;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION descList[256];
+    int count = 0;
+    ERROR_CHECK(system->getParameterDescriptionList(descList, 256, &count));
+    for (int i = 0; i < count; i++) {
+        auto pDesc = descList[i];
+        Dictionary paramDesc;
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+        a.append(paramDesc);
+    }
+    return a;
 }
 
 void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
