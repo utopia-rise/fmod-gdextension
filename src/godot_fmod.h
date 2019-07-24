@@ -176,7 +176,6 @@ namespace godot {
 
         /* event descriptions functions */
         int descGetLength(String eventPath);
-        String descGetPath(String eventPath);
         Array descGetInstanceList(String eventPath);
         int descGetInstanceCount(String eventPath);
         void descReleaseAllInstances(String eventPath);

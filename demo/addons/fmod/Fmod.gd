@@ -318,9 +318,6 @@ func check_event_path(event_path: String) -> bool:
 
 func desc_get_length(event_path: String) -> int:
 	return godot_fmod.desc_get_length(event_path)
-
-func desc_get_path(event_path: String) -> String:
-	return godot_fmod.desc_get_path(event_path)
 	
 func desc_get_instance_list(event_path: String) -> Array:
 	return godot_fmod.desc_get_instance_list(event_path)

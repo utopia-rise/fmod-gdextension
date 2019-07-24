@@ -53,7 +53,6 @@ void Fmod::_register_methods() {
     register_method("set_event_reverb_level", &Fmod::setEventReverbLevel);
     register_method("is_event_virtual", &Fmod::isEventVirtual);
     register_method("desc_get_length", &Fmod::descGetLength);
-    register_method("desc_get_path", &Fmod::descGetPath);
     register_method("desc_get_instance_list", &Fmod::descGetInstanceList);
     register_method("desc_get_instance_count", &Fmod::descGetInstanceCount);
     register_method("desc_release_all_instances", &Fmod::descReleaseAllInstances);
@@ -544,14 +543,6 @@ int Fmod::descGetLength(const String eventPath) {
     FIND_AND_CHECK(eventPath, eventDescriptions, length);
     ERROR_CHECK(instance->getLength(&length));
     return length;
-}
-
-String Fmod::descGetPath(const String eventPath) {
-    auto undef = String("Invalid handle!");
-    FIND_AND_CHECK(eventPath, eventDescriptions, undef)
-    char path[MAX_PATH_SIZE];
-    ERROR_CHECK(instance->getPath(path, MAX_PATH_SIZE, nullptr));
-    return String(path);
 }
 
 Array Fmod::descGetInstanceList(const String eventPath) {
