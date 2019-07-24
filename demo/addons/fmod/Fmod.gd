@@ -149,9 +149,6 @@ func set_global_parameter_by_id(idPair: Array, value: float) -> void:
 func get_global_parameter_by_id(idPair: Array) -> float:
 	return godot_fmod.get_global_parameter_by_id(idPair)
 
-func set_global_parameter_by_id(idPair: Array, value: float) -> void:
-	godot_fmod.set_global_parameter_by_id(idPair, value)
-
 func get_global_parameter_desc_by_name(parameterName: String) -> Dictionary:
 	return godot_fmod.get_global_parameter_desc_by_name(parameterName)
 
@@ -318,6 +315,75 @@ func is_sound_playing(instanceId: int) -> bool:
 #######################
 func check_event_path(event_path: String) -> bool:
 	return godot_fmod.check_event_path(event_path)
+
+func desc_get_length(event_path: String) -> int:
+	return godot_fmod.desc_get_length(event_path)
+
+func desc_get_path(event_path: String) -> String:
+	return godot_fmod.desc_get_path(event_path)
+	
+func desc_get_instance_list(event_path: String) -> Array:
+	return godot_fmod.desc_get_instance_list(event_path)
+
+func desc_get_instance_count(event_path: String) -> int:	
+	return godot_fmod.desc_get_instance_count(event_path)
+
+func desc_release_all_instances(event_path: String) -> void:
+	godot_fmod.desc_release_all_instances(event_path)
+
+func desc_load_sample_data(event_path: String) -> void:
+	godot_fmod.desc_load_sample_data(event_path)
+
+func desc_unload_sample_data(event_path: String) -> void:
+	godot_fmod.desc_unload_sample_data(event_path)
+
+func desc_get_sample_loading_state(event_path: String) -> int:
+	return godot_fmod.desc_get_sample_loading_state(event_path)
+
+func desc_is_3d(event_path: String) -> bool:
+	return godot_fmod.desc_is_3d(event_path)
+
+func desc_is_one_shot(event_path: String) -> bool:
+	return godot_fmod.desc_is_one_shot(event_path)
+
+func desc_is_snapshot(event_path: String) -> bool:
+	return godot_fmod.desc_is_snapshot(event_path)
+
+func desc_is_stream(event_path: String) -> bool:
+	return godot_fmod.desc_is_stream(event_path)
+
+func desc_has_cue(event_path: String) -> bool:
+	return godot_fmod.desc_has_cue(event_path)
+
+func desc_get_maximum_distance(event_path: String) -> float:
+	return godot_fmod.desc_get_maximum_distance(event_path)
+
+func desc_get_minimum_distance(event_path: String) -> float:
+	return godot_fmod.desc_get_minimum_distance(event_path)
+
+func desc_get_sound_size(event_path: String) -> float:
+	return godot_fmod.desc_get_sound_size(event_path)
+
+func desc_get_parameter_description_by_name(event_path: String) -> Dictionary:
+	return godot_fmod.desc_get_parameter_description_by_name(event_path)
+
+func desc_get_parameter_description_by_id(event_path: String) -> Dictionary:
+	return godot_fmod.desc_get_parameter_description_by_id(event_path)
+
+func desc_get_parameter_description_count(event_path: String) -> int:
+	return godot_fmod.desc_get_parameter_description_count(event_path)
+
+func desc_get_parameter_description_by_index(event_path: String) -> Dictionary:
+	return godot_fmod.desc_get_parameter_description_by_index(event_path)
+
+func desc_get_user_property(event_path: String) -> Dictionary:
+	return godot_fmod.desc_get_user_property(event_path)
+
+func desc_get_user_property_count(event_path: String) -> int:
+	return godot_fmod.desc_get_user_property_count(event_path)
+
+func desc_user_property_by_index(event_path: String) -> Dictionary:
+	return godot_fmod.desc_user_property_by_index(event_path)
 
 
 ###########
