@@ -52,6 +52,28 @@ void Fmod::_register_methods() {
     register_method("get_event_reverb_level", &Fmod::getEventReverbLevel);
     register_method("set_event_reverb_level", &Fmod::setEventReverbLevel);
     register_method("is_event_virtual", &Fmod::isEventVirtual);
+    register_method("desc_get_length", &Fmod::descGetLength);
+    register_method("desc_get_instance_list", &Fmod::descGetInstanceList);
+    register_method("desc_get_instance_count", &Fmod::descGetInstanceCount);
+    register_method("desc_release_all_instances", &Fmod::descReleaseAllInstances);
+    register_method("desc_load_sample_data", &Fmod::descLoadSampleData);
+    register_method("desc_unload_sample_data", &Fmod::descUnloadSampleData);
+    register_method("desc_get_sample_loading_state", &Fmod::descGetSampleLoadingState);
+    register_method("desc_is_3d", &Fmod::descIs3D);
+    register_method("desc_is_one_shot", &Fmod::descIsOneShot);
+    register_method("desc_is_snapshot", &Fmod::descIsSnapshot);
+    register_method("desc_is_stream", &Fmod::descIsStream);
+    register_method("desc_has_cue", &Fmod::descHasCue);
+    register_method("desc_get_maximum_distance", &Fmod::descGetMaximumDistance);
+    register_method("desc_get_minimum_distance", &Fmod::descGetMinimumDistance);
+    register_method("desc_get_sound_size", &Fmod::descGetSoundSize);
+    register_method("desc_get_parameter_description_by_name", &Fmod::descGetParameterDescriptionByName);
+    register_method("desc_get_parameter_description_by_id", &Fmod::descGetParameterDescriptionByID);
+    register_method("desc_get_parameter_description_count", &Fmod::descGetParameterDescriptionCount);
+    register_method("desc_get_parameter_description_by_index", &Fmod::descGetParameterDescriptionByIndex);
+    register_method("desc_get_user_property", &Fmod::descGetUserProperty);
+    register_method("desc_get_user_property_count", &Fmod::descGetUserPropertyCount);
+    register_method("desc_user_property_by_index", &Fmod::descUserPropertyByIndex);
     register_method("get_bus_mute", &Fmod::getBusMute);
     register_method("get_bus_paused", &Fmod::getBusPaused);
     register_method("get_bus_volume", &Fmod::getBusVolume);
@@ -514,6 +536,210 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events, v)
     ERROR_CHECK(instance->isVirtual(&v));
     return v;
+}
+
+int Fmod::descGetLength(const String eventPath) {
+    int length = -1;
+    FIND_AND_CHECK(eventPath, eventDescriptions, length);
+    ERROR_CHECK(instance->getLength(&length));
+    return length;
+}
+
+Array Fmod::descGetInstanceList(const String eventPath) {
+    Array array;
+    FIND_AND_CHECK(eventPath, eventDescriptions, array)
+    FMOD::Studio::EventInstance *instances[MAX_EVENT_INSTANCE];
+    int count = 0;
+    ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
+    CHECK_SIZE(MAX_EVENT_INSTANCE, count, events)
+    for (int i = 0; i < count; i++) {
+        array.append((uint64_t)instances[i]);
+    }
+    return array;
+}
+
+int Fmod::descGetInstanceCount(const String eventPath) {
+    int count = -1;
+    FIND_AND_CHECK(eventPath, eventDescriptions, count)
+    ERROR_CHECK(instance->getInstanceCount(&count));
+    return count;
+}
+
+void Fmod::descReleaseAllInstances(const String eventPath) {
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    ERROR_CHECK(instance->releaseAllInstances());
+}
+
+void Fmod::descLoadSampleData(const String eventPath) {
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    ERROR_CHECK(instance->loadSampleData());
+}
+
+void Fmod::descUnloadSampleData(const String eventPath) {
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    ERROR_CHECK(instance->unloadSampleData());
+}
+
+int Fmod::descGetSampleLoadingState(const String eventPath) {
+    FIND_AND_CHECK(eventPath, eventDescriptions, -1)
+    FMOD_STUDIO_LOADING_STATE s;
+    ERROR_CHECK(instance->getSampleLoadingState(&s));
+    return s;
+}
+
+bool Fmod::descIs3D(const String eventPath) {
+    bool is3D = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, is3D)
+    ERROR_CHECK(instance->is3D(&is3D));
+    return is3D;
+}
+
+bool Fmod::descIsOneShot(const String eventPath) {
+    bool isOneShot = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, isOneShot)
+    ERROR_CHECK(instance->isOneshot(&isOneShot));
+    return isOneShot;
+}
+
+bool Fmod::descIsSnapshot(const String eventPath) {
+    bool isSnapshot = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, isSnapshot)
+    ERROR_CHECK(instance->isSnapshot(&isSnapshot));
+    return isSnapshot;
+}
+
+bool Fmod::descIsStream(const String eventPath) {
+    bool isStream = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, isStream)
+    ERROR_CHECK(instance->isStream(&isStream));
+    return isStream;
+}
+
+bool Fmod::descHasCue(const String eventPath) {
+    bool hasCue = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, hasCue)
+    ERROR_CHECK(instance->hasCue(&hasCue));
+    return hasCue;
+}
+
+float Fmod::descGetMaximumDistance(const String eventPath) {
+    float distance = 0.f;
+    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
+    ERROR_CHECK(instance->getMaximumDistance(&distance));
+    return distance;
+}
+
+float Fmod::descGetMinimumDistance(const String eventPath) {
+    float distance = 0.f;
+    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
+    ERROR_CHECK(instance->getMinimumDistance(&distance));
+    return distance;
+}
+
+float Fmod::descGetSoundSize(const String eventPath) {
+    float soundSize = 0.f;
+    FIND_AND_CHECK(eventPath, eventDescriptions, soundSize)
+    ERROR_CHECK(instance->getSoundSize(&soundSize));
+    return soundSize;
+}
+
+Dictionary Fmod::descGetParameterDescriptionByName(const String eventPath, const String name) {
+    Dictionary paramDesc;
+    FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+    return paramDesc;
+}
+
+Dictionary Fmod::descGetParameterDescriptionByID(const String eventPath, const Array idPair) {
+    Dictionary paramDesc;
+    FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
+    FMOD_STUDIO_PARAMETER_ID paramId;
+    paramId.data1 = (unsigned int)idPair[0];
+    paramId.data2 = (unsigned int)idPair[1];
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    if (ERROR_CHECK(instance->getParameterDescriptionByID(paramId, &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+    return paramDesc;
+}
+
+int Fmod::descGetParameterDescriptionCount(const String eventPath) {
+    int count = 0;
+    FIND_AND_CHECK(eventPath, eventDescriptions, count)
+    ERROR_CHECK(instance->getParameterDescriptionCount(&count));
+    return count;
+}
+
+Dictionary Fmod::descGetParameterDescriptionByIndex(const String eventPath, const int index) {
+    Dictionary paramDesc;
+    FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    if (ERROR_CHECK(instance->getParameterDescriptionByIndex(index, &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+    return paramDesc;
+}
+
+Dictionary Fmod::descGetUserProperty(const String eventPath, const String name) {
+    Dictionary propDesc;
+    FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
+    FMOD_STUDIO_USER_PROPERTY uProp;
+    if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
+        FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
+        if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
+            propDesc[String(uProp.name)] = uProp.intvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)
+            propDesc[String(uProp.name)] = (bool)uProp.boolvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_FLOAT)
+            propDesc[String(uProp.name)] = uProp.floatvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
+            propDesc[String(uProp.name)] = String(uProp.stringvalue);
+    }
+    return propDesc;
+}
+
+int Fmod::descGetUserPropertyCount(const String eventPath) {
+    int count = 0;
+    FIND_AND_CHECK(eventPath, eventDescriptions, count)
+    ERROR_CHECK(instance->getUserPropertyCount(&count));
+    return count;
+}
+
+Dictionary Fmod::descUserPropertyByIndex(const String eventPath, const int index) {
+    Dictionary propDesc;
+    FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
+    FMOD_STUDIO_USER_PROPERTY uProp;
+    if (ERROR_CHECK(instance->getUserPropertyByIndex(index, &uProp))) {
+        FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
+        if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
+            propDesc[String(uProp.name)] = uProp.intvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)
+            propDesc[String(uProp.name)] = (bool)uProp.boolvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_FLOAT)
+            propDesc[String(uProp.name)] = uProp.floatvalue;
+        else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
+            propDesc[String(uProp.name)] = String(uProp.stringvalue);
+    }
+
+    return propDesc;
 }
 
 bool Fmod::getBusMute(const String busPath) {
@@ -1013,7 +1239,7 @@ float Fmod::getGlobalParameterByID(const Array idPair) {
 Dictionary Fmod::getGlobalParameterDescByName(const String parameterName) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
-    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.ascii().get_data(), &pDesc))) {
+    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;

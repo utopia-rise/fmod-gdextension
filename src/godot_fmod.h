@@ -28,6 +28,7 @@ path = path.replace("res://", "./");
 #define MAX_PATH_SIZE 512
 #define MAX_VCA_COUNT 64
 #define MAX_BUS_COUNT 64
+#define MAX_EVENT_INSTANCE 128
 #define MAX_EVENT_COUNT 256
 #define MAX_DRIVER_NAME_SIZE 256
 
@@ -112,7 +113,7 @@ namespace godot {
 
         static FMOD_VECTOR toFmodVector(Vector3 &vec);
         static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
-                                           const FMOD_VECTOR &vel);
+                                                  const FMOD_VECTOR &vel);
         bool isNull(Object *o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
@@ -173,6 +174,30 @@ namespace godot {
         float getEventReverbLevel(uint64_t instanceId, int index);
         void setEventReverbLevel(uint64_t instanceId, int index, float level);
         bool isEventVirtual(uint64_t instanceId);
+
+        /* event descriptions functions */
+        int descGetLength(String eventPath);
+        Array descGetInstanceList(String eventPath);
+        int descGetInstanceCount(String eventPath);
+        void descReleaseAllInstances(String eventPath);
+        void descLoadSampleData(String eventPath);
+        void descUnloadSampleData(String eventPath);
+        int descGetSampleLoadingState(String eventPath);
+        bool descIs3D(String eventPath);
+        bool descIsOneShot(String eventPath);
+        bool descIsSnapshot(String eventPath);
+        bool descIsStream(String eventPath);
+        bool descHasCue(String eventPath);
+        float descGetMaximumDistance(String eventPath);
+        float descGetMinimumDistance(String eventPath);
+        float descGetSoundSize(String eventPath);
+        Dictionary descGetParameterDescriptionByName(String eventPath, String name);
+        Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);
+        int descGetParameterDescriptionCount(String eventPath);
+        Dictionary descGetParameterDescriptionByIndex(String eventPath, int index);
+        Dictionary descGetUserProperty(String eventPath, String name);
+        int descGetUserPropertyCount(String eventPath);
+        Dictionary descUserPropertyByIndex(String eventPath, int index);
 
         /* bus functions */
         bool getBusMute(String busPath);
