@@ -28,6 +28,7 @@ path = path.replace("res://", "./");
 #define MAX_PATH_SIZE 512
 #define MAX_VCA_COUNT 64
 #define MAX_BUS_COUNT 64
+#define MAX_EVENT_INSTANCE 128
 #define MAX_EVENT_COUNT 256
 #define MAX_DRIVER_NAME_SIZE 256
 
@@ -112,7 +113,7 @@ namespace godot {
 
         static FMOD_VECTOR toFmodVector(Vector3 &vec);
         static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
-                                           const FMOD_VECTOR &vel);
+                                                  const FMOD_VECTOR &vel);
         bool isNull(Object *o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();

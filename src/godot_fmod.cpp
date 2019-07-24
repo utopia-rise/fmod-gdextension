@@ -548,11 +548,12 @@ int Fmod::descGetLength(const String eventPath) {
 Array Fmod::descGetInstanceList(const String eventPath) {
     Array array;
     FIND_AND_CHECK(eventPath, eventDescriptions, array)
-    FMOD::Studio::EventInstance *instances[128];
+    FMOD::Studio::EventInstance *instances[MAX_EVENT_INSTANCE];
     int count = 0;
-    ERROR_CHECK(instance->getInstanceList(instances, 128, &count));
+    ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
+    CHECK_SIZE(MAX_EVENT_INSTANCE, count, events)
     for (int i = 0; i < count; i++) {
-        array.append((uint64_t)array[i]);
+        array.append((uint64_t)instances[i]);
     }
     return array;
 }
@@ -646,7 +647,7 @@ Dictionary Fmod::descGetParameterDescriptionByName(const String eventPath, const
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
-    if (ERROR_CHECK(instance->getParameterDescriptionByName(name.ascii().get_data(), &pDesc))) {
+    if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
@@ -701,7 +702,7 @@ Dictionary Fmod::descGetUserProperty(const String eventPath, const String name) 
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
     FMOD_STUDIO_USER_PROPERTY uProp;
-    if (ERROR_CHECK(instance->getUserProperty(name.ascii().get_data(), &uProp))) {
+    if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
             propDesc[String(uProp.name)] = uProp.intvalue;
@@ -1238,7 +1239,7 @@ float Fmod::getGlobalParameterByID(const Array idPair) {
 Dictionary Fmod::getGlobalParameterDescByName(const String parameterName) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
-    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.ascii().get_data(), &pDesc))) {
+    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
