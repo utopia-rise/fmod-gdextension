@@ -114,6 +114,8 @@ namespace godot {
         static FMOD_VECTOR toFmodVector(Vector3 &vec);
         static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                                   const FMOD_VECTOR &vel);
+        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
+        FMOD_3D_ATTRIBUTES get3DAttributesFromVector2(Vector2 position);
         bool isNull(Object *o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
@@ -174,8 +176,9 @@ namespace godot {
         float getEventReverbLevel(uint64_t instanceId, int index);
         void setEventReverbLevel(uint64_t instanceId, int index, float level);
         bool isEventVirtual(uint64_t instanceId);
-        void setEvent3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity);
+        void setEvent3DAttributes(uint64_t instanceId, Transform transform);
         Dictionary getEvent3DAttributes(uint64_t instanceId);
+        void setEvent2DAttributes(uint64_t instanceId, Vector2 position);
 
         /* event descriptions functions */
         int descGetLength(String eventPath);
