@@ -53,6 +53,7 @@ void Fmod::_register_methods() {
     register_method("set_event_reverb_level", &Fmod::setEventReverbLevel);
     register_method("is_event_virtual", &Fmod::isEventVirtual);
     register_method("set_event_2d_attributes", &Fmod::setEvent2DAttributes);
+    register_method("get_event_2d_attributes", &Fmod::getEvent2DAttributes);
     register_method("set_event_3d_attributes", &Fmod::setEvent3DAttributes);
     register_method("get_event_3d_attributes", &Fmod::getEvent3DAttributes);
     register_method("desc_get_length", &Fmod::descGetLength);
@@ -235,13 +236,13 @@ void Fmod::setListenerAttributes() {
     }
     auto *ci = Object::cast_to<CanvasItem>(listener);
     if (ci != nullptr) {
-        auto attr = get3DAttributesFromVector2(ci->get_transform().get_origin());
+        auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
         ERROR_CHECK(system->setListenerAttributes(0, &attr));
 
     } else {
         // needs testing
         auto *s = Object::cast_to<Spatial>(listener);
-        auto attr = get3DAttributesFromTransform(s->get_transform());
+        auto attr = get3DAttributesFromTransform(s->get_global_transform());
         ERROR_CHECK(system->setListenerAttributes(0, &attr));
     }
 }
@@ -272,11 +273,11 @@ FMOD_3D_ATTRIBUTES Fmod::get3DAttributesFromTransform(const Transform transform)
     return get3DAttributes(toFmodVector(pos), toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 }
 
-FMOD_3D_ATTRIBUTES Fmod::get3DAttributesFromVector2(const Vector2 position) {
-    Vector2 posVector = position / distanceScale;
+FMOD_3D_ATTRIBUTES Fmod::get3DAttributesFromTransform2D(const Transform2D transform) {
+    Vector2 posVector = transform.get_origin() / distanceScale;
     Vector3 pos(posVector.x, 0.0f, posVector.y);
     Vector3 up(0, 1, 0);
-    Vector3 forward(0, 0, 1);
+    Vector3 forward = Vector3(transform.elements[1].x, 0, transform.elements[1].y).normalized();
     Vector3 vel(0, 0, 0); // TODO: add doppler
     const FMOD_VECTOR &posFmodVector = toFmodVector(pos);
     return get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
@@ -293,12 +294,12 @@ void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Obj
     if (instance && !isNull(o)) {
         auto *ci = Object::cast_to<CanvasItem>(o);
         if (ci != nullptr) {
-            auto attr = get3DAttributesFromVector2(ci->get_transform().get_origin());
+            auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
         } else {
             // needs testing
             auto *s = Object::cast_to<Spatial>(o);
-            auto attr = get3DAttributesFromTransform(s->get_transform());
+            auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
         }
     }
@@ -540,30 +541,48 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
     return v;
 }
 
-void Fmod::setEvent2DAttributes(uint64_t instanceId, const Vector2 position) {
+void Fmod::setEvent2DAttributes(const uint64_t instanceId, const Transform2D position) {
     FIND_AND_CHECK(instanceId, events)
-    auto attr = get3DAttributesFromVector2(position);
+    auto attr = get3DAttributesFromTransform2D(position);
     ERROR_CHECK(instance->set3DAttributes(&attr));
 }
 
-void Fmod::setEvent3DAttributes(uint64_t instanceId, const Transform transform) {
+Dictionary Fmod::getEvent2DAttributes(const uint64_t instanceId) {
+    Dictionary _2Dattr;
+    FIND_AND_CHECK(instanceId, events, _2Dattr)
+    FMOD_3D_ATTRIBUTES attr;
+    ERROR_CHECK(instance->get3DAttributes(&attr));
+    Transform2D transform;
+    transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
+    const Vector2 &forward = Vector2(attr.forward.x, attr.forward.z);
+    transform.elements[1] = forward;
+    transform.elements[0] = Vector2(forward.y, -forward.x);
+    Vector2 velocity(attr.velocity.x, attr.velocity.z);
+    _2Dattr["transform"] = transform;
+    _2Dattr["velocity"] = velocity;
+    return _2Dattr;
+}
+
+void Fmod::setEvent3DAttributes(const uint64_t instanceId, const Transform transform) {
     FIND_AND_CHECK(instanceId, events)
     auto attr = get3DAttributesFromTransform(transform);
     ERROR_CHECK(instance->set3DAttributes(&attr));
 }
 
-Dictionary Fmod::getEvent3DAttributes(uint64_t instanceId) {
+Dictionary Fmod::getEvent3DAttributes(const uint64_t instanceId) {
     Dictionary _3Dattr;
     FIND_AND_CHECK(instanceId, events, _3Dattr)
     FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
-    Vector3 forward(attr.forward.x, attr.forward.y, attr.forward.z);
-    Vector3 up(attr.up.x, attr.up.y, attr.up.z);
-    Vector3 position(attr.position.x, attr.position.y, attr.position.z);
+    Transform transform;
+    transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
+    const Vector3 &upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
+    transform.basis.elements[1] = upVector;
+    const Vector3 &forwardVector = Vector3(attr.forward.x, attr.forward.y, attr.forward.z);
+    transform.basis.elements[2] = forwardVector;
+    transform.basis.elements[0] = upVector.cross(forwardVector);
     Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
-    _3Dattr["forward"] = forward;
-    _3Dattr["position"] = position;
-    _3Dattr["up"] = up;
+    _3Dattr["transform"] = transform;
     _3Dattr["velocity"] = velocity;
     return _3Dattr;
 }
