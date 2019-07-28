@@ -10,12 +10,24 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
+"class": "FmodBankLoader",
+"language": "GDScript",
+"path": "res://addons/fmod/nodes/FmodBankLoader.gd"
+}, {
+"base": "Node",
 "class": "FmodNative",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
+}, {
+"base": "Node",
+"class": "FmodSystem",
+"language": "GDScript",
+"path": "res://addons/fmod/nodes/FmodSystem.gd"
 } ]
 _global_script_class_icons={
-"FmodNative": ""
+"FmodBankLoader": "res://addons/fmod/icons/bank.png",
+"FmodNative": "",
+"FmodSystem": "res://addons/fmod/icons/fmod.png"
 }
 
 [application]
@@ -57,6 +69,17 @@ left={
 space={
 "deadzone": 0.5,
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":32,"unicode":0,"echo":false,"script":null)
+ ]
+}
+rotate_right={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":68,"unicode":0,"echo":false,"script":null)
+ ]
+}
+rotate_left={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":81,"unicode":0,"echo":false,"script":null)
+, Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":65,"unicode":0,"echo":false,"script":null)
  ]
 }
 

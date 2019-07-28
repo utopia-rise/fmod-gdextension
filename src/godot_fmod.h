@@ -77,9 +77,9 @@ namespace godot {
     };
 
     struct Listener {
-        int internalFmodIndex = -1;
         Object *gameObj = nullptr;
         bool listenerLock = false;
+        float weight = 1.0;
     };
 
     class Fmod : public Node {
@@ -95,8 +95,8 @@ namespace godot {
 
         float distanceScale;
 
-        Vector<Listener *> listeners;
-
+        bool listenerNumber = 1;
+        Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
         Vector<LoadingBank *> loadingBanks;
@@ -121,9 +121,11 @@ namespace godot {
         static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                                   const FMOD_VECTOR &vel);
         FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(const Transform2D transform);
+        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(Transform2D transform);
+        Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+        Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+
         bool isNull(Object *o);
-        void clearNullListeners();
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
 
@@ -150,18 +152,22 @@ namespace godot {
         void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
-        const uint64_t addListener(Object *gameObj);
-        void removeListener(uint64_t listenerId);
-        int getSystemNumListeners();
-        float getSystemListenerWeight(int instanceId);
-        void setSystemListenerWeight(int instanceId, float weight);
-        Dictionary getSystemListener3DAttributes(uint64_t instanceId);
-        void setSystemListener3DAttributes(uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up, Vector3 velocity);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
+
+        void addListener(int index, Object *gameObj);
+        void removeListener(int index);
+        void setListenerNumber(int listenerNumber);
+        int getSystemNumListeners();
+        float getSystemListenerWeight(int index);
+        void setSystemListenerWeight(int index, float weight);
+        Dictionary getSystemListener3DAttributes(int index);
+        Dictionary getSystemListener2DAttributes(int index);
+        void setSystemListener3DAttributes(int index, Transform transform);
+        void setSystemListener2DAttributes(int index, Transform2D transform);
+        void setListenerLock(int index, bool isLocked);
+        bool getListenerLock(int index);
+
         String loadBank(String pathToBank, unsigned int flag);
-        void setListenerLock(uint64_t instanceId, bool isLocked);
-        bool getListenerLock(uint64_t instanceId);
-        String loadBank(const String pathToBank, const unsigned int flag);
         void unloadBank(String pathToBank);
         bool checkVCAPath(String vcaPath);
         bool checkBusPath(String busPath);

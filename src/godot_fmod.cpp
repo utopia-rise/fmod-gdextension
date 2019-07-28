@@ -20,6 +20,17 @@ void Fmod::_register_methods() {
     register_method("init", &Fmod::init);
     register_method("shutdown", &Fmod::shutdown);
     register_method("add_listener", &Fmod::addListener);
+    register_method("remove_listener", &Fmod::removeListener);
+    register_method("set_listener_number", &Fmod::setListenerNumber);
+    register_method("get_listener_number", &Fmod::getSystemNumListeners);
+    register_method("get_listener_weight", &Fmod::getSystemListenerWeight);
+    register_method("set_listener_weight", &Fmod::setSystemListenerWeight);
+    register_method("get_listener_3D_attributs", &Fmod::getSystemListener3DAttributes);
+    register_method("get_listener_2D_attributs", &Fmod::getSystemListener2DAttributes);
+    register_method("set_listener_3D_attributs", &Fmod::setSystemListener3DAttributes);
+    register_method("set_listener_2D_attributs", &Fmod::setSystemListener2DAttributes);
+    register_method("set_listener_lock", &Fmod::setListenerLock);
+    register_method("get_listener_lock", &Fmod::getListenerLock);
     register_method("set_software_format", &Fmod::setSoftwareFormat);
     register_method("load_bank", &Fmod::loadBank);
     register_method("unload_bank", &Fmod::unloadBank);
@@ -229,43 +240,31 @@ void Fmod::checkLoadingBanks() {
 }
 
 void Fmod::setListenerAttributes() {
-    if (listeners.empty()) {
+    if (!listeners[0].gameObj) {
         if (listenerWarning) {
-            Godot::print_error("FMOD Sound System: No listeners are set!", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+            GODOT_ERROR("FMOD Sound System: No listeners are set!")
             listenerWarning = false;
         }
         return;
     }
 
-    clearNullListeners();
-
-    for (int i = 0; i < listeners.size(); i++) {
-        auto listener = listeners.get(i);
-        int index = listener->internalFmodIndex == -1 ? i : listener->internalFmodIndex;
+    for (auto & i : listeners) {
+        auto listener = &i;
+        if (isNull(listener->gameObj)){
+            listener->gameObj = nullptr;
+            continue;
+        }
         auto *ci = Object::cast_to<CanvasItem>(listener->gameObj);
-        int noError;
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(0, &attr));
 
         } else {
             // needs testing
-            auto *s = Object::cast_to<Spatial>(listener);
+            auto *s = Object::cast_to<Spatial>(listener->gameObj);
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(0, &attr));
         }
-    }
-}
-
-void Fmod::clearNullListeners() {
-    Vector<Listener> queue;
-    for (int i = 0; i < listeners.size(); i++) {
-        Listener *listener = listeners.get(i);
-        if (isNull(listener->gameObj))
-            queue.push_back(listener);
-    }
-    for (int i = 0; i < queue.size(); i++) {
-        removeListener(queue[i]);
     }
 }
 
@@ -305,6 +304,34 @@ FMOD_3D_ATTRIBUTES Fmod::get3DAttributesFromTransform2D(const Transform2D transf
     return get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 }
 
+Dictionary Fmod::getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr){
+    Dictionary _3Dattr;
+    Transform transform;
+    transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
+    const Vector3 &upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
+    transform.basis.elements[1] = upVector;
+    const Vector3 &forwardVector = Vector3(attr.forward.x, attr.forward.y, attr.forward.z);
+    transform.basis.elements[2] = forwardVector;
+    transform.basis.elements[0] = upVector.cross(forwardVector);
+    Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
+    _3Dattr["transform"] = transform;
+    _3Dattr["velocity"] = velocity;
+    return _3Dattr;
+}
+
+Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr){
+    Dictionary _2Dattr;
+    Transform2D transform;
+    transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
+    const Vector2 &forward = Vector2(attr.forward.x, attr.forward.z);
+    transform.elements[1] = forward;
+    transform.elements[0] = Vector2(forward.y, -forward.x);
+    Vector2 velocity(attr.velocity.x, attr.velocity.z);
+    _2Dattr["transform"] = transform;
+    _2Dattr["velocity"] = velocity;
+    return _2Dattr;
+}
+
 bool Fmod::isNull(Object *o) {
     auto *ci = Object::cast_to<CanvasItem>(o);
     auto *s = Object::cast_to<Spatial>(o);
@@ -338,80 +365,119 @@ void Fmod::shutdown() {
 
 }
 
-const uint64_t Fmod::addListener(Object *gameObj) {
-    int size = listeners.size();
-    if (size >= FMOD_MAX_LISTENERS) {
-        Godot::print_error("FMOD Sound System: Could not add listener. System already at max listeners.", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
-        return 0;
+void Fmod::setListenerNumber(int p_listenerNumber) {
+    if(p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS){
+        if(ERROR_CHECK(system->setNumListeners(p_listenerNumber))){
+            listenerNumber = p_listenerNumber;
+        }
+    }else{
+        GODOT_ERROR("Number of listeners must be set between 1 and 8")
     }
-    Listener listener = Listener();
-    listener.gameObj = gameObj;
-    listeners.append(&listener);
-    checkErrors(system->setNumListeners(listeners.size()));
-    return (uint64_t) gameObj;
 }
 
-void Fmod::removeListener(const uint64_t listenerId) {
-    if (!listeners.has(listenerId)) {
-        Godot::print_error("FMOD Sound System: Invalid listener ID", BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
-        return;
+void Fmod::addListener(int index, Object *gameObj) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        Listener *listener = &listeners[index];
+        listener->gameObj = gameObj;
+        ERROR_CHECK(system->setListenerWeight(index, listener->weight));
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
     }
-    FIND_AND_CHECK(listenerId, listeners)
-    listeners.erase(instance);
-    checkErrors(system->setNumListeners(listeners.empty() ? 1 : listeners.size()));
+}
+
+void Fmod::removeListener(int index) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        Listener *listener = &listeners[index];
+        listener->gameObj = nullptr;
+        ERROR_CHECK(system->setListenerWeight(index, 0));
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
 }
 
 int Fmod::getSystemNumListeners() {
-    return listeners.size();
+    return listenerNumber;
 }
 
-float Fmod::getSystemListenerWeight(const int instanceId) {
-    float weight = 0;
-    FIND_AND_CHECK(instanceId, listeners, weight)
-    checkErrors(system->getListenerWeight(instance->internalFmodIndex, &weight));
-    return weight;
+float Fmod::getSystemListenerWeight(const int index) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        float weight = 0;
+        ERROR_CHECK(system->getListenerWeight(index, &weight));
+        listeners[index].weight = weight;
+        return weight;
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        return 0;
+    }
+
 }
 
-void Fmod::setSystemListenerWeight(const int instanceId, float weight) {
-    FIND_AND_CHECK(instanceId, listeners)
-    checkErrors(system->setListenerWeight(instance->internalFmodIndex, weight));
+void Fmod::setSystemListenerWeight(const int index, float weight) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        listeners[index].weight = weight;
+        ERROR_CHECK(system->setListenerWeight(index, weight));
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
 }
 
-Dictionary Fmod::getSystemListener3DAttributes(const uint64_t instanceId) {
-    Dictionary _3Dattr = Dictionary();
-    FIND_AND_CHECK(instanceId, listeners, _3Dattr)
-    FMOD_3D_ATTRIBUTES attr;
-    checkErrors(system->getListenerAttributes(instance->internalFmodIndex, &attr));
-    Vector3 forward(attr.forward.x, attr.forward.y, attr.forward.z);
-    Vector3 up(attr.up.x, attr.up.y, attr.up.z);
-    Vector3 position(attr.position.x, attr.position.y, attr.position.z);
-    Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
-    _3Dattr["forward"] = forward;
-    _3Dattr["position"] = position;
-    _3Dattr["up"] = up;
-    _3Dattr["velocity"] = velocity;
+Dictionary Fmod::getSystemListener3DAttributes(const int index) {
+    Dictionary _3Dattr;
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        FMOD_3D_ATTRIBUTES attr;
+        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        _3Dattr = getTransformInfoFrom3DAttribut(attr);
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
     return _3Dattr;
 }
 
-void Fmod::setSystemListener3DAttributes(const uint64_t instanceId, Vector3 forward, Vector3 position, Vector3 up,
-                                         Vector3 velocity) {
-    FIND_AND_CHECK(instanceId, listeners)
-    FMOD_3D_ATTRIBUTES attr;
-    attr.forward = toFmodVector(forward);
-    attr.position = toFmodVector(position);
-    attr.up = toFmodVector(up);
-    attr.velocity = toFmodVector(velocity);
-    checkErrors(system->setListenerAttributes(instance->internalFmodIndex, &attr));
+Dictionary Fmod::getSystemListener2DAttributes(int index){
+    Dictionary _2Dattr;
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        FMOD_3D_ATTRIBUTES attr;
+        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
+    return _2Dattr;
 }
 
-void Fmod::setListenerLock(const uint64_t instanceId, bool isLocked) {
-    FIND_AND_CHECK(instanceId, listeners)
-    instance->listenerLock = isLocked;
+void Fmod::setSystemListener3DAttributes(int index, Transform transform) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform(transform);
+        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+    }else{
+    GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
 }
 
-bool Fmod::getListenerLock(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, listeners, false)
-    return instance->listenerLock;
+void Fmod::setSystemListener2DAttributes(int index, Transform2D transform){
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform2D(transform);
+        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
+}
+
+void Fmod::setListenerLock(int index, bool isLocked){
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        listeners[index].listenerLock = isLocked;
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+    }
+}
+
+bool Fmod::getListenerLock(int index) {
+    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+        return listeners[index].listenerLock;
+    }else{
+        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        return false;
+    }
 }
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
@@ -658,14 +724,7 @@ Dictionary Fmod::getEvent2DAttributes(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events, _2Dattr)
     FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
-    Transform2D transform;
-    transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
-    const Vector2 &forward = Vector2(attr.forward.x, attr.forward.z);
-    transform.elements[1] = forward;
-    transform.elements[0] = Vector2(forward.y, -forward.x);
-    Vector2 velocity(attr.velocity.x, attr.velocity.z);
-    _2Dattr["transform"] = transform;
-    _2Dattr["velocity"] = velocity;
+    _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
     return _2Dattr;
 }
 
@@ -680,16 +739,7 @@ Dictionary Fmod::getEvent3DAttributes(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events, _3Dattr)
     FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
-    Transform transform;
-    transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
-    const Vector3 &upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
-    transform.basis.elements[1] = upVector;
-    const Vector3 &forwardVector = Vector3(attr.forward.x, attr.forward.y, attr.forward.z);
-    transform.basis.elements[2] = forwardVector;
-    transform.basis.elements[0] = upVector.cross(forwardVector);
-    Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
-    _3Dattr["transform"] = transform;
-    _3Dattr["velocity"] = velocity;
+    _3Dattr = getTransformInfoFrom3DAttribut(attr);
     return _3Dattr;
 }
 

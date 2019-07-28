@@ -116,8 +116,6 @@ func shutdown() -> void:
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
 	godot_fmod.set_software_format(sampleRate, speakerMode, numRowSpeakers)
 
-func add_listener(object) -> void:
-	godot_fmod.add_listener(object)
 
 func set_sound_3D_settings(dopplerScale: float, distanceFactor: float, rollOffScale: float) -> void:
 	godot_fmod.set_sound_3D_settings(dopplerScale, distanceFactor, rollOffScale)
@@ -161,7 +159,45 @@ func get_global_parameter_desc_count() -> int:
 func get_global_parameter_desc_list() -> Array:
 	return godot_fmod.get_global_parameter_desc_list()
 
+###############
+###LISTENERS###
+###############
 
+func add_listener(index: int, object: Node) -> void:
+	godot_fmod.add_listener(index, object)
+
+func remove_listener(index: int) -> void:
+	godot_fmod.remove_listener(index)
+
+func set_listener_number(number: int) -> void:
+	godot_fmod.set_listener_number(number)
+
+func get_listener_number() -> int:
+	return godot_fmod.get_listener_number()
+
+func get_listener_weight(index: int) -> float:
+	return godot_fmod.get_listener_weight(index)
+
+func set_listener_weight(index: int, weight: float) -> void:
+	godot_fmod.set_listener_weight(index, weight)
+
+func get_listener_3D_attributs(index: int) -> Dictionary:
+	return godot_fmod.get_listener_3D_attributs(index)
+
+func get_listener_2D_attributs(index: int) -> Dictionary:
+	return godot_fmod.get_listener_2D_attributs(index)
+
+func set_listener_3D_attributs(index: int, transform: Transform) -> void:
+	godot_fmod.set_listener_3D_attributs(index, transform)
+
+func set_listener_2D_attributs(index: int, transform: Transform2D) -> void:
+	godot_fmod.set_listener_2D_attributs(index, transform)
+
+func set_listener_lock(index: int, is_locked: bool) -> void:
+	godot_fmod.set_listener_lock(index, is_locked) 
+
+func get_listener_lock(index: int) -> bool:
+	return godot_fmod.get_listener_lock(index)
 ##########
 ###BANK###
 ##########
