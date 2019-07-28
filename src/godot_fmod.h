@@ -95,7 +95,8 @@ namespace godot {
 
         float distanceScale;
 
-        bool listenerNumber = 1;
+        int systemListenerNumber = 1;
+        int actualListenerNumber = 0;
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 

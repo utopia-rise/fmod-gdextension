@@ -240,7 +240,7 @@ void Fmod::checkLoadingBanks() {
 }
 
 void Fmod::setListenerAttributes() {
-    if (!listeners[0].gameObj) {
+    if (actualListenerNumber == 0) {
         if (listenerWarning) {
             GODOT_ERROR("FMOD Sound System: No listeners are set!")
             listenerWarning = false;
@@ -248,22 +248,23 @@ void Fmod::setListenerAttributes() {
         return;
     }
 
-    for (auto & i : listeners) {
-        auto listener = &i;
+    for (int i = 0; i < systemListenerNumber; i++) {
+        auto listener = &listeners[i];
         if (isNull(listener->gameObj)){
             listener->gameObj = nullptr;
+            ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
         }
         auto *ci = Object::cast_to<CanvasItem>(listener->gameObj);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
-            ERROR_CHECK(system->setListenerAttributes(0, &attr));
+            ERROR_CHECK(system->setListenerAttributes(i, &attr));
 
         } else {
             // needs testing
             auto *s = Object::cast_to<Spatial>(listener->gameObj);
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
-            ERROR_CHECK(system->setListenerAttributes(0, &attr));
+            ERROR_CHECK(system->setListenerAttributes(i, &attr));
         }
     }
 }
@@ -368,7 +369,7 @@ void Fmod::shutdown() {
 void Fmod::setListenerNumber(int p_listenerNumber) {
     if(p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS){
         if(ERROR_CHECK(system->setNumListeners(p_listenerNumber))){
-            listenerNumber = p_listenerNumber;
+            systemListenerNumber = p_listenerNumber;
         }
     }else{
         GODOT_ERROR("Number of listeners must be set between 1 and 8")
@@ -376,106 +377,120 @@ void Fmod::setListenerNumber(int p_listenerNumber) {
 }
 
 void Fmod::addListener(int index, Object *gameObj) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         Listener *listener = &listeners[index];
         listener->gameObj = gameObj;
         ERROR_CHECK(system->setListenerWeight(index, listener->weight));
+        int count = 0;
+        for (int i = 0; i < systemListenerNumber; i++) {
+            auto listener = &listeners[i];
+            if (listener->gameObj != nullptr) count++;
+        }
+        actualListenerNumber = count;
+        if(actualListenerNumber > 0) listenerWarning = true;
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 void Fmod::removeListener(int index) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         Listener *listener = &listeners[index];
         listener->gameObj = nullptr;
         ERROR_CHECK(system->setListenerWeight(index, 0));
+        int count = 0;
+        for (int i = 0; i < systemListenerNumber; i++) {
+            auto listener = &listeners[i];
+            if (listener->gameObj != nullptr) count++;
+        }
+        actualListenerNumber = count;
+        if(actualListenerNumber > 0) listenerWarning = true;
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 int Fmod::getSystemNumListeners() {
-    return listenerNumber;
+    return systemListenerNumber;
 }
 
 float Fmod::getSystemListenerWeight(const int index) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         float weight = 0;
         ERROR_CHECK(system->getListenerWeight(index, &weight));
         listeners[index].weight = weight;
         return weight;
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return 0;
     }
 
 }
 
 void Fmod::setSystemListenerWeight(const int index, float weight) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         listeners[index].weight = weight;
         ERROR_CHECK(system->setListenerWeight(index, weight));
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 Dictionary Fmod::getSystemListener3DAttributes(const int index) {
     Dictionary _3Dattr;
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         FMOD_3D_ATTRIBUTES attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _3Dattr = getTransformInfoFrom3DAttribut(attr);
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return _3Dattr;
 }
 
 Dictionary Fmod::getSystemListener2DAttributes(int index){
     Dictionary _2Dattr;
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         FMOD_3D_ATTRIBUTES attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return _2Dattr;
 }
 
 void Fmod::setSystemListener3DAttributes(int index, Transform transform) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     }else{
-    GODOT_ERROR("index of listeners must be set between 0 and 7")
+    GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 void Fmod::setSystemListener2DAttributes(int index, Transform2D transform){
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform2D(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 void Fmod::setListenerLock(int index, bool isLocked){
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         listeners[index].listenerLock = isLocked;
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 bool Fmod::getListenerLock(int index) {
-    if(index >= 0 && index < FMOD_MAX_LISTENERS){
+    if(index >= 0 && index < systemListenerNumber){
         return listeners[index].listenerLock;
     }else{
-        GODOT_ERROR("index of listeners must be set between 0 and 7")
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return false;
     }
 }

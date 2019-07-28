@@ -3,7 +3,7 @@ extends KinematicBody2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# register listener
-	Fmod.add_listener(0, self)
+	#Fmod.add_listener(0, self)
 	print("Listener set.")
 	return
 	
