@@ -52,6 +52,8 @@ void Fmod::_register_methods() {
     register_method("get_event_reverb_level", &Fmod::getEventReverbLevel);
     register_method("set_event_reverb_level", &Fmod::setEventReverbLevel);
     register_method("is_event_virtual", &Fmod::isEventVirtual);
+    register_method("set_event_listener_mask", &Fmod::setEventListenerMask);
+    register_method("get_event_listener_mask", &Fmod::getEventListenerMask);
     register_method("set_event_2d_attributes", &Fmod::setEvent2DAttributes);
     register_method("get_event_2d_attributes", &Fmod::getEvent2DAttributes);
     register_method("set_event_3d_attributes", &Fmod::setEvent3DAttributes);
@@ -539,6 +541,18 @@ bool Fmod::isEventVirtual(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events, v)
     ERROR_CHECK(instance->isVirtual(&v));
     return v;
+}
+
+void Fmod::setEventListenerMask(uint64_t instanceId, unsigned int mask) {
+    FIND_AND_CHECK(instanceId, events)
+    ERROR_CHECK(instance->setListenerMask(mask));
+}
+
+uint32_t Fmod::getEventListenerMask(uint64_t instanceId) {
+    uint32_t mask = 0;
+    FIND_AND_CHECK(instanceId, events, mask)
+    ERROR_CHECK(instance->getListenerMask(&mask));
+    return mask;
 }
 
 void Fmod::setEvent2DAttributes(const uint64_t instanceId, const Transform2D position) {
