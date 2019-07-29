@@ -114,6 +114,7 @@ void Fmod::_register_methods() {
     register_method("banks_still_loading", &Fmod::banksStillLoading);
     register_method("load_sound", &Fmod::loadSound);
     register_method("create_sound_instance", &Fmod::createSoundInstance);
+    register_method("check_sound_instance", &Fmod::checkSoundInstance);
     register_method("play_sound", &Fmod::playSound);
     register_method("stop_sound", &Fmod::stopSound);
     register_method("release_sound", &Fmod::releaseSound);
@@ -194,6 +195,7 @@ void Fmod::_process(float delta) {
                         FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
                         ERROR_CHECK(eventInstance->stop(m));
                         releaseOneEvent(eventInstance);
+                        i--;
                         continue;
                     }
                     if (eventInfo->isOneShot) {
@@ -201,6 +203,7 @@ void Fmod::_process(float delta) {
                         ERROR_CHECK(eventInstance->getPlaybackState(&s));
                         if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
                             releaseOneEvent(eventInstance);
+                            i--;
                             continue;
                         }
                     }
@@ -209,6 +212,14 @@ void Fmod::_process(float delta) {
             } else {
                 GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
             }
+        }
+    }
+
+    for (int i = 0; i < channels.size(); i++) {
+        FMOD::Channel *channel = channels.get(i);
+        if (channel && !isChannelValid(channel)) {
+            channels.erase(channel);
+            i--;
         }
     }
 
@@ -1344,6 +1355,21 @@ const uint64_t Fmod::createSoundInstance(String path) {
     return 0;
 }
 
+bool Fmod::checkSoundInstance(int instanceId) {
+    FIND_AND_CHECK(instanceId, channels, false)
+    return isChannelValid(instance);
+}
+
+bool Fmod::isChannelValid(FMOD::Channel *channel) {
+    bool isValid = false;
+    bool isPlaying;
+    FMOD_RESULT result = channel->isPlaying(&isPlaying);
+    if (result != FMOD_ERR_INVALID_HANDLE) {
+        isValid = true;
+    }
+    return isValid;
+}
+
 void Fmod::playSound(const uint64_t instanceId) {
     setSoundPaused(instanceId, false);
 }
@@ -1393,7 +1419,7 @@ void Fmod::releaseSound(String path) {
     DRIVE_PATH(path)
     FIND_AND_CHECK(path, sounds)
     ERROR_CHECK(instance->release());
-    sounds.erase(instance);
+    sounds.erase(path);
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {

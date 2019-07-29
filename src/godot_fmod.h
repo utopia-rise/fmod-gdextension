@@ -146,6 +146,7 @@ namespace godot {
         void unloadAllVCAs(FMOD::Studio::Bank *bank);
         void unloadAllBuses(FMOD::Studio::Bank *bank);
         void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
+        bool isChannelValid(FMOD::Channel *channel);
 
     public:
         Fmod();
@@ -264,6 +265,7 @@ namespace godot {
 
         void loadSound(String path, int mode);
         const uint64_t createSoundInstance(String path);
+        bool checkSoundInstance(int instanceId);
         void playSound(uint64_t instanceId);
         void releaseSound(String path);
         void setSoundPaused(uint64_t instanceId, bool paused);

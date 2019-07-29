@@ -373,6 +373,9 @@ func load_sound(path: String, mode: int) -> void:
 func create_sound_instance(path: String) -> int:
 	return godot_fmod.create_sound_instance(path)
 
+func check_sound_instance(instanceId: int) -> bool:
+	return godot_fmod.check_sound_instance(instanceId)
+
 func release_sound(instanceId: int) -> void:
 	godot_fmod.release_sound(instanceId)
 	
