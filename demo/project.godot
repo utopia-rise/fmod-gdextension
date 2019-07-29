@@ -10,24 +10,12 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Node",
-"class": "FmodBankLoader",
-"language": "GDScript",
-"path": "res://addons/fmod/nodes/FmodBankLoader.gd"
-}, {
-"base": "Node",
 "class": "FmodNative",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
-}, {
-"base": "Node",
-"class": "FmodSystem",
-"language": "GDScript",
-"path": "res://addons/fmod/nodes/FmodSystem.gd"
 } ]
 _global_script_class_icons={
-"FmodBankLoader": "res://addons/fmod/icons/bank.png",
-"FmodNative": "",
-"FmodSystem": "res://addons/fmod/icons/fmod.png"
+"FmodNative": ""
 }
 
 [application]

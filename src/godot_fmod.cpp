@@ -145,7 +145,7 @@ void Fmod::_register_methods() {
     REGISTER_ALL_CONSTANTS
 }
 
-bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *file, int line){
+bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *file, int line) {
     if (result != FMOD_OK) {
         godot::Godot::print_error(FMOD_ErrorString(result), function, file, line);
         return false;
@@ -155,7 +155,7 @@ bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *fil
 
 void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
     // initialize FMOD Studio and FMOD Core System with provided flags
-    if(system == nullptr && coreSystem == nullptr){
+    if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
@@ -169,7 +169,7 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
     }
 }
 
-void Fmod::_process(float delta){
+void Fmod::_process(float delta) {
     if (!isInitialized) {
         if (!isNotinitPrinted) {
             GODOT_ERROR("FMOD Sound System: Fmod should be initialized before calling update")
@@ -182,10 +182,10 @@ void Fmod::_process(float delta){
     checkLoadingBanks();
 
     for (int i = 0; i < events.size(); i++) {
-        FMOD::Studio::EventInstance * eventInstance = events.get(i);
+        FMOD::Studio::EventInstance *eventInstance = events.get(i);
         if (eventInstance) {
             EventInfo *eventInfo = getEventInfo(eventInstance);
-            if(eventInfo){
+            if (eventInfo) {
                 if (eventInfo->gameObj) {
                     if (isNull(eventInfo->gameObj)) {
                         FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
@@ -203,8 +203,7 @@ void Fmod::_process(float delta){
                     }
                     updateInstance3DAttributes(eventInstance, eventInfo->gameObj);
                 }
-            }
-            else {
+            } else {
                 Godot::GODOT_ERROR("A managed event doesn't have an EventInfoStructure")
             }
         }
@@ -250,7 +249,7 @@ void Fmod::setListenerAttributes() {
 
     for (int i = 0; i < systemListenerNumber; i++) {
         auto listener = &listeners[i];
-        if (isNull(listener->gameObj)){
+        if (isNull(listener->gameObj)) {
             listener->gameObj = nullptr;
             ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
@@ -279,7 +278,8 @@ FMOD_VECTOR Fmod::toFmodVector(Vector3 &vec) {
 
 FMOD_3D_ATTRIBUTES Fmod::get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                          const FMOD_VECTOR &vel) {
-    FMOD_3D_ATTRIBUTES f3d;
+    FMOD_3D_ATTRIBUTES
+    f3d;
     f3d.forward = forward;
     f3d.position = pos;
     f3d.up = up;
@@ -305,7 +305,7 @@ FMOD_3D_ATTRIBUTES Fmod::get3DAttributesFromTransform2D(const Transform2D transf
     return get3DAttributes(posFmodVector, toFmodVector(up), toFmodVector(forward), toFmodVector(vel));
 }
 
-Dictionary Fmod::getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr){
+Dictionary Fmod::getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr) {
     Dictionary _3Dattr;
     Transform transform;
     transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
@@ -320,7 +320,7 @@ Dictionary Fmod::getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr){
     return _3Dattr;
 }
 
-Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr){
+Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr) {
     Dictionary _2Dattr;
     Transform2D transform;
     transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
@@ -367,17 +367,17 @@ void Fmod::shutdown() {
 }
 
 void Fmod::setListenerNumber(int p_listenerNumber) {
-    if(p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS){
-        if(ERROR_CHECK(system->setNumListeners(p_listenerNumber))){
+    if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
+        if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) {
             systemListenerNumber = p_listenerNumber;
         }
-    }else{
+    } else {
         GODOT_ERROR("Number of listeners must be set between 1 and 8")
     }
 }
 
 void Fmod::addListener(int index, Object *gameObj) {
-    if(index >= 0 && index < systemListenerNumber){
+    if (index >= 0 && index < systemListenerNumber) {
         Listener *listener = &listeners[index];
         listener->gameObj = gameObj;
         ERROR_CHECK(system->setListenerWeight(index, listener->weight));
@@ -387,14 +387,14 @@ void Fmod::addListener(int index, Object *gameObj) {
             if (listener->gameObj != nullptr) count++;
         }
         actualListenerNumber = count;
-        if(actualListenerNumber > 0) listenerWarning = true;
-    }else{
+        if (actualListenerNumber > 0) listenerWarning = true;
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 void Fmod::removeListener(int index) {
-    if(index >= 0 && index < systemListenerNumber){
+    if (index >= 0 && index < systemListenerNumber) {
         Listener *listener = &listeners[index];
         listener->gameObj = nullptr;
         ERROR_CHECK(system->setListenerWeight(index, 0));
@@ -404,8 +404,8 @@ void Fmod::removeListener(int index) {
             if (listener->gameObj != nullptr) count++;
         }
         actualListenerNumber = count;
-        if(actualListenerNumber > 0) listenerWarning = true;
-    }else{
+        if (actualListenerNumber > 0) listenerWarning = true;
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
@@ -415,12 +415,12 @@ int Fmod::getSystemNumListeners() {
 }
 
 float Fmod::getSystemListenerWeight(const int index) {
-    if(index >= 0 && index < systemListenerNumber){
+    if (index >= 0 && index < systemListenerNumber) {
         float weight = 0;
         ERROR_CHECK(system->getListenerWeight(index, &weight));
         listeners[index].weight = weight;
         return weight;
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return 0;
     }
@@ -428,75 +428,79 @@ float Fmod::getSystemListenerWeight(const int index) {
 }
 
 void Fmod::setSystemListenerWeight(const int index, float weight) {
-    if(index >= 0 && index < systemListenerNumber){
+    if (index >= 0 && index < systemListenerNumber) {
         listeners[index].weight = weight;
         ERROR_CHECK(system->setListenerWeight(index, weight));
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 Dictionary Fmod::getSystemListener3DAttributes(const int index) {
     Dictionary _3Dattr;
-    if(index >= 0 && index < systemListenerNumber){
-        FMOD_3D_ATTRIBUTES attr;
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _3Dattr = getTransformInfoFrom3DAttribut(attr);
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return _3Dattr;
 }
 
-Dictionary Fmod::getSystemListener2DAttributes(int index){
+Dictionary Fmod::getSystemListener2DAttributes(int index) {
     Dictionary _2Dattr;
-    if(index >= 0 && index < systemListenerNumber){
-        FMOD_3D_ATTRIBUTES attr;
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return _2Dattr;
 }
 
 void Fmod::setSystemListener3DAttributes(int index, Transform transform) {
-    if(index >= 0 && index < systemListenerNumber){
-        FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform(transform);
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr = get3DAttributesFromTransform(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
-    }else{
-    GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
-    }
-}
-
-void Fmod::setSystemListener2DAttributes(int index, Transform2D transform){
-    if(index >= 0 && index < systemListenerNumber){
-        FMOD_3D_ATTRIBUTES attr = get3DAttributesFromTransform2D(transform);
-        ERROR_CHECK(system->setListenerAttributes(index, &attr));
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
-void Fmod::setListenerLock(int index, bool isLocked){
-    if(index >= 0 && index < systemListenerNumber){
+void Fmod::setSystemListener2DAttributes(int index, Transform2D transform) {
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr = get3DAttributesFromTransform2D(transform);
+        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+    } else {
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+void Fmod::setListenerLock(int index, bool isLocked) {
+    if (index >= 0 && index < systemListenerNumber) {
         listeners[index].listenerLock = isLocked;
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
 bool Fmod::getListenerLock(int index) {
-    if(index >= 0 && index < systemListenerNumber){
+    if (index >= 0 && index < systemListenerNumber) {
         return listeners[index].listenerLock;
-    }else{
+    } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return false;
     }
 }
 
 void Fmod::setSoftwareFormat(int sampleRate, const int speakerMode, int numRawSpeakers) {
-    if(system == nullptr && coreSystem == nullptr){
+    if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
@@ -513,10 +517,9 @@ String Fmod::loadBank(String pathToBank, const unsigned int flag) {
         auto *loadingBank = new LoadingBank();
         loadingBank->bank = bank;
         loadingBank->godotPath = pathToBank;
-        if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING){
+        if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
             loadBankData(loadingBank);
-        }
-        else{
+        } else {
             loadingBanks.append(loadingBank);
         }
     }
@@ -737,7 +740,8 @@ void Fmod::setEvent2DAttributes(const uint64_t instanceId, const Transform2D pos
 Dictionary Fmod::getEvent2DAttributes(const uint64_t instanceId) {
     Dictionary _2Dattr;
     FIND_AND_CHECK(instanceId, events, _2Dattr)
-    FMOD_3D_ATTRIBUTES attr;
+    FMOD_3D_ATTRIBUTES
+    attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
     _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
     return _2Dattr;
@@ -752,7 +756,8 @@ void Fmod::setEvent3DAttributes(const uint64_t instanceId, const Transform trans
 Dictionary Fmod::getEvent3DAttributes(const uint64_t instanceId) {
     Dictionary _3Dattr;
     FIND_AND_CHECK(instanceId, events, _3Dattr)
-    FMOD_3D_ATTRIBUTES attr;
+    FMOD_3D_ATTRIBUTES
+    attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
     _3Dattr = getTransformInfoFrom3DAttribut(attr);
     return _3Dattr;
@@ -773,7 +778,7 @@ Array Fmod::descGetInstanceList(const String eventPath) {
     ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
     CHECK_SIZE(MAX_EVENT_INSTANCE, count, events)
     for (int i = 0; i < count; i++) {
-        array.append((uint64_t)instances[i]);
+        array.append((uint64_t) instances[i]);
     }
     return array;
 }
@@ -866,7 +871,8 @@ float Fmod::descGetSoundSize(const String eventPath) {
 Dictionary Fmod::descGetParameterDescriptionByName(const String eventPath, const String name) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -882,9 +888,10 @@ Dictionary Fmod::descGetParameterDescriptionByID(const String eventPath, const A
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_ID paramId;
-    paramId.data1 = (unsigned int)idPair[0];
-    paramId.data2 = (unsigned int)idPair[1];
-    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    paramId.data1 = (unsigned int) idPair[0];
+    paramId.data2 = (unsigned int) idPair[1];
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByID(paramId, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -906,7 +913,8 @@ int Fmod::descGetParameterDescriptionCount(const String eventPath) {
 Dictionary Fmod::descGetParameterDescriptionByIndex(const String eventPath, const int index) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByIndex(index, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -921,13 +929,14 @@ Dictionary Fmod::descGetParameterDescriptionByIndex(const String eventPath, cons
 Dictionary Fmod::descGetUserProperty(const String eventPath, const String name) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY uProp;
+    FMOD_STUDIO_USER_PROPERTY
+    uProp;
     if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
             propDesc[String(uProp.name)] = uProp.intvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)
-            propDesc[String(uProp.name)] = (bool)uProp.boolvalue;
+            propDesc[String(uProp.name)] = (bool) uProp.boolvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_FLOAT)
             propDesc[String(uProp.name)] = uProp.floatvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
@@ -946,13 +955,14 @@ int Fmod::descGetUserPropertyCount(const String eventPath) {
 Dictionary Fmod::descUserPropertyByIndex(const String eventPath, const int index) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY uProp;
+    FMOD_STUDIO_USER_PROPERTY
+    uProp;
     if (ERROR_CHECK(instance->getUserPropertyByIndex(index, &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
             propDesc[String(uProp.name)] = uProp.intvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)
-            propDesc[String(uProp.name)] = (bool)uProp.boolvalue;
+            propDesc[String(uProp.name)] = (bool) uProp.boolvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_FLOAT)
             propDesc[String(uProp.name)] = uProp.floatvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
@@ -1003,22 +1013,21 @@ void Fmod::stopAllBusEvents(const String busPath, int stopMode) {
     ERROR_CHECK(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
-void Fmod::loadBankData(LoadingBank *loadingBank){
+void Fmod::loadBankData(LoadingBank *loadingBank) {
     char path[MAX_PATH_SIZE];
     auto bank = loadingBank->bank;
-    FMOD_RESULT  result = bank->getPath(path, MAX_PATH_SIZE, nullptr);
-    if( result == FMOD_OK){
+    FMOD_RESULT result = bank->getPath(path, MAX_PATH_SIZE, nullptr);
+    if (result == FMOD_OK) {
         Godot::print("FMOD Sound System: BANK " + String(path) + " LOADED");
         loadAllBuses(bank);
         loadAllVCAs(bank);
         loadAllEventDescriptions(bank);
         banks[loadingBank->godotPath] << bank;
-    }
-    else{
-        if(result == FMOD_ERR_EVENT_NOTFOUND){
-            Godot::print("FMOD Sound System: BANK " + String(path) + " COULDN'T BE LOADED. Path incorrect or MasterBank not loaded yet.");
-        }
-        else{
+    } else {
+        if (result == FMOD_ERR_EVENT_NOTFOUND) {
+            Godot::print("FMOD Sound System: BANK " + String(path) +
+                         " COULDN'T BE LOADED. Path incorrect or MasterBank not loaded yet.");
+        } else {
             ERROR_CHECK(result);
         }
         bank->unload();
@@ -1141,9 +1150,9 @@ FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const 
     return eventInstance;
 }
 
-EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance * eventInstance) {
+EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance *eventInstance) {
     EventInfo *eventInfo;
-    ERROR_CHECK(eventInstance->getUserData((void **)&eventInfo));
+    ERROR_CHECK(eventInstance->getUserData((void **) &eventInfo));
     return eventInfo;
 }
 
@@ -1364,14 +1373,15 @@ Array Fmod::getAvailableDrivers() {
         int sampleRate;
         FMOD_SPEAKERMODE speakerMode;
         int speakerModeChannels;
-        ERROR_CHECK(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
+        ERROR_CHECK(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode,
+                                              &speakerModeChannels));
         String nameStr(name);
 
         Dictionary driverInfo;
         driverInfo["id"] = i;
         driverInfo["name"] = nameStr;
         driverInfo["sample_rate"] = sampleRate;
-        driverInfo["speaker_mode"] = (int)speakerMode;
+        driverInfo["speaker_mode"] = (int) speakerMode;
         driverInfo["number_of_channels"] = speakerModeChannels;
         driverList.push_back(driverInfo);
     }
@@ -1458,7 +1468,8 @@ float Fmod::getGlobalParameterByID(const Array idPair) {
 
 Dictionary Fmod::getGlobalParameterDescByName(const String parameterName) {
     Dictionary paramDesc;
-    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
     if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1480,7 +1491,8 @@ Dictionary Fmod::getGlobalParameterDescByID(const Array idPair) {
     FMOD_STUDIO_PARAMETER_ID id;
     id.data1 = idPair[0];
     id.data2 = idPair[1];
-    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
     if (ERROR_CHECK(system->getParameterDescriptionByID(id, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1501,7 +1513,8 @@ int Fmod::getGlobalParameterDescCount() {
 
 Array Fmod::getGlobalParameterDescList() {
     Array a;
-    FMOD_STUDIO_PARAMETER_DESCRIPTION descList[256];
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    descList[256];
     int count = 0;
     ERROR_CHECK(system->getParameterDescriptionList(descList, 256, &count));
     for (int i = 0; i < count; i++) {
@@ -1524,23 +1537,24 @@ void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
     Godot::print(String("CallBack set on event ") + String::num(instanceId, 0));
 }
 
-FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
-    auto *instance = (FMOD::Studio::EventInstance *)event;
+FMOD_RESULT F_CALLBACK
+Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
+    auto *instance = (FMOD::Studio::EventInstance *) event;
     auto instanceId = (uint64_t) instance;
     EventInfo *eventInfo;
     mut->lock();
-    instance->getUserData((void **)&eventInfo);
+    instance->getUserData((void **) &eventInfo);
     if (eventInfo) {
         Callbacks::CallbackInfo *callbackInfo = &eventInfo->callbackInfo;
 
         if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
-            auto *props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES *)parameters;
+            auto *props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES *) parameters;
             callbackInfo->markerCallbackInfo["event_id"] = instanceId;
             callbackInfo->markerCallbackInfo["name"] = props->name;
             callbackInfo->markerCallbackInfo["position"] = props->position;
             callbackInfo->markerSignalEmitted = false;
         } else if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT) {
-            auto *props = (FMOD_STUDIO_TIMELINE_BEAT_PROPERTIES *)parameters;
+            auto *props = (FMOD_STUDIO_TIMELINE_BEAT_PROPERTIES *) parameters;
             callbackInfo->beatCallbackInfo["event_id"] = instanceId;
             callbackInfo->beatCallbackInfo["beat"] = props->beat;
             callbackInfo->beatCallbackInfo["bar"] = props->bar;
@@ -1549,9 +1563,9 @@ FMOD_RESULT F_CALLBACK Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE 
             callbackInfo->beatCallbackInfo["time_signature_lower"] = props->timesignaturelower;
             callbackInfo->beatCallbackInfo["position"] = props->position;
             callbackInfo->beatSignalEmitted = false;
-        }
-        else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED || type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
-            auto *sound = (FMOD::Sound *)parameters;
+        } else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ||
+                   type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
+            auto *sound = (FMOD::Sound *) parameters;
             char n[256];
             sound->getName(n, 256);
             String name(n);
@@ -1593,8 +1607,7 @@ void Fmod::runCallbacks() {
                     emit_signal("sound_stopped", cbInfo->soundCallbackInfo);
                 cbInfo->soundSignalEmitted = true;
             }
-        }
-        else{
+        } else {
             GODOT_ERROR("A managed event doesn't have an EventInfoStructure")
         }
     }
