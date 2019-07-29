@@ -76,6 +76,12 @@ namespace godot {
         FMOD::Channel *channel;
     };
 
+    struct Listener {
+        Object *gameObj = nullptr;
+        bool listenerLock = false;
+        float weight = 1.0;
+    };
+
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
     DECLARE_ALL_CONSTANTS
@@ -89,9 +95,10 @@ namespace godot {
 
         float distanceScale;
 
-        Object *listener;
-
-        bool nullListenerWarning = true;
+        int systemListenerNumber = 1;
+        int actualListenerNumber = 0;
+        Listener listeners[FMOD_MAX_LISTENERS];
+        bool listenerWarning = true;
 
         Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
@@ -115,7 +122,10 @@ namespace godot {
         static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                                   const FMOD_VECTOR &vel);
         FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(const Transform2D transform);
+        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(Transform2D transform);
+        Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+        Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+
         bool isNull(Object *o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
@@ -140,11 +150,24 @@ namespace godot {
 
         void _init();
         void _process(float delta);
+        void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void shutdown();
-        void addListener(Object *gameObj);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
+
+        void addListener(int index, Object *gameObj);
+        void removeListener(int index);
+        void setListenerNumber(int listenerNumber);
+        int getSystemNumListeners();
+        float getSystemListenerWeight(int index);
+        void setSystemListenerWeight(int index, float weight);
+        Dictionary getSystemListener3DAttributes(int index);
+        Dictionary getSystemListener2DAttributes(int index);
+        void setSystemListener3DAttributes(int index, Transform transform);
+        void setSystemListener2DAttributes(int index, Transform2D transform);
+        void setListenerLock(int index, bool isLocked);
+        bool getListenerLock(int index);
+
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
         bool checkVCAPath(String vcaPath);
