@@ -81,11 +81,6 @@ namespace godot {
         String godotPath;
     };
 
-    struct SoundChannel {
-        FMOD::Sound *sound;
-        FMOD::Channel *channel;
-    };
-
     struct Listener {
         Object *gameObj = nullptr;
         bool listenerLock = false;
@@ -113,10 +108,11 @@ namespace godot {
         Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
+        Map<String, FMOD::Sound *> sounds;
         Map<String, FMOD::Studio::Bus *> buses;
         Map<String, FMOD::Studio::VCA *> VCAs;
 
-        Vector<SoundChannel *> sounds;
+        Vector<FMOD::Channel *> channels;
         Vector<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
@@ -266,9 +262,10 @@ namespace godot {
         void unmuteAllEvents();
         bool banksStillLoading();
 
+        void loadSound(String path, int mode);
+        const uint64_t createSoundInstance(String path);
         void playSound(uint64_t instanceId);
-        const uint64_t loadSound(String path, int mode);
-        void releaseSound(uint64_t instanceId);
+        void releaseSound(String path);
         void setSoundPaused(uint64_t instanceId, bool paused);
         void stopSound(uint64_t instanceId);
         bool isSoundPlaying(uint64_t instanceId);

@@ -113,6 +113,7 @@ void Fmod::_register_methods() {
     register_method("unmute_all_events", &Fmod::unmuteAllEvents);
     register_method("banks_still_loading", &Fmod::banksStillLoading);
     register_method("load_sound", &Fmod::loadSound);
+    register_method("create_sound_instance", &Fmod::createSoundInstance);
     register_method("play_sound", &Fmod::playSound);
     register_method("stop_sound", &Fmod::stopSound);
     register_method("release_sound", &Fmod::releaseSound);
@@ -1320,78 +1321,79 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
     ERROR_CHECK(instance->setVolume(volume));
 }
 
-void Fmod::playSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, sounds)
-    FMOD::Channel *channel = instance->channel;
-    FMOD::Sound *sound = instance->sound;
-    ERROR_CHECK(instance->channel->setPaused(false));
-    ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
-    if (channel) {
-        instance->channel = channel;
+void Fmod::loadSound(String path, int mode) {
+    DRIVE_PATH(path)
+    FMOD::Sound *sound = sounds.get(path);
+    if (!sound) {
+        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
+        if (sound) {
+            sounds[path] << sound;
+        }
     }
 }
 
+const uint64_t Fmod::createSoundInstance(String path) {
+    DRIVE_PATH(path)
+    FIND_AND_CHECK(path, sounds, 0)
+    FMOD::Channel *channel = nullptr;
+    ERROR_CHECK(coreSystem->playSound(instance, nullptr, true, &channel));
+    if (channel) {
+        channels.append(channel);
+        return (uint64_t) channel;
+    }
+    return 0;
+}
+
+void Fmod::playSound(const uint64_t instanceId) {
+    setSoundPaused(instanceId, false);
+}
+
 void Fmod::setSoundPaused(const uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, sounds)
-    ERROR_CHECK(instance->channel->setPaused(paused));
+    FIND_AND_CHECK(instanceId, channels)
+    ERROR_CHECK(instance->setPaused(paused));
 }
 
 void Fmod::stopSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, sounds)
-    ERROR_CHECK(instance->channel->stop());
+    FIND_AND_CHECK(instanceId, channels)
+    ERROR_CHECK(instance->stop());
 }
 
 bool Fmod::isSoundPlaying(const uint64_t instanceId) {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, sounds, isPlaying)
-    ERROR_CHECK(instance->channel->isPlaying(&isPlaying));
+    FIND_AND_CHECK(instanceId, channels, isPlaying)
+    ERROR_CHECK(instance->isPlaying(&isPlaying));
     return isPlaying;
 }
 
 void Fmod::setSoundVolume(const uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, sounds)
-    ERROR_CHECK(instance->channel->setVolume(volume));
+    FIND_AND_CHECK(instanceId, channels)
+    ERROR_CHECK(instance->setVolume(volume));
 }
 
 float Fmod::getSoundVolume(const uint64_t instanceId) {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, sounds, volume)
-    ERROR_CHECK(instance->channel->getVolume(&volume));
+    FIND_AND_CHECK(instanceId, channels, volume)
+    ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
 float Fmod::getSoundPitch(const uint64_t instanceId) {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, sounds, pitch)
-    ERROR_CHECK(instance->channel->getPitch(&pitch));
+    FIND_AND_CHECK(instanceId, channels, pitch)
+    ERROR_CHECK(instance->getPitch(&pitch));
     return pitch;
 }
 
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, sounds)
-    ERROR_CHECK(instance->channel->setPitch(pitch));
+    FIND_AND_CHECK(instanceId, channels)
+    ERROR_CHECK(instance->setPitch(pitch));
 }
 
-const uint64_t Fmod::loadSound(String path, int mode) {
+void Fmod::releaseSound(String path) {
     DRIVE_PATH(path)
-    FMOD::Sound *sound = nullptr;
-    ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
-    if (sound) {
-        FMOD::Channel *channel = nullptr;
-        ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
-        auto soundChannel = new SoundChannel();
-        soundChannel->sound = sound;
-        soundChannel->channel = channel;
-        return sounds.append(soundChannel);
-    }
-    return 0;
-}
-
-void Fmod::releaseSound(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, sounds)
-    ERROR_CHECK(instance->sound->release());
+    FIND_AND_CHECK(path, sounds)
+    ERROR_CHECK(instance->release());
     sounds.erase(instance);
-    delete instance;
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {
