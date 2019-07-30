@@ -19,8 +19,9 @@ class TestVolume:
 		Fmod.release_sound(open_sound)
 	
 	func test_assert_set_volume():
-		Fmod.set_sound_volume(open_sound, 2)
-		assert_eq(Fmod.get_sound_volume(open_sound), 2.0, "Sound volume should be 2")
+		var desired_value: float = 2.0
+		Fmod.set_sound_volume(open_sound, desired_value)
+		assert_eq(Fmod.get_sound_volume(open_sound), desired_value, "Sound volume should be 2")
 
 class TestPitch:
 	extends "res://addons/gut/test.gd"
@@ -34,8 +35,9 @@ class TestPitch:
 		Fmod.release_sound(open_sound)
 	
 	func test_assert_set_pitch():
-		Fmod.set_sound_pitch(open_sound, 0.75)
-		assert_eq(Fmod.get_sound_pitch(open_sound), 0.75, "Sound pitch should be 0.75")
+		var desired_value: float = 0.75
+		Fmod.set_sound_pitch(open_sound, desired_value)
+		assert_eq(Fmod.get_sound_pitch(open_sound), desired_value, "Sound pitch should be 0.75")
 
 class TestPlay:
 	extends "res://addons/gut/test.gd"
