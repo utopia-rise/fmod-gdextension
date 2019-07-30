@@ -253,11 +253,20 @@ func stop_event(instanceId: int, stopMode: int) -> void:
 func release_event(instanceId: int) -> void:
 	godot_fmod.release_event(instanceId)
 
+func get_event_volume(instanceId: int) -> float:
+	return godot_fmod.get_event_volume(instanceId);
+
 func set_event_volume(instanceId: int, volume: float) -> void:
 	godot_fmod.set_event_volume(instanceId, volume)
 
+func get_event_paused(instanceId: int) -> bool:
+	return godot_fmod.get_event_paused(instanceId)
+
 func set_event_paused(instanceId: int, paused: bool) -> void:
 	godot_fmod.set_event_paused(instanceId, paused)
+
+func get_event_pitch(instanceId: int) -> float:
+	return godot_fmod.get_event_pitch(instanceId);
 
 func set_event_pitch(instanceId: int, pitch: float) -> void:
 	godot_fmod.set_event_pitch(instanceId, pitch)
