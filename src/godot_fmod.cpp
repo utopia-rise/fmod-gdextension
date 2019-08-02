@@ -626,7 +626,7 @@ void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
     eventInstance->setUserData(nullptr);
     ERROR_CHECK(eventInstance->release());
     events.erase(eventInstance);
-    delete &eventInfo;
+    delete eventInfo;
     Callbacks::mut->unlock();
 }
 
@@ -798,10 +798,12 @@ void Fmod::descReleaseAllInstances(const String eventPath) {
     ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
     for (int i = 0; i < count; i++) {
         FMOD::Studio::EventInstance *it = instances[i];
-        EventInfo *eventInfo = getEventInfo(it);
-        it->setUserData(nullptr);
-        events.erase(it);
-        delete &eventInfo;
+        if (events.has(it)) {
+            EventInfo *eventInfo = getEventInfo(it);
+            it->setUserData(nullptr);
+            events.erase(it);
+            delete eventInfo;
+        }
     }
     ERROR_CHECK(instance->releaseAllInstances());
     Callbacks::mut->unlock();
