@@ -791,8 +791,20 @@ int Fmod::descGetInstanceCount(const String eventPath) {
 }
 
 void Fmod::descReleaseAllInstances(const String eventPath) {
+    Callbacks::mut->lock();
     FIND_AND_CHECK(eventPath, eventDescriptions)
+    FMOD::Studio::EventInstance *instances[MAX_EVENT_INSTANCE];
+    int count = 0;
+    ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
+    for (int i = 0; i < count; i++) {
+        FMOD::Studio::EventInstance *it = instances[i];
+        EventInfo *eventInfo = getEventInfo(it);
+        it->setUserData(nullptr);
+        events.erase(it);
+        delete &eventInfo;
+    }
     ERROR_CHECK(instance->releaseAllInstances());
+    Callbacks::mut->unlock();
 }
 
 void Fmod::descLoadSampleData(const String eventPath) {
