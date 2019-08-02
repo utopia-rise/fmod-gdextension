@@ -27,6 +27,14 @@ class TestBus:
 		Fmod.unload_bank("./assets/Banks/Music.bank")
 		Fmod.unload_bank("./assets/Banks/Vehicles.bank")
 	
+	func test_assert_should_has_master_bus():
+		var wanted: String = "bus:/"
+		assert_true(Fmod.check_bus_path(wanted), wanted + " should be present")
+	
+	func test_assert_should_not_has_bus():
+		var wanted: String = "undefined"
+		assert_false(Fmod.check_bus_path(wanted), wanted + " should not be present")
+	
 	func test_assert_mute_unmute():
 		assert_false(Fmod.get_bus_mute("bus:/"), "Master bus should not be muted")
 		Fmod.set_bus_mute("bus:/", true)

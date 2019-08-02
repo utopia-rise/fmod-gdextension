@@ -31,6 +31,14 @@ class TestEvent:
 		Fmod.unload_bank("./assets/Banks/Music.bank")
 		Fmod.unload_bank("./assets/Banks/Vehicles.bank")
 	
+	func test_should_has_event():
+		var wanted: String = "event:/Vehicles/Car Engine"
+		assert_true(Fmod.check_event_path(wanted), wanted + " should be present")
+	
+	func test_should_not_has_event():
+		var wanted: String = "undefined"
+		assert_false(Fmod.check_event_path(wanted), wanted + " should not be present")
+	
 	func test_assert_set_volume():
 		var desired_value: float = 4.0
 		Fmod.set_event_volume(id, desired_value)
