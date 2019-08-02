@@ -63,5 +63,5 @@ class TestEvent:
 		assert_eq(Fmod.get_event_reverb_level(id, 0), desired_value, "Event reverb level should be " + str(desired_value))
 	
 	func test_assert_event_parameter_by_name():
-		var desired_value: int = 600
-		assert_eq(Fmod.get_event_parameter_by_name(id, "RPM"), desired_value, "Event parameter RPM should be 600")
+		var desired_value: float = 600.0
+		assert_eq(Fmod.get_event_parameter_by_name(id, "RPM"), desired_value, "Event parameter RPM should be " + str(desired_value))

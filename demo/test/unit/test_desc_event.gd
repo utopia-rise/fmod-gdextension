@@ -27,7 +27,7 @@ class TestEventDescription:
 		Fmod.unload_bank("./assets/Banks/Music.bank")
 		Fmod.unload_bank("./assets/Banks/Vehicles.bank")
 	
-	func test_assert_desc_instance_list():
+	func test_assert_should_create_and_release():
 		var desired_value: int = 2
 		var id2: int = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 		var instance_list: Array = Fmod.desc_get_instance_list("event:/Vehicles/Car Engine")
@@ -53,5 +53,32 @@ class TestEventDescription:
 		self.add_child(t)
 		t.start()
 		yield(t, "timeout")
-		assert_eq(Fmod.desc_get_instance_list("event:/Vehicles/Car Engine").size(), desired_value, "Event description list size should be " + str(desired_value))
+		assert_eq(Fmod.desc_get_instance_count("event:/Vehicles/Car Engine"), desired_value, "Event description list size should be " + str(desired_value))
 		id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
+	
+	func test_assert_should_be_3d():
+		assert_true(Fmod.desc_is_3d("event:/Vehicles/Car Engine"), "Event description should be 3D")
+	
+	func test_assert_should_not_be_oneshot():
+		assert_false(Fmod.desc_is_one_shot("event:/Vehicles/Car Engine"), "Event description should not be oneshot")
+	
+	func test_assert_should_not_be_snapshot():
+		assert_false(Fmod.desc_is_snapshot("event:/Vehicles/Car Engine"), "Event description should not be snapshot")
+	
+	func test_assert_should_not_be_stream():
+		assert_false(Fmod.desc_is_stream("event:/Vehicles/Car Engine"), "Event description should not be stream")
+	
+	func test_assert_should_not_have_cue():
+		assert_false(Fmod.desc_has_cue("event:/Vehicles/Car Engine"), "Event description should not have cue")
+	
+	func test_assert_minimum_distance():
+		var desiredValue: float = 1.0
+		assert_eq(Fmod.desc_get_minimum_distance("event:/Vehicles/Car Engine"), desiredValue, "Event description minimum distance should be " + str(desiredValue))
+	
+	func test_assert_maximum_distance():
+		var desiredValue: float = 20.0
+		assert_eq(Fmod.desc_get_maximum_distance("event:/Vehicles/Car Engine"), desiredValue, "Event description maximum distance should be " + str(desiredValue))
+	
+	func test_assert_sound_size():
+		var desiredValue: float = 2.0
+		assert_eq(Fmod.desc_get_sound_size("event:/Vehicles/Car Engine"), desiredValue, "Event description sound size should be " + str(desiredValue))
