@@ -139,7 +139,7 @@ func get_driver() -> int:
 func set_driver(id: int) -> void:
 	godot_fmod.set_driver(id)
 	
-func get_performance_data() -> Array:
+func get_performance_data() -> Dictionary:
 	return godot_fmod.get_performance_data()
 	
 func set_global_parameter_by_name(parameterName: String, value: float) -> void:

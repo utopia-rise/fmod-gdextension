@@ -73,3 +73,19 @@ class TestEvent:
 	func test_assert_event_parameter_by_name():
 		var desired_value: float = 600.0
 		assert_eq(Fmod.get_event_parameter_by_name(id, "RPM"), desired_value, "Event parameter RPM should be " + str(desired_value))
+	
+	func test_assert_should_pause_all():
+		Fmod.set_event_paused(id, false)
+		var id2 = Fmod.create_event_instance("event:/Vehicles/Car Engine")
+		Fmod.start_event(id2)
+		Fmod.pause_all_events(true)
+		assert_true(Fmod.get_event_paused(id), "Event " + str(id) + " should be paused")
+		assert_true(Fmod.get_event_paused(id2), "Event " + str(id2) + " should be paused")
+		Fmod.stop_event(id2, Fmod.FMOD_STUDIO_STOP_IMMEDIATE)
+		Fmod.release_event(id2)
+	
+	func test_assert_should_mute_unmute_all():
+		Fmod.mute_all_events()
+		assert_true(Fmod.get_bus_mute("bus:/"), "Master bus should be muted")
+		Fmod.unmute_all_events()
+		assert_false(Fmod.get_bus_mute("bus:/"), "Master bus should not be muted")
