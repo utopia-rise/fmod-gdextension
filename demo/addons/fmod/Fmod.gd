@@ -223,8 +223,8 @@ func get_bank_bus_count(pathTo_bank: String) -> int:
 func get_bank_event_count(pathTo_bank: String) -> int:
 	return godot_fmod.get_bank_event_count(pathTo_bank)
 	
-func get_bankString_count(pathTo_bank: String) -> int:
-	return godot_fmod.get_bankString_count(pathTo_bank)
+func get_bank_string_count(pathTo_bank: String) -> int:
+	return godot_fmod.get_bank_string_count(pathTo_bank)
 	
 func get_bank_VCA_count(pathTo_bank: String) -> int:
 	return godot_fmod.get_bank_VCA_count(pathTo_bank)
