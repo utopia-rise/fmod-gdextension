@@ -37,6 +37,9 @@ namespace godot {
 #define GODOT_ERROR(message)\
     Godot::print_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
 
+#define GODOT_WARNING(message)\
+    Godot::print_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
     auto instance = cont.get(instanceId); \
     if (!instance) { \
@@ -167,6 +170,7 @@ namespace godot {
         void setSystemListener2DAttributes(int index, Transform2D transform);
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
+        int64_t getObjectAttachedToListener(int index);
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);

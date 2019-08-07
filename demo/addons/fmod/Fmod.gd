@@ -205,6 +205,9 @@ func set_listener_lock(index: int, is_locked: bool) -> void:
 
 func get_listener_lock(index: int) -> bool:
 	return godot_fmod.get_listener_lock(index)
+
+func get_object_attached_to_listener(index: int) -> int:
+	return godot_fmod.get_object_attached_to_listener(index)
 ##########
 ###BANK###
 ##########

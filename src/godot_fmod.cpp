@@ -31,6 +31,7 @@ void Fmod::_register_methods() {
     register_method("set_listener_2D_attributs", &Fmod::setSystemListener2DAttributes);
     register_method("set_listener_lock", &Fmod::setListenerLock);
     register_method("get_listener_lock", &Fmod::getListenerLock);
+    register_method("get_object_attached_to_listener", &Fmod::getObjectAttachedToListener);
     register_method("set_software_format", &Fmod::setSoftwareFormat);
     register_method("load_bank", &Fmod::loadBank);
     register_method("unload_bank", &Fmod::unloadBank);
@@ -241,7 +242,7 @@ void Fmod::checkLoadingBanks() {
 void Fmod::setListenerAttributes() {
     if (actualListenerNumber == 0) {
         if (listenerWarning) {
-            GODOT_ERROR("FMOD Sound System: No listeners are set!")
+            GODOT_WARNING("FMOD Sound System: No listeners are set!")
             listenerWarning = false;
         }
         return;
@@ -496,6 +497,21 @@ bool Fmod::getListenerLock(int index) {
     } else {
         GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return false;
+    }
+}
+
+int64_t Fmod::getObjectAttachedToListener(int index) {
+    if (index < 0 || index >= systemListenerNumber) {
+        GODOT_ERROR("index of listeners must be set between 0 and the number of listeners set")
+        return -1;
+    } else {
+        Object *object = listeners[index].gameObj;
+        if (object) {
+            return object->get_instance_id();
+        } else {
+            GODOT_WARNING("No object was set on listener")
+            return -1;
+        }
     }
 }
 
