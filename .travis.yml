@@ -14,7 +14,7 @@ matrix:
             - scons
             - p7zip
           update: true
-    - env: PLATFORM=linux BINDINGS_ARGS="godotbinpath=../Godot_v3.1.1-stable_x11.64 use_llvm=yes platform=linux generate_bindings=True bits=64 target=release clang-path=/usr/local/clang-5.0.0/bin/" DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-5.0.0/bin/"
+    - env: PLATFORM=linux BINDINGS_ARGS="godotbinpath=../Godot_v3.1.1-stable_x11.64 use_llvm=yes platform=linux generate_bindings=True bits=64 target=release clang-path=/usr/local/clang-7.0.0/bin/" DRIVER_ARGS="p=linux use_llvm=yes target=release clang-path=/usr/local/clang-7.0.0/bin/"
       os: linux
       compiler: clang
     - env: PLATFORM=android BINDINGS_ARGS="" DRIVER_ARGS="NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk  APP_PLATFORM=android-21" ANDROID_NDK_ROOT="/home/travis/build/utopia-rise/android-sdk/ndk-bundle"
