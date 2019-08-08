@@ -33,6 +33,7 @@ matrix:
       os: windows
       compiler: clang
 before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then apt-get install scons; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O Python27.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv Python27.zip C:/Python27.zip && 7z x C:/Python27.zip -oC:/ && export PATH="/c/Python27:/c/Python27/Scripts:$PATH"; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then wget -O scons.zip http://prdownloads.sourceforge.net/scons/scons-local-3.0.5.zip && mv scons.zip C:/scons.zip && 7z x C:/scons.zip -oC:/scons; fi
   - cd ..
