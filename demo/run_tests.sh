@@ -1,5 +1,4 @@
-alias godot=$1
-godot -d -s --path $PWD addons/gut/gut_cmdln.gd | ( no_error="false"; while read -r line
+$1 -d -s --path $PWD addons/gut/gut_cmdln.gd | ( no_error="false"; while read -r line
 do
     echo "$line"
     if echo "$line" | grep -q "failing asserts:  0"; then
