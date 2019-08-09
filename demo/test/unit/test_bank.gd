@@ -52,3 +52,11 @@ class TestBank:
 		assert_eq(Fmod.get_bank_VCA_count("./assets/Banks/Master Bank.bank"), desiredValue, "Master bank should have " + str(desiredValue) + " VCAs")
 		desiredValue = 0
 		assert_eq(Fmod.get_bank_VCA_count("./assets/Banks/Vehicles.bank"), desiredValue, "Vehicles bank should have " + str(desiredValue) + " VCAs")
+	
+	func test_assert_bank_loading():
+		Fmod.unload_bank("./assets/Banks/Vehicles.bank")
+		var desired_value: int = -1
+		assert_eq(Fmod.get_bank_loading_state("./assets/Banks/Vehicles.bank"), desired_value, "Loading state should be -1")
+		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		desired_value = Fmod.FMOD_STUDIO_LOADING_STATE_LOADED
+		assert_eq(Fmod.get_bank_loading_state("./assets/Banks/Vehicles.bank"), desired_value, "Loading state should be FMOD_STUDIO_LOADING_STATE_LOADED")
