@@ -36,6 +36,7 @@ class TestCallbacks:
 		watch_signals(Fmod)
 		var id: int = Fmod.create_event_instance("event:/Music/Level 02")
 		Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED)
+		Fmod.set_event_volume(id, 0)
 		Fmod.start_event(id)
 		yield(yield_for(2), YIELD)
 		assert_signal_not_emitted(Fmod, "timeline_beat", "Fmod should not have emitted timeline_beat signal")
