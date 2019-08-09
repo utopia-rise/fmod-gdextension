@@ -4,6 +4,7 @@ class TestEventDescription:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
+	var sprite: Sprite = Sprite.new()
 	
 	func before_all():
 		# load banks
@@ -16,7 +17,8 @@ class TestEventDescription:
 		# warning-ignore:return_value_discarded
 		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 		id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 	
 	func after_all():

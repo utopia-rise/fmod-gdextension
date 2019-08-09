@@ -294,6 +294,9 @@ func attach_instance_to_node(instanceId: int, object: Object) -> void:
 func detach_instance_from_node(instanceId: int) -> void:
 	godot_fmod.detach_instance_from_node(instanceId)
 
+func get_object_attached_to_instance(instanceId: int) -> int:
+	return godot_fmod.get_object_attached_to_instance(instanceId)
+
 func get_event_parameter_by_name(instanceId: int, parameterName: String) -> float:
 	return godot_fmod.get_event_parameter_by_name(instanceId, parameterName)
 	

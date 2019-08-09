@@ -3,6 +3,8 @@ extends "res://addons/gut/test.gd"
 class TestVCA:
 	extends "res://addons/gut/test.gd"
 	
+	var sprite: Sprite = Sprite.new()
+	
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
@@ -14,7 +16,8 @@ class TestVCA:
 		# warning-ignore:return_value_discarded
 		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 	
 	func after_all():
 		Fmod.remove_listener(0)

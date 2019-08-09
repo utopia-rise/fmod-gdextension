@@ -4,6 +4,7 @@ class TestBus:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
+	var sprite: Sprite = Sprite.new()
 	
 	func before_all():
 		# load banks
@@ -17,7 +18,8 @@ class TestBus:
 		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		Fmod.set_listener_number(1)
 		id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 	
 	func after_all():
 		Fmod.release_event(id)

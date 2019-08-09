@@ -4,6 +4,7 @@ class TestEvent:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
+	var sprite: Sprite = Sprite.new()
 	
 	func before_all():
 		# load banks
@@ -16,9 +17,9 @@ class TestEvent:
 		# warning-ignore:return_value_discarded
 		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 		id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
-		Fmod.attach_instance_to_node(id, self)
 		Fmod.set_event_parameter_by_name(id, "RPM", 600)
 		Fmod.start_event(id)
 	
@@ -89,3 +90,19 @@ class TestEvent:
 		assert_true(Fmod.get_bus_mute("bus:/"), "Master bus should be muted")
 		Fmod.unmute_all_events()
 		assert_false(Fmod.get_bus_mute("bus:/"), "Master bus should not be muted")
+	
+	func test_assert_attached_to_node():
+		Fmod.attach_instance_to_node(id, sprite)
+		var node_instance_id: int = Fmod.get_object_attached_to_instance(id)
+		assert_false(node_instance_id == -1, "Instance " + str(id) + " should be attached to Node")
+		var id2: int = Fmod.create_event_instance("event:/Vehicles/Car Engine")
+		var object_instance_id: int = Fmod.get_object_attached_to_instance(id2)
+		assert_true(object_instance_id == -1, "Instance " + str(id2) + " should not be attached to any Node")
+		Fmod.attach_instance_to_node(id2, sprite)
+		object_instance_id = Fmod.get_object_attached_to_instance(id2)
+		assert_true(node_instance_id == object_instance_id, "Both instances should be attached to same Node")
+		Fmod.detach_instance_from_node(id2)
+		object_instance_id = Fmod.get_object_attached_to_instance(id2)
+		assert_true(object_instance_id == -1, "Instance " + str(id2) + " should be detached")
+		Fmod.release_event(id2)
+		Fmod.detach_instance_from_node(id)

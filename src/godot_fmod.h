@@ -253,6 +253,7 @@ namespace godot {
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
+        int64_t getObjectAttachedToInstance(uint64_t instanceId);
         void pauseAllEvents(bool pause);
         void muteAllEvents();
         void unmuteAllEvents();

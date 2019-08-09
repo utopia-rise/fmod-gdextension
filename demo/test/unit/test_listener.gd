@@ -3,6 +3,8 @@ extends "res://addons/gut/test.gd"
 class TestListener:
 	extends "res://addons/gut/test.gd"
 	
+	var sprite: Sprite = Sprite.new()
+	
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
@@ -14,7 +16,8 @@ class TestListener:
 		# warning-ignore:return_value_discarded
 		Fmod.load_bank("./assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 	
 	func after_all():
 		Fmod.remove_listener(0)
@@ -43,7 +46,7 @@ class TestListener:
 		Fmod.set_listener_weight(0, desiredValue)
 		Fmod.set_listener_number(2)
 		desiredValue = 2.0
-		Fmod.add_listener(1, self)
+		Fmod.add_listener(1, sprite)
 		Fmod.set_listener_weight(1, desiredValue)
 		assert_listener_weight(1, desiredValue)
 		Fmod.remove_listener(1)
@@ -51,13 +54,13 @@ class TestListener:
 	
 	func test_assert_attach_object_to_listener():
 		var desired_listener: int = 0;
-		var self_instance_id: int = Fmod.get_object_attached_to_listener(desired_listener)
-		assert_false(self_instance_id == -1, "Listener " + str(desired_listener) + " should have an object attached")
+		var node_instance_id: int = Fmod.get_object_attached_to_listener(desired_listener)
+		assert_false(node_instance_id == -1, "Listener " + str(desired_listener) + " should have an object attached")
 		Fmod.set_listener_number(2);
 		desired_listener = 1;
 		assert_no_object_attached_to_listener(desired_listener)
-		Fmod.add_listener(desired_listener, self)
-		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == self_instance_id, "Both listeners should be attached to same object")
+		Fmod.add_listener(desired_listener, sprite)
+		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == node_instance_id, "Both listeners should be attached to same object")
 		Fmod.remove_listener(1)
 		assert_no_object_attached_to_listener(desired_listener)
 		Fmod.set_listener_number(1)

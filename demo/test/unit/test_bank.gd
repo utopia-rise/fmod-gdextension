@@ -3,6 +3,8 @@ extends "res://addons/gut/test.gd"
 class TestBank:
 	extends "res://addons/gut/test.gd"
 	
+	var sprite: Sprite = Sprite.new()
+	
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
@@ -16,7 +18,8 @@ class TestBank:
 		var desired_value = Fmod.FMOD_STUDIO_LOADING_STATE_LOADED
 		assert_eq(Fmod.get_bank_loading_state("./assets/Banks/Vehicles.bank"), desired_value, "Loading state should be FMOD_STUDIO_LOADING_STATE_LOADED")
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 	
 	func after_all():
 		Fmod.remove_listener(0)

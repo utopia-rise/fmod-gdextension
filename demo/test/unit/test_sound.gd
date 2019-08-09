@@ -4,10 +4,12 @@ class TestSound:
 	extends "res://addons/gut/test.gd"
 	
 	var open_sound: int
+	var sprite: Sprite = Sprite.new()
 	
 	func before_all():
 		Fmod.set_listener_number(1)
-		Fmod.add_listener(0, self)
+		get_tree().get_root().add_child(sprite)
+		Fmod.add_listener(0, sprite)
 		open_sound = Fmod.load_sound("res://assets/Sounds/doorOpen_1.ogg", Fmod.FMOD_DEFAULT)
 	
 	func after_all():

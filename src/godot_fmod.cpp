@@ -107,6 +107,7 @@ void Fmod::_register_methods() {
     register_method("play_one_shot_attached_with_params", &Fmod::playOneShotAttachedWithParams);
     register_method("attach_instance_to_node", &Fmod::attachInstanceToNode);
     register_method("detach_instance_from_node", &Fmod::detachInstanceFromNode);
+    register_method("get_object_attached_to_instance", &Fmod::getObjectAttachedToInstance);
     register_method("pause_all_events", &Fmod::pauseAllEvents);
     register_method("mute_all_events", &Fmod::muteAllEvents);
     register_method("unmute_all_events", &Fmod::unmuteAllEvents);
@@ -1243,7 +1244,10 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
 }
 
 void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
-    if (isNull(gameObj)) return;
+    if (isNull(gameObj)) {
+        GODOT_WARNING("Trying to attach event instance to null game object")
+        return;
+    }
     FIND_AND_CHECK(instanceId, events)
     getEventInfo(instance)->gameObj = gameObj;
 }
@@ -1251,6 +1255,22 @@ void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
 void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events)
     getEventInfo(instance)->gameObj = nullptr;
+}
+
+int64_t Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
+    int64_t objectId = -1;
+    FIND_AND_CHECK(instanceId, events, objectId)
+    EventInfo *eventInfo = getEventInfo(instance);
+    if (eventInfo) {
+        Object *object = eventInfo->gameObj;
+        if (object) {
+            objectId = object->get_instance_id();
+        }
+        else {
+            GODOT_WARNING("There is no object attached to event instance.")
+        }
+    }
+    return objectId;
 }
 
 void Fmod::pauseAllEvents(const bool pause) {
