@@ -1,6 +1,8 @@
 extends Node
 signal timeline_beat
 signal timeline_marker
+signal sound_played
+signal sound_stopped
 
 var godot_fmod = FmodNative.new()
 
@@ -116,6 +118,8 @@ const FMOD_STUDIO_PLAYBACK_FORCEINT = 65536
 func _init() -> void:
 	godot_fmod.connect("timeline_beat", self, "on_timeline_beat")
 	godot_fmod.connect("timeline_marker", self, "on_timeline_marker")
+	godot_fmod.connect("sound_played", self, "on_sound_played")
+	godot_fmod.connect("sound_stopped", self, "on_sound_stopped")
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
 
 func _process(delta):
@@ -515,3 +519,9 @@ func on_timeline_beat(dict : Dictionary) -> void:
 	
 func on_timeline_marker(dict : Dictionary) -> void:
 	emit_signal("timeline_marker", dict)
+
+func on_sound_played(dict: Dictionary) -> void:
+	emit_signal("sound_played", dict)
+
+func on_sound_stopped(dict: Dictionary) -> void:
+	emit_signal("sound_stopped", dict)
