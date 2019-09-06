@@ -501,18 +501,16 @@ bool Fmod::getListenerLock(int index) {
     }
 }
 
-int64_t Fmod::getObjectAttachedToListener(int index) {
+Object *Fmod::getObjectAttachedToListener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
-        return -1;
+        return nullptr;
     } else {
         Object *object = listeners[index].gameObj;
-        if (object) {
-            return object->get_instance_id();
-        } else {
+        if (!object) {
             GODOT_LOG(1, "No object was set on listener")
-            return -1;
         }
+        return object;
     }
 }
 
@@ -813,6 +811,7 @@ void Fmod::descReleaseAllInstances(const String eventPath) {
     FMOD::Studio::EventInstance *instances[MAX_EVENT_INSTANCE];
     int count = 0;
     ERROR_CHECK(instance->getInstanceList(instances, MAX_EVENT_INSTANCE, &count));
+    CHECK_SIZE(MAX_EVENT_INSTANCE, count, events)
     for (int i = 0; i < count; i++) {
         FMOD::Studio::EventInstance *it = instances[i];
         if (events.has(it)) {
@@ -1257,20 +1256,17 @@ void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
     getEventInfo(instance)->gameObj = nullptr;
 }
 
-int64_t Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
-    int64_t objectId = -1;
-    FIND_AND_CHECK(instanceId, events, objectId)
+Object *Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
+    Object *object = nullptr;
+    FIND_AND_CHECK(instanceId, events, object)
     EventInfo *eventInfo = getEventInfo(instance);
     if (eventInfo) {
-        Object *object = eventInfo->gameObj;
-        if (object) {
-            objectId = object->get_instance_id();
-        }
-        else {
+        object = eventInfo->gameObj;
+        if (!object) {
             GODOT_LOG(1, "There is no object attached to event instance.")
         }
     }
-    return objectId;
+    return object;
 }
 
 void Fmod::pauseAllEvents(const bool pause) {

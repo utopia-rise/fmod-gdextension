@@ -54,13 +54,13 @@ class TestListener:
 	
 	func test_assert_attach_object_to_listener():
 		var desired_listener: int = 0;
-		var node_instance_id: int = Fmod.get_object_attached_to_listener(desired_listener)
-		assert_false(node_instance_id == -1, "Listener " + str(desired_listener) + " should have an object attached")
+		var node_instance: Object = Fmod.get_object_attached_to_listener(desired_listener)
+		assert_false(node_instance == null, "Listener " + str(desired_listener) + " should have an object attached")
 		Fmod.set_listener_number(2);
 		desired_listener = 1;
 		assert_no_object_attached_to_listener(desired_listener)
 		Fmod.add_listener(desired_listener, sprite)
-		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == node_instance_id, "Both listeners should be attached to same object")
+		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == node_instance, "Both listeners should be attached to same object")
 		Fmod.remove_listener(1)
 		assert_no_object_attached_to_listener(desired_listener)
 		Fmod.set_listener_number(1)
@@ -72,4 +72,4 @@ class TestListener:
 		assert_eq(Fmod.get_listener_weight(listenerNum), desiredValue, str(listenerNum) + " should have a weight of " + str(desiredValue))
 	
 	func assert_no_object_attached_to_listener(desired_listener: int):
-		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == -1, "Listener " + str(desired_listener) + " should not have any object attached")
+		assert_true(Fmod.get_object_attached_to_listener(desired_listener) == null, "Listener " + str(desired_listener) + " should not have any object attached")

@@ -217,7 +217,7 @@ func set_listener_lock(index: int, is_locked: bool) -> void:
 func get_listener_lock(index: int) -> bool:
 	return godot_fmod.get_listener_lock(index)
 
-func get_object_attached_to_listener(index: int) -> int:
+func get_object_attached_to_listener(index: int) -> Object:
 	return godot_fmod.get_object_attached_to_listener(index)
 ##########
 ###BANK###
@@ -298,7 +298,7 @@ func attach_instance_to_node(instanceId: int, object: Object) -> void:
 func detach_instance_from_node(instanceId: int) -> void:
 	godot_fmod.detach_instance_from_node(instanceId)
 
-func get_object_attached_to_instance(instanceId: int) -> int:
+func get_object_attached_to_instance(instanceId: int) -> Object:
 	return godot_fmod.get_object_attached_to_instance(instanceId)
 
 func get_event_parameter_by_name(instanceId: int, parameterName: String) -> float:
