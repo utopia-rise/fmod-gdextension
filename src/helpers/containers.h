@@ -38,6 +38,11 @@ namespace godot {
             return var;
         }
 
+        bool has(const T value) {
+            const auto var = (uint64_t) value;
+            return Array::has(var);
+        }
+
         void erase(const T value){
             const auto var = (uint64_t) value;
             Array::erase(var);

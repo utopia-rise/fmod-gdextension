@@ -34,14 +34,24 @@ path = path.replace("res://", "./");
 
 namespace godot {
 
-#define GODOT_ERROR(message)\
-    Godot::print_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+#define GODOT_LOG(level, message)\
+    switch (level) {\
+        case 0:\
+            Godot::print(message);\
+            break;\
+        case 1:\
+            Godot::print_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            break;\
+        case 2:\
+            Godot::print_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            break;\
+    }\
 
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
     auto instance = cont.get(instanceId); \
     if (!instance) { \
         String message = String("FMOD Sound System: cannot find " + String(instanceId) + " in ##cont collection.");\
-        GODOT_ERROR(message)\
+        GODOT_LOG(2, message)\
         return defaultReturn; \
     }
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
@@ -53,7 +63,7 @@ namespace godot {
 #define CHECK_SIZE(maxSize, actualSize, type) \
     if(actualSize > maxSize){\
         String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries";\
-        GODOT_ERROR(message)\
+        GODOT_LOG(2, message)\
         actualSize = maxSize;\
     }\
 
@@ -84,7 +94,7 @@ namespace godot {
 
     class Fmod : public Node {
     GODOT_CLASS(Fmod, Node)
-    DECLARE_ALL_CONSTANTS
+        DECLARE_ALL_CONSTANTS
 
     private:
         FMOD::Studio::System *system;
@@ -167,6 +177,7 @@ namespace godot {
         void setSystemListener2DAttributes(int index, Transform2D transform);
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
+        Object *getObjectAttachedToListener(int index);
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
@@ -249,6 +260,7 @@ namespace godot {
         void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
         void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
+        Object *getObjectAttachedToInstance(uint64_t instanceId);
         void pauseAllEvents(bool pause);
         void muteAllEvents();
         void unmuteAllEvents();

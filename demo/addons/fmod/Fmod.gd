@@ -1,6 +1,8 @@
 extends Node
 signal timeline_beat
 signal timeline_marker
+signal sound_played
+signal sound_stopped
 
 var godot_fmod = FmodNative.new()
 
@@ -41,6 +43,13 @@ const FMOD_SPEAKERMODE_7POINT1POINT4 = 8
 const FMOD_STUDIO_LOAD_BANK_NORMAL = 0x00000000
 const FMOD_STUDIO_LOAD_BANK_NONBLOCKING = 0x00000001
 const FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES = 0x00000002
+
+const FMOD_STUDIO_LOADING_STATE_UNLOADING = 0
+const FMOD_STUDIO_LOADING_STATE_UNLOADED = 1
+const FMOD_STUDIO_LOADING_STATE_LOADING = 2
+const FMOD_STUDIO_LOADING_STATE_LOADED = 3
+const FMOD_STUDIO_LOADING_STATE_ERROR = 4
+const FMOD_STUDIO_LOADING_STATE_FORCEINT = 65536
 
 const FMOD_DEFAULT = 0x00000000
 const FMOD_LOOP_OFF = 0x00000001
@@ -96,12 +105,21 @@ const FMOD_STUDIO_STOP_ALLOWFADEOUT = 0
 const FMOD_STUDIO_STOP_IMMEDIATE = 1
 const FMOD_STUDIO_STOP_FORCEINT = 65536
 
+const FMOD_STUDIO_PLAYBACK_PLAYING = 0
+const FMOD_STUDIO_PLAYBACK_SUSTAINING = 1
+const FMOD_STUDIO_PLAYBACK_STOPPED = 2
+const FMOD_STUDIO_PLAYBACK_STARTING = 3
+const FMOD_STUDIO_PLAYBACK_STOPPING = 4
+const FMOD_STUDIO_PLAYBACK_FORCEINT = 65536
+
 ############
 ###SYSTEM###
 ############
 func _init() -> void:
 	godot_fmod.connect("timeline_beat", self, "on_timeline_beat")
 	godot_fmod.connect("timeline_marker", self, "on_timeline_marker")
+	godot_fmod.connect("sound_played", self, "on_sound_played")
+	godot_fmod.connect("sound_stopped", self, "on_sound_stopped")
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
 
 func _process(delta):
@@ -132,7 +150,7 @@ func get_driver() -> int:
 func set_driver(id: int) -> void:
 	godot_fmod.set_driver(id)
 	
-func get_performance_data() -> Array:
+func get_performance_data() -> Dictionary:
 	return godot_fmod.get_performance_data()
 	
 func set_global_parameter_by_name(parameterName: String, value: float) -> void:
@@ -198,6 +216,9 @@ func set_listener_lock(index: int, is_locked: bool) -> void:
 
 func get_listener_lock(index: int) -> bool:
 	return godot_fmod.get_listener_lock(index)
+
+func get_object_attached_to_listener(index: int) -> Object:
+	return godot_fmod.get_object_attached_to_listener(index)
 ##########
 ###BANK###
 ##########
@@ -216,8 +237,8 @@ func get_bank_bus_count(pathTo_bank: String) -> int:
 func get_bank_event_count(pathTo_bank: String) -> int:
 	return godot_fmod.get_bank_event_count(pathTo_bank)
 	
-func get_bankString_count(pathTo_bank: String) -> int:
-	return godot_fmod.get_bankString_count(pathTo_bank)
+func get_bank_string_count(pathTo_bank: String) -> int:
+	return godot_fmod.get_bank_string_count(pathTo_bank)
 	
 func get_bank_VCA_count(pathTo_bank: String) -> int:
 	return godot_fmod.get_bank_VCA_count(pathTo_bank)
@@ -253,11 +274,20 @@ func stop_event(instanceId: int, stopMode: int) -> void:
 func release_event(instanceId: int) -> void:
 	godot_fmod.release_event(instanceId)
 
+func get_event_volume(instanceId: int) -> float:
+	return godot_fmod.get_event_volume(instanceId);
+
 func set_event_volume(instanceId: int, volume: float) -> void:
 	godot_fmod.set_event_volume(instanceId, volume)
 
+func get_event_paused(instanceId: int) -> bool:
+	return godot_fmod.get_event_paused(instanceId)
+
 func set_event_paused(instanceId: int, paused: bool) -> void:
 	godot_fmod.set_event_paused(instanceId, paused)
+
+func get_event_pitch(instanceId: int) -> float:
+	return godot_fmod.get_event_pitch(instanceId);
 
 func set_event_pitch(instanceId: int, pitch: float) -> void:
 	godot_fmod.set_event_pitch(instanceId, pitch)
@@ -267,6 +297,9 @@ func attach_instance_to_node(instanceId: int, object: Object) -> void:
 
 func detach_instance_from_node(instanceId: int) -> void:
 	godot_fmod.detach_instance_from_node(instanceId)
+
+func get_object_attached_to_instance(instanceId: int) -> Object:
+	return godot_fmod.get_object_attached_to_instance(instanceId)
 
 func get_event_parameter_by_name(instanceId: int, parameterName: String) -> float:
 	return godot_fmod.get_event_parameter_by_name(instanceId, parameterName)
@@ -486,3 +519,9 @@ func on_timeline_beat(dict : Dictionary) -> void:
 	
 func on_timeline_marker(dict : Dictionary) -> void:
 	emit_signal("timeline_marker", dict)
+
+func on_sound_played(dict: Dictionary) -> void:
+	emit_signal("sound_played", dict)
+
+func on_sound_stopped(dict: Dictionary) -> void:
+	emit_signal("sound_stopped", dict)

@@ -30,7 +30,7 @@ Fmod="*res://addons/fmod/Fmod.gd"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "fmod" )
+enabled=PoolStringArray( "fmod", "gut" )
 
 [input]
 

@@ -64,7 +64,9 @@ before_install:
 install:
   - if [[ "$PLATFORM" == "android" ]]; then scons godotbinpath=../Godot_v3.1.1-stable_x11.64 platform=android generate_bindings=True bits=64 target=release android-abi=arm && scons platform=android generate_bindings=True bits=64 target=release android-abi=arm64 && cd ../fmod-gdnative; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$PLATFORM" != "android" ]]; then scons $BINDINGS_ARGS && cd ../fmod-gdnative; fi
-script: if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; elif [[ "$PLATFORM" == "android" ]]; then $ANDROID_NDK_ROOT/ndk-build $DRIVER_ARGS && rm libs/arm64-v8a/libc++_shared.so && rm libs/arm64-v8a/libfmod.so && rm libs/arm64-v8a/libfmodstudio.so && rm libs/armeabi-v7a/libc++_shared.so && rm libs/armeabi-v7a/libfmod.so && rm libs/armeabi-v7a/libfmodstudio.so && tar zcvf libandroid_fmod_gdnative.tar.gz libs/; else scons $DRIVER_ARGS; fi
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; elif [[ "$PLATFORM" == "android" ]]; then $ANDROID_NDK_ROOT/ndk-build $DRIVER_ARGS && rm libs/arm64-v8a/libc++_shared.so && rm libs/arm64-v8a/libfmod.so && rm libs/arm64-v8a/libfmodstudio.so && rm libs/armeabi-v7a/libc++_shared.so && rm libs/armeabi-v7a/libfmod.so && rm libs/armeabi-v7a/libfmodstudio.so && tar zcvf libandroid_fmod_gdnative.tar.gz libs/; else scons $DRIVER_ARGS; fi
+script:
+  - if [[ "$PLATFORM" == "osx" ]]; then mkdir -p demo/addons/fmod/libs/osx/ && cp bin/libGodotFmod.osx.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/core/lib/libfmod.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/studio/lib/libfmodstudio.dylib demo/addons/fmod/libs/osx/ && cd demo && ./run_tests.sh ../../Godot.app/Contents/MacOS/Godot && cd ..; fi
 deploy:
   provider: releases
   api_key:
