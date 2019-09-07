@@ -88,8 +88,9 @@ class TestEvent:
 	
 	func test_assert_attached_to_node():
 		Fmod.attach_instance_to_node(id, sprite)
-		var node_instance_id: int = Fmod.get_object_attached_to_instance(id).get_instance_id()
-		assert_false(node_instance_id == -1, "Instance " + str(id) + " should be attached to Node")
+		var node_instance: Object = Fmod.get_object_attached_to_instance(id)
+		var node_instance_id: int = node_instance.get_instance_id()
+		assert_false(node_instance == null, "Instance " + str(id) + " should be attached to Node")
 		var id2: int = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 		var object: Object = Fmod.get_object_attached_to_instance(id2)
 		assert_true(object == null, "Instance " + str(id2) + " should not be attached to any Node")
