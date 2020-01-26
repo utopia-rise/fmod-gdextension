@@ -112,12 +112,14 @@ void Fmod::_register_methods() {
     register_method("mute_all_events", &Fmod::muteAllEvents);
     register_method("unmute_all_events", &Fmod::unmuteAllEvents);
     register_method("banks_still_loading", &Fmod::banksStillLoading);
-    register_method("load_sound", &Fmod::loadSound);
+    register_method("load_file_as_sound", &Fmod::loadFileAsSound);
+    register_method("load_file_as_music", &Fmod::loadFileAsMusic);
+    register_method("unload_file", &Fmod::unloadFile);
     register_method("create_sound_instance", &Fmod::createSoundInstance);
     register_method("check_sound_instance", &Fmod::checkSoundInstance);
+    register_method("release_sound", &Fmod::releaseSound);
     register_method("play_sound", &Fmod::playSound);
     register_method("stop_sound", &Fmod::stopSound);
-    register_method("release_sound", &Fmod::releaseSound);
     register_method("set_sound_paused", &Fmod::setSoundPaused);
     register_method("is_sound_playing", &Fmod::isSoundPlaying);
     register_method("set_sound_volume", &Fmod::setSoundVolume);
@@ -1332,15 +1334,36 @@ void Fmod::setVCAVolume(const String VCAPath, float volume) {
     ERROR_CHECK(instance->setVolume(volume));
 }
 
-void Fmod::loadSound(String path, int mode) {
+void Fmod::loadFileAsSound(String path) {
     DRIVE_PATH(path)
     FMOD::Sound *sound = sounds.get(path);
     if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), mode, nullptr, &sound));
+        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), FMOD_CREATESAMPLE, nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
+            Godot::print("FMOD Sound System: LOADING AS SOUND FILE" + String(path));
         }
     }
+}
+
+void Fmod::loadFileAsMusic(String path) {
+    DRIVE_PATH(path)
+    FMOD::Sound *sound = sounds.get(path);
+    if (!sound) {
+        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL) , nullptr, &sound));
+        if (sound) {
+            sounds[path] << sound;
+            Godot::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
+        }
+    }
+}
+
+void Fmod::unloadFile(String path) {
+    DRIVE_PATH(path)
+    FIND_AND_CHECK(path, sounds)
+    ERROR_CHECK(instance->release());
+    sounds.erase(path);
+    Godot::print("FMOD Sound System: UNLOADING FILE" + String(path));
 }
 
 const uint64_t Fmod::createSoundInstance(String path) {
@@ -1355,22 +1378,25 @@ const uint64_t Fmod::createSoundInstance(String path) {
     return 0;
 }
 
-bool Fmod::checkSoundInstance(int instanceId) {
+bool Fmod::checkSoundInstance(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, channels, false)
     return isChannelValid(instance);
 }
 
 bool Fmod::isChannelValid(FMOD::Channel *channel) {
-    bool isValid = false;
     bool isPlaying;
     FMOD_RESULT result = channel->isPlaying(&isPlaying);
-    if (result != FMOD_ERR_INVALID_HANDLE) {
-        isValid = true;
-    }
-    return isValid;
+    return result != FMOD_ERR_INVALID_HANDLE;
+}
+
+void Fmod::releaseSound(const uint64_t  instanceId){
+    FIND_AND_CHECK(instanceId, channels)
+    ERROR_CHECK(instance->stop());
+    channels.erase(instance);
 }
 
 void Fmod::playSound(const uint64_t instanceId) {
+    FIND_AND_CHECK(instanceId, channels)
     setSoundPaused(instanceId, false);
 }
 
@@ -1413,13 +1439,6 @@ float Fmod::getSoundPitch(const uint64_t instanceId) {
 void Fmod::setSoundPitch(const uint64_t instanceId, float pitch) {
     FIND_AND_CHECK(instanceId, channels)
     ERROR_CHECK(instance->setPitch(pitch));
-}
-
-void Fmod::releaseSound(String path) {
-    DRIVE_PATH(path)
-    FIND_AND_CHECK(path, sounds)
-    ERROR_CHECK(instance->release());
-    sounds.erase(path);
 }
 
 void Fmod::setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale) {

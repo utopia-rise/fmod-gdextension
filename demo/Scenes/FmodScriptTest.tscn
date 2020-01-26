@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Script/FmodTest.gd" type="Script" id=1]
 [ext_resource path="res://icon.png" type="Texture" id=2]
@@ -6,6 +6,8 @@
 [ext_resource path="res://Script/Listener.gd" type="Script" id=4]
 [ext_resource path="res://Script/EnterAndLeave.gd" type="Script" id=5]
 [ext_resource path="res://Script/ChangeColor.gd" type="Script" id=6]
+[ext_resource path="res://Script/EnterandLeave2.gd" type="Script" id=7]
+
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 43.8519, 41.3105 )
@@ -84,7 +86,9 @@ margin_top = -95.0
 margin_right = 160.0
 margin_bottom = -47.0
 size_flags_stretch_ratio = 0.0
-text = "A sound is played when entering and exiting this area
+text = "Files loaded as sounds.
+Played when entering and exiting this area.
+Several instances of the same sound can be played at the same time
 "
 align = 1
 autowrap = true
@@ -112,5 +116,33 @@ margin_bottom = -61.0
 size_flags_stretch_ratio = 0.0
 text = "Event is unpaused when entering 
 The color changes every beat"
+align = 1
+autowrap = true
+
+[node name="SoundArea3" type="Area2D" parent="."]
+position = Vector2( 91.9974, 414.5 )
+script = ExtResource( 7 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea3"]
+position = Vector2( 52.8021, 45.8286 )
+shape = SubResource( 3 )
+
+[node name="icon" type="Sprite" parent="SoundArea3"]
+self_modulate = Color( 0.827451, 0.345098, 0.0941176, 1 )
+position = Vector2( 52.3218, 46.0544 )
+scale = Vector2( 3, 3 )
+z_index = -1
+texture = ExtResource( 2 )
+
+[node name="Label3" type="Label" parent="SoundArea3"]
+margin_left = -74.0
+margin_top = -92.0
+margin_right = 176.0
+margin_bottom = -61.0
+size_flags_stretch_ratio = 0.0
+text = "File loaded as Music
+Start when entering
+Stop when exiting
+Only one instance of that music can be played "
 align = 1
 autowrap = true
