@@ -8,7 +8,6 @@
 [ext_resource path="res://Script/ChangeColor.gd" type="Script" id=6]
 [ext_resource path="res://Script/EnterandLeave2.gd" type="Script" id=7]
 
-
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 43.8519, 41.3105 )
 
