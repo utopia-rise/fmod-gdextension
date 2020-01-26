@@ -17,8 +17,8 @@ class TestSound:
 	func after_all():
 		Fmod.release_sound(sound)
 		Fmod.release_sound(music)
-		Fmod.unload_file(sound)
-		Fmod.unload_file(music)
+		Fmod.unload_file(sound_file)
+		Fmod.unload_file(music_file)
 	
 	func test_assert_set_volume():
 		var desired_value: float = 2.0

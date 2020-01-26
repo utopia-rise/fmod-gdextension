@@ -21,7 +21,7 @@ _global_script_class_icons={
 [application]
 
 config/name="FMOD Gdnative Integration Demo"
-run/main_scene="res://Scenes/FmodTest.tscn"
+run/main_scene="res://Scenes/FmodScriptTest.tscn"
 config/icon="res://icon.png"
 
 [autoload]
