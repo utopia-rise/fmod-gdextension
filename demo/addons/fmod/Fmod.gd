@@ -367,8 +367,20 @@ func set_callback(instanceId: int, callbackMask: int) -> void:
 ###########
 ###SOUND###
 ###########
-func load_sound(path: String, mode: int) -> int:
-	return godot_fmod.load_sound(path, mode)
+func load_file_as_sound(path: String) -> void:
+	godot_fmod.load_file_as_sound(path)
+	
+func load_file_as_music(path: String) -> void:
+	godot_fmod.load_file_as_music(path)
+	
+func unload_file(path: String) -> void:
+	godot_fmod.unload_file(path)
+
+func create_sound_instance(path: String) -> int:
+	return godot_fmod.create_sound_instance(path)
+
+func check_sound_instance(instanceId: int) -> bool:
+	return godot_fmod.check_sound_instance(instanceId)
 
 func release_sound(instanceId: int) -> void:
 	godot_fmod.release_sound(instanceId)

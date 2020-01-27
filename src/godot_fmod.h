@@ -81,11 +81,6 @@ namespace godot {
         String godotPath;
     };
 
-    struct SoundChannel {
-        FMOD::Sound *sound;
-        FMOD::Channel *channel;
-    };
-
     struct Listener {
         Object *gameObj = nullptr;
         bool listenerLock = false;
@@ -113,10 +108,11 @@ namespace godot {
         Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
         Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
+        Map<String, FMOD::Sound *> sounds;
         Map<String, FMOD::Studio::Bus *> buses;
         Map<String, FMOD::Studio::VCA *> VCAs;
 
-        Vector<SoundChannel *> sounds;
+        Vector<FMOD::Channel *> channels;
         Vector<FMOD::Studio::EventInstance *> events;
 
         //Store disctionnary of performance data
@@ -150,6 +146,7 @@ namespace godot {
         void unloadAllVCAs(FMOD::Studio::Bank *bank);
         void unloadAllBuses(FMOD::Studio::Bank *bank);
         void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
+        static bool isChannelValid(FMOD::Channel *channel);
 
     public:
         Fmod();
@@ -266,9 +263,17 @@ namespace godot {
         void unmuteAllEvents();
         bool banksStillLoading();
 
-        void playSound(uint64_t instanceId);
-        const uint64_t loadSound(String path, int mode);
-        void releaseSound(uint64_t instanceId);
+
+        //LOW LEVEL API
+        //Load and release memory
+        void loadFileAsSound(String path);
+        void loadFileAsMusic(String path);
+        void unloadFile(String path);
+        //Check validity of an instance
+        const uint64_t createSoundInstance(String path);
+        bool checkSoundInstance(const uint64_t instanceId);
+        void releaseSound(const uint64_t  instanceId);
+        //Setting the sound
         void setSoundPaused(uint64_t instanceId, bool paused);
         void stopSound(uint64_t instanceId);
         bool isSoundPlaying(uint64_t instanceId);
@@ -276,8 +281,11 @@ namespace godot {
         float getSoundVolume(uint64_t instanceId);
         float getSoundPitch(uint64_t instanceId);
         void setSoundPitch(uint64_t instanceId, float pitch);
-        void waitForAllLoads();
+        //Playing a sound
+        void playSound(uint64_t instanceId);
 
+        //MISC
+        void waitForAllLoads();
         Array getAvailableDrivers();
         int getDriver();
         void setDriver(int id);
