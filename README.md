@@ -117,6 +117,17 @@ scons platform=ios generate_bindings=True bits=64 target=release
 ```
 
 #### Android
+Warning: 
+Fmod require a specific .jar to run on Android + some additionnal setup lines in the godot java wrapper for Android.
+Starting from Godot 3.2, a new custom android build system was introduced. You can use add simple files to your godot project to add java code and libraries without recompiling the whole engine.
+You can find those files in the demo/android/ folder. You must add thoses files in your godot project in order to run the Fmod Gdnative on Android.
+
+Exporting on Android require additionnal steps:
+-Follow this [tutorial](https://docs.godotengine.org/en/3.2/getting_started/workflow/export/android_custom_build.html#doc-android-custom-build) to setup a android custom build.
+-Copy the addons/fmod/ folder from the demo project to your godot project and add the specific Fmod libraries for Android in addons/fmod/libs/android/ folder (You can download them on the FMOD official website).
+-Add the compiled Fmod Gdnative for Android in addons/fmod/libs/android/
+-Copy the android/fmod folder from the demo project to your godot project and add the Fmod.jar for Android in android/fmod/libs (You can download them on the FMOD official website).
+-Your project can now be exported on Android (Don't forget the check the Custom Android build option in the Editor)
 
 To build bindings for iOS, we provide our [godot-cpp](https://github.com/utopia-rise/godot-cpp) version, with Android
 and iOS build export. Checkout `3.1-utopia` branch. This is also provided with our [GDNative example project](https://github.com/utopia-rise/GDNative-example-repo).  

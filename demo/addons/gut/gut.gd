@@ -321,7 +321,7 @@ func _get_summary_text():
 
 	if(_new_summary.get_totals().tests > 0):
 		to_return +=  '+++ ' + str(_new_summary.get_totals().passing) + ' passed ' + str(_new_summary.get_totals().failing) + ' failed.  ' + \
-		              "Tests finished in:  " + str(_gui.get_run_duration()) + ' +++'
+					  "Tests finished in:  " + str(_gui.get_run_duration()) + ' +++'
 		var c = Color(0, 1, 0)
 		if(_new_summary.get_totals().failing > 0):
 			c = Color(1, 0, 0)
@@ -395,8 +395,8 @@ func _end_run():
 # ------------------------------------------------------------------------------
 func _is_function_state(script_result):
 	return script_result != null and \
-	       typeof(script_result) == TYPE_OBJECT and \
-	       script_result is GDScriptFunctionState
+		   typeof(script_result) == TYPE_OBJECT and \
+		   script_result is GDScriptFunctionState
 
 # ------------------------------------------------------------------------------
 # Print out the heading for a new script
@@ -423,7 +423,7 @@ func _print_script_heading(script):
 # ------------------------------------------------------------------------------
 func _should_yield_now():
 	var should = _yield_between.should and \
-	             _yield_between.tests_since_last_yield == _yield_between.after_x_tests
+				 _yield_between.tests_since_last_yield == _yield_between.after_x_tests
 	if(should):
 		_yield_between.tests_since_last_yield = 0
 	else:
