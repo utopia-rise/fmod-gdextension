@@ -50,7 +50,6 @@ before_install:
   - if [[ "$PLATFORM" == "android" ]]; then tar -xvf fmodstudioapi20002android.tar.gz; fi
   - if [[ "$PLATFORM" == "linux" ]]; then mv fmodstudioapi20002linux/api linux; fi
   - if [[ "$PLATFORM" == "osx" ]]; then cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx; fi
-  - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows && mv windows/core/lib/x86/fmod_vc.lib windows/core/lib/x86/fmod.lib && mv windows/core/lib/x64/fmod_vc.lib windows/core/lib/x64/fmod.lib && mv windows/studio/lib/x86/fmodstudio_vc.lib windows/studio/lib/x86/fmodstudio.lib && mv windows/studio/lib/x64/fmodstudio_vc.lib windows/studio/lib/x64/fmodstudio.lib; fi
   - if [[ "$PLATFORM" == "ios" ]]; then cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios; fi
   - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi20002android/api android; fi
   - cd ../../
