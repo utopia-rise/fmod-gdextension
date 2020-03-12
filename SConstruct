@@ -104,16 +104,16 @@ opts.Add(EnumVariable(
     ignorecase=2
 ))
 opts.Add(PathVariable(
-    'headers_dir',
-    'Path to the directory containing Godot headers',
-    os.environ.getenv("GODOT_HEADERS", "../godot-cpp/godot_headers/"),
-    PathVariable.PathIsDir
-))
-opts.Add(PathVariable(
     'cpp_bindings_dir',
     'Path to the cpp binding library',
     "../godot-cpp/",
     PathVariable.PathIsDir
+))
+opts.Add(PathVariable(
+    'headers_dir',
+    'Path to the directory containing Godot headers',
+    'default',
+    PathVariable.PathAccept
 ))
 opts.Add(EnumVariable(
     'android_arch',
@@ -148,7 +148,6 @@ opts.Add(
     "../libs/fmod/"
 )
 
-
 env = Environment(ENV = os.environ)
 opts.Update(env)
 Help(opts.GenerateHelpText(env))
@@ -165,12 +164,16 @@ if (
 # This makes sure to keep the session environment variables on Windows.
 # This way, you can run SCons in a Visual Studio 2017 prompt and it will find
 # all the required tools
-if host_platform == 'windows' and env['platform'] != 'android':
-    if env['bits'] == '64':
-        env = Environment(TARGET_ARCH='amd64')
-    elif env['bits'] == '32':
-        env = Environment(TARGET_ARCH='x86')
+if host_platform == 'windows':
+    if env['platform'] != 'android':
+        if env['bits'] == '64':
+            env = Environment(TARGET_ARCH='amd64')
+        elif env['bits'] == '32':
+            env = Environment(TARGET_ARCH='x86')
     opts.Update(env)
+
+if env["headers_dir"] == 'default':
+    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot_headers/")
 
 if env['bits'] == 'default':
     env['bits'] = '64' if is64 else '32'
@@ -331,18 +334,18 @@ elif env['platform'] == 'android':
     arch_info_table = {
         "armv7" : {
             "march":"armv7-a", "target":"armv7a-linux-androideabi", "tool_path":"arm-linux-androideabi", "compiler_path":"armv7a-linux-androideabi",
-            "ccflags" : ['-mfpu=neon']
+            "ccflags" : ['-mfpu=neon'], "target_platform": "arch-arm"
             },
         "arm64v8" : {
             "march":"armv8-a", "target":"aarch64-linux-android", "tool_path":"aarch64-linux-android", "compiler_path":"aarch64-linux-android",
-            "ccflags" : []
+            "ccflags" : [], "target_platform": "arch-arm64"
             },
         "x86" : {
             "march":"i686", "target":"i686-linux-android", "tool_path":"i686-linux-android", "compiler_path":"i686-linux-android",
-            "ccflags" : ['-mstackrealign']
+            "ccflags" : ['-mstackrealign'], "target_platform": "arch-x86"
             },
         "x86_64" : {"march":"x86-64", "target":"x86_64-linux-android", "tool_path":"x86_64-linux-android", "compiler_path":"x86_64-linux-android",
-            "ccflags" : []
+            "ccflags" : [], "target_platform": "arch-x86_64"
         }
     }
     arch_info = arch_info_table[env['android_arch']]
@@ -355,9 +358,15 @@ elif env['platform'] == 'android':
     env["LD"] = toolchain + "/bin/" + arch_info['tool_path'] + "-ld"
     env["STRIP"] = toolchain + "/bin/" + arch_info['tool_path'] + "-strip"
     env["RANLIB"] = toolchain + "/bin/" + arch_info['tool_path'] + "-ranlib"
+    env['OBJCOPY'] = toolchain + "/bin/" + arch_info['tool_path'] + "-objcopy"
+    env['LINK'] = toolchain + "/bin/clang++"
+    target_platform = env['ANDROID_NDK_ROOT'] + ("/platforms/android-%s" % api_level) + ('/%s/usr/lib' % arch_info['target_platform'])
+    env['SHLINKFLAGS'] = ["-Wl", "-shared", "--sysroot=%s" % target_platform, "-Wl", "-z", "noexecstack"]
 
     env.Append(CCFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march'], '-fPIC'])
-    env.Append(CCFLAGS=arch_info['ccflags'])
+    env.Append(CCFLAGS= arch_info['ccflags'])
+    env.Append(CPPDEFINES = "-DANDROID")
+
 
 #####################
 #ADD SOURCES#########
@@ -370,16 +379,7 @@ cpp_bindings_libname = 'libgodot-cpp.{}.{}.{}'.format(
 lfix = ""
 if env["target"] == "debug":
     lfix = "L"
-
-fmod_info_table = {
-    "64" : "x64",
-    "32" : "x86",
-    "armv7": "armeabi-v7a",
-    "arm64v8": "arm64-v8a",
-    "x86": "x86",
-    "x86_64": "x86_64"
-}
-
+platform = env['platform']
 if platform == "osx":
     libfmod = 'libfmod%s.dylib' % lfix
     libfmodstudio = 'libfmodstudio%s.dylib' % lfix
@@ -387,7 +387,7 @@ if platform == "osx":
     env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
                env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/' ])
+    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/'])
 elif platform == "linux":
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
@@ -399,7 +399,7 @@ elif platform == "linux":
     env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
                env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'linux/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'linux/studio/lib/' + arch_dir' ])
+    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'linux/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'linux/studio/lib/' + arch_dir])
 elif platform == "windows":
     cpp_bindings_libname += '.lib'
     libfmod = 'fmod%s_vc'% lfix
@@ -412,7 +412,7 @@ elif platform == "windows":
     env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
                         env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'windows/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_dir ])
+    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'windows/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_dir])
 elif platform == "ios":
     cpp_bindings_libname += '.a'
     libfmod = 'libfmod%s_iphoneos.a' % lfix
@@ -420,9 +420,9 @@ elif platform == "ios":
     env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
                         env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/' ])
+    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
 elif platform == "android":
-    cpp_bindings_libname += '.so'
+    cpp_bindings_libname += '.a'
     libfmod = 'libfmod%.so' % lfix
     libfmodstudio = 'libfmodstudio%.so' % lfix
     fmod_info_table = {
@@ -435,10 +435,10 @@ elif platform == "android":
     env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
                         env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
-    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir', env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir ])
+    env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
 sources = []
-add_sources(sources, "./src")
+add_sources(sources, "./src", 'cpp')
 
 
 ###############
@@ -461,10 +461,12 @@ if platform == "osx":
         sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/libfmod.dylib", "bin/libGodotFmod.%s.dylib" % platform])
 
     AddPostAction(library, change_id_action)
-elif platform == "android" or platform == "linux":
+elif platform == "android":
+    library = env.SharedLibrary(target=lib_name +".dll", source=sources)
+elif platform == "linux":
     library = env.SharedLibrary(target=lib_name +".so", source=sources)
 elif platform == "windows":
     library = env.SharedLibrary(target=lib_name +".dll", source=sources)
-elif platform != "ios"::
+elif platform != "ios":
     library = env.StaticLibrary(target=lib_name +".a", source=sources)
 Default(library)
