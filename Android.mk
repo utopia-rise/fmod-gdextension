@@ -14,18 +14,18 @@ include $(PREBUILT_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE := godot-prebuilt
 ifeq ($(TARGET_ARCH_ABI),x86)
-    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.i686.a
+    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.x86.a
 endif
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.armv7-a.a
+    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.armv7.a
 endif
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
-    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.armv8-a.a
+    LOCAL_SRC_FILES := ../godot-cpp/bin/libgodot-cpp.android.release.arm64v8.a
 endif
 include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_MODULE := android_fmod_gdnative
+LOCAL_MODULE := libGodotFmod.android.release.$(TARGET_ARCH_ABI)
 LOCAL_CPPFLAGS := -std=c++14
 LOCAL_CPP_FEATURES := rtti exceptions
 LOCAL_LDLIBS := -llog
