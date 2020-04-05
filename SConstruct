@@ -53,6 +53,11 @@ if os.name == "nt":
 
         return rv
 
+def sys_exec(args):
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+    (out, err) = proc.communicate()
+    return out.rstrip("\r\n").lstrip()
+
 #################
 #OPTIONS#########
 #################
@@ -446,19 +451,23 @@ add_sources(sources, "./src", 'cpp')
 ###############
 
 # determine to link as shared or static library
-lib_name = 'bin/' + 'libGodotFmod.{}.{}.{}'.format(
+
+lib_name_without_bin = 'libGodotFmod.{}.{}.{}'.format(
     env['platform'],
     env['target'],
     arch_suffix)
 
-if platform == "osx":
-    library = env.SharedLibrary(target=lib_name +".dylib", source=sources)
-    change_id_action = Action('', change_id)
+lib_name = 'bin/' + lib_name_without_bin
 
+if platform == "osx":
+    lib_path = lib_name + '.dylib'
+    lib_name_dylib = lib_name_without_bin + '.dylib'
     def change_id(self, arg, env):
-        sys_exec(["install_name_tool", "-id", "@rpath/libGodotFmod.%s.dylib" % platform, "bin/libGodotFmod.%s.dylib" % platform])
-        sys_exec(["install_name_tool", "-change", "@rpath/libfmodstudio.dylib", "@loader_path/libfmodstudio.dylib", "bin/libGodotFmod.%s.dylib" % platform])
-        sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/libfmod.dylib", "bin/libGodotFmod.%s.dylib" % platform])
+        sys_exec(["install_name_tool", "-id", "@rpath/%s" % lib_name_dylib , lib_path])
+        sys_exec(["install_name_tool", "-change", "@rpath/libfmodstudio.dylib", "@loader_path/libfmodstudio.dylib", lib_path])
+        sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/libfmod.dylib", lib_path])
+    library = env.SharedLibrary(target=lib_path, source=sources)
+    change_id_action = Action('', change_id)
 
     AddPostAction(library, change_id_action)
 elif platform == "android":
