@@ -476,6 +476,6 @@ elif platform == "linux":
     library = env.SharedLibrary(target=lib_name +".so", source=sources)
 elif platform == "windows":
     library = env.SharedLibrary(target=lib_name +".dll", source=sources)
-elif platform != "ios":
+elif platform == "ios":
     library = env.StaticLibrary(target=lib_name +".a", source=sources)
 Default(library)
