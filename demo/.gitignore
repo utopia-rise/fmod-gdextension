@@ -1,2 +1,4 @@
 .import/
 *.import
+.vscode/
+logs/
