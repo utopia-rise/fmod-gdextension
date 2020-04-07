@@ -462,7 +462,7 @@ lib_name = 'bin/' + lib_name_without_bin
 if platform == "osx":
     lib_path = lib_name + '.dylib'
     lib_name_dylib = lib_name_without_bin + '.dylib'
-    def change_id(self, arg, env):
+    def change_id(self, arg, env, executor = None):
         sys_exec(["install_name_tool", "-id", "@rpath/%s" % lib_name_dylib , lib_path])
         sys_exec(["install_name_tool", "-change", "@rpath/libfmodstudio.dylib", "@loader_path/libfmodstudio.dylib", lib_path])
         sys_exec(["install_name_tool", "-change", "@rpath/libfmod.dylib", "@loader_path/libfmod.dylib", lib_path])
