@@ -7,25 +7,33 @@ import com.godot.game.R;
 import javax.microedition.khronos.opengles.GL10;
 import org.fmod.FMOD;
 
-public class MySingleton extends Godot.SingletonBase {
+
+
+public class FmodSingleton extends Godot.SingletonBase {
 
     protected Activity appActivity;
     protected Context appContext;
     private Godot activity = null;
 
-    static public Godot.SingletonBase initialize(Activity p_activity) {
-        return new MySingleton(p_activity);
+    static
+    {
+        System.loadLibrary("fmod");
     }
 
-    public MySingleton(Activity p_activity) {
+    static public Godot.SingletonBase initialize(Activity p_activity) {
+        return new FmodSingleton(p_activity);
+    }
+
+    public FmodSingleton(Activity p_activity) {
         this.appActivity = p_activity;
         this.appContext = appActivity.getApplicationContext();
         // You might want to try initializing your singleton here, but android
         // threads are weird and this runs in another thread, so to interact with Godot you usually have to do.
         this.activity = (Godot)p_activity;
+        FMOD.init(p_activity);
         this.activity.runOnUiThread(new Runnable() {
             public void run() {
-                FMOD.init(this);
+                System.out.println("Fmod jar init");
             }
         });
     }

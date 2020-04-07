@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "",
+"base": "Node",
 "class": "FmodNative",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
@@ -17,6 +17,14 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "FmodNative": ""
 }
+
+[android]
+
+modules="org/godotengine/godot/FmodSingleton"
+
+[application]
+
+run/main_scene="res://Scenes/FmodScriptTest.tscn"
 
 [autoload]
 
