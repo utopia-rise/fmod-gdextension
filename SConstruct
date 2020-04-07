@@ -54,7 +54,7 @@ if os.name == "nt":
         return rv
 
 def sys_exec(args):
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
     (out, err) = proc.communicate()
     return out.rstrip("\r\n").lstrip()
 

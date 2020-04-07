@@ -53,8 +53,8 @@ before_install:
   - if [[ "$PLATFORM" == "windows" ]]; then mv api/ windows; fi
   - if [[ "$PLATFORM" == "ios" ]]; then cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios; fi
   - if [[ "$PLATFORM" == "android" ]]; then mv fmodstudioapi20002android/api android; fi
-  - ls -al
   - cd ../../
+  - if [[ "$PLATFORM" == "osx" ]]; then wget https://downloads.tuxfamily.org/godotengine/3.2.1/Godot_v3.2.1-stable_osx.64.zip && 7z x Godot_v3.2.1-stable_osx.64.zip; fi
   - git clone --recursive  https://github.com/utopia-rise/godot-cpp godot-cpp
   - cd godot-cpp
   - git checkout utopia-3.2
@@ -64,17 +64,17 @@ install:
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $BINDINGS_ARGS && cd ../fmod-gdnative; elif [[ "$PLATFORM" != "android" ]]; then scons $BINDINGS_ARGS && cd ../fmod-gdnative; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then C:/scons/scons.bat $DRIVER_ARGS; elif [[ "$PLATFORM" == "android" ]]; then $ANDROID_NDK_ROOT/ndk-build $DRIVER_ARGS && rm libs/arm64-v8a/libc++_shared.so && rm libs/arm64-v8a/libfmod.so && rm libs/arm64-v8a/libfmodstudio.so && rm libs/armeabi-v7a/libc++_shared.so && rm libs/armeabi-v7a/libfmod.so && rm libs/armeabi-v7a/libfmodstudio.so && tar zcvf libandroid_fmod_gdnative.tar.gz libs/; else scons $DRIVER_ARGS; fi
 script:
-  - if [[ "$PLATFORM" == "osx" ]]; then mkdir -p demo/addons/fmod/libs/osx/ && cp bin/libGodotFmod.osx.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/core/lib/libfmod.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/studio/lib/libfmodstudio.dylib demo/addons/fmod/libs/osx/ && cd demo && ./run_tests.sh ../../Godot.app/Contents/MacOS/Godot && cd ..; fi
+  - if [[ "$PLATFORM" == "osx" ]]; then mkdir -p demo/addons/fmod/libs/osx/ && cp bin/libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/core/lib/libfmod.dylib demo/addons/fmod/libs/osx/ && cp ../libs/fmod/osx/studio/lib/libfmodstudio.dylib demo/addons/fmod/libs/osx/ && cd demo && ./run_tests.sh ../../Godot.app/Contents/MacOS/Godot && cd ..; fi
 deploy:
   provider: releases
   api_key:
     secure: $TRAVIS_TOKEN
   file:
-    - "bin/libGodotFmod.linux.so"
-    - "bin/libGodotFmod.osx.dylib"
-    - "bin/libGodotFmod.windows.dll"
-    - "bin/libGodotFmod.ios.a"
-    - "../godot-cpp/bin/libgodot-cpp.ios.release.a"
+    - "bin/libGodotFmod.linux.release.64.so"
+    - "bin/libGodotFmod.osx.release.64.dylib"
+    - "bin/libGodotFmod.windows.release.64.dll"
+    - "bin/libGodotFmod.ios.release.arm64.a"
+    - "../godot-cpp/bin/libgodot-cpp.ios.release.arm64.a"
     - "libandroid_fmod_gdnative.tar.gz"
   skip_cleanup: true
   on:
