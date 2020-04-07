@@ -24,7 +24,9 @@ modules="org/godotengine/godot/FmodSingleton"
 
 [application]
 
+config/name="Fmod Demo"
 run/main_scene="res://Scenes/FmodScriptTest.tscn"
+config/icon="res://icon.png"
 
 [autoload]
 
