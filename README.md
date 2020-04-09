@@ -1,4 +1,4 @@
-# FMOD Studio integration for Godot using GDNative (WIP)
+# FMOD Studio integration for Godot using GDNative
 
 A Godot C++ GDNative that provides an integration for the FMOD Studio API.
 
@@ -109,17 +109,6 @@ scons platform=ios generate_bindings=True ios_arch=armv7/arm64 target=release
 ```
 
 #### Android
-Warning: 
-Fmod require a specific .jar to run on Android + some additionnal setup lines in the godot java wrapper for Android.
-Starting from Godot 3.2, a new custom android build system was introduced. You can use add simple files to your godot project to add java code and libraries without recompiling the whole engine.
-You can find those files in the demo/android/ folder. You must add thoses files in your godot project in order to run the Fmod Gdnative on Android.
-
-Exporting on Android require additionnal steps:
--Follow this [tutorial](https://docs.godotengine.org/en/3.2/getting_started/workflow/export/android_custom_build.html#doc-android-custom-build) to setup a android custom build.
--Copy the addons/fmod/ folder from the demo project to your godot project and add the specific Fmod libraries for Android in addons/fmod/libs/android/ folder (You can download them on the FMOD official website).
--Add the compiled Fmod Gdnative for Android in addons/fmod/libs/android/
--Copy the android/fmod folder from the demo project to your godot project and add the Fmod.jar for Android in android/fmod/libs (You can download them on the FMOD official website).
--Your project can now be exported on Android (Don't forget the check the Custom Android build option in the Editor)
 
 To build bindings for android, we provide our [godot-cpp](https://github.com/utopia-rise/godot-cpp) version. 
 Checkout `utopia-3.2` branch. This is also provided with our [GDNative example project](https://github.com/utopia-rise/GDNative-example-repo).  
@@ -193,7 +182,7 @@ project, with `libGodotFmod.ios.release.arm64.a`.
 
 ### Example project
 
-We provide a demo project in demo subfolder to help you to understand how to link the driver to your game project, and how to use it. 
+We provide a [demo project](demo/) in demo subfolder to help you to understand how to link the driver to your game project, and how to use it. 
 
 It does not contains :
 - built driver.
@@ -205,7 +194,7 @@ It contains :
 
 ### Copy addon folder
 
-Copy `addons/fmod` folder from [demo project](https://github.com/utopia-rise/fmod-gdnative/tree/master/demo) into your addons folder.
+Copy `addons/fmod` folder from [demo project](demo/) into your addons folder.
 
 ### Copy built GDNative
 
@@ -233,7 +222,13 @@ iOS.arm64=[ "res://addons/fmod/libs/iOS/libfmodstudio_iphoneos.a", "res://addons
 
 ### Fmod on android with GDNative
 
-To export android project, you need to copy `android` folder from [demo project](https://github.com/utopia-rise/fmod-gdnative/tree/master/demo).  
+Fmod require a specific .jar to run on Android + some additionnal setup lines in the godot java wrapper for Android.
+Starting from Godot 3.2, a new custom android build system was introduced. You can use add simple files to your godot
+project to add java code and libraries without recompiling the whole engine.  
+All is explained in this tutorial this [tutorial](https://docs.godotengine.org/en/3.2/getting_started/workflow/export/android_custom_build.html#doc-android-custom-build).  
+
+Here is how-to:  
+To export android project, you need to copy `android` folder from [demo project](demo/).  
 Also you will have to add `fmod.jar` from `core/lib` of downloaded android fmod library into `android/fmod/libs/`.
 Then add the Fmod java singleton in `ProjectSettings ==> android`.  
 
@@ -540,13 +535,12 @@ print(perf_data.memory)
 print(perf_data.file)
 ```
 
-## Issues
+## Thanks
 
-This is a work in progress project, forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
+This project is a forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
 from [alexfonseka](https://github.com/alexfonseka). We'd like to thank him for the work he did, we simply adapted his
 work to GDNative.  
-This is currently not available to be putted in production environment, but we'll improve the driver with time. Feel free
-to propose any modification using github's *pull request*. We hope you'll enjoy this driver.
+Feel free to propose any modification using github's *pull request*. We hope you'll enjoy this driver.
 
 
 [wowmeme]: .README/wowmeme.png
