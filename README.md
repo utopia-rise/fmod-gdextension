@@ -33,9 +33,7 @@ This fork was designed to be able to use Fmod without building Godot Engine !
         ├── LICENSE
         ├── README.md
         ├── SConstruct (here to build on Windows, Linux, OSX and IOS
-        ├── godot_fmod.h
-        ├── godot_fmod.cpp
-        └── gdlibrary.cpp
+        └── src
 ```
 
 If you look at [Sconstruct](SConstruct) script, you'll see that it refers to libraries that are in path relatives to
@@ -74,46 +72,40 @@ This project uses [SEMVER](https://semver.org/).
 
 #### Godot compatibility matrix
 
-| Driver Version | Godot 3.0 | Godot 3.1-stable | Godot 3.1.1-stable |
-|----------------|-----------|------------------|--------------------|
-|      0.0.0     |           |         X        |                    |
-|      1.0.0     |           |         X        |                    |
-|      2.0.0     |           |         X        |          X         |
-|      2.0.1     |           |         X        |          X         |
-|      2.0.2     |           |         X        |          X         |
-|      3.0.0     |           |         X        |          X         |
+| Driver Version | Godot 3.0 | Godot 3.1 | Godot 3.2 |
+|----------------|-----------|-----------|-----------|
+|      0.0.0     |           |      X    |           |
+|      1.0.0     |           |      X    |           |
+|      2.0.0     |           |      X    |           |
+|      2.0.1     |           |      X    |           |
+|      2.0.2     |           |      X    |           |
+|      3.0.0     |           |      X    |     X     |
 
 #### Fmod compatibility matrix
 
-| Driver Version | 1.10.13 | 2.00.00 | 2.00.01 | 2.00.02 |
-|----------------|---------|---------|---------|---------|
-|      0.0.0     |    X    |         |         |         |
-|      1.0.0     |    X    |         |         |         |
-|      2.0.0     |    X    |         |         |         |
-|      2.0.1     |    X    |         |         |         |
-|      2.0.2     |    X    |         |         |         |
-|      3.0.0     |         |    X    |    X    |    X    |
+| Driver Version | 1.10.13 | 2.00.XX |
+|----------------|---------|---------|
+|      0.0.0     |    X    |         |
+|      1.0.0     |    X    |         |
+|      2.0.0     |    X    |         |
+|      2.0.1     |    X    |         |
+|      2.0.2     |    X    |         |
+|      3.0.0     |         |    X    |
 
 ### Building GDNative API bindings
 
 To Build GDNative bindings you can follow [this tutorial from godot official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#building-the-c-bindings).
-If you want to regenerate bindings you can add the following argument to your building command :
+If you want to regenerate api you can add the following argument to your building command :
 ```
 godotbinpath="path to your godot binary"
 ```
-For the moment we are focusing on release target. So you may need to add :
-```
-target=release
-```
-When you're done with that part you should have `libgodot-cpp.<platform>.<target>.<bits>.<a|lib>` in godot-cpp/bin` folder.
+When you're done with that part you should have `libgodot-cpp.<platform>.<target>.<bits|android_arch|ios_arch>.<a|lib>` in godot-cpp/bin` folder.
 
 #### iOS
 
-To build bindings for iOS, we provide our [godot-cpp](https://github.com/utopia-rise/godot-cpp) version, with Android
-and iOS build export. Checkout `3.1-utopia` branch. This is also provided with our [GDNative example project](https://github.com/utopia-rise/GDNative-example-repo).  
-To build on iOS, you should type :
+To build bindings for iOS, execute:
 ```
-scons platform=ios generate_bindings=True bits=64 target=release
+scons platform=ios generate_bindings=True ios_arch=armv7/arm64 target=release
 ```
 
 #### Android
@@ -129,15 +121,15 @@ Exporting on Android require additionnal steps:
 -Copy the android/fmod folder from the demo project to your godot project and add the Fmod.jar for Android in android/fmod/libs (You can download them on the FMOD official website).
 -Your project can now be exported on Android (Don't forget the check the Custom Android build option in the Editor)
 
-To build bindings for iOS, we provide our [godot-cpp](https://github.com/utopia-rise/godot-cpp) version, with Android
-and iOS build export. Checkout `3.1-utopia` branch. This is also provided with our [GDNative example project](https://github.com/utopia-rise/GDNative-example-repo).  
+To build bindings for android, we provide our [godot-cpp](https://github.com/utopia-rise/godot-cpp) version. 
+Checkout `utopia-3.2` branch. This is also provided with our [GDNative example project](https://github.com/utopia-rise/GDNative-example-repo).  
 First, you should set `ANDROID_NDK_ROOT` environment variable by typing :
 ```
 export ANDROID_NDK_ROOT="pathToYourAndroidNDK"
 ```  
 To build on Android, you should type :
 ```
-scons platform=android generate_bindings=True bits=64 target=release android-abi=arm/arm64
+scons platform=android generate_bindings=True android_arch=armv7/arm64v8 target=release
 ```
 
 ### Building the GDNative driver
@@ -145,44 +137,38 @@ scons platform=android generate_bindings=True bits=64 target=release android-abi
 [Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account) and place it in the
 appropriate platform folder into lib folder (see project structure).
 
-For each platforms, if your project structure is different from the one proposed here, you can overload `cpp_bindings` 
-and `headers` parameters.
+For each platforms, if your project structure is different from the one proposed here, you can overload `cpp_bindings_dir` 
+and `headers_dir` parameters.
+
+To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder `libs` by default, as in OSX
+part. you can overload this relative path adding this parameter to the command `fmod_lib_dir="path to fmod dll"`. 
 
 #### OSX
 
 To build the GDNative for OSX, you should use this command in `fmod-gdnative` folder :
 
 ```
-scons p=osx target=release
+scons platform=osx target=release bits=64
 ```
 
-This will generate `libGodotFmod.osx.dylib` in `fmod-gdnative/bin` folder. 
+This will generate `libGodotFmod.osx.release.64.dylib` in `fmod-gdnative/bin` folder. 
 
-Be aware that osx is a bit tricky with dynamic library loading. [This link](https://blogs.oracle.com/dipol/dynamic-libraries,-rpath,-and-mac-os) 
-explains how to load dynamic dependencies on OSX. By default the GDNative will look for fmod libraries in a `libs` folder
-relative to its path when loading the game or the engine. Otherwise, if you want to change that loading path, you can add this parameter `fmod-lib-install-path="path to fmod dll"`.
 
 #### Linux
 
 To build the GDNative for Linux, you should use this command in `fmod-gdnative` folder :
 ```
-scons p=linux use_llvm=yes target=release bits=64
+scons platform=linux use_llvm=yes target=release bits=64
 ```
-This will generate a `libGodotFmod.linux.so` in `fmod-gdnative/bin` folder.
-
-To load fmod dynamic libraries on app or engine loading, fmod GDNative will look in subfolder `libs` by default, as in OSX
-part. you can overload this relative path adding this parameter to the command `fmod-lib-install-path="path to fmod dll"`. 
+This will generate a `libGodotFmod.linux.release.64.so` in `fmod-gdnative/bin` folder.
 
 #### Windows
 
 To build the GDNative for Windows, you should use this command in `fmod-gdnative` folder :
 ```
-scons p=windows target=release bits=64
+scons platform=windows target=release bits=64
 ```
-This will generate `libGodotFmod.windows.dll` in `fmod-gdnative/bin` folder.
-
-To load fmod dynamic libraries on app or engine loading, the simplest way is to put fmod dynamic dependencies in the 
-same folder as GDNative dll. 
+This will generate `libGodotFmod.windows.release.64.dll` in `fmod-gdnative/bin` folder.
 
 #### Android
 
@@ -190,29 +176,24 @@ To build the GDNative for Android, we currently use NDKBuild. So you should use 
 ```
 $ANDROID_NDK_ROOT/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk  APP_PLATFORM=android-21
 ```
-This will generate `libandroid_fmod_gdnative.so` for each supported architectures in `libs` folder.
-
-To load fmod dynamic libraries on app or engine loading, the simplest way is to put fmod dynamic dependencies in the 
-same folder as GDNative dll, with `libc++_shared.so`.
+This will generate `libGodotFmod.android.<target>.<android_arch>.so` for each supported architectures in `libs` folder.
 
 #### iOS
 
 To build the GDNative for iOS, you should use this command in `fmod-gdnative` folder :
 ```
-p=ios target=release dynamic=no
+scons platform=ios target=release ios-arch=armv7/arm64
 ```
-This will generate `libGodotFmod.ios.a` in `fmod-gdnative/bin` folder.
+This will generate `libGodotFmod.ios.release.arm64.a` in `fmod-gdnative/bin` folder.
 
 Those libraries are statics, so you need to add fmod static librairies and godot-cpp static library for ios in your
-project, with `libGodotFmod.ios.a`.
+project, with `libGodotFmod.ios.release.arm64.a`.
 
 ## Installing the GDNative in your project
 
-In order to understand how to link the driver you built to your game, you can read the [official documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
-
 ### Example project
 
-We provide an [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to help you to understand how to link the driver to your game project, and how to use it. 
+We provide a demo project in demo subfolder to help you to understand how to link the driver to your game project, and how to use it. 
 
 It does not contains :
 - built driver.
@@ -222,116 +203,45 @@ It contains :
 - Fmod gdscript singleton
 - test scripts.
 
+### Copy addon folder
+
+Copy `addons/fmod` folder from [demo project](https://github.com/utopia-rise/fmod-gdnative/tree/master/demo) into your addons folder.
+
 ### Copy built GDNative
 
-You first should copy the built GDNative into your project, for each supported platform.
-You can look at [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) to get inspired of you don't know how to process.
+You have to copy the built GDNative driver in the correspoinding folder:  
+- windows: `res://addons/fmod/libs/windows/`
+- linux: `res://addons/fmod/libs/linux/`
+- osx: `res://addons/fmod/libs/osx/`
+- ios: `res://addons/fmod/libs/iOS/libGodotFmod.ios.release.arm64.a`
+- android: copy arm folders this way `res://addons/fmod/libs/android/arm64_v8a/`
 
-### Create the gdnlib
+### Add Fmod libraries to appropriate folder
 
-In order to create the gdnlib you should go on [the following part of Godot engine documentation](
-https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).  
-You can look at the [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project) gdnlib in lib folder.  
-It tells to godot where to look for dependencies of each platform.
+[Download the FMOD Studio API](https://www.fmod.com/download) (You need to create an account), if you have not done it yet.
+Then place fmod libraries in the appropriate folder, using `gdnlib` to know where:
 
-#### iOS specificity
-
-In order to tell godot where to look for static dependencies of the driver, you need to add them in gdnlib that way :
-```
-[dependencies]
-...
-iOS.armv7=[ "res://lib/iOS/libfmodstudio_iphoneos.a", "res://lib/iOS/libfmod_iphoneos.a", "res://lib/iOS/libgodot-cpp.ios.release.a" ]
-iOS.arm64=[ "res://lib/iOS/libfmodstudio_iphoneos.a", "res://lib/iOS/libfmod_iphoneos.a", "res://lib/iOS/libgodot-cpp.ios.release.a" ]
-```
-
-#### Android specificity
-
-In order to tell godot where to look for dependencies of the driver, you need to add them in gdnlib that way :
 ```
 [dependencies]
 
-Android.armeabi-v7a=[ "res://lib/android/armeabi-v7a/libfmod.so", "res://lib/android/armeabi-v7a/libfmodstudio.so" ]
-Android.arm64-v8a=[ "res://lib/android/arm64-v8a/libfmod.so", "res://lib/android/arm64-v8a/libfmodstudio.so" ]
+Android.arm64-v8a=[ "res://addons/fmod/libs/android/arm64_v8a/libfmod.so", "res://addons/fmod/libs/android/arm64_v8a/libfmodstudio.so" ]
+OSX.64=[ "res://addons/fmod/libs/osx/libfmod.dylib", "res://addons/fmod/libs/osx/libfmodstudio.dylib" ]
+Windows.64=[ "res://addons/fmod/libs/windows/fmod.dll", "res://addons/fmod/libs/windows/fmodstudio.dll" ]
+X11.64=[ "res://addons/fmod/libs/linux/libfmod.so", "res://addons/fmod/libs/linux/libfmodstudio.so" ]
+iOS.arm64=[ "res://addons/fmod/libs/iOS/libfmodstudio_iphoneos.a", "res://addons/fmod/libs/iOS/libfmod_iphoneos.a", "res://addons/fmod/libs/iOS/libgodot-cpp.ios.release.arm64.a" ]
 ```
-
-### Create the gdns
-
-To create the gdns, you still should go on [the same part of documentation](https://docs.godotengine.org/en/3.1/tutorials/plugins/gdnative/gdnative-cpp-example.html#using-the-gdnative-module).
-You still can look at the [example project](https://github.com/utopia-rise/fmod-gndative-godot-example-project), the gdns is located in main/backend/sound/  
-It is used by the scripts as entry point to get gdnlib.
-
-### Create the Fmod singleton
-
-We recommand to wrap an instance of the GDNative into a singleton script. You also can set the GDNative directly as a singleton, but you won't be able to know what methods you can access.  
-You can copy the [Fmod singleton script](https://github.com/utopia-rise/fmod-gndative-godot-example-project/blob/master/main/backend/sound/Fmod.gd) and modify gdns loading according to your project structure.
-
-This script contains :
-- fmod binding methods.
-- process loop implementation to call Fmod update.
-
-You should set this script as auto-loaded in editor.
-
-If you choose the GDNative as singleton method, you also should provide yourself the process loop method implementation.
 
 ### Fmod on android with GDNative
 
-Fmod is a bit tricky to use on android with gdnative. It requires to modify the android export template to load `Fmod.jar`
-and load .so using JNI.  
-You can take example on our [android export template](https://github.com/utopia-rise/godot-export-android-fmod) or take
-the release as is. But if you have you own export template here is what you should do :
+To export android project, you need to copy `android` folder from [demo project](https://github.com/utopia-rise/fmod-gdnative/tree/master/demo).  
+Also you will have to add `fmod.jar` from `core/lib` of downloaded android fmod library into `android/fmod/libs/`.
+Then add the Fmod java singleton in `ProjectSettings ==> android`.  
 
-- Add fmod.jar as dependency in your project (here we will say it is in libs folder, as [here](https://github.com/utopia-rise/godot-export-android-fmod/tree/master/libs)).
-In order to add fmod to gradle you should have dependencies looking like this :  
-```
-dependencies {
-	implementation "com.android.support:support-core-utils:28.0.0"
-	compile files("libs/fmod.jar")
-}
-```
-- Modify `onCreate` and `onDestroy` methods in `Godot` java class  
+![fmodsingleton]
 
-For `onCreate` you should initialize java part of fmod. You should have something like this :  
-```java
-	@Override
-	protected void onCreate(Bundle icicle) {
+And finally you have to setup the android export template.
 
-		super.onCreate(icicle);
-		FMOD.init(this);
-		Window window = getWindow();
-		...
-	}
-```
-
-For `onDestroy` method, you should close java part of Fmod. It should looks like this :
-```java
-	@Override
-	protected void onDestroy() {
-
-		if (mPaymentsManager != null) mPaymentsManager.destroy();
-		for (int i = 0; i < singleton_count; i++) {
-			singletons[i].onMainDestroy();
-		}
-		FMOD.close();
-		super.onDestroy();
-	}
-```
-
-- Modify `GodotLib` java class to load .so using jni.
-
-```java
-public class GodotLib {
-
-	public static GodotIO io;
-
-	static {
-		System.loadLibrary("fmod");
-		System.loadLibrary("fmodstudio");
-		System.loadLibrary("godot_android");
-	}
-	...
-}
-```
-You should not add fmod .so to export template, those lines will use GDNative driver dependencies.
+![usecustombuild]
 
 ## Using the GDNative
 
@@ -635,3 +545,5 @@ to propose any modification using github's *pull request*. We hope you'll enjoy 
 
 
 [wowmeme]: .README/wowmeme.png
+[fmodsingleton]: .README/fmodsingleton.png
+[usecustombuild]: .README/usecustombuild.png
