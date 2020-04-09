@@ -112,6 +112,9 @@ const FMOD_STUDIO_PLAYBACK_STARTING = 3
 const FMOD_STUDIO_PLAYBACK_STOPPING = 4
 const FMOD_STUDIO_PLAYBACK_FORCEINT = 65536
 
+
+var started := false
+
 ############
 ###SYSTEM###
 ############
@@ -123,12 +126,16 @@ func _init() -> void:
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
 
 func _process(delta):
-	godot_fmod._process(delta)
+	if started:
+		godot_fmod._process(delta)
+
 
 func init(numOfChannels: int, studioFlag: int, fmodFlag: int) -> void:
 	godot_fmod.init(numOfChannels, studioFlag, fmodFlag)
+	started = true
 	
 func shutdown() -> void:
+	started = false
 	godot_fmod.shutdown()
 
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
