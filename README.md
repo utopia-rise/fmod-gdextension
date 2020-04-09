@@ -261,7 +261,7 @@ func _ready():
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 	# register listener
-	Fmod.add_listener(self)
+	Fmod.add_listener(0, self)
 
 	# play some events
 	Fmod.play_one_shot("event:/Music/Level 02", self)
@@ -287,7 +287,7 @@ func _ready():
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.add_listener(self)
+	Fmod.add_listener(0, self)
 	
 	# play some events
 	var my_music_event = Fmod.create_event_instance("event:/Music/Level 02")
@@ -409,25 +409,30 @@ In the above example, `params` is a Dictionary which contains parameters passed 
 
 ### Playing sounds using FMOD Core / Low Level API
 
-You can load and play any sound file in your project directory by using the FMOD Low Level API bindings. Similar to Studio Events these instances are identified by a UUID generated in script. Any instances you create must be released manually. Refer to FMOD's documentation pages for a list of compatible sound formats.
+You can load and play any sound file in your project directory by using the FMOD Low Level API bindings. Similar to Studio Events these instances are identified by a UUID generated in script. Any instances you create must be released manually. Refer to FMOD's documentation pages for a list of compatible sound formats. You can use Fmod.load_file_as_music(path) to stream the file and loop it or Fmod.load_file_as_sound(path) to load and play it at once.
+Note that instances of file loaded as sound are automatically release by FMOD once played.
 
 ```gdscript
 func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
-	Fmod.add_listener(self)
-	var my_sound = Fmod.load_sound("./main/sound/20-Title_Gym.wav", Fmod.FMOD_DEFAULT)
+	Fmod.add_listener(0, self)
+	
+	Fmod.load_file_as_music("./main/sound/20-Title_Gym.wav")
+	music = Fmod.create_sound_instance("res://assets/Music/jingles_SAX07.ogg")
 	Fmod.play_sound(my_sound)
+	
 	var t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
 	self.add_child(t)
 	t.start()
 	yield(t, "timeout")
+	
 	Fmod.stop_sound(my_sound)
-	Fmod.release_sound(my_sound)
+	Fmod.release_sound(music)
+	Fmod.unload_file("res://assets/Music/jingles_SAX07.ogg")
 ```
 
 ### Muting all event
@@ -446,7 +451,7 @@ func _ready():
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.add_listener(self)
+	Fmod.add_listener(0, self)
 	
 	# play some events
 	Fmod.play_one_shot("event:/Music/Level 02", self)
@@ -475,7 +480,7 @@ func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	Fmod.setSound3DSettings(1/0, 64.0, 1.0)
 	
 	# load banks
 	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
@@ -483,7 +488,7 @@ func _ready():
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.add_listener(self)
+	Fmod.add_listener(0, self)
 	
 	# play some events
 	Fmod.play_one_shot("event:/Music/Level 02", self)
