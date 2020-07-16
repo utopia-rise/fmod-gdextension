@@ -374,10 +374,10 @@ void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Obj
 void Fmod::shutdown() {
     isInitialized = false;
     isNotinitPrinted = false;
-    system = nullptr;
-    coreSystem = nullptr;
     ERROR_CHECK(system->unloadAll());
     ERROR_CHECK(system->release());
+    system = nullptr;
+    coreSystem = nullptr;
     GODOT_LOG(0, "FMOD Sound System: System released")
 
 }
