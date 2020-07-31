@@ -414,7 +414,7 @@ func _ready():
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
 	Fmod.add_listener(0, self)
 	
-	Fmod.load_file_as_music("./main/sound/20-Title_Gym.wav")
+	Fmod.load_file_as_music("res://assets/Music/jingles_SAX07.ogg")
 	music = Fmod.create_sound_instance("res://assets/Music/jingles_SAX07.ogg")
 	Fmod.play_sound(my_sound)
 	
