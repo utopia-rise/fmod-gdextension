@@ -353,9 +353,10 @@ Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr) {
 }
 
 bool Fmod::isNull(Object *o) {
-    auto *ci = Object::cast_to<CanvasItem>(o);
-    auto *s = Object::cast_to<Spatial>(o);
-    return ci == nullptr && s == nullptr;
+    if (!o) {
+        return true;
+    }
+    return !godot::core_1_1_api->godot_is_instance_valid(o->_owner);
 }
 
 void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {

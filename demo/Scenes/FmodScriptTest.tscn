@@ -67,7 +67,8 @@ margin_top = 52.1241
 margin_right = 102.068
 margin_bottom = 139.124
 size_flags_stretch_ratio = 0.0
-text = "Listener"
+text = "Listener
+Kill it with K key!"
 align = 1
 autowrap = true
 __meta__ = {
