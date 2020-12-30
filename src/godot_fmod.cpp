@@ -264,7 +264,10 @@ void Fmod::setListenerAttributes() {
     }
 
     for (int i = 0; i < systemListenerNumber; i++) {
-        auto listener = &listeners[i];
+        Listener* listener = &listeners[i];
+        if (listener->listenerLock) {
+            continue;
+        }
         if (isNull(listener->gameObj)) {
             listener->gameObj = nullptr;
             ERROR_CHECK(system->setListenerWeight(i, 0));
