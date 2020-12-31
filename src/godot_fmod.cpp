@@ -193,7 +193,7 @@ void Fmod::_process(float delta) {
             EventInfo *eventInfo = getEventInfo(eventInstance);
             if (eventInfo) {
                 if (eventInfo->gameObj) {
-                    if (isNull(eventInfo->gameObj)) {
+                    if (isDead(eventInfo->gameObj)) {
                         FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
                         ERROR_CHECK(eventInstance->stop(m));
                         releaseOneEvent(eventInstance);
@@ -268,7 +268,7 @@ void Fmod::setListenerAttributes() {
         if (listener->listenerLock) {
             continue;
         }
-        if (isNull(listener->gameObj)) {
+        if (isDead(listener->gameObj)) {
             listener->gameObj = nullptr;
             ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
@@ -352,15 +352,23 @@ Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr) {
     return _2Dattr;
 }
 
-bool Fmod::isNull(Object *o) {
-    auto *ci = Object::cast_to<CanvasItem>(o);
-    auto *s = Object::cast_to<Spatial>(o);
-    return ci == nullptr && s == nullptr;
+bool Fmod::isDead(Object* o) {
+    if (!o) {
+        return true;
+    }
+    return !godot::core_1_1_api->godot_is_instance_valid(o->_owner);
+}
+
+bool Fmod::isFmodValid(Object* o) {
+    if (o) {
+        return Object::cast_to<Spatial>(o) || Object::cast_to<CanvasItem>(o);
+    }
+    return false;
 }
 
 void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
     // try to set 3D attributes
-    if (instance && !isNull(o)) {
+    if (instance && isFmodValid(o)) {
         auto *ci = Object::cast_to<CanvasItem>(o);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
@@ -1207,7 +1215,7 @@ void Fmod::playOneShot(const String eventName, Object *gameObj) {
     FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
-        if (!isNull(gameObj)) {
+        if (isFmodValid(gameObj)) {
             updateInstance3DAttributes(instance, gameObj);
         }
         ERROR_CHECK(instance->start());
@@ -1219,7 +1227,7 @@ void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const 
     FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
-        if (!isNull(gameObj)) {
+        if (isFmodValid(gameObj)) {
             updateInstance3DAttributes(instance, gameObj);
         }
         // set the initial parameter values
@@ -1235,7 +1243,7 @@ void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const 
 }
 
 void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
-    if (!isNull(gameObj)) {
+    if (isFmodValid(gameObj)) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
             ERROR_CHECK(instance->start());
@@ -1244,7 +1252,7 @@ void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
 }
 
 void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
-    if (!isNull(gameObj)) {
+    if (isFmodValid(gameObj)) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
             // set the initial parameter values
@@ -1260,8 +1268,8 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
 }
 
 void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
-    if (isNull(gameObj)) {
-        GODOT_LOG(1, "Trying to attach event instance to null game object")
+    if (!isFmodValid(gameObj)) {
+        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Spatial or CanvasItem")
         return;
     }
     FIND_AND_CHECK(instanceId, events)

@@ -132,7 +132,8 @@ namespace godot {
         Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
         Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
 
-        bool isNull(Object *o);
+        static bool isDead(Object* o);
+        static bool isFmodValid(Object* o);
         void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
         void runCallbacks();
 

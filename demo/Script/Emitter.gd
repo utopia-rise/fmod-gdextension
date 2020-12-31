@@ -22,3 +22,5 @@ func _process(delta):
 		else:
 			print("Mower paused")
 			Fmod.set_event_paused(id, true)
+	elif Input.is_action_just_pressed("kill_event"):
+		self.queue_free()
