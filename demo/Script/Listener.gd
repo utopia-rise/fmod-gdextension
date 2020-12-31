@@ -27,3 +27,5 @@ func _process(delta):
 	direction.y = direction.y * delta * 200
 	self.position += direction
 	self.rotate(rotation_dir * delta * 5)
+	if Input.is_action_just_pressed("lock_listener"):
+		Fmod.set_listener_lock(0, !Fmod.get_listener_lock(0))
