@@ -21,6 +21,7 @@ matrix:
       os: linux
     - env: PLATFORM=osx BINDINGS_ARGS="platform=osx generate_bindings=True bits=64 target=release" DRIVER_ARGS="platform=osx target=release"
       os: osx
+      osx_image: xcode10.2
       compiler: clang
       addons:
         homebrew:
