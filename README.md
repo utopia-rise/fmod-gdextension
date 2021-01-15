@@ -248,7 +248,7 @@ extends Node
 func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	
 	# load banks
 	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
@@ -273,7 +273,7 @@ These instances are refered by an int id, returned when created. Remember to rel
 func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
 	
 	# load banks
@@ -345,7 +345,7 @@ you have a scene `AttachToInstanceTest` where you can play with listener positio
 ```gdscript
 func _ready():
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
@@ -411,7 +411,7 @@ Note that instances of file loaded as sound are automatically release by FMOD on
 func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.add_listener(0, self)
 	
 	Fmod.load_file_as_music("res://assets/Music/jingles_SAX07.ogg")
@@ -437,7 +437,7 @@ You can mute all event using `muteAllEvents`. This will mute the master bus.
 ```gdscript
 func _ready():
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
@@ -474,7 +474,7 @@ func _ready():
 func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, FmodF.FMOD_INIT_NORMAL)
+	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.setSound3DSettings(1/0, 64.0, 1.0)
 	
 	# load banks
