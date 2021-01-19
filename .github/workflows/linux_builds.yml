@@ -1,0 +1,75 @@
+name: 🐧 Linux Builds
+on:
+  push:
+    branches: [ master, add-github-actions ]
+
+# Global Settings
+env:
+  TARGET: release
+  FMOD_EXECUTABLE: fmodstudioapi20002linux.tar.gz
+
+jobs:
+  linux-compilation:
+    name: Linux Compilation
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Install all packages (except scons)
+      - name: Configure dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+            libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
+          tar -xvf ${{env.FMOD_EXECUTABLE}}
+          mv fmodstudioapi20002linux/api linux
+          cd ../../
+
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      # Linux shared libraries are humongous (>70MB) for some reason.. don't forget to strip them!
+      - name: Compilation
+        run: |
+          cd godot-cpp
+          scons platform=linux bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ..
+          scons platform=linux target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
+          strip --strip-all bin/libGodotFmod.linux.release.64.so
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: linux
+          path: bin

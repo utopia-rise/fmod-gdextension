@@ -1,0 +1,66 @@
+name: 🍎 macOS Builds
+on:
+  push:
+    branches: [ master, add-github-actions ]
+
+# Global Settings
+env:
+  TARGET: release
+  FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+
+jobs:
+  macos-compilation:
+    name: MacOS Compilation
+    runs-on: "macos-latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          hdiutil attach ${{env.FMOD_EXECUTABLE}}
+          cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          cd ../../
+
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        run: |
+          cd godot-cpp
+          scons platform=osx bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ..
+          scons platform=osx target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: osx
+          path: bin
