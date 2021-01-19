@@ -354,7 +354,7 @@ func _ready():
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
-	Fmod.add_listener($Listener)
+	Fmod.add_listener(0, $Listener)
 	
 	# Create event instance
 	var my_music_event = Fmod.create_event_instance("event:/Weapons/Machine Gun")
