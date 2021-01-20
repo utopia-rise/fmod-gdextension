@@ -324,7 +324,7 @@ FMOD.play_one_shot_attached("event:/Footstep", self)
 
 # same as play_one_shot_attached but lets you set initial parameters
 # subsequent parameters cannot be set
-FMOD.play_one_shot_Attached_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
+FMOD.play_one_shot_attached_with_params("event:/Footstep", self, { "Surface": 1.0, "Speed": 2.0 })
 
 # attaches a manually called instance to a Node
 # once attached 3D attributes are automatically set every frame (when update is called)
