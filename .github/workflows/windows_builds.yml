@@ -1,10 +1,11 @@
 name: 🏁 Windows Builds
 on:
   push:
-    branches: [ master, add-github-actions ]
+    branches: [ master, add-github-actions, implementing-todo-list ]
 
 # Global Settings
 env:
+  PROJECT_FOLDER: fmod-gdnative
   TARGET: release
   FMOD_EXECUTABLE: fmodstudioapi20002win-installer.exe
 
@@ -37,13 +38,17 @@ jobs:
 
       - name : Installing FMOD
         run: |
+          cd ..
           New-Item -ItemType directory -Path libs; cd libs
           New-Item -ItemType directory -Path fmod; cd fmod
-          python ..\..\get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows
           7z x ${{env.FMOD_EXECUTABLE}}
           mv api/ windows
-          cd ..\..\
+          cd ../../
 
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
@@ -54,13 +59,14 @@ jobs:
 
       - name: Compilation
         run: |
-          cd godot-cpp
+          Copy-Item -Path "./godot-cpp/" -Destination "../godot-cpp/" -Recurse
+          cd ../godot-cpp
           scons platform=windows bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
-          cd ..
-          scons platform=windows target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=windows target=${{env.TARGET}}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: windows
-          path: bin
+          path: bin/libGodotFmod.windows.release.64.dll

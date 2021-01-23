@@ -32,16 +32,19 @@ elif platform == 'ios':
 
 downloadlink += user
 
+# First login and get a token!
 response = requests.post(fmodlink, auth = (user, password)).json()
 token = response["token"]
 
-print(token)
+print("Received token from FMOD login API.")
 
+# Next request a download link using the token!
 response = requests.get(downloadlink, headers = {"Authorization": f"Bearer {token}"}).json()
 url = response["url"]
 
+# Download FMOD!
 response = requests.get(url, allow_redirects=True)
 open(filename, 'wb').write(response.content)
 
-print(downloadlink)
+print("Downloading FMOD using the requested download link.")
 print(response)

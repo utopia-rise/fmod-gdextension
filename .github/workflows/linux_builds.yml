@@ -1,10 +1,11 @@
 name: 🐧 Linux Builds
 on:
   push:
-    branches: [ master, add-github-actions ]
+    branches: [ master, add-github-actions, implementing-todo-list ]
 
 # Global Settings
 env:
+  PROJECT_FOLDER: fmod-gdnative
   TARGET: release
   FMOD_EXECUTABLE: fmodstudioapi20002linux.tar.gz
 
@@ -44,13 +45,17 @@ jobs:
 
       - name : Installing FMOD
         run: |
+          cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20002linux/api linux
           cd ../../
 
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
@@ -62,14 +67,15 @@ jobs:
       # Linux shared libraries are humongous (>70MB) for some reason.. don't forget to strip them!
       - name: Compilation
         run: |
-          cd godot-cpp
+          cp -r godot-cpp ../godot-cpp
+          cd ../godot-cpp
           scons platform=linux bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
-          cd ..
-          scons platform=linux target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=linux target=${{env.TARGET}}
           strip --strip-all bin/libGodotFmod.linux.release.64.so
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: linux
-          path: bin
+          path: bin/libGodotFmod.linux.release.64.so

@@ -1,11 +1,12 @@
 name: 🤖 Android Builds
 on:
   push:
-    branches: [ master, add-github-actions ]
+    branches: [ master, add-github-actions, implementing-todo-list ]
     
 # Global Settings
 # Only use the release target for android, otherwise further modification of the make-files is required!
 env:
+  PROJECT_FOLDER: fmod-gdnative
   TARGET: release
   FMOD_EXECUTABLE: fmodstudioapi20002android.tar.gz
 
@@ -42,13 +43,17 @@ jobs:
 
       - name : Installing FMOD
         run: |
+          cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20002android/api android
           cd ../../
 
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
@@ -61,15 +66,17 @@ jobs:
         env:
           ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk-bundle
         run: |
-          cd godot-cpp
+          cp -r godot-cpp ../godot-cpp
+          cd ../godot-cpp
           scons platform=android bits=64 android_arch=armv7 target=${{env.TARGET}} generate_bindings=yes -j4
           scons platform=android bits=64 android_arch=arm64v8 target=${{env.TARGET}} generate_bindings=yes -j4
-          scons platform=android bits=64 android_arch=x86 target=${{env.TARGET}} generate_bindings=yes -j4
-          cd ..
+          cd ../${{env.PROJECT_FOLDER}}
           $ANDROID_NDK_ROOT/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 NDK_LIBS_OUT=bin/
       
       - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: android
-          path: bin
+          path: |
+            bin/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so
+            bin/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so

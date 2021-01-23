@@ -1,10 +1,11 @@
 name: 🍏 iOS Builds
 on:
   push:
-    branches: [ master, add-github-actions ]
+    branches: [ master, add-github-actions, implementing-todo-list ]
 
 # Global Settings
 env:
+  PROJECT_FOLDER: fmod-gdnative
   TARGET: release
   FMOD_EXECUTABLE: fmodstudioapi20002ios.dmg
 
@@ -37,13 +38,17 @@ jobs:
 
       - name : Installing FMOD
         run: |
+          cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
 
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
@@ -54,15 +59,20 @@ jobs:
 
       - name: Compilation
         run: |
-          cd godot-cpp
-          scons platform=ios ios_arch=armv7 bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cp -r "godot-cpp" "../godot-cpp"
+          cd ../godot-cpp
           scons platform=ios ios_arch=arm64 bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
-          cd ..
-          scons platform=ios ios_arch=armv7 target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
-          scons platform=ios ios_arch=arm64 target=${{env.TARGET}} cpp_bindings_dir=godot-cpp/ fmod_lib_dir=libs/fmod/
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=ios ios_arch=arm64 target=${{env.TARGET}}
+          ls /Users/runner/work/fmod-gdnative/godot-cpp/bin/
+          ls /Users/runner/work/fmod-gdnative/godot-cpp/
 
+      # Unfortunately the `upload-artefact@v2`-action doesn't allow the use of . or ..
+      # So we have to use the full path to the compiled godot-cpp library here.
       - name: Upload Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v2
         with:
           name: ios
-          path: bin
+          path: |
+            bin/libGodotFmod.ios.release.arm64.a
+            /Users/runner/work/fmod-gdnative/godot-cpp/bin/libgodot-cpp.ios.release.arm64.a
