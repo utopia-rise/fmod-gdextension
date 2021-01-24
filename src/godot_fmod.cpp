@@ -11,7 +11,6 @@ Mutex *Callbacks::mut;
 Fmod::Fmod() = default;
 
 Fmod::~Fmod() {
-    Fmod::shutdown();
     delete Callbacks::mut;
     Callbacks::mut = nullptr;
 }
