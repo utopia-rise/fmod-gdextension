@@ -4,7 +4,7 @@ signal timeline_marker
 signal sound_played
 signal sound_stopped
 
-var godot_fmod = FmodNative.new()
+var godot_fmod: FmodNative
 
 ############
 ###UTILS###
@@ -119,11 +119,16 @@ var started := false
 ###SYSTEM###
 ############
 func _init() -> void:
+	godot_fmod = FmodNative.new()
 	godot_fmod.connect("timeline_beat", self, "on_timeline_beat")
 	godot_fmod.connect("timeline_marker", self, "on_timeline_marker")
 	godot_fmod.connect("sound_played", self, "on_sound_played")
 	godot_fmod.connect("sound_stopped", self, "on_sound_stopped")
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
+	
+func _notification(what):
+	if what == NOTIFICATION_PREDELETE:
+		godot_fmod.free()
 
 func _process(delta):
 	if started:
