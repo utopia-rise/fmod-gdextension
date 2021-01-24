@@ -134,7 +134,7 @@ namespace godot {
 
         static bool isDead(Node *node);
         static bool isFmodValid(Node *node);
-        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *o);
+        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *node);
         void runCallbacks();
 
         FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Node *gameObject);

@@ -273,13 +273,17 @@ void Fmod::setListenerAttributes() {
             ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
         }
-        auto *ci = Node::cast_to<CanvasItem>(listener->gameObj);
+        Node *node = listener->gameObj;
+        if(!node->is_inside_tree()){
+            return;
+        }
+        auto *ci = Node::cast_to<CanvasItem>(node);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
         }
-        auto *s = Node::cast_to<Spatial>(listener->gameObj);
+        auto *s = Node::cast_to<Spatial>(node);
         if (s != nullptr) {
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
@@ -372,16 +376,16 @@ bool Fmod::isFmodValid(Node *node) {
     return false;
 }
 
-void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *o) {
+void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *node) {
     // try to set 3D attributes
-    if (instance && isFmodValid(o)) {
-        auto *ci = Node::cast_to<CanvasItem>(o);
+    if (instance && isFmodValid(node) && node->is_inside_tree()) {
+        auto *ci = Node::cast_to<CanvasItem>(node);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
-        auto *s = Node::cast_to<Spatial>(o);
+        auto *s = Node::cast_to<Spatial>(node);
         if (s != nullptr) {
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
