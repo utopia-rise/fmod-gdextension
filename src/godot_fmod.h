@@ -71,7 +71,7 @@ namespace godot {
         //Is the event oneshot
         bool isOneShot = false;
         //GameObject to which this event is attached
-        Object *gameObj = nullptr;
+        Node *gameObj = nullptr;
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
@@ -82,7 +82,7 @@ namespace godot {
     };
 
     struct Listener {
-        Object *gameObj = nullptr;
+        Node *gameObj = nullptr;
         bool listenerLock = false;
         float weight = 1.0;
     };
@@ -132,12 +132,12 @@ namespace godot {
         Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
         Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
 
-        static bool isDead(Object* o);
-        static bool isFmodValid(Object* o);
-        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o);
+        static bool isDead(Node *node);
+        static bool isFmodValid(Node *node);
+        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *o);
         void runCallbacks();
 
-        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Object *gameObject);
+        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Node *gameObject);
         EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
         void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
         void loadBankData(LoadingBank *loadingBank);
@@ -163,7 +163,7 @@ namespace godot {
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
 
-        void addListener(int index, Object *gameObj);
+        void addListener(int index, Node *gameObj);
         void removeListener(int index);
         void setListenerNumber(int listenerNumber);
         int getSystemNumListeners();
@@ -175,7 +175,7 @@ namespace godot {
         void setSystemListener2DAttributes(int index, Transform2D transform);
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
-        Object *getObjectAttachedToListener(int index);
+        Node * getObjectAttachedToListener(int index);
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
@@ -252,13 +252,13 @@ namespace godot {
         float getVCAVolume(String VCAPath);
         void setVCAVolume(String VCAPath, float volume);
         /* Helper methods */
-        void playOneShot(String eventName, Object *gameObj);
-        void playOneShotWithParams(String eventName, Object *gameObj, Dictionary parameters);
-        void playOneShotAttached(String eventName, Object *gameObj);
-        void playOneShotAttachedWithParams(String eventName, Object *gameObj, Dictionary parameters);
-        void attachInstanceToNode(uint64_t instanceId, Object *gameObj);
+        void playOneShot(String eventName, Node *gameObj);
+        void playOneShotWithParams(String eventName, Node *gameObj, Dictionary parameters);
+        void playOneShotAttached(String eventName, Node *gameObj);
+        void playOneShotAttachedWithParams(String eventName, Node *gameObj, Dictionary parameters);
+        void attachInstanceToNode(uint64_t instanceId, Node *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
-        Object *getObjectAttachedToInstance(uint64_t instanceId);
+        Node * getObjectAttachedToInstance(uint64_t instanceId);
         void pauseAllEvents(bool pause);
         void muteAllEvents();
         void unmuteAllEvents();

@@ -273,16 +273,17 @@ void Fmod::setListenerAttributes() {
             ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
         }
-        auto *ci = Object::cast_to<CanvasItem>(listener->gameObj);
+        auto *ci = Node::cast_to<CanvasItem>(listener->gameObj);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
-
-        } else {
-            // needs testing
-            auto *s = Object::cast_to<Spatial>(listener->gameObj);
+            continue;
+        }
+        auto *s = Node::cast_to<Spatial>(listener->gameObj);
+        if (s != nullptr) {
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
+            continue;
         }
     }
 }
@@ -298,7 +299,7 @@ FMOD_VECTOR Fmod::toFmodVector(Vector3 &vec) {
 FMOD_3D_ATTRIBUTES Fmod::get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
                                          const FMOD_VECTOR &vel) {
     FMOD_3D_ATTRIBUTES
-    f3d;
+            f3d;
     f3d.forward = forward;
     f3d.position = pos;
     f3d.up = up;
@@ -352,32 +353,39 @@ Dictionary Fmod::getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attr) {
     return _2Dattr;
 }
 
-bool Fmod::isDead(Object* o) {
-    if (!o) {
+bool Fmod::isDead(Node *node) {
+    if (!node) {
         return true;
     }
-    return !godot::core_1_1_api->godot_is_instance_valid(o->_owner);
+    return !godot::core_1_1_api->godot_is_instance_valid(node->_owner);
 }
 
-bool Fmod::isFmodValid(Object* o) {
-    if (o) {
-        return Object::cast_to<Spatial>(o) || Object::cast_to<CanvasItem>(o);
+bool Fmod::isFmodValid(Node *node) {
+    if (node) {
+        bool ret = Node::cast_to<Spatial>(node) || Node::cast_to<CanvasItem>(node);
+        if(!ret) {
+            GODOT_LOG(2, "Invalid Object. A listener has to be either a Spatial or CanvasItem.")
+        }
+        return ret;
     }
+    GODOT_LOG(2, "Object is null")
     return false;
 }
 
-void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Object *o) {
+void Fmod::updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *o) {
     // try to set 3D attributes
     if (instance && isFmodValid(o)) {
-        auto *ci = Object::cast_to<CanvasItem>(o);
+        auto *ci = Node::cast_to<CanvasItem>(o);
         if (ci != nullptr) {
             auto attr = get3DAttributesFromTransform2D(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
-        } else {
-            // needs testing
-            auto *s = Object::cast_to<Spatial>(o);
+            return;
+        }
+        auto *s = Node::cast_to<Spatial>(o);
+        if (s != nullptr) {
             auto attr = get3DAttributesFromTransform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
+            return;
         }
     }
 }
@@ -403,7 +411,10 @@ void Fmod::setListenerNumber(int p_listenerNumber) {
     }
 }
 
-void Fmod::addListener(int index, Object *gameObj) {
+void Fmod::addListener(int index, Node *gameObj) {
+    if(!isFmodValid(gameObj)) {
+        return;
+    }
     if (index >= 0 && index < systemListenerNumber) {
         Listener *listener = &listeners[index];
         listener->gameObj = gameObj;
@@ -467,7 +478,7 @@ Dictionary Fmod::getSystemListener3DAttributes(const int index) {
     Dictionary _3Dattr;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr;
+                attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _3Dattr = getTransformInfoFrom3DAttribut(attr);
     } else {
@@ -480,7 +491,7 @@ Dictionary Fmod::getSystemListener2DAttributes(int index) {
     Dictionary _2Dattr;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr;
+                attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
     } else {
@@ -492,7 +503,7 @@ Dictionary Fmod::getSystemListener2DAttributes(int index) {
 void Fmod::setSystemListener3DAttributes(int index, Transform transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr = get3DAttributesFromTransform(transform);
+                attr = get3DAttributesFromTransform(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
@@ -502,7 +513,7 @@ void Fmod::setSystemListener3DAttributes(int index, Transform transform) {
 void Fmod::setSystemListener2DAttributes(int index, Transform2D transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr = get3DAttributesFromTransform2D(transform);
+                attr = get3DAttributesFromTransform2D(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
@@ -526,16 +537,16 @@ bool Fmod::getListenerLock(int index) {
     }
 }
 
-Object *Fmod::getObjectAttachedToListener(int index) {
+Node * Fmod::getObjectAttachedToListener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
     } else {
-        Object *object = listeners[index].gameObj;
-        if (!object) {
-            GODOT_LOG(1, "No object was set on listener")
+        Node *node = listeners[index].gameObj;
+        if (!node) {
+            GODOT_LOG(1, "No node was set on listener")
         }
-        return object;
+        return node;
     }
 }
 
@@ -781,7 +792,7 @@ Dictionary Fmod::getEvent2DAttributes(const uint64_t instanceId) {
     Dictionary _2Dattr;
     FIND_AND_CHECK(instanceId, events, _2Dattr)
     FMOD_3D_ATTRIBUTES
-    attr;
+            attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
     _2Dattr = getTransform2DInfoFrom3DAttribut(attr);
     return _2Dattr;
@@ -797,7 +808,7 @@ Dictionary Fmod::getEvent3DAttributes(const uint64_t instanceId) {
     Dictionary _3Dattr;
     FIND_AND_CHECK(instanceId, events, _3Dattr)
     FMOD_3D_ATTRIBUTES
-    attr;
+            attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
     _3Dattr = getTransformInfoFrom3DAttribut(attr);
     return _3Dattr;
@@ -927,7 +938,7 @@ Dictionary Fmod::descGetParameterDescriptionByName(const String eventPath, const
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+            pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -946,7 +957,7 @@ Dictionary Fmod::descGetParameterDescriptionByID(const String eventPath, const A
     paramId.data1 = (unsigned int) idPair[0];
     paramId.data2 = (unsigned int) idPair[1];
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+            pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByID(paramId, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -969,7 +980,7 @@ Dictionary Fmod::descGetParameterDescriptionByIndex(const String eventPath, cons
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+            pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByIndex(index, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -985,7 +996,7 @@ Dictionary Fmod::descGetUserProperty(const String eventPath, const String name) 
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
     FMOD_STUDIO_USER_PROPERTY
-    uProp;
+            uProp;
     if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1011,7 +1022,7 @@ Dictionary Fmod::descUserPropertyByIndex(const String eventPath, const int index
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
     FMOD_STUDIO_USER_PROPERTY
-    uProp;
+            uProp;
     if (ERROR_CHECK(instance->getUserPropertyByIndex(index, &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1191,7 +1202,7 @@ bool Fmod::checkEventPath(const String eventPath) {
     return eventDescriptions.has(eventPath);
 }
 
-FMOD::Studio::EventInstance *Fmod::createInstance(const String eventName, const bool isOneShot, Object *gameObject) {
+FMOD::Studio::EventInstance *Fmod::createInstance(String eventName, bool isOneShot, Node *gameObject) {
     FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
     FMOD::Studio::EventInstance *eventInstance = nullptr;
     ERROR_CHECK(instance->createInstance(&eventInstance));
@@ -1211,7 +1222,7 @@ EventInfo *Fmod::getEventInfo(FMOD::Studio::EventInstance *eventInstance) {
     return eventInfo;
 }
 
-void Fmod::playOneShot(const String eventName, Object *gameObj) {
+void Fmod::playOneShot(String eventName, Node *gameObj) {
     FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1223,7 +1234,7 @@ void Fmod::playOneShot(const String eventName, Object *gameObj) {
     }
 }
 
-void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
+void Fmod::playOneShotWithParams(String eventName, Node *gameObj, Dictionary parameters) {
     FMOD::Studio::EventInstance *instance = createInstance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1242,7 +1253,7 @@ void Fmod::playOneShotWithParams(const String eventName, Object *gameObj, const 
     }
 }
 
-void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
+void Fmod::playOneShotAttached(String eventName, Node *gameObj) {
     if (isFmodValid(gameObj)) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
@@ -1251,7 +1262,7 @@ void Fmod::playOneShotAttached(const String eventName, Object *gameObj) {
     }
 }
 
-void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj, const Dictionary parameters) {
+void Fmod::playOneShotAttachedWithParams(String eventName, Node *gameObj, Dictionary parameters) {
     if (isFmodValid(gameObj)) {
         FMOD::Studio::EventInstance *instance = createInstance(eventName, true, gameObj);
         if (instance) {
@@ -1267,7 +1278,7 @@ void Fmod::playOneShotAttachedWithParams(const String eventName, Object *gameObj
     }
 }
 
-void Fmod::attachInstanceToNode(const uint64_t instanceId, Object *gameObj) {
+void Fmod::attachInstanceToNode(uint64_t instanceId, Node *gameObj) {
     if (!isFmodValid(gameObj)) {
         GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Spatial or CanvasItem")
         return;
@@ -1281,17 +1292,17 @@ void Fmod::detachInstanceFromNode(const uint64_t instanceId) {
     getEventInfo(instance)->gameObj = nullptr;
 }
 
-Object *Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
-    Object *object = nullptr;
-    FIND_AND_CHECK(instanceId, events, object)
+Node * Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
+    Node *node = nullptr;
+    FIND_AND_CHECK(instanceId, events, node)
     EventInfo *eventInfo = getEventInfo(instance);
     if (eventInfo) {
-        object = eventInfo->gameObj;
-        if (!object) {
-            GODOT_LOG(1, "There is no object attached to event instance.")
+        node = eventInfo->gameObj;
+        if (!node) {
+            GODOT_LOG(1, "There is no node attached to event instance.")
         }
     }
-    return object;
+    return node;
 }
 
 void Fmod::pauseAllEvents(const bool pause) {
@@ -1573,7 +1584,7 @@ float Fmod::getGlobalParameterByID(const Array idPair) {
 Dictionary Fmod::getGlobalParameterDescByName(const String parameterName) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+            pDesc;
     if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1596,7 +1607,7 @@ Dictionary Fmod::getGlobalParameterDescByID(const Array idPair) {
     id.data1 = idPair[0];
     id.data2 = idPair[1];
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+            pDesc;
     if (ERROR_CHECK(system->getParameterDescriptionByID(id, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1618,7 +1629,7 @@ int Fmod::getGlobalParameterDescCount() {
 Array Fmod::getGlobalParameterDescList() {
     Array a;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
-    descList[256];
+            descList[256];
     int count = 0;
     ERROR_CHECK(system->getParameterDescriptionList(descList, 256, &count));
     for (int i = 0; i < count; i++) {
