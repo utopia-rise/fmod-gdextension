@@ -128,6 +128,8 @@ func _init() -> void:
 	
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
+		if started:
+			shutdown()
 		godot_fmod.free()
 
 func _process(delta):
@@ -136,12 +138,18 @@ func _process(delta):
 
 
 func init(numOfChannels: int, studioFlag: int, fmodFlag: int) -> void:
-	godot_fmod.init(numOfChannels, studioFlag, fmodFlag)
-	started = true
+	if not started:
+		godot_fmod.init(numOfChannels, studioFlag, fmodFlag)
+		started = true
+	else:
+		print("Fmod already started")
 	
 func shutdown() -> void:
-	started = false
-	godot_fmod.shutdown()
+	if started:
+		started = false
+		godot_fmod.shutdown()
+	else:
+		print("Fmod not started, can't shutdown'")
 
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
 	godot_fmod.set_software_format(sampleRate, speakerMode, numRowSpeakers)
