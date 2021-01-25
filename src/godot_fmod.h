@@ -175,7 +175,7 @@ namespace godot {
         void setSystemListener2DAttributes(int index, Transform2D transform);
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
-        Node * getObjectAttachedToListener(int index);
+        Node* getObjectAttachedToListener(int index);
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);
@@ -258,7 +258,7 @@ namespace godot {
         void playOneShotAttachedWithParams(String eventName, Node *gameObj, Dictionary parameters);
         void attachInstanceToNode(uint64_t instanceId, Node *gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
-        Node * getObjectAttachedToInstance(uint64_t instanceId);
+        Node* getObjectAttachedToInstance(uint64_t instanceId);
         void pauseAllEvents(bool pause);
         void muteAllEvents();
         void unmuteAllEvents();
