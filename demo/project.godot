@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "",
+"base": "Node",
 "class": "FmodNative",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
@@ -30,7 +30,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-Fmod="*res://addons/fmod/Fmod.gd"
+Fmod="*res://addons/fmod/Fmod.tscn"
 
 [editor_plugins]
 
