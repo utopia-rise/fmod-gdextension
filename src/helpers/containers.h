@@ -52,6 +52,10 @@ namespace godot {
             return (T) ((uint64_t) Array::pop_front());
         }
 
+        void push_front_value(const T &v){
+            Array::push_front((uint64_t) v);
+        }
+
         void push_back_value(const T &v){
             Array::push_back((uint64_t) v);
         }

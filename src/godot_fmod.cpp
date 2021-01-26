@@ -11,6 +11,7 @@ Mutex *Callbacks::mut;
 Fmod::Fmod() = default;
 
 Fmod::~Fmod() {
+    Callbacks::GodotFileRunner::get_singleton()->finish();
     delete Callbacks::mut;
     Callbacks::mut = nullptr;
 }
@@ -163,6 +164,15 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
+        ERROR_CHECK(coreSystem->setFileSystem(
+                &Callbacks::godotFileOpen,
+                &Callbacks::godotFileClose,
+                nullptr,
+                nullptr,
+                &Callbacks::godotSyncRead,
+                &Callbacks::godotSyncCancel,
+                -1
+        ));
     }
 
     if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
@@ -1736,9 +1746,11 @@ void Fmod::_init() {
     coreSystem = nullptr;
     isInitialized = false;
     isNotinitPrinted = false;
+    Callbacks::GodotFileRunner::get_singleton()->start();
     Callbacks::mut = Mutex::_new();
     performanceData["CPU"] = Dictionary();
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
     distanceScale = 1.0;
+
 }

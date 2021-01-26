@@ -6,12 +6,14 @@
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
+#include <fmod.hpp>
 #include <Spatial.hpp>
 #include <Object.hpp>
 #include <CanvasItem.hpp>
 #include <Node.hpp>
 #include <gen/Mutex.hpp>
-#include "callback/callbacks.h"
+#include "callback/event_callbacks.h"
+#include "callback/file_callbacks.h"
 #include "helpers/containers.h"
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
@@ -115,7 +117,7 @@ namespace godot {
         Vector<FMOD::Channel *> channels;
         Vector<FMOD::Studio::EventInstance *> events;
 
-        //Store disctionnary of performance data
+        //Store dictionary of performance data
         Dictionary performanceData;
 
         void checkLoadingBanks();
