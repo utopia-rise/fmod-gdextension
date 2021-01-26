@@ -3,9 +3,10 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <Mutex.hpp>
 #include <File.hpp>
 #include "../helpers/containers.h"
+#include <thread>
+#include <condition_variable>
 #include <thread>
 
 namespace Callbacks {
@@ -25,10 +26,16 @@ namespace Callbacks {
     private:
 
         std::thread fileThread;
-        bool stop = false;
-        godot::Mutex* mut = godot::Mutex::_new();
-        godot::Vector<FMOD_ASYNCREADINFO*> requests = godot::Vector<FMOD_ASYNCREADINFO*>();
 
+        std::condition_variable read_cv;
+        std::mutex read_mut;
+
+        std::condition_variable cancel_cv;
+        std::mutex cancel_mut;
+
+        bool stop = false;
+        FMOD_ASYNCREADINFO* current_request = nullptr;
+        godot::Vector<FMOD_ASYNCREADINFO*> requests = godot::Vector<FMOD_ASYNCREADINFO*>();
 
         GodotFileRunner() = default;
         ~GodotFileRunner() = default;
