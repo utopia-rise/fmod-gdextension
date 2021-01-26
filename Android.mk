@@ -33,6 +33,7 @@ LOCAL_LDLIBS := -llog
 LOCAL_SRC_FILES := \
 src/godot_fmod.cpp \
 src/gdlibrary.cpp \
+src/callback/file_callbacks.cpp \
 
 LOCAL_SHARED_LIBRARIES := \
 fmod-core-prebuilt \
