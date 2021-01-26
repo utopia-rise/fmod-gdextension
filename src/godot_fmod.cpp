@@ -164,15 +164,6 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
-        ERROR_CHECK(coreSystem->setFileSystem(
-                &Callbacks::godotFileOpen,
-                &Callbacks::godotFileClose,
-                nullptr,
-                nullptr,
-                &Callbacks::godotSyncRead,
-                &Callbacks::godotSyncCancel,
-                -1
-        ));
     }
 
     if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
@@ -182,6 +173,20 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
             GODOT_LOG(0, "FMOD Sound System: Live update enabled!")
         }
     }
+
+#ifdef CUSTOM_FILESYSTEM
+    if (ERROR_CHECK(coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            nullptr,
+            nullptr,
+            &Callbacks::godotSyncRead,
+            &Callbacks::godotSyncCancel,
+            -1)
+    )) {
+        GODOT_LOG(0, "Custom File System enabled.")
+    }
+#endif
 }
 
 void Fmod::_process(float delta) {
