@@ -7,7 +7,6 @@
 #include "../helpers/containers.h"
 #include <thread>
 #include <condition_variable>
-#include <thread>
 
 namespace Callbacks {
     struct GodotFileHandle {

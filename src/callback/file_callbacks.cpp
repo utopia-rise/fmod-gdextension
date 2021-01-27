@@ -26,11 +26,11 @@ namespace Callbacks{
     void GodotFileRunner::cancelReadRequest(FMOD_ASYNCREADINFO* request) {
         //lock so we can't add and remove elements from the queue at the same time.
         {
-        std::lock_guard<std::mutex> lk(read_mut);
-        requests.erase(request);
+            std::lock_guard<std::mutex> lk(read_mut);
+            requests.erase(request);
         }
 
-        //We lock and check if the current request is the one being cancel.
+        //We lock and check if the current request is the one being canceled.
         //In this case, we wait until it's done.
         {
             std::unique_lock<std::mutex> lk(cancel_mut);

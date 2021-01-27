@@ -34,6 +34,7 @@ LOCAL_SRC_FILES := \
 src/godot_fmod.cpp \
 src/gdlibrary.cpp \
 src/callback/file_callbacks.cpp \
+src/callback/event_callbacks.cpp \
 
 LOCAL_SHARED_LIBRARIES := \
 fmod-core-prebuilt \

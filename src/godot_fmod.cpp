@@ -6,14 +6,10 @@
 
 using namespace godot;
 
-Mutex *Callbacks::mut;
-
 Fmod::Fmod() = default;
 
 Fmod::~Fmod() {
     Callbacks::GodotFileRunner::get_singleton()->finish();
-    delete Callbacks::mut;
-    Callbacks::mut = nullptr;
 }
 
 void Fmod::_register_methods() {
@@ -689,13 +685,12 @@ void Fmod::releaseEvent(const uint64_t instanceId) {
 }
 
 void Fmod::releaseOneEvent(FMOD::Studio::EventInstance *eventInstance) {
-    Callbacks::mut->lock();
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
     EventInfo *eventInfo = getEventInfo(eventInstance);
     eventInstance->setUserData(nullptr);
     ERROR_CHECK(eventInstance->release());
     events.erase(eventInstance);
     delete eventInfo;
-    Callbacks::mut->unlock();
 }
 
 void Fmod::startEvent(const uint64_t instanceId) {
@@ -859,7 +854,7 @@ int Fmod::descGetInstanceCount(const String eventPath) {
 }
 
 void Fmod::descReleaseAllInstances(const String eventPath) {
-    Callbacks::mut->lock();
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
     FIND_AND_CHECK(eventPath, eventDescriptions)
     FMOD::Studio::EventInstance *instances[MAX_EVENT_INSTANCE];
     int count = 0;
@@ -875,7 +870,6 @@ void Fmod::descReleaseAllInstances(const String eventPath) {
         }
     }
     ERROR_CHECK(instance->releaseAllInstances());
-    Callbacks::mut->unlock();
 }
 
 void Fmod::descLoadSampleData(const String eventPath) {
@@ -1669,51 +1663,11 @@ void Fmod::setCallback(const uint64_t instanceId, int callbackMask) {
     GODOT_LOG(0, String("CallBack set on event ") + String::num(instanceId, 0))
 }
 
-FMOD_RESULT F_CALLBACK
-Callbacks::eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters) {
-    auto *instance = (FMOD::Studio::EventInstance *) event;
-    auto instanceId = (uint64_t) instance;
-    EventInfo *eventInfo;
-    mut->lock();
-    instance->getUserData((void **) &eventInfo);
-    if (eventInfo) {
-        Callbacks::CallbackInfo *callbackInfo = &eventInfo->callbackInfo;
 
-        if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
-            auto *props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES *) parameters;
-            callbackInfo->markerCallbackInfo["event_id"] = instanceId;
-            callbackInfo->markerCallbackInfo["name"] = props->name;
-            callbackInfo->markerCallbackInfo["position"] = props->position;
-            callbackInfo->markerSignalEmitted = false;
-        } else if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT) {
-            auto *props = (FMOD_STUDIO_TIMELINE_BEAT_PROPERTIES *) parameters;
-            callbackInfo->beatCallbackInfo["event_id"] = instanceId;
-            callbackInfo->beatCallbackInfo["beat"] = props->beat;
-            callbackInfo->beatCallbackInfo["bar"] = props->bar;
-            callbackInfo->beatCallbackInfo["tempo"] = props->tempo;
-            callbackInfo->beatCallbackInfo["time_signature_upper"] = props->timesignatureupper;
-            callbackInfo->beatCallbackInfo["time_signature_lower"] = props->timesignaturelower;
-            callbackInfo->beatCallbackInfo["position"] = props->position;
-            callbackInfo->beatSignalEmitted = false;
-        } else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ||
-                   type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
-            auto *sound = (FMOD::Sound *) parameters;
-            char n[256];
-            sound->getName(n, 256);
-            String name(n);
-            String mType = type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ? "played" : "stopped";
-            callbackInfo->soundCallbackInfo["name"] = name;
-            callbackInfo->soundCallbackInfo["type"] = mType;
-            callbackInfo->soundSignalEmitted = false;
-        }
-    }
-    mut->unlock();
-    return FMOD_OK;
-}
 
 // runs on the game thread
 void Fmod::runCallbacks() {
-    Callbacks::mut->lock();
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
     for (int i = 0; i < events.size(); i++) {
         FMOD::Studio::EventInstance *eventInstance = events.get(i);
         auto eventInfo = getEventInfo(eventInstance);
@@ -1743,7 +1697,6 @@ void Fmod::runCallbacks() {
             GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
         }
     }
-    Callbacks::mut->unlock();
 }
 
 void Fmod::_init() {
@@ -1752,7 +1705,6 @@ void Fmod::_init() {
     isInitialized = false;
     isNotinitPrinted = false;
     Callbacks::GodotFileRunner::get_singleton()->start();
-    Callbacks::mut = Mutex::_new();
     performanceData["CPU"] = Dictionary();
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();

@@ -4,7 +4,7 @@
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
 #include <core/Dictionary.hpp>
-#include <Mutex.hpp>
+#include <mutex>
 
 namespace Callbacks {
     struct CallbackInfo {
@@ -16,7 +16,7 @@ namespace Callbacks {
         godot::Dictionary soundCallbackInfo;
     };
 
-    extern godot::Mutex *mut;
+    extern std::mutex callback_mut;
 
     FMOD_RESULT F_CALLBACK eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE *event, void *parameters);
 }
