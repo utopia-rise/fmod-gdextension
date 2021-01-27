@@ -4,8 +4,8 @@
 namespace Callbacks{
 
     GodotFileRunner* GodotFileRunner::get_singleton() {
-        static GodotFileRunner* singleton {new GodotFileRunner()};
-        return singleton;
+        static GodotFileRunner singleton;
+        return &singleton;
     }
 
     void GodotFileRunner::queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority) {
@@ -134,7 +134,7 @@ namespace Callbacks{
     ) {
         godot::Ref<godot::File> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
         file->close();
-        free(handle);
+        delete reinterpret_cast<GodotFileHandle*>(handle);
         return FMOD_RESULT::FMOD_OK;
     }
 

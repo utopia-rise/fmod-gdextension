@@ -9,7 +9,7 @@ extern "C" void GDN_EXPORT fmod_gdnative_init(godot_gdnative_init_options *o){
 }
 
 extern "C" void GDN_EXPORT fmod_gdnative_terminate(godot_gdnative_terminate_options *o){
-    free(Callbacks::GodotFileRunner::get_singleton());
+    delete Callbacks::GodotFileRunner::get_singleton();
     Godot::gdnative_terminate(o);
 }
 

@@ -22,6 +22,8 @@ namespace Callbacks {
             HIGH
         };
 
+        ~GodotFileRunner() = default;
+
     private:
 
         std::thread fileThread;
@@ -37,7 +39,8 @@ namespace Callbacks {
         godot::Vector<FMOD_ASYNCREADINFO*> requests = godot::Vector<FMOD_ASYNCREADINFO*>();
 
         GodotFileRunner() = default;
-        ~GodotFileRunner() = default;
+        GodotFileRunner(const GodotFileRunner&) = delete;
+        GodotFileRunner& operator=(const GodotFileRunner&) = delete;
 
         void run();
     public:
