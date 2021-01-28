@@ -6,23 +6,30 @@
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
+#include <fmod.hpp>
 #include <Spatial.hpp>
 #include <Object.hpp>
 #include <CanvasItem.hpp>
 #include <Node.hpp>
 #include <gen/Mutex.hpp>
-#include "callback/callbacks.h"
+#include "callback/event_callbacks.h"
+#include "callback/file_callbacks.h"
 #include "helpers/containers.h"
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
 
+#define CUSTOM_FILESYSTEM
 
-#ifdef __ANDROID__
-#define DRIVE_PATH(path)\
+#ifndef CUSTOM_FILESYSTEM
+    #ifdef __ANDROID__
+        #define DRIVE_PATH(path)\
 path = path.replace("res://", "file:///android_asset/");
-#else
-#define DRIVE_PATH(path)\
+    #else
+        #define DRIVE_PATH(path)\
 path = path.replace("res://", "./");
+    #endif
+#else
+    #define DRIVE_PATH(path)
 #endif
 
 #define MAX_PATH_SIZE 512
@@ -115,7 +122,7 @@ namespace godot {
         Vector<FMOD::Channel *> channels;
         Vector<FMOD::Studio::EventInstance *> events;
 
-        //Store disctionnary of performance data
+        //Store dictionary of performance data
         Dictionary performanceData;
 
         void checkLoadingBanks();
