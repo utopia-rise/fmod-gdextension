@@ -132,7 +132,6 @@ jobs:
           ref: utopia-3.2
           submodules: recursive
 
-      # Linux shared libraries are humongous (>70MB) for some reason.. don't forget to strip them!
       - name: Compilation
         run: |
           cp -r godot-cpp ../godot-cpp
@@ -140,7 +139,6 @@ jobs:
           scons platform=linux bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
           cd ../${{env.PROJECT_FOLDER}}
           scons platform=linux target=${{env.TARGET}}
-          strip --strip-all bin/libGodotFmod.linux.release.64.so
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
