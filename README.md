@@ -346,7 +346,7 @@ you have a scene `AttachToInstanceTest` where you can play with listener positio
 func _ready():
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
 	
 	# load banks
 	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
