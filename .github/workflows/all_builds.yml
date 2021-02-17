@@ -1,7 +1,7 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master, add-github-actions, implementing-todo-list ]
+    branches: [ master, add-github-actions, test-release]
     tags:
       - "v*"
   pull_request:
@@ -438,15 +438,17 @@ jobs:
       - name: Download Artefacts
         uses: actions/download-artifact@v2
 
-      - name: Copy Libraries to Addons
+      - name: Copy Libraries to Libs Folder
         run: |
           cp windows/libGodotFmod.windows.release.64.dll demo/addons/fmod/libs/windows/
           cp linux/libGodotFmod.linux.release.64.so demo/addons/fmod/libs/linux/
           cp osx/libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/
-          cp android/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so demo/addons/fmod/libs/android/armeabi-v7a/
-          cp android/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so demo/addons/fmod/libs/android/arm64-v8a/
+          cp android/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so demo/addons/fmod/libs/android/armeabi_v7a/
+          cp android/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so demo/addons/fmod/libs/android/arm64_v8a/
           cp ios/libGodotFmod.ios.release.arm64.a demo/addons/fmod/libs/iOS/
           cp ios/libgodot-cpp.ios.release.arm64.a demo/addons/fmod/libs/iOS/
+          cd demo/addons/
+          zip -r fmod.zip fmod/
 
       - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
@@ -454,6 +456,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/demo/addons/fmod/
-          asset_name: fmod
+          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/demo/addons/fmod.zip
+          asset_name: fmod.zip
           asset_content_type: application/zip
