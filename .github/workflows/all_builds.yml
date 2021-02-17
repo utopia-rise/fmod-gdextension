@@ -11,6 +11,7 @@ on:
 env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET: release
+  GODOT_VERSION: 3.2.3
 
 jobs:
   windows-compilation:
@@ -349,10 +350,69 @@ jobs:
             bin/libGodotFmod.ios.release.arm64.a
             bin/libgodot-cpp.ios.release.arm64.a
 
+  test:
+    name: GUT Test
+    runs-on: macos-latest
+    needs: [macos-compilation]
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          hdiutil attach ${{env.FMOD_EXECUTABLE}}
+          cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          cd ../../
+
+      - name: Download Godot Engine
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+          unzip Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+          rm Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+      - name: Download OSX binary
+        uses: actions/download-artifact@v2
+        with:
+          name: osx
+
+      - name: Run Tests
+        run: |
+          mkdir -p demo/addons/fmod/libs/osx/
+          cp libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/
+          cp "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api/core/lib/libfmod.dylib" demo/addons/fmod/libs/osx/
+          cp "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api/studio/lib/libfmodstudio.dylib" demo/addons/fmod/libs/osx/
+          cd demo
+          chmod +x run_tests.sh
+          ./run_tests.sh ../Godot.app/Contents/MacOS/Godot
+
   release:
     name: Release
     runs-on: "ubuntu-20.04"
-    needs: [windows-compilation, linux-compilation, macos-compilation, ios-compilation, android-compilation]
+    needs: [windows-compilation, linux-compilation, macos-compilation, ios-compilation, android-compilation, test]
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
     steps:
       - name: Create Release
@@ -370,75 +430,30 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
       - name: Download Artefacts
         uses: actions/download-artifact@v2
 
-      - name: Upload Windows Release Asset
+      - name: Copy Libraries to Addons
+        run: |
+          cp windows/libGodotFmod.windows.release.64.dll demo/addons/fmod/libs/windows/
+          cp linux/libGodotFmod.linux.release.64.so demo/addons/fmod/libs/linux/
+          cp osx/libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/
+          cp android/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so demo/addons/fmod/libs/android/armeabi-v7a/
+          cp android/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so demo/addons/fmod/libs/android/arm64-v8a/
+          cp ios/libGodotFmod.ios.release.arm64.a demo/addons/fmod/libs/iOS/
+          cp ios/libgodot-cpp.ios.release.arm64.a demo/addons/fmod/libs/iOS/
+
+      - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/windows/libGodotFmod.windows.release.64.dll
-          asset_name: libGodotFmod.windows.release.64.dll
-          asset_content_type: application/zip
-      
-      - name: Upload Linux Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/linux/libGodotFmod.linux.release.64.so
-          asset_name: libGodotFmod.linux.release.64.so
-          asset_content_type: application/zip
-      
-      - name: Upload MacOS Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/osx/libGodotFmod.osx.release.64.dylib
-          asset_name: libGodotFmod.osx.release.64.dylib
-          asset_content_type: application/zip
-      
-      - name: Upload Android (armeabi-v7a) Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/android/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so
-          asset_name: libGodotFmod.android.release.armeabi-v7a.so
-          asset_content_type: application/zip
-
-      - name: Upload Android (arm64-v8a) Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/android/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so
-          asset_name: libGodotFmod.android.release.arm64-v8a.so
-          asset_content_type: application/zip
-
-      - name: Upload iOS (arm64) Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/ios/libGodotFmod.ios.release.arm64.a
-          asset_name: libGodotFmod.ios.release.arm64.a
-          asset_content_type: application/zip
-      
-      - name: Upload compiled iOS `godot-cpp` bindings
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/ios/libgodot-cpp.ios.release.arm64.a
-          asset_name: libgodot-cpp.ios.release.arm64.a
+          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/demo/addons/fmod/
+          asset_name: fmod
           asset_content_type: application/zip
