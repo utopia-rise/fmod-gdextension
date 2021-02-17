@@ -445,7 +445,7 @@ elif platform == "android":
 
 sources = []
 add_sources(sources, "./src", 'cpp')
-
+add_sources(sources, "./src/callback", 'cpp')
 
 ###############
 #BUILD LIB#####

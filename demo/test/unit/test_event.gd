@@ -56,8 +56,8 @@ class TestEvent:
 	
 	func test_assert_timeline_position():
 		var desired_value: int = 10
-		Fmod.set_event_timeline_position(id, desired_value)
 		Fmod.set_event_paused(id, true)
+		Fmod.set_event_timeline_position(id, desired_value)
 		yield(yield_for(2), YIELD)
 		assert_eq(Fmod.get_event_timeline_position(id), 10, "Event timeline should be at " + str(desired_value))
 	
