@@ -1,0 +1,461 @@
+name: 🌈 All Builds
+on:
+  push:
+    branches: [ master, add-github-actions, test-release]
+    tags:
+      - "v*"
+  pull_request:
+    branches: "*"
+
+# Global Settings
+env:
+  PROJECT_FOLDER: fmod-gdnative
+  TARGET: release
+  GODOT_VERSION: 3.2.3
+
+jobs:
+  windows-compilation:
+    name: Windows Compilation
+    runs-on: "windows-latest"
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002win-installer.exe
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons pywin32 requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          New-Item -ItemType directory -Path libs; cd libs
+          New-Item -ItemType directory -Path fmod; cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows
+          7z x ${{env.FMOD_EXECUTABLE}}
+          mv api/ windows
+          cd ../../
+
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        run: |
+          Copy-Item -Path "./godot-cpp/" -Destination "../godot-cpp/" -Recurse
+          cd ../godot-cpp
+          scons platform=windows bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=windows target=${{env.TARGET}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows
+          path: bin/libGodotFmod.windows.release.64.dll
+
+  linux-compilation:
+    name: Linux Compilation
+    runs-on: "ubuntu-20.04"
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002linux.tar.gz
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Install all packages (except scons)
+      - name: Configure dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+            libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev libudev-dev libxi-dev libxrandr-dev yasm
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
+          tar -xvf ${{env.FMOD_EXECUTABLE}}
+          mv fmodstudioapi20002linux/api linux
+          cd ../../
+
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        run: |
+          cp -r godot-cpp ../godot-cpp
+          cd ../godot-cpp
+          scons platform=linux bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=linux target=${{env.TARGET}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux
+          path: bin/libGodotFmod.linux.release.64.so
+
+  macos-compilation:
+    name: MacOS Compilation
+    runs-on: "macos-latest"
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          hdiutil attach ${{env.FMOD_EXECUTABLE}}
+          cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          cd ../../
+
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        run: |
+          cp -r godot-cpp ../godot-cpp
+          cd ../godot-cpp
+          scons platform=osx bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=osx target=${{env.TARGET}}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: osx
+          path: bin/libGodotFmod.osx.release.64.dylib
+
+  android-compilation:
+    name: Android Compilation
+    runs-on: "ubuntu-20.04"
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002android.tar.gz
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 
+        with:
+            submodules: recursive
+
+      - name: Set up Java 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      # Use python 3.x release (works cross platform)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
+          tar -xvf ${{env.FMOD_EXECUTABLE}}
+          mv fmodstudioapi20002android/api android
+          cd ../../
+
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        env:
+          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk-bundle
+        run: |
+          cp -r godot-cpp ../godot-cpp
+          cd ../godot-cpp
+          scons platform=android bits=64 android_arch=armv7 target=${{env.TARGET}} generate_bindings=yes -j4
+          scons platform=android bits=64 android_arch=arm64v8 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ../${{env.PROJECT_FOLDER}}
+          $ANDROID_NDK_ROOT/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 NDK_LIBS_OUT=bin/
+      
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: android
+          path: |
+            bin/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so
+            bin/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so
+
+  ios-compilation:
+    name: iOS Compilation
+    runs-on: "macos-latest"
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002ios.dmg
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # You can test your matrix by printing the current Python version
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios
+          hdiutil attach ${{env.FMOD_EXECUTABLE}}
+          cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
+          cd ../../
+
+      # The `godot-cpp`-repository is currently cloned inside of the project folder.
+      # This is a limitation of the checkout action and will be fixed in PR#388...
+      # For now we'll have to copy the `godot-cpp`-repository ourselves!
+      - name: Cloning godot-cpp
+        uses: actions/checkout@v2
+        with:
+          repository: utopia-rise/godot-cpp
+          path: godot-cpp
+          ref: utopia-3.2
+          submodules: recursive
+
+      - name: Compilation
+        run: |
+          cp -r "godot-cpp" "../godot-cpp"
+          cd ../godot-cpp
+          scons platform=ios ios_arch=arm64 bits=64 target=${{env.TARGET}} generate_bindings=yes -j4
+          cd ../${{env.PROJECT_FOLDER}}
+          scons platform=ios ios_arch=arm64 target=${{env.TARGET}}
+          cp "../godot-cpp/bin/libgodot-cpp.ios.release.arm64.a" "bin/libgodot-cpp.ios.release.arm64.a"
+
+      # Unfortunately the `upload-artefact@v2`-action doesn't allow the use of . or ..
+      # So we have to use the full path to the compiled godot-cpp library here.
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios
+          path: |
+            bin/libGodotFmod.ios.release.arm64.a
+            bin/libgodot-cpp.ios.release.arm64.a
+
+  test:
+    name: GUT Test
+    runs-on: macos-latest
+    needs: [macos-compilation]
+    env:
+      FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          # Semantic version range syntax or exact version of a Python version
+          python-version: '3.x'
+          # Optional - x64 or x86 architecture, defaults to x64
+          architecture: 'x64'
+
+      # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+      - name: Configuring Python packages
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip install scons requests
+          python --version
+          scons --version
+
+      - name : Installing FMOD
+        run: |
+          cd ..
+          mkdir libs && cd libs
+          mkdir fmod && cd fmod
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          hdiutil attach ${{env.FMOD_EXECUTABLE}}
+          cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          cd ../../
+
+      - name: Download Godot Engine
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+          unzip Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+          rm Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+      - name: Download OSX binary
+        uses: actions/download-artifact@v2
+        with:
+          name: osx
+
+      - name: Run Tests
+        run: |
+          mkdir -p demo/addons/fmod/libs/osx/
+          cp libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/
+          cp "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api/core/lib/libfmod.dylib" demo/addons/fmod/libs/osx/
+          cp "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api/studio/lib/libfmodstudio.dylib" demo/addons/fmod/libs/osx/
+          cd demo
+          chmod +x run_tests.sh
+          ./run_tests.sh ../Godot.app/Contents/MacOS/Godot
+
+  release:
+    name: Release
+    runs-on: "ubuntu-20.04"
+    needs: [windows-compilation, linux-compilation, macos-compilation, ios-compilation, android-compilation, test]
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Download Artefacts
+        uses: actions/download-artifact@v2
+
+      - name: Copy Libraries to Libs Folder
+        run: |
+          cp windows/libGodotFmod.windows.release.64.dll demo/addons/fmod/libs/windows/
+          cp linux/libGodotFmod.linux.release.64.so demo/addons/fmod/libs/linux/
+          cp osx/libGodotFmod.osx.release.64.dylib demo/addons/fmod/libs/osx/
+          cp android/armeabi-v7a/libGodotFmod.android.release.armeabi-v7a.so demo/addons/fmod/libs/android/armeabi_v7a/
+          cp android/arm64-v8a/libGodotFmod.android.release.arm64-v8a.so demo/addons/fmod/libs/android/arm64_v8a/
+          cp ios/libGodotFmod.ios.release.arm64.a demo/addons/fmod/libs/iOS/
+          cp ios/libgodot-cpp.ios.release.arm64.a demo/addons/fmod/libs/iOS/
+          cd demo/addons/
+          zip -r fmod.zip fmod/
+
+      - name: Upload Release Assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: /home/runner/work/fmod-gdnative/fmod-gdnative/demo/addons/fmod.zip
+          asset_name: fmod.zip
+          asset_content_type: application/zip
