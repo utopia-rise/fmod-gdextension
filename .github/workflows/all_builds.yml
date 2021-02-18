@@ -1,7 +1,7 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master, add-github-actions, test-release]
+    branches: [ master ]
     tags:
       - "v*"
   pull_request:
