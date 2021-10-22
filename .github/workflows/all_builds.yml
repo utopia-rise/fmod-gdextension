@@ -11,7 +11,8 @@ on:
 env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET: release
-  GODOT_VERSION: 3.2.3
+  GODOT_VERSION: 3.3.4
+  UTOPIA_GODOT_CPP_REF: utopia-3.3.4-stable
 
 jobs:
   windows-compilation:
@@ -60,7 +61,7 @@ jobs:
         with:
           repository: utopia-rise/godot-cpp
           path: godot-cpp
-          ref: utopia-3.2
+          ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
 
       - name: Compilation
@@ -130,7 +131,7 @@ jobs:
         with:
           repository: utopia-rise/godot-cpp
           path: godot-cpp
-          ref: utopia-3.2
+          ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
 
       - name: Compilation
@@ -193,7 +194,7 @@ jobs:
         with:
           repository: utopia-rise/godot-cpp
           path: godot-cpp
-          ref: utopia-3.2
+          ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
 
       - name: Compilation
@@ -260,7 +261,7 @@ jobs:
         with:
           repository: utopia-rise/godot-cpp
           path: godot-cpp
-          ref: utopia-3.2
+          ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
 
       - name: Compilation
@@ -328,7 +329,7 @@ jobs:
         with:
           repository: utopia-rise/godot-cpp
           path: godot-cpp
-          ref: utopia-3.2
+          ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
 
       - name: Compilation
