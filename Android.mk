@@ -41,7 +41,7 @@ fmod-core-prebuilt \
 fmod-studio-prebuilt
 
 LOCAL_C_INCLUDES := \
-../godot-cpp/godot_headers \
+../godot-cpp/godot-headers \
 ../godot-cpp/include/ \
 ../godot-cpp/include/core \
 ../godot-cpp/include/gen \

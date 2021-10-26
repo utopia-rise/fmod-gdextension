@@ -178,7 +178,7 @@ if host_platform == 'windows':
     opts.Update(env)
 
 if env["headers_dir"] == 'default':
-    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot_headers/")
+    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot-headers/")
 
 if env['bits'] == 'default':
     env['bits'] = '64' if is64 else '32'
@@ -232,7 +232,7 @@ elif env['platform'] == 'osx':
     ])
 
     if env['target'] == 'debug':
-        env.Append(CCFLAGS=['-Og'])
+        env.Append(CCFLAGS=['-Og', 'g'])
     elif env['target'] == 'release':
         env.Append(CCFLAGS=['-O3'])
 
@@ -269,7 +269,7 @@ elif env['platform'] == 'ios':
     ])
 
     if env['target'] == 'debug':
-        env.Append(CCFLAGS=['-Og'])
+        env.Append(CCFLAGS=['-Og', '-g'])
     elif env['target'] == 'release':
         env.Append(CCFLAGS=['-O3'])
 
