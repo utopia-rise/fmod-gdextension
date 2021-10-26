@@ -394,9 +394,9 @@ jobs:
 
       - name: Download Godot Engine
         run: |
-          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
-          unzip Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
-          rm Godot_v${{env.GODOT_VERSION}}-stable_osx.64.zip
+          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_osx.universal.zip
+          unzip Godot_v${{env.GODOT_VERSION}}-stable_osx.universal.zip
+          rm Godot_v${{env.GODOT_VERSION}}-stable_osx.universal.zip
       - name: Download OSX binary
         uses: actions/download-artifact@v2
         with:
