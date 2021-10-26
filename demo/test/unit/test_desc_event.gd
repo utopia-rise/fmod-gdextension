@@ -71,7 +71,7 @@ class TestEventDescription:
 		var desiredValue: float = 20.0
 		assert_eq(Fmod.desc_get_maximum_distance("event:/Vehicles/Car Engine"), desiredValue, "Event description maximum distance should be " + str(desiredValue))
 
-    func test_assert_maximum_distance():
+    func test_assert_min_max_distance():
         var desiredMin: float = 1.0
         var desiredMax: float = 20.0
         var minMaxDistance = Fmod.desc_get_min_max_distance("event:/Vehicles/Car Engine")
