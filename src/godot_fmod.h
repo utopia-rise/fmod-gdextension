@@ -235,8 +235,9 @@ namespace godot {
         bool descIsSnapshot(String eventPath);
         bool descIsStream(String eventPath);
         bool descHasCue(String eventPath);
-        float descGetMaximumDistance(String eventPath);
-        float descGetMinimumDistance(String eventPath);
+        Array descGetMinMaxDistance(const String& eventPath);
+        [[deprecated]] float descGetMaximumDistance(String eventPath);
+        [[deprecated]] float descGetMinimumDistance(String eventPath);
         float descGetSoundSize(String eventPath);
         Dictionary descGetParameterDescriptionByName(String eventPath, String name);
         Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);

@@ -471,6 +471,9 @@ func desc_is_stream(event_path: String) -> bool:
 func desc_has_cue(event_path: String) -> bool:
 	return godot_fmod.desc_has_cue(event_path)
 
+func desc_get_min_max_distance(event_path: String) -> Array:
+	return godot_fmod.desc_get_min_max_distance(event_path)
+
 func desc_get_maximum_distance(event_path: String) -> float:
 	return godot_fmod.desc_get_maximum_distance(event_path)
 

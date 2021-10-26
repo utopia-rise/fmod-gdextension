@@ -33,9 +33,11 @@ class TestGlobal:
 		assert_contains_in_dict(cpu_perf_data, "dsp")
 		assert_contains_in_dict(cpu_perf_data, "geometry")
 		assert_contains_in_dict(cpu_perf_data, "stream")
-		assert_contains_in_dict(cpu_perf_data, "studio")
 		assert_contains_in_dict(cpu_perf_data, "update")
-	
+		assert_contains_in_dict(cpu_perf_data, "convolution1")
+		assert_contains_in_dict(cpu_perf_data, "convolution2")
+		assert_contains_in_dict(cpu_perf_data, "studio")
+
 	func test_assert_should_have_memory_performance_data():
 		var perf_data: Dictionary = Fmod.get_performance_data()
 		assert_contains_in_dict(perf_data, "memory")
