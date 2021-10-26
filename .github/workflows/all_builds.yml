@@ -1,11 +1,12 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master ]
+    branches: [ master, approved-review-testing ]
     tags:
       - "v*"
   pull_request_target:
     branches: "*"
+    if: github.event.review.state == 'approved'
 
 # Global Settings
 env:
