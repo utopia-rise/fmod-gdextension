@@ -1,11 +1,13 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master ]
+    branches: [ master, workflow-run-testing ]
     tags:
       - "v*"
-  pull_request_target:
-    branches: "*"
+  workflow_run:
+    workflows: ["Receive PR"]
+    types:
+      - completed
 
 # Global Settings
 env:
