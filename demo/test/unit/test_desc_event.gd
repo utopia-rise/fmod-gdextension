@@ -61,16 +61,8 @@ class TestEventDescription:
 		assert_false(Fmod.desc_is_stream("event:/Vehicles/Car Engine"), "Event description should not be stream")
 	
 	func test_assert_should_not_have_cue():
-		assert_false(Fmod.desc_has_cue("event:/Vehicles/Car Engine"), "Event description should not have cue")
+		assert_false(Fmod.desc_has_sustain_point("event:/Vehicles/Car Engine"), "Event description should not have cue")
 	
-	func test_assert_minimum_distance():
-		var desiredValue: float = 1.0
-		assert_eq(Fmod.desc_get_minimum_distance("event:/Vehicles/Car Engine"), desiredValue, "Event description minimum distance should be " + str(desiredValue))
-	
-	func test_assert_maximum_distance():
-		var desiredValue: float = 20.0
-		assert_eq(Fmod.desc_get_maximum_distance("event:/Vehicles/Car Engine"), desiredValue, "Event description maximum distance should be " + str(desiredValue))
-
     func test_assert_min_max_distance():
         var desiredMin: float = 1.0
         var desiredMax: float = 20.0

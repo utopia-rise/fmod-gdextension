@@ -47,7 +47,7 @@ void Fmod::_register_methods() {
     register_method("release_event", &Fmod::releaseEvent);
     register_method("start_event", &Fmod::startEvent);
     register_method("stop_event", &Fmod::stopEvent);
-    register_method("trigger_event_cue", &Fmod::triggerEventCue);
+    register_method("event_key_off", &Fmod::eventKeyOff);
     register_method("get_event_playback_state", &Fmod::getEventPlaybackState);
     register_method("get_event_paused", &Fmod::getEventPaused);
     register_method("set_event_paused", &Fmod::setEventPaused);
@@ -77,10 +77,8 @@ void Fmod::_register_methods() {
     register_method("desc_is_one_shot", &Fmod::descIsOneShot);
     register_method("desc_is_snapshot", &Fmod::descIsSnapshot);
     register_method("desc_is_stream", &Fmod::descIsStream);
-    register_method("desc_has_cue", &Fmod::descHasCue);
+    register_method("desc_has_sustain_point", &Fmod::descHasSustainPoint);
     register_method("desc_get_min_max_distance", &Fmod::descGetMinMaxDistance);
-    register_method("desc_get_maximum_distance", &Fmod::descGetMaximumDistance);
-    register_method("desc_get_minimum_distance", &Fmod::descGetMinimumDistance);
     register_method("desc_get_sound_size", &Fmod::descGetSoundSize);
     register_method("desc_get_parameter_description_by_name", &Fmod::descGetParameterDescriptionByName);
     register_method("desc_get_parameter_description_by_id", &Fmod::descGetParameterDescriptionByID);
@@ -704,7 +702,7 @@ void Fmod::stopEvent(const uint64_t instanceId, int stopMode) {
     ERROR_CHECK(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
-void Fmod::triggerEventCue(const uint64_t instanceId) {
+void Fmod::eventKeyOff(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events)
     ERROR_CHECK(instance->keyOff());
 }
@@ -918,7 +916,7 @@ bool Fmod::descIsStream(const String eventPath) {
     return isStream;
 }
 
-bool Fmod::descHasCue(const String eventPath) {
+bool Fmod::descHasSustainPoint(const String eventPath) {
     bool hasSustainPoint = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, hasSustainPoint)
     ERROR_CHECK(instance->hasSustainPoint(&hasSustainPoint));
@@ -935,24 +933,6 @@ Array Fmod::descGetMinMaxDistance(const String& eventPath) {
     ret.append(minDistance);
     ret.append(maxDistance);
     return ret;
-}
-
-[[deprecated]]
-float Fmod::descGetMaximumDistance(const String eventPath) {
-    float distance = 0.f;
-    float _;
-    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
-    ERROR_CHECK(instance->getMinMaxDistance(&_, &distance));
-    return distance;
-}
-
-[[deprecated]]
-float Fmod::descGetMinimumDistance(const String eventPath) {
-    float distance = 0.f;
-    float _;
-    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
-    ERROR_CHECK(instance->getMinMaxDistance(&distance, &_));
-    return distance;
 }
 
 float Fmod::descGetSoundSize(const String eventPath) {

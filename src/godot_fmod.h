@@ -202,7 +202,7 @@ namespace godot {
         void releaseEvent(uint64_t instanceId);
         void startEvent(uint64_t instanceId);
         void stopEvent(uint64_t instanceId, int stopMode);
-        void triggerEventCue(uint64_t instanceId);
+        void eventKeyOff(const uint64_t instanceId);
         int getEventPlaybackState(uint64_t instanceId);
         bool getEventPaused(uint64_t instanceId);
         void setEventPaused(uint64_t instanceId, bool paused);
@@ -234,10 +234,8 @@ namespace godot {
         bool descIsOneShot(String eventPath);
         bool descIsSnapshot(String eventPath);
         bool descIsStream(String eventPath);
-        bool descHasCue(String eventPath);
+        bool descHasSustainPoint(const String eventPath);
         Array descGetMinMaxDistance(const String& eventPath);
-        [[deprecated]] float descGetMaximumDistance(String eventPath);
-        [[deprecated]] float descGetMinimumDistance(String eventPath);
         float descGetSoundSize(String eventPath);
         Dictionary descGetParameterDescriptionByName(String eventPath, String name);
         Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);
