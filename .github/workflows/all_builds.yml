@@ -19,7 +19,7 @@ jobs:
     name: Windows Compilation
     runs-on: "windows-latest"
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002win-installer.exe
+      FMOD_EXECUTABLE: fmodstudioapi20203win-installer.exe
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -82,7 +82,7 @@ jobs:
     name: Linux Compilation
     runs-on: "ubuntu-20.04"
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002linux.tar.gz
+      FMOD_EXECUTABLE: fmodstudioapi20203linux.tar.gz
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -120,7 +120,7 @@ jobs:
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
           tar -xvf ${{env.FMOD_EXECUTABLE}}
-          mv fmodstudioapi20002linux/api linux
+          mv fmodstudioapi20203linux/api linux
           cd ../../
 
       # The `godot-cpp`-repository is currently cloned inside of the project folder.
@@ -152,7 +152,7 @@ jobs:
     name: MacOS Compilation
     runs-on: "macos-latest"
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+      FMOD_EXECUTABLE: fmodstudioapi20203osx.dmg
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -215,7 +215,7 @@ jobs:
     name: Android Compilation
     runs-on: "ubuntu-20.04"
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002android.tar.gz
+      FMOD_EXECUTABLE: fmodstudioapi20203android.tar.gz
     steps:
       - name: Checkout
         uses: actions/checkout@v2 
@@ -250,7 +250,7 @@ jobs:
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
           tar -xvf ${{env.FMOD_EXECUTABLE}}
-          mv fmodstudioapi20002android/api android
+          mv fmodstudioapi20203android/api android
           cd ../../
 
       # The `godot-cpp`-repository is currently cloned inside of the project folder.
@@ -287,7 +287,7 @@ jobs:
     name: iOS Compilation
     runs-on: "macos-latest"
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002ios.dmg
+      FMOD_EXECUTABLE: fmodstudioapi20203ios.dmg
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -356,7 +356,7 @@ jobs:
     runs-on: macos-latest
     needs: [macos-compilation]
     env:
-      FMOD_EXECUTABLE: fmodstudioapi20002osx.dmg
+      FMOD_EXECUTABLE: fmodstudioapi20203osx.dmg
     steps:
       - name: Checkout
         uses: actions/checkout@v2

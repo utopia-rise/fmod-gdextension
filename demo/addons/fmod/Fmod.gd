@@ -333,8 +333,8 @@ func get_event_parameter_by_id(instanceId: int, idPair: Array) -> float:
 func set_event_parameter_by_id(instanceId: int, idPair: Array, value: float) -> void:
 	godot_fmod.set_event_parameter_by_id(instanceId, idPair, value)
 	
-func trigger_event_cue(instanceId: int) -> void:
-	godot_fmod.trigger_event_cue(instanceId)
+func event_key_off(instanceId: int) -> void:
+	godot_fmod.event_key_off(instanceId)
 	
 func get_event_playback_state(instanceId: int) -> int:
 	return godot_fmod.get_event_playback_state(instanceId)
@@ -468,14 +468,11 @@ func desc_is_snapshot(event_path: String) -> bool:
 func desc_is_stream(event_path: String) -> bool:
 	return godot_fmod.desc_is_stream(event_path)
 
-func desc_has_cue(event_path: String) -> bool:
-	return godot_fmod.desc_has_cue(event_path)
+func desc_has_sustain_point(event_path: String) -> bool:
+	return godot_fmod.desc_has_sustain_point(event_path)
 
-func desc_get_maximum_distance(event_path: String) -> float:
-	return godot_fmod.desc_get_maximum_distance(event_path)
-
-func desc_get_minimum_distance(event_path: String) -> float:
-	return godot_fmod.desc_get_minimum_distance(event_path)
+func desc_get_min_max_distance(event_path: String) -> Array:
+	return godot_fmod.desc_get_min_max_distance(event_path)
 
 func desc_get_sound_size(event_path: String) -> float:
 	return godot_fmod.desc_get_sound_size(event_path)

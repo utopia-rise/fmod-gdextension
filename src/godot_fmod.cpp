@@ -47,7 +47,7 @@ void Fmod::_register_methods() {
     register_method("release_event", &Fmod::releaseEvent);
     register_method("start_event", &Fmod::startEvent);
     register_method("stop_event", &Fmod::stopEvent);
-    register_method("trigger_event_cue", &Fmod::triggerEventCue);
+    register_method("event_key_off", &Fmod::eventKeyOff);
     register_method("get_event_playback_state", &Fmod::getEventPlaybackState);
     register_method("get_event_paused", &Fmod::getEventPaused);
     register_method("set_event_paused", &Fmod::setEventPaused);
@@ -77,9 +77,8 @@ void Fmod::_register_methods() {
     register_method("desc_is_one_shot", &Fmod::descIsOneShot);
     register_method("desc_is_snapshot", &Fmod::descIsSnapshot);
     register_method("desc_is_stream", &Fmod::descIsStream);
-    register_method("desc_has_cue", &Fmod::descHasCue);
-    register_method("desc_get_maximum_distance", &Fmod::descGetMaximumDistance);
-    register_method("desc_get_minimum_distance", &Fmod::descGetMinimumDistance);
+    register_method("desc_has_sustain_point", &Fmod::descHasSustainPoint);
+    register_method("desc_get_min_max_distance", &Fmod::descGetMinMaxDistance);
     register_method("desc_get_sound_size", &Fmod::descGetSoundSize);
     register_method("desc_get_parameter_description_by_name", &Fmod::descGetParameterDescriptionByName);
     register_method("desc_get_parameter_description_by_id", &Fmod::descGetParameterDescriptionByID);
@@ -703,9 +702,9 @@ void Fmod::stopEvent(const uint64_t instanceId, int stopMode) {
     ERROR_CHECK(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
 
-void Fmod::triggerEventCue(const uint64_t instanceId) {
+void Fmod::eventKeyOff(const uint64_t instanceId) {
     FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->triggerCue());
+    ERROR_CHECK(instance->keyOff());
 }
 
 int Fmod::getEventPlaybackState(const uint64_t instanceId) {
@@ -917,25 +916,23 @@ bool Fmod::descIsStream(const String eventPath) {
     return isStream;
 }
 
-bool Fmod::descHasCue(const String eventPath) {
-    bool hasCue = false;
-    FIND_AND_CHECK(eventPath, eventDescriptions, hasCue)
-    ERROR_CHECK(instance->hasCue(&hasCue));
-    return hasCue;
+bool Fmod::descHasSustainPoint(const String eventPath) {
+    bool hasSustainPoint = false;
+    FIND_AND_CHECK(eventPath, eventDescriptions, hasSustainPoint)
+    ERROR_CHECK(instance->hasSustainPoint(&hasSustainPoint));
+    return hasSustainPoint;
 }
 
-float Fmod::descGetMaximumDistance(const String eventPath) {
-    float distance = 0.f;
-    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
-    ERROR_CHECK(instance->getMaximumDistance(&distance));
-    return distance;
-}
+Array Fmod::descGetMinMaxDistance(const String& eventPath) {
+    float minDistance;
+    float maxDistance;
+    Array ret;
 
-float Fmod::descGetMinimumDistance(const String eventPath) {
-    float distance = 0.f;
-    FIND_AND_CHECK(eventPath, eventDescriptions, distance)
-    ERROR_CHECK(instance->getMinimumDistance(&distance));
-    return distance;
+    FIND_AND_CHECK(eventPath, eventDescriptions, ret)
+    ERROR_CHECK(instance->getMinMaxDistance(&minDistance, &maxDistance));
+    ret.append(minDistance);
+    ret.append(maxDistance);
+    return ret;
 }
 
 float Fmod::descGetSoundSize(const String eventPath) {
@@ -1528,14 +1525,17 @@ void Fmod::setDriver(const int id) {
 Dictionary Fmod::getPerformanceData() {
 
     // get the CPU usage
-    FMOD_STUDIO_CPU_USAGE cpuUsage;
-    ERROR_CHECK(system->getCPUUsage(&cpuUsage));
+    FMOD_STUDIO_CPU_USAGE studioCpuUsage;
+    FMOD_CPU_USAGE cpuUsage;
+    ERROR_CHECK(system->getCPUUsage(&studioCpuUsage, &cpuUsage));
     Dictionary cpuPerfData = performanceData["CPU"];
-    cpuPerfData["dsp"] = cpuUsage.dspusage;
-    cpuPerfData["geometry"] = cpuUsage.geometryusage;
-    cpuPerfData["stream"] = cpuUsage.streamusage;
-    cpuPerfData["studio"] = cpuUsage.studiousage;
-    cpuPerfData["update"] = cpuUsage.updateusage;
+    cpuPerfData["dsp"] = cpuUsage.dsp;
+    cpuPerfData["geometry"] = cpuUsage.geometry;
+    cpuPerfData["stream"] = cpuUsage.stream;
+    cpuPerfData["update"] = cpuUsage.update;
+    cpuPerfData["convolution1"] = cpuUsage.convolution1;
+    cpuPerfData["convolution2"] = cpuUsage.convolution2;
+    cpuPerfData["studio"] = studioCpuUsage.update;
 
     // get the memory usage
     int currentAlloc = 0;
@@ -1551,9 +1551,9 @@ Dictionary Fmod::getPerformanceData() {
     long long otherBytesRead = 0;
     ERROR_CHECK(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
     Dictionary filePerfData = performanceData["file"];
-    filePerfData["sample_bytes_read"] = static_cast<int64_t >(sampleBytesRead);
-    filePerfData["stream_bytes_read"] = static_cast<int64_t >(streamBytesRead);
-    filePerfData["other_bytes_read"] = static_cast<int64_t >(otherBytesRead);
+    filePerfData["sample_bytes_read"] = static_cast<int64_t>(sampleBytesRead);
+    filePerfData["stream_bytes_read"] = static_cast<int64_t>(streamBytesRead);
+    filePerfData["other_bytes_read"] = static_cast<int64_t>(otherBytesRead);
 
     return performanceData;
 }
