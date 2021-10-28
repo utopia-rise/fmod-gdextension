@@ -63,12 +63,12 @@ class TestEventDescription:
 	func test_assert_should_not_have_cue():
 		assert_false(Fmod.desc_has_sustain_point("event:/Vehicles/Car Engine"), "Event description should not have cue")
 	
-    func test_assert_min_max_distance():
-        var desiredMin: float = 1.0
-        var desiredMax: float = 20.0
-        var minMaxDistance = Fmod.desc_get_min_max_distance("event:/Vehicles/Car Engine")
-        assert_eq(minMaxDistance[0], desiredMin, "Event description minimum distance should be " + str(desiredMin))
-        assert_eq(minMaxDistance[1], desiredMax, "Event description maximum distance should be " + str(desiredMax))
+	func test_assert_min_max_distance():
+		var desiredMin: float = 1.0
+		var desiredMax: float = 20.0
+		var minMaxDistance = Fmod.desc_get_min_max_distance("event:/Vehicles/Car Engine")
+		assert_eq(minMaxDistance[0], desiredMin, "Event description minimum distance should be " + str(desiredMin))
+		assert_eq(minMaxDistance[1], desiredMax, "Event description maximum distance should be " + str(desiredMax))
 	
 	func test_assert_sound_size():
 		var desiredValue: float = 2.0

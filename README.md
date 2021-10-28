@@ -536,6 +536,11 @@ print(perf_data.memory)
 print(perf_data.file)
 ```
 
+## Contributing
+
+In order to be able to PR this repo from a fork, you need to add `FMODUSER` and `FMODPASS` secrets to your fork repo.  
+This enables CI to download FMOD api.
+
 ## Thanks
 
 This project is a forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
