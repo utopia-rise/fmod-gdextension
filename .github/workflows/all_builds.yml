@@ -13,6 +13,7 @@ env:
   TARGET: release
   GODOT_VERSION: 3.3.4
   UTOPIA_GODOT_CPP_REF: utopia-3.3.4-stable
+  FMOD_VERSION: 20203
 
 jobs:
   windows-compilation:
@@ -48,7 +49,7 @@ jobs:
           cd ..
           New-Item -ItemType directory -Path libs; cd libs
           New-Item -ItemType directory -Path fmod; cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows ${{env.FMOD_VERSION}}
           7z x ${{env.FMOD_EXECUTABLE}}
           mv api/ windows
           cd ../../
@@ -118,7 +119,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux ${{env.FMOD_VERSION}}
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20203linux/api linux
           cd ../../
@@ -181,7 +182,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
           cd ../../
@@ -248,7 +249,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android ${{env.FMOD_VERSION}}
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20203android/api android
           cd ../../
@@ -316,7 +317,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
@@ -385,7 +386,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
           cd ../../
