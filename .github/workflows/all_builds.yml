@@ -4,7 +4,7 @@ on:
     branches: [ master ]
     tags:
       - "v*"
-  pull_request_target:
+  pull_request:
     branches: "*"
 
 # Global Settings
@@ -13,6 +13,7 @@ env:
   TARGET: release
   GODOT_VERSION: 3.3.4
   UTOPIA_GODOT_CPP_REF: utopia-3.3.4-stable
+  FMOD_VERSION: 20203
 
 jobs:
   windows-compilation:
@@ -25,6 +26,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
       - name: Set up Python 3.x
@@ -48,7 +50,7 @@ jobs:
           cd ..
           New-Item -ItemType directory -Path libs; cd libs
           New-Item -ItemType directory -Path fmod; cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} windows ${{env.FMOD_VERSION}}
           7z x ${{env.FMOD_EXECUTABLE}}
           mv api/ windows
           cd ../../
@@ -88,6 +90,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       # Install all packages (except scons)
       - name: Configure dependencies
@@ -118,7 +121,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} linux ${{env.FMOD_VERSION}}
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20203linux/api linux
           cd ../../
@@ -158,6 +161,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
       - name: Set up Python 3.x
@@ -181,7 +185,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
           cd ../../
@@ -221,6 +225,7 @@ jobs:
         uses: actions/checkout@v2 
         with:
             submodules: recursive
+            lfs: true
 
       - name: Set up Java 8
         uses: actions/setup-java@v1
@@ -248,7 +253,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} android ${{env.FMOD_VERSION}}
           tar -xvf ${{env.FMOD_EXECUTABLE}}
           mv fmodstudioapi20203android/api android
           cd ../../
@@ -293,6 +298,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       # Use python 3.x release (works cross platform)
       - name: Set up Python 3.x
@@ -316,7 +322,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ios ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
@@ -362,6 +368,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
       - name: Set up Python 3.x
@@ -385,7 +392,7 @@ jobs:
           cd ..
           mkdir libs && cd libs
           mkdir fmod && cd fmod
-          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx
+          python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} osx ${{env.FMOD_VERSION}}
           hdiutil attach ${{env.FMOD_EXECUTABLE}}
           cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
           cd ../../
@@ -435,6 +442,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: recursive
+          lfs: true
 
       - name: Download Artefacts
         uses: actions/download-artifact@v2

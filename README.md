@@ -252,8 +252,8 @@ func _ready():
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	
 	# load banks
-	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 	# register listener
@@ -278,8 +278,8 @@ func _ready():
 	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
@@ -350,8 +350,8 @@ func _ready():
 	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
@@ -442,8 +442,8 @@ func _ready():
 	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
@@ -479,8 +479,8 @@ func _ready():
 	Fmod.setSound3DSettings(1/0, 64.0, 1.0)
 	
 	# load banks
-	Fmod.load_bank("res://Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	# register listener
@@ -535,6 +535,11 @@ print(perf_data.CPU)
 print(perf_data.memory)
 print(perf_data.file)
 ```
+
+## Contributing
+
+In order to be able to PR this repo from a fork, you need to add `FMODUSER` and `FMODPASS` secrets to your fork repo.  
+This enables CI to download FMOD api.
 
 ## Thanks
 

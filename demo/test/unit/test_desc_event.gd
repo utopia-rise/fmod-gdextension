@@ -9,9 +9,9 @@ class TestEventDescription:
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master Bank.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		Fmod.load_bank("res://assets/Banks/Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master Bank.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		Fmod.load_bank("res://assets/Banks/Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
 		Fmod.load_bank("res://assets/Banks/Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
@@ -24,8 +24,8 @@ class TestEventDescription:
 	func after_all():
 		Fmod.release_event(id)
 		Fmod.remove_listener(0)
-		Fmod.unload_bank("res://assets/Banks/Master Bank.strings.bank")
-		Fmod.unload_bank("res://assets/Banks/Master Bank.bank")
+		Fmod.unload_bank("res://assets/Banks/Master.strings.bank")
+		Fmod.unload_bank("res://assets/Banks/Master.bank")
 		Fmod.unload_bank("res://assets/Banks/Music.bank")
 		Fmod.unload_bank("res://assets/Banks/Vehicles.bank")
 	
@@ -63,12 +63,12 @@ class TestEventDescription:
 	func test_assert_should_not_have_cue():
 		assert_false(Fmod.desc_has_sustain_point("event:/Vehicles/Car Engine"), "Event description should not have cue")
 	
-    func test_assert_min_max_distance():
-        var desiredMin: float = 1.0
-        var desiredMax: float = 20.0
-        var minMaxDistance = Fmod.desc_get_min_max_distance("event:/Vehicles/Car Engine")
-        assert_eq(minMaxDistance[0], desiredMin, "Event description minimum distance should be " + str(desiredMin))
-        assert_eq(minMaxDistance[1], desiredMax, "Event description maximum distance should be " + str(desiredMax))
+	func test_assert_min_max_distance():
+		var desiredMin: float = 1.0
+		var desiredMax: float = 20.0
+		var minMaxDistance = Fmod.desc_get_min_max_distance("event:/Vehicles/Car Engine")
+		assert_eq(minMaxDistance[0], desiredMin, "Event description minimum distance should be " + str(desiredMin))
+		assert_eq(minMaxDistance[1], desiredMax, "Event description maximum distance should be " + str(desiredMax))
 	
 	func test_assert_sound_size():
 		var desiredValue: float = 2.0
