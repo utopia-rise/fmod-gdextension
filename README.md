@@ -523,6 +523,13 @@ Fmod.set_driver(id)
 var id = Fmod.get_driver()
 ```
 
+### Reducing audio playback latency
+
+You may encounter that the audio playback has some latency. This may be caused by the DSP buffer size. You can change the value **before** initialisation to adjust it:
+```gdscript
+Fmod.set_dsp_buffer_size(512, 4)
+```
+
 ### Profiling & querying performance data
 
 `getPerformanceData` returns an object which contains current performance stats for CPU, Memory and File Streaming usage of both FMOD Studio and the Core System.
