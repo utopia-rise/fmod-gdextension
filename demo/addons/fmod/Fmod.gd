@@ -197,6 +197,9 @@ func get_global_parameter_desc_count() -> int:
 func get_global_parameter_desc_list() -> Array:
 	return godot_fmod.get_global_parameter_desc_list()
 
+func set_dsp_buffer_size(bufferLength: int, numberOfBuffers: int) -> int:
+    return godot_fmod.set_dsp_buffer_size(bufferLength, numberOfBuffers)
+
 ###############
 ###LISTENERS###
 ###############

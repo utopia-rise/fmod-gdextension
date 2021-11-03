@@ -183,6 +183,7 @@ namespace godot {
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
         Node* getObjectAttachedToListener(int index);
+        void setSystemDSPBufferSize(unsigned int bufferlength, int numbuffers);
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);

@@ -136,6 +136,7 @@ void Fmod::_register_methods() {
     register_method("get_global_parameter_desc_by_id", &Fmod::getGlobalParameterDescByID);
     register_method("get_global_parameter_desc_count", &Fmod::getGlobalParameterDescCount);
     register_method("get_global_parameter_desc_list", &Fmod::getGlobalParameterDescList);
+    register_method("set_dsp_buffer_size", &Fmod::setSystemDSPBufferSize);
     register_method("_process", &Fmod::_process);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -1311,6 +1312,14 @@ Node * Fmod::getObjectAttachedToInstance(uint64_t instanceId) {
         }
     }
     return node;
+}
+
+void Fmod::setSystemDSPBufferSize(unsigned int bufferlength, int numbuffers) {
+    if (bufferlength > 0 && numbuffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(bufferlength, numbuffers))) {
+        GODOT_LOG(0, "FMOD Sound System: Successfully set DSP buffer size")
+    } else {
+        GODOT_LOG(2, "FMOD Sound System: Failed to set DSP buffer size :|")
+    }
 }
 
 void Fmod::pauseAllEvents(const bool pause) {
