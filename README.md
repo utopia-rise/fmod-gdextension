@@ -528,6 +528,10 @@ var id = Fmod.get_driver()
 You may encounter that the audio playback has some latency. This may be caused by the DSP buffer size. You can change the value **before** initialisation to adjust it:
 ```gdscript
 Fmod.set_dsp_buffer_size(512, 4)
+# retrieve the buffer length
+Fmod.get_dsp_buffer_length()
+# retrieve the number of buffers
+Fmod.get_dsp_num_buffers()
 ```
 
 ### Profiling & querying performance data
