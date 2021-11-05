@@ -198,12 +198,12 @@ func get_global_parameter_desc_list() -> Array:
 	return godot_fmod.get_global_parameter_desc_list()
 
 func set_dsp_buffer_size(bufferLength: int, numberOfBuffers: int) -> void:
-    godot_fmod.set_dsp_buffer_size(bufferLength, numberOfBuffers)
+	godot_fmod.set_dsp_buffer_size(bufferLength, numberOfBuffers)
 
 func get_dsp_buffer_length() -> int:
 	return godot_fmod.get_dsp_buffer_length()
 
-func set_dsp_num_buffers() -> int:
+func get_dsp_num_buffers() -> int:
 	return godot_fmod.get_dsp_num_buffers()
 
 ###############
