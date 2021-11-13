@@ -111,8 +111,6 @@ namespace godot {
         int actualListenerNumber = 0;
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
-        unsigned int bufferlength = 0;
-        int numbuffers = 0;
 
         Vector<LoadingBank *> loadingBanks;
         Map<String, FMOD::Studio::Bank *> banks;
@@ -186,8 +184,9 @@ namespace godot {
         bool getListenerLock(int index);
         Node* getObjectAttachedToListener(int index);
         void setSystemDSPBufferSize(unsigned int bufferlength, int numbuffers);
-        int getSystemDSPBufferLength();
+        unsigned int getSystemDSPBufferLength();
         int getSystemDSPNumBuffers();
+        Array getSystemDSPBufferSize();
 
         String loadBank(String pathToBank, unsigned int flag);
         void unloadBank(String pathToBank);

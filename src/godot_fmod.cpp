@@ -137,6 +137,7 @@ void Fmod::_register_methods() {
     register_method("get_global_parameter_desc_count", &Fmod::getGlobalParameterDescCount);
     register_method("get_global_parameter_desc_list", &Fmod::getGlobalParameterDescList);
     register_method("set_dsp_buffer_size", &Fmod::setSystemDSPBufferSize);
+    register_method("get_dsp_buffer_size", &Fmod::getSystemDSPBufferSize);
     register_method("get_dsp_buffer_length", &Fmod::getSystemDSPBufferLength);
     register_method("get_dsp_num_buffers", &Fmod::getSystemDSPNumBuffers);
     register_method("_process", &Fmod::_process);
@@ -1324,14 +1325,28 @@ void Fmod::setSystemDSPBufferSize(unsigned int bufferlength, int numbuffers) {
     }
 }
 
-int Fmod::getSystemDSPBufferLength() {
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&this->bufferlength, &this->numbuffers));
-    return this->bufferlength;
+Array Fmod::getSystemDSPBufferSize() {
+    unsigned int bufferlength;
+    int numbuffers;
+    Array a;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    a.append(bufferlength);
+    a.append(numbuffers);
+    return a;
+}
+
+unsigned int Fmod::getSystemDSPBufferLength() {
+    unsigned int bufferlength;
+    int numbuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    return bufferlength;
 }
 
 int Fmod::getSystemDSPNumBuffers() {
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&this->bufferlength, &this->numbuffers));
-    return this->numbuffers;
+    unsigned int bufferlength;
+    int numbuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    return numbuffers;
 }
 
 void Fmod::pauseAllEvents(const bool pause) {

@@ -63,3 +63,9 @@ class TestGlobal:
 	func test_assert_should_have_dsp_num_buffers():
 		var num_buffers = Fmod.get_dsp_num_buffers()
 		assert_eq(num_buffers, 4)
+
+	func test_assert_should_have_dsp_buffer_size():
+		var buffer_size = Fmod.get_dsp_buffer_size()
+		assert_eq(buffer_size.size(), 2)
+		assert_eq(buffer_size[0], 512)
+		assert_eq(buffer_size[1], 4)
