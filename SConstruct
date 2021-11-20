@@ -152,6 +152,12 @@ opts.Add(
     'Path to the FMOD library',
     "../libs/fmod/"
 )
+opts.Add(EnumVariable(
+    'macos_arch',
+    'Target macOS architecture',
+    'universal',
+    ['universal', 'x86_64', 'arm64']
+))
 
 env = Environment(ENV = os.environ)
 opts.Update(env)
@@ -222,17 +228,23 @@ elif env['platform'] == 'osx':
             'Only 64-bit builds are supported for the macOS target.'
         )
 
-    env.Append(CCFLAGS=['-g', '-std=c++14', '-arch', 'x86_64'])
+    if env["macos_arch"] == "universal":
+        env.Append(LINKFLAGS=["-arch", "x86_64", "-arch", "arm64"])
+        env.Append(CCFLAGS=["-arch", "x86_64", "-arch", "arm64"])
+    else:
+        env.Append(LINKFLAGS=["-arch", env["macos_arch"]])
+        env.Append(CCFLAGS=["-arch", env["macos_arch"]])
+
+    env.Append(CCFLAGS=['-std=c++14'])
+
     env.Append(LINKFLAGS=[
-        '-arch',
-        'x86_64',
         '-framework',
         'Cocoa',
         '-Wl,-undefined,dynamic_lookup',
     ])
 
     if env['target'] == 'debug':
-        env.Append(CCFLAGS=['-Og', 'g'])
+        env.Append(CCFLAGS=['-Og', '-g'])
     elif env['target'] == 'release':
         env.Append(CCFLAGS=['-O3'])
 
