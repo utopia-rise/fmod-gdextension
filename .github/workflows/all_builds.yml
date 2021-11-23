@@ -11,8 +11,8 @@ on:
 env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET: release
-  GODOT_VERSION: 3.3.4
-  UTOPIA_GODOT_CPP_REF: utopia-3.3.4-stable
+  GODOT_VERSION: 3.4
+  UTOPIA_GODOT_CPP_REF: godot-3.4-stable
   FMOD_VERSION: 20203
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
-          repository: utopia-rise/godot-cpp
+          repository: godotengine/godot-cpp
           path: godot-cpp
           ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
@@ -132,7 +132,7 @@ jobs:
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
-          repository: utopia-rise/godot-cpp
+          repository: godotengine/godot-cpp
           path: godot-cpp
           ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
@@ -196,7 +196,7 @@ jobs:
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
-          repository: utopia-rise/godot-cpp
+          repository: godotengine/godot-cpp
           path: godot-cpp
           ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
@@ -264,7 +264,7 @@ jobs:
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
-          repository: utopia-rise/godot-cpp
+          repository: godotengine/godot-cpp
           path: godot-cpp
           ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
@@ -333,7 +333,7 @@ jobs:
       - name: Cloning godot-cpp
         uses: actions/checkout@v2
         with:
-          repository: utopia-rise/godot-cpp
+          repository: godotengine/godot-cpp
           path: godot-cpp
           ref: ${{env.UTOPIA_GODOT_CPP_REF}}
           submodules: recursive
