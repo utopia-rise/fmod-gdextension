@@ -153,7 +153,8 @@ jobs:
 
   macos-compilation:
     name: MacOS Compilation
-    runs-on: "macos-latest"
+    # Use macos-11 since macos-latest still points to version 10.15, which doesn't support arm64
+    runs-on: "macos-11"
     env:
       FMOD_EXECUTABLE: fmodstudioapi20203osx.dmg
     steps:
