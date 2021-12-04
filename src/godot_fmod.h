@@ -55,7 +55,7 @@ namespace godot {
     }\
 
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
-    auto instance = cont.get(instanceId); \
+    auto instance = (cont).get(instanceId); \
     if (!instance) { \
         String message = String("FMOD Sound System: cannot find " + String(instanceId) + " in ##cont collection.");\
         GODOT_LOG(2, message)\
@@ -68,28 +68,28 @@ namespace godot {
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 #define CHECK_SIZE(maxSize, actualSize, type) \
-    if(actualSize > maxSize){\
+    if((actualSize) > (maxSize)){\
         String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries";\
         GODOT_LOG(2, message)\
-        actualSize = maxSize;\
+        (actualSize) = maxSize;\
     }\
 
     struct EventInfo {
         //Is the event oneshot
         bool isOneShot = false;
         //GameObject to which this event is attached
-        Node *gameObj = nullptr;
+        Node* gameObj = nullptr;
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
     struct LoadingBank {
-        FMOD::Studio::Bank * bank;
+        FMOD::Studio::Bank*  bank;
         String godotPath;
     };
 
     struct Listener {
-        Node *gameObj = nullptr;
+        Node* gameObj = nullptr;
         bool listenerLock = false;
         float weight = 1.0;
     };
@@ -112,15 +112,15 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
-        Vector<LoadingBank *> loadingBanks;
-        Map<String, FMOD::Studio::Bank *> banks;
-        Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
-        Map<String, FMOD::Sound *> sounds;
-        Map<String, FMOD::Studio::Bus *> buses;
-        Map<String, FMOD::Studio::VCA *> VCAs;
+        Vector<LoadingBank* > loadingBanks;
+        Map<String, FMOD::Studio::Bank*> banks;
+        Map<String, FMOD::Studio::EventDescription*> eventDescriptions;
+        Map<String, FMOD::Sound*> sounds;
+        Map<String, FMOD::Studio::Bus*> buses;
+        Map<String, FMOD::Studio::VCA*> VCAs;
 
-        Vector<FMOD::Channel *> channels;
-        Vector<FMOD::Studio::EventInstance *> events;
+        Vector<FMOD::Channel*> channels;
+        Vector<FMOD::Studio::EventInstance*> events;
 
         //Store dictionary of performance data
         Dictionary performanceData;
@@ -132,29 +132,29 @@ namespace godot {
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
         static FMOD_VECTOR toFmodVector(Vector3 &vec);
-        static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
-                                                  const FMOD_VECTOR &vel);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(Transform2D transform);
-        Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
-        Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+        static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward,
+                                                  const FMOD_VECTOR& vel);
+        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(const Transform& transform) const;
+        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(const Transform2D& transform) const;
+        Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES& attribut) const;
+        Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES& attribut) const;
 
-        static bool isDead(Node *node);
-        static bool isFmodValid(Node *node);
-        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *node);
+        static bool isDead(Node* node);
+        static bool isFmodValid(Node* node);
+        void updateInstance3DAttributes(FMOD::Studio::EventInstance* instance, Node* node);
         void runCallbacks();
 
-        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Node *gameObject);
-        EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
-        void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
-        void loadBankData(LoadingBank *loadingBank);
-        void loadAllVCAs(FMOD::Studio::Bank *bank);
-        void loadAllBuses(FMOD::Studio::Bank *bank);
-        void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
-        void unloadAllVCAs(FMOD::Studio::Bank *bank);
-        void unloadAllBuses(FMOD::Studio::Bank *bank);
-        void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
-        static bool isChannelValid(FMOD::Channel *channel);
+        FMOD::Studio::EventInstance* createInstance(const String& eventName, bool isOneShot, Node* gameObject);
+        static EventInfo *getEventInfo(FMOD::Studio::EventInstance* eventInstance);
+        void releaseOneEvent(FMOD::Studio::EventInstance* eventInstance);
+        void loadBankData(LoadingBank* loadingBank);
+        void loadAllVCAs(FMOD::Studio::Bank* bank);
+        void loadAllBuses(FMOD::Studio::Bank* bank);
+        void loadAllEventDescriptions(FMOD::Studio::Bank* bank);
+        void unloadAllVCAs(FMOD::Studio::Bank* bank);
+        void unloadAllBuses(FMOD::Studio::Bank* bank);
+        void unloadAllEventDescriptions(FMOD::Studio::Bank* bank);
+        static bool isChannelValid(FMOD::Channel* channel);
 
     public:
         Fmod();
@@ -170,16 +170,16 @@ namespace godot {
         void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
         void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
 
-        void addListener(int index, Node *gameObj);
+        void addListener(int index, Node* gameObj);
         void removeListener(int index);
         void setListenerNumber(int listenerNumber);
-        int getSystemNumListeners();
+        int getSystemNumListeners() const;
         float getSystemListenerWeight(int index);
         void setSystemListenerWeight(int index, float weight);
         Dictionary getSystemListener3DAttributes(int index);
         Dictionary getSystemListener2DAttributes(int index);
-        void setSystemListener3DAttributes(int index, Transform transform);
-        void setSystemListener2DAttributes(int index, Transform2D transform);
+        void setSystemListener3DAttributes(int index, const Transform& transform);
+        void setSystemListener2DAttributes(int index, const Transform2D& transform);
         void setListenerLock(int index, bool isLocked);
         bool getListenerLock(int index);
         Node* getObjectAttachedToListener(int index);
@@ -188,25 +188,25 @@ namespace godot {
         int getSystemDSPNumBuffers();
         Array getSystemDSPBufferSize();
 
-        String loadBank(String pathToBank, unsigned int flag);
-        void unloadBank(String pathToBank);
-        bool checkVCAPath(String vcaPath);
-        bool checkBusPath(String busPath);
-        bool checkEventPath(String eventPath);
-        int getBankLoadingState(String pathToBank);
-        int getBankBusCount(String pathToBank);
-        int getBankEventCount(String pathToBank);
-        int getBankStringCount(String pathToBank);
-        int getBankVCACount(String pathToBank);
-        const uint64_t createEventInstance(String eventPath);
-        float getEventParameterByName(uint64_t instanceId, String parameterName);
-        void setEventParameterByName(uint64_t instanceId, String parameterName, float value);
-        float getEventParameterByID(uint64_t instanceId, Array idPair);
-        void setEventParameterByID(uint64_t instanceId, Array idPair, float value);
+        String loadBank(const String& pathToBank, unsigned int flag);
+        void unloadBank(const String& pathToBank);
+        bool checkVCAPath(const String& vcaPath);
+        bool checkBusPath(const String& busPath);
+        bool checkEventPath(const String& eventPath);
+        int getBankLoadingState(const String& pathToBank);
+        int getBankBusCount(const String& pathToBank);
+        int getBankEventCount(const String& pathToBank);
+        int getBankStringCount(const String& pathToBank);
+        int getBankVCACount(const String& pathToBank);
+        uint64_t createEventInstance(const String& eventPath);
+        float getEventParameterByName(uint64_t instanceId, const String& parameterName);
+        void setEventParameterByName(uint64_t instanceId, const String& parameterName, float value);
+        float getEventParameterByID(uint64_t instanceId, const Array& idPair);
+        void setEventParameterByID(uint64_t instanceId, const Array& idPair, float value);
         void releaseEvent(uint64_t instanceId);
         void startEvent(uint64_t instanceId);
         void stopEvent(uint64_t instanceId, int stopMode);
-        void eventKeyOff(const uint64_t instanceId);
+        void eventKeyOff(uint64_t instanceId);
         int getEventPlaybackState(uint64_t instanceId);
         bool getEventPaused(uint64_t instanceId);
         void setEventPaused(uint64_t instanceId, bool paused);
@@ -221,52 +221,52 @@ namespace godot {
         bool isEventVirtual(uint64_t instanceId);
         void setEventListenerMask(uint64_t instanceId, unsigned int mask);
         uint32_t getEventListenerMask(uint64_t instanceId);
-        void setEvent3DAttributes(uint64_t instanceId, Transform transform);
+        void setEvent3DAttributes(uint64_t instanceId, const Transform& transform);
         Dictionary getEvent3DAttributes(uint64_t instanceId);
         Dictionary getEvent2DAttributes(uint64_t instanceId);
         void setEvent2DAttributes(uint64_t instanceId, Transform2D position);
 
         /* event descriptions functions */
-        int descGetLength(String eventPath);
-        Array descGetInstanceList(String eventPath);
-        int descGetInstanceCount(String eventPath);
-        void descReleaseAllInstances(String eventPath);
-        void descLoadSampleData(String eventPath);
-        void descUnloadSampleData(String eventPath);
-        int descGetSampleLoadingState(String eventPath);
-        bool descIs3D(String eventPath);
-        bool descIsOneShot(String eventPath);
-        bool descIsSnapshot(String eventPath);
-        bool descIsStream(String eventPath);
-        bool descHasSustainPoint(const String eventPath);
+        int descGetLength(const String& eventPath);
+        Array descGetInstanceList(const String& eventPath);
+        int descGetInstanceCount(const String& eventPath);
+        void descReleaseAllInstances(const String& eventPath);
+        void descLoadSampleData(const String& eventPath);
+        void descUnloadSampleData(const String& eventPath);
+        int descGetSampleLoadingState(const String& eventPath);
+        bool descIs3D(const String& eventPath);
+        bool descIsOneShot(const String& eventPath);
+        bool descIsSnapshot(const String& eventPath);
+        bool descIsStream(const String& eventPath);
+        bool descHasSustainPoint(const String& eventPath);
         Array descGetMinMaxDistance(const String& eventPath);
-        float descGetSoundSize(String eventPath);
-        Dictionary descGetParameterDescriptionByName(String eventPath, String name);
-        Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);
-        int descGetParameterDescriptionCount(String eventPath);
-        Dictionary descGetParameterDescriptionByIndex(String eventPath, int index);
-        Dictionary descGetUserProperty(String eventPath, String name);
-        int descGetUserPropertyCount(String eventPath);
-        Dictionary descUserPropertyByIndex(String eventPath, int index);
+        float descGetSoundSize(const String& eventPath);
+        Dictionary descGetParameterDescriptionByName(const String& eventPath, const String& name);
+        Dictionary descGetParameterDescriptionByID(const String& eventPath, const Array& idPair);
+        int descGetParameterDescriptionCount(const String& eventPath);
+        Dictionary descGetParameterDescriptionByIndex(const String& eventPath, int index);
+        Dictionary descGetUserProperty(const String& eventPath, const String& name);
+        int descGetUserPropertyCount(const String& eventPath);
+        Dictionary descUserPropertyByIndex(const String& eventPath, int index);
 
         /* bus functions */
-        bool getBusMute(String busPath);
-        bool getBusPaused(String busPath);
-        float getBusVolume(String busPath);
-        void setBusMute(String busPath, bool mute);
-        void setBusPaused(String busPath, bool paused);
-        void setBusVolume(String busPath, float volume);
-        void stopAllBusEvents(String busPath, int stopMode);
+        bool getBusMute(const String& busPath);
+        bool getBusPaused(const String& busPath);
+        float getBusVolume(const String& busPath);
+        void setBusMute(const String& busPath, bool mute);
+        void setBusPaused(const String& busPath, bool paused);
+        void setBusVolume(const String& busPath, float volume);
+        void stopAllBusEvents(const String& busPath, int stopMode);
 
         /* VCA functions */
-        float getVCAVolume(String VCAPath);
-        void setVCAVolume(String VCAPath, float volume);
+        float getVCAVolume(const String& VCAPath);
+        void setVCAVolume(const String& VCAPath, float volume);
         /* Helper methods */
-        void playOneShot(String eventName, Node *gameObj);
-        void playOneShotWithParams(String eventName, Node *gameObj, Dictionary parameters);
-        void playOneShotAttached(String eventName, Node *gameObj);
-        void playOneShotAttachedWithParams(String eventName, Node *gameObj, Dictionary parameters);
-        void attachInstanceToNode(uint64_t instanceId, Node *gameObj);
+        void playOneShot(const String& eventName, Node* gameObj);
+        void playOneShotWithParams(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void playOneShotAttached(const String& eventName, Node* gameObj);
+        void playOneShotAttachedWithParams(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void attachInstanceToNode(uint64_t instanceId, Node* gameObj);
         void detachInstanceFromNode(uint64_t instanceId);
         Node* getObjectAttachedToInstance(uint64_t instanceId);
         void pauseAllEvents(bool pause);
@@ -277,13 +277,13 @@ namespace godot {
 
         //LOW LEVEL API
         //Load and release memory
-        void loadFileAsSound(String path);
-        void loadFileAsMusic(String path);
-        void unloadFile(String path);
+        void loadFileAsSound(const String& path);
+        void loadFileAsMusic(const String& path);
+        void unloadFile(const String& path);
         //Check validity of an instance
-        const uint64_t createSoundInstance(String path);
-        bool checkSoundInstance(const uint64_t instanceId);
-        void releaseSound(const uint64_t  instanceId);
+        uint64_t createSoundInstance(const String& path);
+        bool checkSoundInstance(uint64_t instanceId);
+        void releaseSound(uint64_t instanceId);
         //Setting the sound
         void setSoundPaused(uint64_t instanceId, bool paused);
         void stopSound(uint64_t instanceId);
@@ -301,12 +301,12 @@ namespace godot {
         int getDriver();
         void setDriver(int id);
         Dictionary getPerformanceData();
-        void setGlobalParameterByName(String parameterName, float value);
-        float getGlobalParameterByName(String parameterName);
-        void setGlobalParameterByID(Array idPair, float value);
-        float getGlobalParameterByID(Array idPair);
-        Dictionary getGlobalParameterDescByName(String parameterName);
-        Dictionary getGlobalParameterDescByID(Array idPair);
+        void setGlobalParameterByName(const String& parameterName, float value);
+        float getGlobalParameterByName(const String& parameterName);
+        void setGlobalParameterByID(const Array& idPair, float value);
+        float getGlobalParameterByID(const Array& idPair);
+        Dictionary getGlobalParameterDescByName(const String& parameterName);
+        Dictionary getGlobalParameterDescByID(const Array& idPair);
         int getGlobalParameterDescCount();
         Array getGlobalParameterDescList();
 
