@@ -55,7 +55,7 @@ namespace godot {
     }\
 
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
-    auto instance = cont.get(instanceId); \
+    auto instance = (cont).get(instanceId); \
     if (!instance) { \
         String message = String("FMOD Sound System: cannot find " + String(instanceId) + " in ##cont collection.");\
         GODOT_LOG(2, message)\
@@ -68,28 +68,28 @@ namespace godot {
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
 #define CHECK_SIZE(maxSize, actualSize, type) \
-    if(actualSize > maxSize){\
+    if((actualSize) > (maxSize)){\
         String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries";\
         GODOT_LOG(2, message)\
-        actualSize = maxSize;\
+        (actualSize) = maxSize;\
     }\
 
     struct EventInfo {
         //Is the event oneshot
         bool isOneShot = false;
         //GameObject to which this event is attached
-        Node *gameObj = nullptr;
+        Node* gameObj = nullptr;
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
     struct LoadingBank {
-        FMOD::Studio::Bank * bank;
+        FMOD::Studio::Bank*  bank;
         String godotPath;
     };
 
     struct Listener {
-        Node *gameObj = nullptr;
+        Node* gameObj = nullptr;
         bool listenerLock = false;
         float weight = 1.0;
     };
@@ -112,49 +112,49 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
-        Vector<LoadingBank *> loadingBanks;
-        Map<String, FMOD::Studio::Bank *> banks;
-        Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
-        Map<String, FMOD::Sound *> sounds;
-        Map<String, FMOD::Studio::Bus *> buses;
-        Map<String, FMOD::Studio::VCA *> VCAs;
+        Vector<LoadingBank* > loadingBanks;
+        Map<String, FMOD::Studio::Bank*> banks;
+        Map<String, FMOD::Studio::EventDescription*> eventDescriptions;
+        Map<String, FMOD::Sound*> sounds;
+        Map<String, FMOD::Studio::Bus*> buses;
+        Map<String, FMOD::Studio::VCA*> VCAs;
 
-        Vector<FMOD::Channel *> channels;
-        Vector<FMOD::Studio::EventInstance *> events;
+        Vector<FMOD::Channel*> channels;
+        Vector<FMOD::Studio::EventInstance*> events;
 
         //Store dictionary of performance data
         Dictionary performanceData;
 
-        void checkLoadingBanks();
-        void setListenerAttributes();
+        void _check_loading_banks();
+        void _set_listener_attributes();
 
         static bool checkErrors(FMOD_RESULT result, const char *function, const char *file, int line);
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
-        static FMOD_VECTOR toFmodVector(Vector3 &vec);
-        static FMOD_3D_ATTRIBUTES get3DAttributes(const FMOD_VECTOR &pos, const FMOD_VECTOR &up, const FMOD_VECTOR &forward,
-                                                  const FMOD_VECTOR &vel);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform(Transform transform);
-        FMOD_3D_ATTRIBUTES get3DAttributesFromTransform2D(Transform2D transform);
-        Dictionary getTransformInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
-        Dictionary getTransform2DInfoFrom3DAttribut(FMOD_3D_ATTRIBUTES &attribut);
+        static FMOD_VECTOR _to_fmod_vector(Vector3& vec);
+        static FMOD_3D_ATTRIBUTES _get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward,
+                                                     const FMOD_VECTOR& vel);
+        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform(const Transform& transform) const;
+        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform_2d(const Transform2D& transform) const;
+        Dictionary _get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
+        Dictionary _get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
 
-        static bool isDead(Node *node);
-        static bool isFmodValid(Node *node);
-        void updateInstance3DAttributes(FMOD::Studio::EventInstance *instance, Node *node);
-        void runCallbacks();
+        static bool _is_dead(Node* node);
+        static bool _is_fmod_valid(Node* node);
+        void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Node* node);
+        void _run_callbacks();
 
-        FMOD::Studio::EventInstance *createInstance(String eventName, bool isOneShot, Node *gameObject);
-        EventInfo *getEventInfo(FMOD::Studio::EventInstance *eventInstance);
-        void releaseOneEvent(FMOD::Studio::EventInstance *eventInstance);
-        void loadBankData(LoadingBank *loadingBank);
-        void loadAllVCAs(FMOD::Studio::Bank *bank);
-        void loadAllBuses(FMOD::Studio::Bank *bank);
-        void loadAllEventDescriptions(FMOD::Studio::Bank *bank);
-        void unloadAllVCAs(FMOD::Studio::Bank *bank);
-        void unloadAllBuses(FMOD::Studio::Bank *bank);
-        void unloadAllEventDescriptions(FMOD::Studio::Bank *bank);
-        static bool isChannelValid(FMOD::Channel *channel);
+        FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Node* gameObject);
+        static EventInfo *_get_event_info(FMOD::Studio::EventInstance* eventInstance);
+        void _release_one_event(FMOD::Studio::EventInstance* eventInstance);
+        void _load_bank_data(LoadingBank* loadingBank);
+        void _load_all_vca(FMOD::Studio::Bank* bank);
+        void _load_all_buses(FMOD::Studio::Bank* bank);
+        void _load_all_event_descriptions(FMOD::Studio::Bank* bank);
+        void _unload_all_vca(FMOD::Studio::Bank* bank);
+        void _unload_all_buses(FMOD::Studio::Bank* bank);
+        void _unload_all_event_descriptions(FMOD::Studio::Bank* bank);
+        static bool _is_channel_valid(FMOD::Channel* channel);
 
     public:
         Fmod();
@@ -167,150 +167,150 @@ namespace godot {
         void _process(float delta);
         void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
-        void setSound3DSettings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void setSoftwareFormat(int sampleRate, int speakerMode, int numRawSpeakers);
+        void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);
+        void set_software_format(int sampleRate, int speakerMode, int numRawSpeakers);
 
-        void addListener(int index, Node *gameObj);
-        void removeListener(int index);
-        void setListenerNumber(int listenerNumber);
-        int getSystemNumListeners();
-        float getSystemListenerWeight(int index);
-        void setSystemListenerWeight(int index, float weight);
-        Dictionary getSystemListener3DAttributes(int index);
-        Dictionary getSystemListener2DAttributes(int index);
-        void setSystemListener3DAttributes(int index, Transform transform);
-        void setSystemListener2DAttributes(int index, Transform2D transform);
-        void setListenerLock(int index, bool isLocked);
-        bool getListenerLock(int index);
-        Node* getObjectAttachedToListener(int index);
-        void setSystemDSPBufferSize(unsigned int bufferlength, int numbuffers);
-        unsigned int getSystemDSPBufferLength();
-        int getSystemDSPNumBuffers();
-        Array getSystemDSPBufferSize();
+        void add_listener(int index, Node* gameObj);
+        void remove_listener(int index);
+        void set_listener_number(int listenerNumber);
+        int get_system_num_listeners() const;
+        float get_system_listener_weight(int index);
+        void set_system_listener_weight(int index, float weight);
+        Dictionary get_system_listener_3d_attributes(int index);
+        Dictionary get_system_listener_2d_attributes(int index);
+        void set_system_listener_3d_attributes(int index, const Transform& transform);
+        void set_system_listener_2d_attributes(int index, const Transform2D& transform);
+        void set_listener_lock(int index, bool isLocked);
+        bool get_listener_lock(int index);
+        Node* get_object_attached_to_listener(int index);
+        void set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers);
+        unsigned int get_system_dsp_buffer_length();
+        int get_system_dsp_num_buffers();
+        Array get_system_dsp_buffer_size();
 
-        String loadBank(String pathToBank, unsigned int flag);
-        void unloadBank(String pathToBank);
-        bool checkVCAPath(String vcaPath);
-        bool checkBusPath(String busPath);
-        bool checkEventPath(String eventPath);
-        int getBankLoadingState(String pathToBank);
-        int getBankBusCount(String pathToBank);
-        int getBankEventCount(String pathToBank);
-        int getBankStringCount(String pathToBank);
-        int getBankVCACount(String pathToBank);
-        const uint64_t createEventInstance(String eventPath);
-        float getEventParameterByName(uint64_t instanceId, String parameterName);
-        void setEventParameterByName(uint64_t instanceId, String parameterName, float value);
-        float getEventParameterByID(uint64_t instanceId, Array idPair);
-        void setEventParameterByID(uint64_t instanceId, Array idPair, float value);
-        void releaseEvent(uint64_t instanceId);
-        void startEvent(uint64_t instanceId);
-        void stopEvent(uint64_t instanceId, int stopMode);
-        void eventKeyOff(const uint64_t instanceId);
-        int getEventPlaybackState(uint64_t instanceId);
-        bool getEventPaused(uint64_t instanceId);
-        void setEventPaused(uint64_t instanceId, bool paused);
-        float getEventPitch(uint64_t instanceId);
-        void setEventPitch(uint64_t instanceId, float pitch);
-        float getEventVolume(uint64_t instanceId);
-        void setEventVolume(uint64_t instanceId, float volume);
-        int getEventTimelinePosition(uint64_t instanceId);
-        void setEventTimelinePosition(uint64_t instanceId, int position);
-        float getEventReverbLevel(uint64_t instanceId, int index);
-        void setEventReverbLevel(uint64_t instanceId, int index, float level);
-        bool isEventVirtual(uint64_t instanceId);
-        void setEventListenerMask(uint64_t instanceId, unsigned int mask);
-        uint32_t getEventListenerMask(uint64_t instanceId);
-        void setEvent3DAttributes(uint64_t instanceId, Transform transform);
-        Dictionary getEvent3DAttributes(uint64_t instanceId);
-        Dictionary getEvent2DAttributes(uint64_t instanceId);
-        void setEvent2DAttributes(uint64_t instanceId, Transform2D position);
+        String load_bank(const String& pathToBank, unsigned int flag);
+        void unload_bank(const String& pathToBank);
+        bool check_vca_path(const String& vcaPath);
+        bool check_bus_path(const String& busPath);
+        bool check_event_path(const String& eventPath);
+        int get_bank_loading_state(const String& pathToBank);
+        int get_bank_bus_count(const String& pathToBank);
+        int get_bank_event_count(const String& pathToBank);
+        int get_bank_string_count(const String& pathToBank);
+        int get_bank_vca_count(const String& pathToBank);
+        uint64_t create_event_instance(const String& eventPath);
+        float get_event_parameter_by_name(uint64_t instanceId, const String& parameterName);
+        void set_event_parameter_by_name(uint64_t instanceId, const String& parameterName, float value);
+        float get_event_parameter_by_id(uint64_t instanceId, const Array& idPair);
+        void set_event_parameter_by_id(uint64_t instanceId, const Array& idPair, float value);
+        void release_event(uint64_t instanceId);
+        void start_event(uint64_t instanceId);
+        void stop_event(uint64_t instanceId, int stopMode);
+        void event_key_off(uint64_t instanceId);
+        int get_event_playback_state(uint64_t instanceId);
+        bool get_event_paused(uint64_t instanceId);
+        void set_event_paused(uint64_t instanceId, bool paused);
+        float get_event_pitch(uint64_t instanceId);
+        void set_event_pitch(uint64_t instanceId, float pitch);
+        float get_event_volume(uint64_t instanceId);
+        void set_event_volume(uint64_t instanceId, float volume);
+        int get_event_timeline_position(uint64_t instanceId);
+        void set_event_timeline_position(uint64_t instanceId, int position);
+        float get_event_reverb_level(uint64_t instanceId, int index);
+        void set_event_reverb_level(uint64_t instanceId, int index, float level);
+        bool is_event_virtual(uint64_t instanceId);
+        void set_event_listener_mask(uint64_t instanceId, unsigned int mask);
+        uint32_t get_event_listener_mask(uint64_t instanceId);
+        void set_event_3d_attributes(uint64_t instanceId, const Transform& transform);
+        Dictionary get_event_3d_attributes(uint64_t instanceId);
+        Dictionary get_event_2d_attributes(uint64_t instanceId);
+        void set_event_2d_attributes(uint64_t instanceId, Transform2D position);
 
         /* event descriptions functions */
-        int descGetLength(String eventPath);
-        Array descGetInstanceList(String eventPath);
-        int descGetInstanceCount(String eventPath);
-        void descReleaseAllInstances(String eventPath);
-        void descLoadSampleData(String eventPath);
-        void descUnloadSampleData(String eventPath);
-        int descGetSampleLoadingState(String eventPath);
-        bool descIs3D(String eventPath);
-        bool descIsOneShot(String eventPath);
-        bool descIsSnapshot(String eventPath);
-        bool descIsStream(String eventPath);
-        bool descHasSustainPoint(const String eventPath);
-        Array descGetMinMaxDistance(const String& eventPath);
-        float descGetSoundSize(String eventPath);
-        Dictionary descGetParameterDescriptionByName(String eventPath, String name);
-        Dictionary descGetParameterDescriptionByID(String eventPath, Array idPair);
-        int descGetParameterDescriptionCount(String eventPath);
-        Dictionary descGetParameterDescriptionByIndex(String eventPath, int index);
-        Dictionary descGetUserProperty(String eventPath, String name);
-        int descGetUserPropertyCount(String eventPath);
-        Dictionary descUserPropertyByIndex(String eventPath, int index);
+        int desc_get_length(const String& eventPath);
+        Array desc_get_instance_list(const String& eventPath);
+        int desc_get_instance_count(const String& eventPath);
+        void desc_release_all_instances(const String& eventPath);
+        void desc_load_sample_data(const String& eventPath);
+        void desc_unload_sample_data(const String& eventPath);
+        int desc_get_sample_loading_state(const String& eventPath);
+        bool desc_is_3d(const String& eventPath);
+        bool desc_is_one_shot(const String& eventPath);
+        bool desc_is_snapshot(const String& eventPath);
+        bool desc_is_stream(const String& eventPath);
+        bool desc_has_sustain_point(const String& eventPath);
+        Array desc_get_min_max_distance(const String& eventPath);
+        float desc_get_sound_size(const String& eventPath);
+        Dictionary desc_get_parameter_description_by_name(const String& eventPath, const String& name);
+        Dictionary desc_get_parameter_description_by_id(const String& eventPath, const Array& idPair);
+        int desc_get_parameter_description_count(const String& eventPath);
+        Dictionary desc_get_parameter_description_by_index(const String& eventPath, int index);
+        Dictionary desc_get_user_property(const String& eventPath, const String& name);
+        int desc_get_user_property_count(const String& eventPath);
+        Dictionary desc_user_property_by_index(const String& eventPath, int index);
 
         /* bus functions */
-        bool getBusMute(String busPath);
-        bool getBusPaused(String busPath);
-        float getBusVolume(String busPath);
-        void setBusMute(String busPath, bool mute);
-        void setBusPaused(String busPath, bool paused);
-        void setBusVolume(String busPath, float volume);
-        void stopAllBusEvents(String busPath, int stopMode);
+        bool get_bus_mute(const String& busPath);
+        bool get_bus_paused(const String& busPath);
+        float get_bus_volume(const String& busPath);
+        void set_bus_mute(const String& busPath, bool mute);
+        void set_bus_paused(const String& busPath, bool paused);
+        void set_bus_volume(const String& busPath, float volume);
+        void stop_all_bus_events(const String& busPath, int stopMode);
 
         /* VCA functions */
-        float getVCAVolume(String VCAPath);
-        void setVCAVolume(String VCAPath, float volume);
+        float get_vca_volume(const String& VCAPath);
+        void set_vca_volume(const String& VCAPath, float volume);
         /* Helper methods */
-        void playOneShot(String eventName, Node *gameObj);
-        void playOneShotWithParams(String eventName, Node *gameObj, Dictionary parameters);
-        void playOneShotAttached(String eventName, Node *gameObj);
-        void playOneShotAttachedWithParams(String eventName, Node *gameObj, Dictionary parameters);
-        void attachInstanceToNode(uint64_t instanceId, Node *gameObj);
-        void detachInstanceFromNode(uint64_t instanceId);
-        Node* getObjectAttachedToInstance(uint64_t instanceId);
-        void pauseAllEvents(bool pause);
-        void muteAllEvents();
-        void unmuteAllEvents();
-        bool banksStillLoading();
+        void play_one_shot(const String& eventName, Node* gameObj);
+        void play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void play_one_shot_attached(const String& eventName, Node* gameObj);
+        void play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void attach_instance_to_node(uint64_t instanceId, Node* gameObj);
+        void detach_instance_from_node(const uint64_t instanceId);
+        Node* get_object_attached_to_instance(uint64_t instanceId);
+        void pause_all_events(bool pause);
+        void mute_all_events();
+        void unmute_all_events();
+        bool banks_still_loading();
 
 
         //LOW LEVEL API
         //Load and release memory
-        void loadFileAsSound(String path);
-        void loadFileAsMusic(String path);
-        void unloadFile(String path);
+        void load_file_as_sound(const String& path);
+        void load_file_as_music(const String& path);
+        void unload_file(const String& path);
         //Check validity of an instance
-        const uint64_t createSoundInstance(String path);
-        bool checkSoundInstance(const uint64_t instanceId);
-        void releaseSound(const uint64_t  instanceId);
+        uint64_t create_sound_instance(const String& path);
+        bool check_sound_instance(const uint64_t instanceId);
+        void release_sound(const uint64_t instanceId);
         //Setting the sound
-        void setSoundPaused(uint64_t instanceId, bool paused);
-        void stopSound(uint64_t instanceId);
-        bool isSoundPlaying(uint64_t instanceId);
-        void setSoundVolume(uint64_t instanceId, float volume);
-        float getSoundVolume(uint64_t instanceId);
-        float getSoundPitch(uint64_t instanceId);
-        void setSoundPitch(uint64_t instanceId, float pitch);
+        void set_sound_paused(const uint64_t instanceId, bool paused);
+        void stop_sound(const uint64_t instanceId);
+        bool is_sound_playing(const uint64_t instanceId);
+        void set_sound_volume(const uint64_t instanceId, float volume);
+        float get_sound_volume(const uint64_t instanceId);
+        float get_sound_pitch(const uint64_t instanceId);
+        void set_sound_pitch(const uint64_t instanceId, float pitch);
         //Playing a sound
-        void playSound(uint64_t instanceId);
+        void play_sound(const uint64_t instanceId);
 
         //MISC
-        void waitForAllLoads();
-        Array getAvailableDrivers();
-        int getDriver();
-        void setDriver(int id);
-        Dictionary getPerformanceData();
-        void setGlobalParameterByName(String parameterName, float value);
-        float getGlobalParameterByName(String parameterName);
-        void setGlobalParameterByID(Array idPair, float value);
-        float getGlobalParameterByID(Array idPair);
-        Dictionary getGlobalParameterDescByName(String parameterName);
-        Dictionary getGlobalParameterDescByID(Array idPair);
-        int getGlobalParameterDescCount();
-        Array getGlobalParameterDescList();
+        void wait_for_all_loads();
+        Array get_available_drivers();
+        int get_driver();
+        void set_driver(int id);
+        Dictionary get_performance_data();
+        void set_global_parameter_by_name(const String& parameterName, float value);
+        float get_global_parameter_by_name(const String& parameterName);
+        void set_global_parameter_by_id(const Array& idPair, const float value);
+        float get_global_parameter_by_id(const Array& idPair);
+        Dictionary get_global_parameter_desc_by_name(const String& parameterName);
+        Dictionary get_global_parameter_desc_by_id(const Array& idPair);
+        int get_global_parameter_desc_count();
+        Array get_global_parameter_desc_list();
 
-        void setCallback(uint64_t instanceId, int callbackMask);
+        void set_callback(const uint64_t instanceId, int callbackMask);
     };
 }
 
