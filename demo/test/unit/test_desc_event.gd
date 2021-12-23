@@ -73,3 +73,18 @@ class TestEventDescription:
 	func test_assert_sound_size():
 		var desiredValue: float = 2.0
 		assert_eq(Fmod.desc_get_sound_size("event:/Vehicles/Car Engine"), desiredValue, "Event description sound size should be " + str(desiredValue))
+		
+	func test_assert_should_retrieve_user_property_by_name():
+		var desiredSize: int = 0
+		var property = Fmod.desc_get_user_property("event:/Vehicles/Car Engine", "abc")
+		assert_eq(property.size(), desiredSize, "Number of user properties should be " + str(desiredSize))
+		
+	func test_assert_should_retrieve_user_property_by_index():
+		var desiredSize: int = 0
+		var property = Fmod.desc_user_property_by_index("event:/Vehicles/Car Engine", 0)
+		assert_eq(property.size(), desiredSize, "Number of user properties should be " + str(desiredSize))
+
+	func test_assert_should_retrieve_user_property_count():
+		var desiredSize: int = 0
+		var property = Fmod.desc_get_user_property_count("event:/Vehicles/Car Engine")
+		assert_eq(property, desiredSize, "Number of user properties should be " + str(desiredSize))
