@@ -78,4 +78,3 @@ func _set_event_name(e:String) -> void:
 		fmod_event_name = e
 	else:
 		fmod_event_name = EVENT_PREFIX + e
-		property_list_changed_notify()
