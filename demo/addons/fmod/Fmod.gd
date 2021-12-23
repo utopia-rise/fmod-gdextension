@@ -501,14 +501,14 @@ func desc_get_parameter_description_count(event_path: String) -> int:
 func desc_get_parameter_description_by_index(event_path: String) -> Dictionary:
 	return godot_fmod.desc_get_parameter_description_by_index(event_path)
 
-func desc_get_user_property(event_path: String) -> Dictionary:
-	return godot_fmod.desc_get_user_property(event_path)
+func desc_get_user_property(event_path: String, property_name: String) -> Dictionary:
+	return godot_fmod.desc_get_user_property(event_path, property_name)
 
 func desc_get_user_property_count(event_path: String) -> int:
 	return godot_fmod.desc_get_user_property_count(event_path)
 
-func desc_user_property_by_index(event_path: String) -> Dictionary:
-	return godot_fmod.desc_user_property_by_index(event_path)
+func desc_user_property_by_index(event_path: String, index: int) -> Dictionary:
+	return godot_fmod.desc_user_property_by_index(event_path, index)
 
 
 ###########
