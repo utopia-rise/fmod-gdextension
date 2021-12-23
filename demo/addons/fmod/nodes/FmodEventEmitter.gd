@@ -16,7 +16,7 @@ var is_paused = false
 
 func _ready():
 	for key in params:
-		set_param(key, params[key])
+		_set_fmod_param(key, params[key])
 	if autoplay:
 		play()
 		
@@ -31,8 +31,8 @@ func _exit_tree():
 			
 func set_param(key:String, value:float) -> void:
 	params[key] = value
-	if event_id != UNDEFINED:
-		Fmod.set_event_parameter_by_name(event_id, key, value)
+	_set_fmod_param(key, value)
+	
 
 func play() -> void:
 	if is_paused:
@@ -78,3 +78,7 @@ func _set_event_name(e:String) -> void:
 		fmod_event_name = e
 	else:
 		fmod_event_name = EVENT_PREFIX + e
+
+func _set_fmod_param(key:String, value: float) -> void:
+	if event_id != UNDEFINED:
+		Fmod.set_event_parameter_by_name(event_id, key, value)
