@@ -1,5 +1,5 @@
 tool
-class_name FmodSoundEffect, "res://addons/fmod/nodes/fmod.svg"
+class_name FmodEventEmitter, "res://addons/fmod/nodes/fmod.svg"
 extends Node2D
 
 const UNDEFINED = -1
