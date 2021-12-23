@@ -1,9 +1,11 @@
+tool
 class_name FmodSoundEffect, "res://addons/fmod/nodes/fmod.svg"
 extends Node2D
 
 const UNDEFINED = -1
+const EVENT_PREFIX = "event:/"
 
-export(String) var fmod_event_name = "event:/"
+export(String) var fmod_event_name = EVENT_PREFIX setget _set_event_name
 export(bool) var attached = true
 export(bool) var autoplay = false
 export(bool) var looped = false
@@ -70,3 +72,10 @@ func _play_looped() -> void:
 		Fmod.attach_instance_to_node(event_id, self)
 	for param in params:
 		Fmod.set_event_parameter_by_name(event_id, param, params[param])
+
+func _set_event_name(e:String) -> void:
+	if e.begins_with(EVENT_PREFIX):
+		fmod_event_name = e
+	else:
+		fmod_event_name = EVENT_PREFIX + e
+		property_list_changed_notify()
