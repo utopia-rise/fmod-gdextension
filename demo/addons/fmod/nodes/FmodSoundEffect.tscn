@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/fmod/nodes/FmodSoundEffect.gd" type="Script" id=1]
+
+[node name="FmodSoundEffect" type="Node2D"]
+pause_mode = 2
+script = ExtResource( 1 )
