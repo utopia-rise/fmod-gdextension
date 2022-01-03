@@ -19,7 +19,7 @@ var is_paused = false
 func _ready():
 	for key in params:
 		_set_fmod_param(key, params[key])
-	if event_id != UNDEFINED and preload_event:
+	if preload_event:
 		Fmod.desc_load_sample_data(fmod_event_name)
 	if autoplay:
 		play()
