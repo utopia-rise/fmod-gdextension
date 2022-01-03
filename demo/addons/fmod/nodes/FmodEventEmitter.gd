@@ -10,13 +10,17 @@ export(bool) var attached = true
 export(bool) var autoplay = false
 export(bool) var looped = false
 export(bool) var allow_fadeout = true
-export(Dictionary) var params
+export(bool) var preload_event = true
+
+var params = {}
 var event_id = UNDEFINED 
 var is_paused = false
 
 func _ready():
 	for key in params:
 		_set_fmod_param(key, params[key])
+	if event_id != UNDEFINED and preload_event:
+		Fmod.desc_load_sample_data(fmod_event_name)
 	if autoplay:
 		play()
 		
@@ -32,7 +36,6 @@ func _exit_tree():
 func set_param(key:String, value:float) -> void:
 	params[key] = value
 	_set_fmod_param(key, value)
-	
 
 func play() -> void:
 	if is_paused:
@@ -50,6 +53,7 @@ func pause() -> void:
 func _unpause() -> void:
 	if event_id != UNDEFINED:
 		Fmod.set_event_paused(event_id, false)
+	is_paused = false
 		
 func _play_one_shot() -> void:
 	if !attached:
