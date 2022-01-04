@@ -13,8 +13,7 @@ export(bool) var allow_fadeout = true
 export(bool) var preload_event = true
 
 var params = {}
-var event_id = UNDEFINED 
-var is_paused = false
+var event_id = UNDEFINED
 
 func _ready():
 	for key in params:
@@ -36,9 +35,14 @@ func _exit_tree():
 func set_param(key:String, value:float) -> void:
 	params[key] = value
 	_set_fmod_param(key, value)
+	
+func is_paused() -> bool:
+	if event_id == UNDEFINED:
+		return false
+	return Fmod.get_event_paused(event_id)
 
 func play() -> void:
-	if is_paused:
+	if is_paused():
 		_unpause()
 	elif looped:
 		_play_looped()
@@ -48,12 +52,10 @@ func play() -> void:
 func pause() -> void:
 	if event_id != UNDEFINED:
 		Fmod.set_event_paused(event_id, true)
-	is_paused = true
 	
 func _unpause() -> void:
 	if event_id != UNDEFINED:
 		Fmod.set_event_paused(event_id, false)
-	is_paused = false
 		
 func _play_one_shot() -> void:
 	if !attached:
