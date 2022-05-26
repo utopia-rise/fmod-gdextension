@@ -433,13 +433,13 @@ func _ready():
 
 ### Muting all event
 
-You can mute all event using `muteAllEvents`. This will mute the master bus.
+You can mute all event using `mute_all_events`. This will mute the master bus.
 
 ```gdscript
 func _ready():
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1.0, 64.0, 1.0)
+	Fmod.set_sound_3d_settings(1.0, 64.0, 1.0)
 	
 	# load banks
 	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
@@ -476,7 +476,7 @@ func _ready():
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.setSound3DSettings(1/0, 64.0, 1.0)
+	Fmod.set_sound_3d_settings(1/0, 64.0, 1.0)
 	
 	# load banks
 	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
@@ -489,7 +489,7 @@ func _ready():
 	# play some events
 	Fmod.play_one_shot("event:/Music/Level 02", self)
 	var my_music_event = Fmod.create_event_instance("event:/Music/Level 01")
-	Fmod.startEvent(my_music_event)
+	Fmod.start_event(my_music_event)
 	var t = Timer.new()
 	t.set_wait_time(3)
 	t.set_one_shot(true)
@@ -510,7 +510,7 @@ func _ready():
 
 By default, FMOD will use the primary audio output device as determined by the operating system. This can be changed at runtime, ideally through your game's Options Menu.
 
-Here, `getAvailableDrivers()` returns an Array which contains a Dictionary for every audio driver found. Each Dictionary contains fields such as the name, sample rate
+Here, `get_available_drivers()` returns an Array which contains a Dictionary for every audio driver found. Each Dictionary contains fields such as the name, sample rate
 and speaker config of the respective driver. Most importantly, it contains the id for that driver.
 
  ```gdscript
@@ -536,7 +536,7 @@ Fmod.get_dsp_num_buffers()
 
 ### Profiling & querying performance data
 
-`getPerformanceData` returns an object which contains current performance stats for CPU, Memory and File Streaming usage of both FMOD Studio and the Core System.
+`get_performance_data` returns an object which contains current performance stats for CPU, Memory and File Streaming usage of both FMOD Studio and the Core System.
 
 ```gdscript
 # called every frame
