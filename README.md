@@ -252,7 +252,7 @@ func _ready():
 	yield(t, "timeout")
 	
 	Fmod.detach_instance_from_node(my_music_event)
-	Fmod.stop_event(my_music_event, Fmods.FMOD_STUDIO_STOP_IMMEDIATE)
+	Fmod.stop_event(my_music_event, Fmod.FMOD_STUDIO_STOP_IMMEDIATE)
 ```
 
 ### Timeline marker & music beat callbacks
