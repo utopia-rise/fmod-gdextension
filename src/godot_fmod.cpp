@@ -3,6 +3,8 @@
 //
 
 #include "godot_fmod.h"
+#include <core/class_db.hpp>
+#include <variant/utility_functions.hpp>
 
 using namespace godot;
 
@@ -14,147 +16,147 @@ Fmod::~Fmod() {
     Callbacks::GodotFileRunner::get_singleton()->finish();
 }
 
-void Fmod::_register_methods() {
-    register_method("init", &Fmod::init);
-    register_method("shutdown", &Fmod::shutdown);
-    register_method("add_listener", &Fmod::add_listener);
-    register_method("remove_listener", &Fmod::remove_listener);
-    register_method("set_listener_number", &Fmod::set_listener_number);
-    register_method("get_listener_number", &Fmod::get_system_num_listeners);
-    register_method("get_listener_weight", &Fmod::get_system_listener_weight);
-    register_method("set_listener_weight", &Fmod::set_system_listener_weight);
-    register_method("get_listener_3D_attributs", &Fmod::get_system_listener_3d_attributes);
-    register_method("get_listener_2D_attributs", &Fmod::get_system_listener_2d_attributes);
-    register_method("set_listener_3D_attributs", &Fmod::set_system_listener_3d_attributes);
-    register_method("set_listener_2D_attributs", &Fmod::set_system_listener_2d_attributes);
-    register_method("set_listener_lock", &Fmod::set_listener_lock);
-    register_method("get_listener_lock", &Fmod::get_listener_lock);
-    register_method("get_object_attached_to_listener", &Fmod::get_object_attached_to_listener);
-    register_method("set_software_format", &Fmod::set_software_format);
-    register_method("load_bank", &Fmod::load_bank);
-    register_method("unload_bank", &Fmod::unload_bank);
-    register_method("check_VCA_path", &Fmod::check_vca_path);
-    register_method("check_bus_path", &Fmod::check_bus_path);
-    register_method("check_event_path", &Fmod::check_event_path);
-    register_method("get_bank_loading_state", &Fmod::get_bank_loading_state);
-    register_method("get_bank_bus_count", &Fmod::get_bank_bus_count);
-    register_method("get_bank_event_count", &Fmod::get_bank_event_count);
-    register_method("get_bank_string_count", &Fmod::get_bank_string_count);
-    register_method("get_bank_VCA_count", &Fmod::get_bank_vca_count);
-    register_method("create_event_instance", &Fmod::create_event_instance);
-    register_method("get_event_parameter_by_name", &Fmod::get_event_parameter_by_name);
-    register_method("set_event_parameter_by_name", &Fmod::set_event_parameter_by_name);
-    register_method("get_event_parameter_by_id", &Fmod::get_event_parameter_by_id);
-    register_method("set_event_parameter_by_id", &Fmod::set_event_parameter_by_id);
-    register_method("release_event", &Fmod::release_event);
-    register_method("start_event", &Fmod::start_event);
-    register_method("stop_event", &Fmod::stop_event);
-    register_method("event_key_off", &Fmod::event_key_off);
-    register_method("get_event_playback_state", &Fmod::get_event_playback_state);
-    register_method("get_event_paused", &Fmod::get_event_paused);
-    register_method("set_event_paused", &Fmod::set_event_paused);
-    register_method("get_event_pitch", &Fmod::get_event_pitch);
-    register_method("set_event_pitch", &Fmod::set_event_pitch);
-    register_method("get_event_volume", &Fmod::get_event_volume);
-    register_method("set_event_volume", &Fmod::set_event_volume);
-    register_method("get_event_timeline_position", &Fmod::get_event_timeline_position);
-    register_method("set_event_timeline_position", &Fmod::set_event_timeline_position);
-    register_method("get_event_reverb_level", &Fmod::get_event_reverb_level);
-    register_method("set_event_reverb_level", &Fmod::set_event_reverb_level);
-    register_method("is_event_virtual", &Fmod::is_event_virtual);
-    register_method("set_event_listener_mask", &Fmod::set_event_listener_mask);
-    register_method("get_event_listener_mask", &Fmod::get_event_listener_mask);
-    register_method("set_event_2d_attributes", &Fmod::set_event_2d_attributes);
-    register_method("get_event_2d_attributes", &Fmod::get_event_2d_attributes);
-    register_method("set_event_3d_attributes", &Fmod::set_event_3d_attributes);
-    register_method("get_event_3d_attributes", &Fmod::get_event_3d_attributes);
-    register_method("desc_get_length", &Fmod::desc_get_length);
-    register_method("desc_get_instance_list", &Fmod::desc_get_instance_list);
-    register_method("desc_get_instance_count", &Fmod::desc_get_instance_count);
-    register_method("desc_release_all_instances", &Fmod::desc_release_all_instances);
-    register_method("desc_load_sample_data", &Fmod::desc_load_sample_data);
-    register_method("desc_unload_sample_data", &Fmod::desc_unload_sample_data);
-    register_method("desc_get_sample_loading_state", &Fmod::desc_get_sample_loading_state);
-    register_method("desc_is_3d", &Fmod::desc_is_3d);
-    register_method("desc_is_one_shot", &Fmod::desc_is_one_shot);
-    register_method("desc_is_snapshot", &Fmod::desc_is_snapshot);
-    register_method("desc_is_stream", &Fmod::desc_is_stream);
-    register_method("desc_has_sustain_point", &Fmod::desc_has_sustain_point);
-    register_method("desc_get_min_max_distance", &Fmod::desc_get_min_max_distance);
-    register_method("desc_get_sound_size", &Fmod::desc_get_sound_size);
-    register_method("desc_get_parameter_description_by_name", &Fmod::desc_get_parameter_description_by_name);
-    register_method("desc_get_parameter_description_by_id", &Fmod::desc_get_parameter_description_by_id);
-    register_method("desc_get_parameter_description_count", &Fmod::desc_get_parameter_description_count);
-    register_method("desc_get_parameter_description_by_index", &Fmod::desc_get_parameter_description_by_index);
-    register_method("desc_get_user_property", &Fmod::desc_get_user_property);
-    register_method("desc_get_user_property_count", &Fmod::desc_get_user_property_count);
-    register_method("desc_user_property_by_index", &Fmod::desc_user_property_by_index);
-    register_method("get_bus_mute", &Fmod::get_bus_mute);
-    register_method("get_bus_paused", &Fmod::get_bus_paused);
-    register_method("get_bus_volume", &Fmod::get_bus_volume);
-    register_method("set_bus_mute", &Fmod::set_bus_mute);
-    register_method("set_bus_paused", &Fmod::set_bus_paused);
-    register_method("set_bus_volume", &Fmod::set_bus_volume);
-    register_method("stop_all_bus_events", &Fmod::stop_all_bus_events);
-    register_method("get_VCA_volume", &Fmod::get_vca_volume);
-    register_method("set_VCA_volume", &Fmod::set_vca_volume);
-    register_method("play_one_shot", &Fmod::play_one_shot);
-    register_method("play_one_shot_with_params", &Fmod::play_one_shot_with_params);
-    register_method("play_one_shot_attached", &Fmod::play_one_shot_attached);
-    register_method("play_one_shot_attached_with_params", &Fmod::play_one_shot_attached_with_params);
-    register_method("attach_instance_to_node", &Fmod::attach_instance_to_node);
-    register_method("detach_instance_from_node", &Fmod::detach_instance_from_node);
-    register_method("get_object_attached_to_instance", &Fmod::get_object_attached_to_instance);
-    register_method("pause_all_events", &Fmod::pause_all_events);
-    register_method("mute_all_events", &Fmod::mute_all_events);
-    register_method("unmute_all_events", &Fmod::unmute_all_events);
-    register_method("banks_still_loading", &Fmod::banks_still_loading);
-    register_method("load_file_as_sound", &Fmod::load_file_as_sound);
-    register_method("load_file_as_music", &Fmod::load_file_as_music);
-    register_method("unload_file", &Fmod::unload_file);
-    register_method("create_sound_instance", &Fmod::create_sound_instance);
-    register_method("check_sound_instance", &Fmod::check_sound_instance);
-    register_method("release_sound", &Fmod::release_sound);
-    register_method("play_sound", &Fmod::play_sound);
-    register_method("stop_sound", &Fmod::stop_sound);
-    register_method("set_sound_paused", &Fmod::set_sound_paused);
-    register_method("is_sound_playing", &Fmod::is_sound_playing);
-    register_method("set_sound_volume", &Fmod::set_sound_volume);
-    register_method("get_sound_volume", &Fmod::get_sound_volume);
-    register_method("set_sound_pitch", &Fmod::set_sound_pitch);
-    register_method("get_sound_pitch", &Fmod::get_sound_pitch);
-    register_method("set_callback", &Fmod::set_callback);
-    register_method("set_sound_3D_settings", &Fmod::set_sound_3d_settings);
-    register_method("wait_for_all_loads", &Fmod::wait_for_all_loads);
-    register_method("get_available_drivers", &Fmod::get_available_drivers);
-    register_method("get_driver", &Fmod::get_driver);
-    register_method("set_driver", &Fmod::set_driver);
-    register_method("get_performance_data", &Fmod::get_performance_data);
-    register_method("set_global_parameter_by_name", &Fmod::set_global_parameter_by_name);
-    register_method("get_global_parameter_by_name", &Fmod::get_global_parameter_by_name);
-    register_method("set_global_parameter_by_id", &Fmod::set_global_parameter_by_id);
-    register_method("get_global_parameter_by_id", &Fmod::get_global_parameter_by_id);
-    register_method("get_global_parameter_desc_by_name", &Fmod::get_global_parameter_desc_by_name);
-    register_method("get_global_parameter_desc_by_id", &Fmod::get_global_parameter_desc_by_id);
-    register_method("get_global_parameter_desc_count", &Fmod::get_global_parameter_desc_count);
-    register_method("get_global_parameter_desc_list", &Fmod::get_global_parameter_desc_list);
-    register_method("set_dsp_buffer_size", &Fmod::set_system_dsp_buffer_size);
-    register_method("get_dsp_buffer_size", &Fmod::get_system_dsp_buffer_size);
-    register_method("get_dsp_buffer_length", &Fmod::get_system_dsp_buffer_length);
-    register_method("get_dsp_num_buffers", &Fmod::get_system_dsp_num_buffers);
-    register_method("_process", &Fmod::_process);
+void Fmod::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("init"), &Fmod::init);
+    ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
+    ClassDB::bind_method(D_METHOD("add_listener"), &Fmod::add_listener);
+    ClassDB::bind_method(D_METHOD("remove_listener"), &Fmod::remove_listener);
+    ClassDB::bind_method(D_METHOD("set_listener_number"), &Fmod::set_listener_number);
+    ClassDB::bind_method(D_METHOD("get_listener_number"), &Fmod::get_system_num_listeners);
+    ClassDB::bind_method(D_METHOD("get_listener_weight"), &Fmod::get_system_listener_weight);
+    ClassDB::bind_method(D_METHOD("set_listener_weight"), &Fmod::set_system_listener_weight);
+    ClassDB::bind_method(D_METHOD("get_listener_3D_attributs"), &Fmod::get_system_listener_3d_attributes);
+    ClassDB::bind_method(D_METHOD("get_listener_2D_attributs"), &Fmod::get_system_listener_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_3D_attributs"), &Fmod::set_system_listener_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_2D_attributs"), &Fmod::set_system_listener_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_lock"), &Fmod::set_listener_lock);
+    ClassDB::bind_method(D_METHOD("get_listener_lock"), &Fmod::get_listener_lock);
+    ClassDB::bind_method(D_METHOD("get_object_attached_to_listener"), &Fmod::get_object_attached_to_listener);
+    ClassDB::bind_method(D_METHOD("set_software_format"), &Fmod::set_software_format);
+    ClassDB::bind_method(D_METHOD("load_bank"), &Fmod::load_bank);
+    ClassDB::bind_method(D_METHOD("unload_bank"), &Fmod::unload_bank);
+    ClassDB::bind_method(D_METHOD("check_VCA_path"), &Fmod::check_vca_path);
+    ClassDB::bind_method(D_METHOD("check_bus_path"), &Fmod::check_bus_path);
+    ClassDB::bind_method(D_METHOD("check_event_path"), &Fmod::check_event_path);
+    ClassDB::bind_method(D_METHOD("get_bank_loading_state"), &Fmod::get_bank_loading_state);
+    ClassDB::bind_method(D_METHOD("get_bank_bus_count"), &Fmod::get_bank_bus_count);
+    ClassDB::bind_method(D_METHOD("get_bank_event_count"), &Fmod::get_bank_event_count);
+    ClassDB::bind_method(D_METHOD("get_bank_string_count"), &Fmod::get_bank_string_count);
+    ClassDB::bind_method(D_METHOD("get_bank_VCA_count"), &Fmod::get_bank_vca_count);
+    ClassDB::bind_method(D_METHOD("create_event_instance"), &Fmod::create_event_instance);
+    ClassDB::bind_method(D_METHOD("get_event_parameter_by_name"), &Fmod::get_event_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_event_parameter_by_name"), &Fmod::set_event_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("get_event_parameter_by_id"), &Fmod::get_event_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_event_parameter_by_id"), &Fmod::set_event_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("release_event"), &Fmod::release_event);
+    ClassDB::bind_method(D_METHOD("start_event"), &Fmod::start_event);
+    ClassDB::bind_method(D_METHOD("stop_event"), &Fmod::stop_event);
+    ClassDB::bind_method(D_METHOD("event_key_off"), &Fmod::event_key_off);
+    ClassDB::bind_method(D_METHOD("get_event_playback_state"), &Fmod::get_event_playback_state);
+    ClassDB::bind_method(D_METHOD("get_event_paused"), &Fmod::get_event_paused);
+    ClassDB::bind_method(D_METHOD("set_event_paused"), &Fmod::set_event_paused);
+    ClassDB::bind_method(D_METHOD("get_event_pitch"), &Fmod::get_event_pitch);
+    ClassDB::bind_method(D_METHOD("set_event_pitch"), &Fmod::set_event_pitch);
+    ClassDB::bind_method(D_METHOD("get_event_volume"), &Fmod::get_event_volume);
+    ClassDB::bind_method(D_METHOD("set_event_volume"), &Fmod::set_event_volume);
+    ClassDB::bind_method(D_METHOD("get_event_timeline_position"), &Fmod::get_event_timeline_position);
+    ClassDB::bind_method(D_METHOD("set_event_timeline_position"), &Fmod::set_event_timeline_position);
+    ClassDB::bind_method(D_METHOD("get_event_reverb_level"), &Fmod::get_event_reverb_level);
+    ClassDB::bind_method(D_METHOD("set_event_reverb_level"), &Fmod::set_event_reverb_level);
+    ClassDB::bind_method(D_METHOD("is_event_virtual"), &Fmod::is_event_virtual);
+    ClassDB::bind_method(D_METHOD("set_event_listener_mask"), &Fmod::set_event_listener_mask);
+    ClassDB::bind_method(D_METHOD("get_event_listener_mask"), &Fmod::get_event_listener_mask);
+    ClassDB::bind_method(D_METHOD("set_event_2d_attributes"), &Fmod::set_event_2d_attributes);
+    ClassDB::bind_method(D_METHOD("get_event_2d_attributes"), &Fmod::get_event_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_event_3d_attributes"), &Fmod::set_event_3d_attributes);
+    ClassDB::bind_method(D_METHOD("get_event_3d_attributes"), &Fmod::get_event_3d_attributes);
+    ClassDB::bind_method(D_METHOD("desc_get_length"), &Fmod::desc_get_length);
+    ClassDB::bind_method(D_METHOD("desc_get_instance_list"), &Fmod::desc_get_instance_list);
+    ClassDB::bind_method(D_METHOD("desc_get_instance_count"), &Fmod::desc_get_instance_count);
+    ClassDB::bind_method(D_METHOD("desc_release_all_instances"), &Fmod::desc_release_all_instances);
+    ClassDB::bind_method(D_METHOD("desc_load_sample_data"), &Fmod::desc_load_sample_data);
+    ClassDB::bind_method(D_METHOD("desc_unload_sample_data"), &Fmod::desc_unload_sample_data);
+    ClassDB::bind_method(D_METHOD("desc_get_sample_loading_state"), &Fmod::desc_get_sample_loading_state);
+    ClassDB::bind_method(D_METHOD("desc_is_3d"), &Fmod::desc_is_3d);
+    ClassDB::bind_method(D_METHOD("desc_is_one_shot"), &Fmod::desc_is_one_shot);
+    ClassDB::bind_method(D_METHOD("desc_is_snapshot"), &Fmod::desc_is_snapshot);
+    ClassDB::bind_method(D_METHOD("desc_is_stream"), &Fmod::desc_is_stream);
+    ClassDB::bind_method(D_METHOD("desc_has_sustain_point"), &Fmod::desc_has_sustain_point);
+    ClassDB::bind_method(D_METHOD("desc_get_min_max_distance"), &Fmod::desc_get_min_max_distance);
+    ClassDB::bind_method(D_METHOD("desc_get_sound_size"), &Fmod::desc_get_sound_size);
+    ClassDB::bind_method(D_METHOD("desc_get_parameter_description_by_name"), &Fmod::desc_get_parameter_description_by_name);
+    ClassDB::bind_method(D_METHOD("desc_get_parameter_description_by_id"), &Fmod::desc_get_parameter_description_by_id);
+    ClassDB::bind_method(D_METHOD("desc_get_parameter_description_count"), &Fmod::desc_get_parameter_description_count);
+    ClassDB::bind_method(D_METHOD("desc_get_parameter_description_by_index"), &Fmod::desc_get_parameter_description_by_index);
+    ClassDB::bind_method(D_METHOD("desc_get_user_property"), &Fmod::desc_get_user_property);
+    ClassDB::bind_method(D_METHOD("desc_get_user_property_count"), &Fmod::desc_get_user_property_count);
+    ClassDB::bind_method(D_METHOD("desc_user_property_by_index"), &Fmod::desc_user_property_by_index);
+    ClassDB::bind_method(D_METHOD("get_bus_mute"), &Fmod::get_bus_mute);
+    ClassDB::bind_method(D_METHOD("get_bus_paused"), &Fmod::get_bus_paused);
+    ClassDB::bind_method(D_METHOD("get_bus_volume"), &Fmod::get_bus_volume);
+    ClassDB::bind_method(D_METHOD("set_bus_mute"), &Fmod::set_bus_mute);
+    ClassDB::bind_method(D_METHOD("set_bus_paused"), &Fmod::set_bus_paused);
+    ClassDB::bind_method(D_METHOD("set_bus_volume"), &Fmod::set_bus_volume);
+    ClassDB::bind_method(D_METHOD("stop_all_bus_events"), &Fmod::stop_all_bus_events);
+    ClassDB::bind_method(D_METHOD("get_VCA_volume"), &Fmod::get_vca_volume);
+    ClassDB::bind_method(D_METHOD("set_VCA_volume"), &Fmod::set_vca_volume);
+    ClassDB::bind_method(D_METHOD("play_one_shot"), &Fmod::play_one_shot);
+    ClassDB::bind_method(D_METHOD("play_one_shot_with_params"), &Fmod::play_one_shot_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_attached"), &Fmod::play_one_shot_attached);
+    ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params"), &Fmod::play_one_shot_attached_with_params);
+    ClassDB::bind_method(D_METHOD("attach_instance_to_node"), &Fmod::attach_instance_to_node);
+    ClassDB::bind_method(D_METHOD("detach_instance_from_node"), &Fmod::detach_instance_from_node);
+    ClassDB::bind_method(D_METHOD("get_object_attached_to_instance"), &Fmod::get_object_attached_to_instance);
+    ClassDB::bind_method(D_METHOD("pause_all_events"), &Fmod::pause_all_events);
+    ClassDB::bind_method(D_METHOD("mute_all_events"), &Fmod::mute_all_events);
+    ClassDB::bind_method(D_METHOD("unmute_all_events"), &Fmod::unmute_all_events);
+    ClassDB::bind_method(D_METHOD("banks_still_loading"), &Fmod::banks_still_loading);
+    ClassDB::bind_method(D_METHOD("load_file_as_sound"), &Fmod::load_file_as_sound);
+    ClassDB::bind_method(D_METHOD("load_file_as_music"), &Fmod::load_file_as_music);
+    ClassDB::bind_method(D_METHOD("unload_file"), &Fmod::unload_file);
+    ClassDB::bind_method(D_METHOD("create_sound_instance"), &Fmod::create_sound_instance);
+    ClassDB::bind_method(D_METHOD("check_sound_instance"), &Fmod::check_sound_instance);
+    ClassDB::bind_method(D_METHOD("release_sound"), &Fmod::release_sound);
+    ClassDB::bind_method(D_METHOD("play_sound"), &Fmod::play_sound);
+    ClassDB::bind_method(D_METHOD("stop_sound"), &Fmod::stop_sound);
+    ClassDB::bind_method(D_METHOD("set_sound_paused"), &Fmod::set_sound_paused);
+    ClassDB::bind_method(D_METHOD("is_sound_playing"), &Fmod::is_sound_playing);
+    ClassDB::bind_method(D_METHOD("set_sound_volume"), &Fmod::set_sound_volume);
+    ClassDB::bind_method(D_METHOD("get_sound_volume"), &Fmod::get_sound_volume);
+    ClassDB::bind_method(D_METHOD("set_sound_pitch"), &Fmod::set_sound_pitch);
+    ClassDB::bind_method(D_METHOD("get_sound_pitch"), &Fmod::get_sound_pitch);
+    ClassDB::bind_method(D_METHOD("set_callback"), &Fmod::set_callback);
+    ClassDB::bind_method(D_METHOD("set_sound_3D_settings"), &Fmod::set_sound_3d_settings);
+    ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &Fmod::wait_for_all_loads);
+    ClassDB::bind_method(D_METHOD("get_available_drivers"), &Fmod::get_available_drivers);
+    ClassDB::bind_method(D_METHOD("get_driver"), &Fmod::get_driver);
+    ClassDB::bind_method(D_METHOD("set_driver"), &Fmod::set_driver);
+    ClassDB::bind_method(D_METHOD("get_performance_data"), &Fmod::get_performance_data);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_name"), &Fmod::set_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_name"), &Fmod::get_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_id"), &Fmod::set_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_id"), &Fmod::get_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name"), &Fmod::get_global_parameter_desc_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id"), &Fmod::get_global_parameter_desc_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &Fmod::get_global_parameter_desc_count);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_list"), &Fmod::get_global_parameter_desc_list);
+    ClassDB::bind_method(D_METHOD("set_dsp_buffer_size"), &Fmod::set_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_dsp_buffer_size"), &Fmod::get_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_dsp_buffer_length"), &Fmod::get_system_dsp_buffer_length);
+    ClassDB::bind_method(D_METHOD("get_dsp_num_buffers"), &Fmod::get_system_dsp_num_buffers);
+    ClassDB::bind_method(D_METHOD("_process"), &Fmod::_process);
 
-    register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
-    register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
-    register_signal<Fmod>("sound_played", "params", GODOT_VARIANT_TYPE_DICTIONARY);
-    register_signal<Fmod>("sound_stopped", "params", GODOT_VARIANT_TYPE_DICTIONARY);
+    ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("sound_played", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
 
     REGISTER_ALL_CONSTANTS
 }
 
 bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *file, int line) {
     if (result != FMOD_OK) {
-        godot::Godot::print_error(FMOD_ErrorString(result), function, file, line);
+        UtilityFunctions::printerr(FMOD_ErrorString(result), function, file, line);
         return false;
     }
     return true;
@@ -1361,7 +1363,7 @@ void Fmod::pause_all_events(const bool pause) {
 void Fmod::mute_all_events() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/"), &masterBus))) {
             masterBus->setMute(true);
         }
     }
@@ -1370,7 +1372,7 @@ void Fmod::mute_all_events() {
 void Fmod::unmute_all_events() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/"), &masterBus))) {
             masterBus->setMute(false);
         }
     }
@@ -1407,7 +1409,7 @@ void Fmod::load_file_as_sound(const String& path) {
         ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), FMOD_CREATESAMPLE, nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
-            Godot::print("FMOD Sound System: LOADING AS SOUND FILE" + String(path));
+            UtilityFunctions::print("FMOD Sound System: LOADING AS SOUND FILE" + String(path));
         }
     }
 }
@@ -1419,7 +1421,7 @@ void Fmod::load_file_as_music(const String& path) {
         ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL) , nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
-            Godot::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
+            UtilityFunctions::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
         }
     }
 }
@@ -1429,7 +1431,7 @@ void Fmod::unload_file(const String& path) {
     FIND_AND_CHECK(path, sounds)
     ERROR_CHECK(instance->release());
     sounds.erase(path);
-    Godot::print("FMOD Sound System: UNLOADING FILE" + String(path));
+    UtilityFunctions::print("FMOD Sound System: UNLOADING FILE" + String(path));
 }
 
 uint64_t Fmod::create_sound_instance(const String& path) {

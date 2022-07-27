@@ -16,6 +16,7 @@
 #include "helpers/containers.h"
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
+#include <variant/utility_functions.hpp>
 
 #define CUSTOM_FILESYSTEM
 
@@ -43,13 +44,13 @@ namespace godot {
 #define GODOT_LOG(level, message)\
     switch (level) {\
         case 0:\
-            Godot::print(message);\
+            UtilityFunctions::print(message);\
             break;\
         case 1:\
-            Godot::print_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            UtilityFunctions::print(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
             break;\
         case 2:\
-            Godot::print_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            UtilityFunctions::printerr(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
             break;\
     }\
 
@@ -162,8 +163,6 @@ namespace godot {
         Fmod();
 
         ~Fmod();
-
-        static void _register_methods();
 
         void _init();
         void _process(float delta);
