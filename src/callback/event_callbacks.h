@@ -3,7 +3,7 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <core/Dictionary.hpp>
+#include <variant/dictionary.hpp>
 #include <mutex>
 
 namespace Callbacks {

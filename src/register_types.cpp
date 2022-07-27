@@ -17,7 +17,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 
     Callbacks::GodotFileRunner::get_singleton();
 
-    ClassDB::register_class<FMOD>();
+    ClassDB::register_class<Fmod>();
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {

@@ -1,17 +1,16 @@
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
-#include <Godot.hpp>
-#include <GodotGlobal.hpp>
+#include <godot.hpp>
+#include <classes/global_constants.hpp>
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
 #include <fmod.hpp>
-#include <Spatial.hpp>
-#include <Object.hpp>
-#include <CanvasItem.hpp>
-#include <Node.hpp>
-#include <gen/Mutex.hpp>
+#include <core/object.hpp>
+#include <classes/canvas_item.hpp>
+#include <classes/node.hpp>
+#include <classes/mutex.hpp>
 #include "callback/event_callbacks.h"
 #include "callback/file_callbacks.h"
 #include "helpers/containers.h"
@@ -95,8 +94,11 @@ namespace godot {
     };
 
     class Fmod : public Node {
-    GODOT_CLASS(Fmod, Node)
+    GDCLASS(Fmod, Node)
         DECLARE_ALL_CONSTANTS
+
+    protected:
+        static void _bind_methods();
 
     private:
         FMOD::Studio::System *system;

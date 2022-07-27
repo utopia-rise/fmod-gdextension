@@ -5,8 +5,8 @@
 #ifndef GODOTFMOD_POINTERARRAY_H
 #define GODOTFMOD_POINTERARRAY_H
 
-#include <core/Godot.hpp>
-#include <core/Array.hpp>
+#include <godot.hpp>
+#include <variant/array.hpp>
 #include "current_function.h"
 
 namespace godot {
