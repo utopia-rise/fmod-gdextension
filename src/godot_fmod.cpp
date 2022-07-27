@@ -1363,7 +1363,7 @@ void Fmod::pause_all_events(const bool pause) {
 void Fmod::mute_all_events() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/"), &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(true);
         }
     }
@@ -1372,7 +1372,7 @@ void Fmod::mute_all_events() {
 void Fmod::unmute_all_events() {
     if (banks.size() > 1) {
         FMOD::Studio::Bus *masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/"), &masterBus))) {
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(false);
         }
     }
