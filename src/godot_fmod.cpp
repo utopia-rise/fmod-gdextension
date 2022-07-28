@@ -5,6 +5,8 @@
 #include "godot_fmod.h"
 #include <core/class_db.hpp>
 #include <variant/utility_functions.hpp>
+#include <variant/transform3d.hpp>
+#include <classes/node3d.hpp>
 
 using namespace godot;
 
@@ -302,7 +304,7 @@ void Fmod::_set_listener_attributes() {
             continue;
         }
 
-        if (auto *s {Node::cast_to<Spatial>(node)}) {
+        if (auto *s {Node::cast_to<Node3D>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
@@ -329,7 +331,7 @@ FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_V
     return f3d;
 }
 
-FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes_from_transform(const Transform& transform) const {
+FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes_from_transform(const Transform3D& transform) const {
     Vector3 pos = transform.get_origin() / distanceScale;
     Vector3 up = transform.get_basis().elements[1];
     Vector3 forward = transform.get_basis().elements[2];
@@ -349,7 +351,7 @@ FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes_from_transform_2d(const Transform2D&
 
 Dictionary Fmod::_get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attr) const {
     Dictionary _3Dattr;
-    Transform transform;
+    Transform3D transform;
     transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
     const Vector3& upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
     transform.basis.elements[1] = upVector;
@@ -384,9 +386,9 @@ bool Fmod::_is_dead(Node* node) {
 
 bool Fmod::_is_fmod_valid(Node* node) {
     if (node) {
-        bool ret = Node::cast_to<Spatial>(node) || Node::cast_to<CanvasItem>(node);
+        bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
         if(!ret) {
-            GODOT_LOG(2, "Invalid Object. A listener has to be either a Spatial or CanvasItem.")
+            GODOT_LOG(2, "Invalid Object. A listener has to be either a Node3D or CanvasItem.")
         }
         return ret;
     }
@@ -402,7 +404,7 @@ void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance,
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
-        if (auto *s {Node::cast_to<Spatial>(node)}) {
+        if (auto *s {Node::cast_to<Node3D>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
@@ -518,7 +520,7 @@ Dictionary Fmod::get_system_listener_2d_attributes(int index) {
     return _2Dattr;
 }
 
-void Fmod::set_system_listener_3d_attributes(int index, const Transform& transform) {
+void Fmod::set_system_listener_3d_attributes(int index, const Transform3D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
                 attr = _get_3d_attributes_from_transform(transform);
@@ -815,7 +817,7 @@ Dictionary Fmod::get_event_2d_attributes(uint64_t instanceId) {
     return _2Dattr;
 }
 
-void Fmod::set_event_3d_attributes(uint64_t instanceId, const Transform& transform) {
+void Fmod::set_event_3d_attributes(uint64_t instanceId, const Transform3D& transform) {
     FIND_AND_CHECK(instanceId, events)
     auto attr = _get_3d_attributes_from_transform(transform);
     ERROR_CHECK(instance->set3DAttributes(&attr));
@@ -1294,7 +1296,7 @@ void Fmod::play_one_shot_attached_with_params(const String& eventName, Node* gam
 
 void Fmod::attach_instance_to_node(uint64_t instanceId, Node* gameObj) {
     if (!_is_fmod_valid(gameObj)) {
-        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Spatial or CanvasItem")
+        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Node3D or CanvasItem")
         return;
     }
     FIND_AND_CHECK(instanceId, events)

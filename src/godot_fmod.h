@@ -47,10 +47,10 @@ namespace godot {
             UtilityFunctions::print(message);\
             break;\
         case 1:\
-            UtilityFunctions::print(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
             break;\
         case 2:\
-            UtilityFunctions::printerr(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
+            UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
             break;\
     }\
 
@@ -137,7 +137,7 @@ namespace godot {
         static FMOD_VECTOR _to_fmod_vector(Vector3& vec);
         static FMOD_3D_ATTRIBUTES _get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward,
                                                      const FMOD_VECTOR& vel);
-        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform(const Transform& transform) const;
+        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform(const Transform3D& transform) const;
         FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform_2d(const Transform2D& transform) const;
         Dictionary _get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
         Dictionary _get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
@@ -179,7 +179,7 @@ namespace godot {
         void set_system_listener_weight(int index, float weight);
         Dictionary get_system_listener_3d_attributes(int index);
         Dictionary get_system_listener_2d_attributes(int index);
-        void set_system_listener_3d_attributes(int index, const Transform& transform);
+        void set_system_listener_3d_attributes(int index, const Transform3D& transform);
         void set_system_listener_2d_attributes(int index, const Transform2D& transform);
         void set_listener_lock(int index, bool isLocked);
         bool get_listener_lock(int index);
@@ -222,7 +222,7 @@ namespace godot {
         bool is_event_virtual(uint64_t instanceId);
         void set_event_listener_mask(uint64_t instanceId, unsigned int mask);
         uint32_t get_event_listener_mask(uint64_t instanceId);
-        void set_event_3d_attributes(uint64_t instanceId, const Transform& transform);
+        void set_event_3d_attributes(uint64_t instanceId, const Transform3D& transform);
         Dictionary get_event_3d_attributes(uint64_t instanceId);
         Dictionary get_event_2d_attributes(uint64_t instanceId);
         void set_event_2d_attributes(uint64_t instanceId, Transform2D position);

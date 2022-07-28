@@ -6,6 +6,7 @@
 #define GODOTFMOD_CONSTANTS_H
 
 #include <fmod_common.h>
+#include <godot_cpp/core/class_db.hpp>
 
 #define DECLARE_CONSTANT(name)\
     int _##name = name;\
@@ -18,7 +19,7 @@
     }\
 
 #define REGISTER_CONSTANT(name)\
-    register_property<Fmod, int>(#name,&Fmod::set_##name, &Fmod::get_##name, name);\
+    BIND_CONSTANT(name)\
 
 #define DECLARE_ALL_CONSTANTS\
     DECLARE_CONSTANT(FMOD_INIT_3D_RIGHTHANDED)\
