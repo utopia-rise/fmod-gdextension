@@ -402,8 +402,8 @@ if platform == "osx":
     libfmod = 'libfmod%s.dylib' % lfix
     libfmodstudio = 'libfmodstudio%s.dylib' % lfix
     cpp_bindings_libname += '.a'
-    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
-               env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
+    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + '/include/', env['cpp_bindings_dir'] + '/include/godot_cpp/', env['cpp_bindings_dir'] + '/include/godot_cpp/core/',
+               env['cpp_bindings_dir'] + '/gen/include/godot_cpp/', env['cpp_bindings_dir'] + '/gen/include/', env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/'])
 elif platform == "linux":
@@ -414,8 +414,8 @@ elif platform == "linux":
         "32" : "x86",
     }
     arch_dir = fmod_info_table[arch_suffix]
-    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
-               env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
+    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + '/include/', env['cpp_bindings_dir'] + '/include/godot_cpp/', env['cpp_bindings_dir'] + '/include/godot_cpp/core/',
+               env['cpp_bindings_dir'] + '/gen/include/godot_cpp/', env['cpp_bindings_dir'] + '/gen/include/', env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'linux/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'linux/studio/lib/' + arch_dir])
 elif platform == "windows":
@@ -427,16 +427,16 @@ elif platform == "windows":
         "32" : "x86",
     }
     arch_dir = fmod_info_table[arch_suffix]
-    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
-                        env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
+    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + '/include/', env['cpp_bindings_dir'] + '/include/godot_cpp/', env['cpp_bindings_dir'] + '/include/godot_cpp/core/',
+                        env['cpp_bindings_dir'] + '/gen/include/godot_cpp', env['cpp_bindings_dir'] + '/gen/include/', env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'windows/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_dir])
 elif platform == "ios":
     cpp_bindings_libname += '.a'
     libfmod = 'libfmod%s_iphoneos.a' % lfix
     libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
-    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
-                        env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
+    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + '/include/', env['cpp_bindings_dir'] + '/include/godot_cpp/', env['cpp_bindings_dir'] + '/include/godot_cpp/core/',
+                        env['cpp_bindings_dir'] + '/gen/include/godot_cpp', env['cpp_bindings_dir'] + '/gen/include/', env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
 elif platform == "android":
@@ -450,8 +450,8 @@ elif platform == "android":
         "x86_64": "x86_64"
     }
     arch_dir = fmod_info_table[arch_suffix]
-    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + 'include/', env['cpp_bindings_dir'] + 'include/core/',
-                        env['cpp_bindings_dir'] + 'include/gen/', env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
+    env.Append(CPPPATH=[env['headers_dir'], env['cpp_bindings_dir'] + '/include/', env['cpp_bindings_dir'] + '/include/godot_cpp/', env['cpp_bindings_dir'] + '/include/godot_cpp/core/',
+                        env['cpp_bindings_dir'] + '/gen/include/godot_cpp', env['cpp_bindings_dir'] + '/gen/include/', env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
     env.Append(LIBS=[cpp_bindings_libname, libfmod, libfmodstudio])
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
