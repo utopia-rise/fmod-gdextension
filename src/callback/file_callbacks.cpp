@@ -46,10 +46,10 @@ namespace Callbacks{
             //waiting for the container to have one request
             {
                 std::unique_lock<std::mutex> lk(read_mut);
-                read_cv.wait(lk, [this]{return !requests.empty() || stop;});
+                read_cv.wait(lk, [this]{return !requests.is_empty() || stop;});
             }
 
-            while(!requests.empty()) {
+            while(!requests.is_empty()) {
                 //lock so we can't add and remove elements from the queue at the same time.
                 //also store the current request so it cannot be cancel during process.
                 {
@@ -65,7 +65,7 @@ namespace Callbacks{
                 file->seek(current_request->offset);
 
                 //We read and store the requested data in an array.
-                godot::PoolByteArray buffer {file->get_buffer(current_request->sizebytes)};
+                godot::PackedByteArray buffer {file->get_buffer(current_request->sizebytes)};
                 int size {buffer.size()};
                 const uint8_t* data {buffer.read().ptr()};
 
@@ -114,12 +114,12 @@ namespace Callbacks{
             void *userdata
     ) {
         godot::Ref<godot::File> file;
-        file.instance();
+        file.instantiate();
 
         GodotFileHandle* fileHandle {new GodotFileHandle{file}};
 
         godot::Error err = file->open(name, godot::File::ModeFlags::READ);
-        *filesize = file->get_len();
+        *filesize = file->get_length();
         *handle = reinterpret_cast<void *>(fileHandle);
 
         if(err == godot::Error::OK) {

@@ -381,7 +381,7 @@ bool Fmod::_is_dead(Node* node) {
     if (!node) {
         return true;
     }
-    return !godot::core_1_1_api->godot_is_instance_valid(node->_owner);
+    return node->get_owner() == nullptr;
 }
 
 bool Fmod::_is_fmod_valid(Node* node) {
