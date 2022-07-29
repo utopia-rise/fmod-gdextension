@@ -582,7 +582,7 @@ String Fmod::load_bank(const String& pathToBank, unsigned int flag) {
     DRIVE_PATH(pathToBank)
     if (banks.has(pathToBank)) return pathToBank; // bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
-    ERROR_CHECK(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
+    ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
     if (bank) {
         GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(pathToBank))
         auto *loadingBank = new LoadingBank();
@@ -1382,7 +1382,8 @@ void Fmod::unmute_all_events() {
 
 bool Fmod::banks_still_loading() {
     for (int i = 0; i < banks.size(); i++) {
-        FMOD::Studio::Bank* bank = banks.get(i);
+        auto key = banks.keys()[i];
+        FMOD::Studio::Bank* bank = banks.get(key);
         FMOD_STUDIO_LOADING_STATE loadingState;
         ERROR_CHECK(bank->getLoadingState(&loadingState));
         if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
@@ -1408,7 +1409,7 @@ void Fmod::load_file_as_sound(const String& path) {
     DRIVE_PATH(path)
     FMOD::Sound *sound = sounds.get(path);
     if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), FMOD_CREATESAMPLE, nullptr, &sound));
+        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
             UtilityFunctions::print("FMOD Sound System: LOADING AS SOUND FILE" + String(path));
@@ -1420,7 +1421,7 @@ void Fmod::load_file_as_music(const String& path) {
     DRIVE_PATH(path)
     FMOD::Sound *sound = sounds.get(path);
     if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL) , nullptr, &sound));
+        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL) , nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
             UtilityFunctions::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
