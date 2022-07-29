@@ -381,7 +381,7 @@ bool Fmod::_is_dead(Node* node) {
     if (!node) {
         return true;
     }
-    return node->get_owner() == nullptr;
+    return UtilityFunctions::is_instance_valid(node->get_owner());
 }
 
 bool Fmod::_is_fmod_valid(Node* node) {
@@ -1381,8 +1381,11 @@ void Fmod::unmute_all_events() {
 }
 
 bool Fmod::banks_still_loading() {
+
+    const godot::Array keys = banks.keys();
+    
     for (int i = 0; i < banks.size(); i++) {
-        auto key = banks.keys()[i];
+        godot::String key = keys[i];
         FMOD::Studio::Bank* bank = banks.get(key);
         FMOD_STUDIO_LOADING_STATE loadingState;
         ERROR_CHECK(bank->getLoadingState(&loadingState));
