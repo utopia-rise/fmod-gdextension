@@ -241,11 +241,11 @@ func _get_stubber_metadata_text(obj_info, override_path = null):
 	if(override_path != null):
 		path = override_path
 	return "var __gut_metadata_ = {\n" + \
-           "\tpath='" + path + "',\n" + \
+		   "\tpath='" + path + "',\n" + \
 		   "\tsubpath='" + obj_info.get_subpath() + "',\n" + \
 		   "\tstubber=" + _get_inst_id_ref_str(_stubber) + ",\n" + \
 		   "\tspy=" + _get_inst_id_ref_str(_spy) + "\n" + \
-           "}\n"
+		   "}\n"
 
 func _get_spy_text(method_hash):
 	var txt = ''

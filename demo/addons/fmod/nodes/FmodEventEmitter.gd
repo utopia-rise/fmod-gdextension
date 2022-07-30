@@ -1,16 +1,22 @@
-tool
 class_name FmodEventEmitter, "res://addons/fmod/nodes/fmod.svg"
 extends Node2D
 
 const UNDEFINED = -1
 const EVENT_PREFIX = "event:/"
 
-export(String) var fmod_event_name = EVENT_PREFIX setget _set_event_name
-export(bool) var attached = true
-export(bool) var autoplay = false
-export(bool) var looped = false
-export(bool) var allow_fadeout = true
-export(bool) var preload_event = true
+@export var fmod_event_name:String = EVENT_PREFIX:
+	set(e):
+		if e.begins_with(EVENT_PREFIX):
+			fmod_event_name = e
+		else:	
+			fmod_event_name = EVENT_PREFIX + e
+	get:
+		return fmod_event_name
+@export var attached:bool = true
+@export var autoplay:bool = false
+@export var looped:bool = false
+@export var allow_fadeout:bool = true
+@export var preload_event:bool = true
 
 var params = {}
 var event_id = UNDEFINED
@@ -78,12 +84,6 @@ func _play_looped() -> void:
 		Fmod.attach_instance_to_node(event_id, self)
 	for param in params:
 		Fmod.set_event_parameter_by_name(event_id, param, params[param])
-
-func _set_event_name(e:String) -> void:
-	if e.begins_with(EVENT_PREFIX):
-		fmod_event_name = e
-	else:
-		fmod_event_name = EVENT_PREFIX + e
 
 func _set_fmod_param(key:String, value: float) -> void:
 	if event_id != UNDEFINED:

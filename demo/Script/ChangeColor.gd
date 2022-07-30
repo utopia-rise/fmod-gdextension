@@ -7,9 +7,9 @@ func _ready():
 # warning-ignore:return_value_discarded
 	Fmod.connect("timeline_beat", self, "change_color")
 # warning-ignore:return_value_discarded
-	self.connect("body_entered", self, "enter")
+	body_entered.connect(enter)
 # warning-ignore:return_value_discarded
-	self.connect("body_exited", self, "leave")
+	body_exited.connect(leave)
 	id = Fmod.create_event_instance("event:/Music/Level 02")
 	Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	Fmod.start_event(id)
@@ -27,4 +27,4 @@ func leave(area):
 
 # warning-ignore:unused_argument
 func change_color(dict: Dictionary):
-	$icon.self_modulate = Color(rand_range(0,1), rand_range(0,1), rand_range(0,1), 1)
+	$icon.self_modulate = Color(randf_range(0,1), randf_range(0,1), randf_range(0,1), 1)
