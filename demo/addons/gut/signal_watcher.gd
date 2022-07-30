@@ -1,28 +1,28 @@
-################################################################################
-#The MIT License (MIT)
-#=====================
+# ##############################################################################
+# The MIT License (MIT)
+# =====================
 #
-#Copyright (c) 2019 Tom "Butch" Wesley
+# Copyright (c) 2020 Tom "Butch" Wesley
 #
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
 #
-#The above copyright notice and this permission notice shall be included in
-#all copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 #
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-#THE SOFTWARE.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
 #
-################################################################################
+# ##############################################################################
 
 # Some arbitrary string that should never show up by accident.  If it does, then
 # shame on  you.
@@ -47,12 +47,12 @@ const ARG_NOT_SET = '_*_argument_*_is_*_not_set_*_'
 #
 # In this sample:
 #	- signal1 on the ref1 object was emitted 3 times and each time, zero
-#	  parameters were passed.
+#	parameters were passed.
 #	- signal3 on ref1 was emitted once and passed a single parameter
 #	- some_signal on ref2 was never emitted.
 #	- other_signal on ref2 was emitted 3 times, each time with 3 parameters.
 var _watched_signals = {}
-var _utils = load('res://addons/gut/utils.gd').new()
+var _utils = load('res://addons/gut/utils.gd').get_instance()
 
 func _add_watched_signal(obj, name):
 	# SHORTCIRCUIT - ignore dupes
@@ -63,7 +63,7 @@ func _add_watched_signal(obj, name):
 		_watched_signals[obj] = {name:[]}
 	else:
 		_watched_signals[obj][name] = []
-	obj.connect(name, self, '_on_watched_signal', [obj, name])
+	obj.connect(name,Callable(self,'_on_watched_signal'),[obj,name])
 
 # This handles all the signals that are watched.  It supports up to 9 parameters
 # which could be emitted by the signal and the two parameters used when it is
@@ -75,7 +75,7 @@ func _add_watched_signal(obj, name):
 # to 4 parameters when firing a signal.  I haven't verified this, but this should
 # future proof this some if the value ever grows.
 func _on_watched_signal(arg1=ARG_NOT_SET, arg2=ARG_NOT_SET, arg3=ARG_NOT_SET, \
-                        arg4=ARG_NOT_SET, arg5=ARG_NOT_SET, arg6=ARG_NOT_SET, \
+						arg4=ARG_NOT_SET, arg5=ARG_NOT_SET, arg6=ARG_NOT_SET, \
 						arg7=ARG_NOT_SET, arg8=ARG_NOT_SET, arg9=ARG_NOT_SET, \
 						arg10=ARG_NOT_SET, arg11=ARG_NOT_SET):
 	var args = [arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11]
@@ -83,10 +83,10 @@ func _on_watched_signal(arg1=ARG_NOT_SET, arg2=ARG_NOT_SET, arg3=ARG_NOT_SET, \
 	# strip off any unused vars.
 	var idx = args.size() -1
 	while(str(args[idx]) == ARG_NOT_SET):
-		args.remove(idx)
+		args.remove_at(idx)
 		idx -= 1
 
-	# retrieve object and signal name from the array and remove them.  These
+	# retrieve object and signal name from the array and remove_at them.  These
 	# will always be at the end since they are added when the connect happens.
 	var signal_name = args[args.size() -1]
 	args.pop_back()
@@ -149,9 +149,9 @@ func is_watching(object, signal_name):
 
 func clear():
 	for obj in _watched_signals:
-		for signal_name in _watched_signals[obj]:
-			if(_utils.is_not_freed(obj)):
-				obj.disconnect(signal_name, self, '_on_watched_signal')
+		if(_utils.is_not_freed(obj)):
+			for signal_name in _watched_signals[obj]:
+				obj.disconnect(signal_name,Callable(self,'_on_watched_signal'))
 	_watched_signals.clear()
 
 # Returns a list of all the signal names that were emitted by the object.

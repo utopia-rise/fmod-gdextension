@@ -237,7 +237,7 @@ func get_listener_3D_attributs(index: int) -> Dictionary:
 func get_listener_2D_attributs(index: int) -> Dictionary:
 	return godot_fmod.get_listener_2D_attributs(index)
 
-func set_listener_3D_attributs(index: int, transform: Transform) -> void:
+func set_listener_3D_attributs(index: int, transform: Transform3D) -> void:
 	godot_fmod.set_listener_3D_attributs(index, transform)
 
 func set_listener_2D_attributs(index: int, transform: Transform2D) -> void:
@@ -378,7 +378,7 @@ func set_event_2d_attributes(instanceId: int, pos: Transform2D) -> void:
 func get_event_2d_attributes(instanceId: int) -> Dictionary:
 	return godot_fmod.get_event_2d_attributes(instanceId)
 
-func set_event_3d_attributes(instanceId: int, transf: Transform) -> void:
+func set_event_3d_attributes(instanceId: int, transf: Transform3D) -> void:
 	godot_fmod.set_event_3d_attributes(instanceId, transf)
 
 func get_event_3d_attributes(instanceId: int) -> Dictionary:

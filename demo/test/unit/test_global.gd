@@ -3,7 +3,7 @@ extends "res://addons/gut/test.gd"
 class TestGlobal:
 	extends "res://addons/gut/test.gd"
 	
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks

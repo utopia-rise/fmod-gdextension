@@ -13,9 +13,21 @@ _global_script_classes=[{
 "class": &"FmodEventEmitter",
 "language": &"GDScript",
 "path": "res://addons/fmod/nodes/FmodEventEmitter.gd"
+}, {
+"base": "RefCounted",
+"class": &"GutHookScript",
+"language": &"GDScript",
+"path": "res://addons/gut/hook_script.gd"
+}, {
+"base": "Node",
+"class": &"GutTest",
+"language": &"GDScript",
+"path": "res://addons/gut/test.gd"
 }]
 _global_script_class_icons={
-"FmodEventEmitter": "res://addons/fmod/nodes/fmod.svg"
+"FmodEventEmitter": "res://addons/fmod/nodes/fmod.svg",
+"GutHookScript": "",
+"GutTest": ""
 }
 
 [android]

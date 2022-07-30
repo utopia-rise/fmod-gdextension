@@ -4,7 +4,7 @@ class TestEvent:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks
