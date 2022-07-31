@@ -57,7 +57,7 @@ namespace godot {
 #define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
     auto instance = (cont).get(instanceId); \
     if (!instance) { \
-        String message = String("FMOD Sound System: cannot find " + String(instanceId) + " in ##cont collection.");\
+        String message = String("FMOD Sound System: cannot find instance in ##cont collection.");\
         GODOT_LOG(2, message)\
         return defaultReturn; \
     }
