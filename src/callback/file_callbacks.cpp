@@ -67,7 +67,7 @@ namespace Callbacks{
                 //We read and store the requested data in an array.
                 godot::PackedByteArray buffer {file->get_buffer(current_request->sizebytes)};
                 int size {buffer.size()};
-                const uint8_t* data {buffer.read().ptr()};
+                const uint8_t* data {buffer.ptr()};
 
                 //We copy the data to FMOD buffer
                 memcpy(current_request->buffer, data, size * sizeof(uint8_t));
