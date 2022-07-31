@@ -272,7 +272,7 @@ jobs:
 
       - name: Compilation
         env:
-          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk-bundle
+          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/21.4.7075529
         run: |
           cp -r godot-cpp ../godot-cpp
           cd ../godot-cpp

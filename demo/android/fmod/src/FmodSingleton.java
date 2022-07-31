@@ -13,7 +13,6 @@ public class FmodSingleton extends Godot.SingletonBase {
 
     protected Activity appActivity;
     protected Context appContext;
-    private Godot activity = null;
 
     static
     {
@@ -29,13 +28,7 @@ public class FmodSingleton extends Godot.SingletonBase {
         this.appContext = appActivity.getApplicationContext();
         // You might want to try initializing your singleton here, but android
         // threads are weird and this runs in another thread, so to interact with Godot you usually have to do.
-        this.activity = (Godot)p_activity;
         FMOD.init(p_activity);
-        this.activity.runOnUiThread(new Runnable() {
-            public void run() {
-                System.out.println("Fmod jar init");
-            }
-        });
     }
 
     // Forwarded callbacks you can reimplement, as SDKs often need them.
