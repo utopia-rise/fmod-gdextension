@@ -9,17 +9,10 @@
 #include <godot_cpp/core/class_db.hpp>
 
 #define DECLARE_CONSTANT(name)\
-    int _##name = name;\
-    int get_##name(){\
-        return _##name;\
-    }\
-    void set_##name(int i){ \
-        _##name = name;\
-        return;\
-    }\
+    GD_##name = name,\
 
 #define REGISTER_CONSTANT(name)\
-    BIND_CONSTANT(name)\
+    BIND_CONSTANT(GD_##name)\
 
 #define DECLARE_ALL_CONSTANTS\
     DECLARE_CONSTANT(FMOD_INIT_3D_RIGHTHANDED)\

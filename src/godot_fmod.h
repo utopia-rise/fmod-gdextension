@@ -96,7 +96,6 @@ namespace godot {
 
     class Fmod : public Node {
     GDCLASS(Fmod, Node)
-        DECLARE_ALL_CONSTANTS
 
     protected:
         static void _bind_methods();
@@ -163,6 +162,10 @@ namespace godot {
         Fmod();
 
         ~Fmod();
+
+        enum {
+            DECLARE_ALL_CONSTANTS
+        };
 
         void _init();
         void _process(float delta);
