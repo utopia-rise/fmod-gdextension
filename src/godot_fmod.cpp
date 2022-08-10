@@ -293,7 +293,7 @@ void Fmod::_set_listener_attributes() {
             continue;
         }
 
-        Node* node {listener->gameObj};
+        Node* node {Object::cast_to<Node>(listener->gameObj)};
         if(!node->is_inside_tree()){
             return;
         }
@@ -377,14 +377,14 @@ Dictionary Fmod::_get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& att
     return _2Dattr;
 }
 
-bool Fmod::_is_dead(Node* node) {
+bool Fmod::_is_dead(Object* node) {
     if (!node) {
         return true;
     }
-    return UtilityFunctions::is_instance_valid(node->get_owner());
+    return UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
 }
 
-bool Fmod::_is_fmod_valid(Node* node) {
+bool Fmod::_is_fmod_valid(Object* node) {
     if (node) {
         bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
         if(!ret) {
@@ -396,9 +396,9 @@ bool Fmod::_is_fmod_valid(Node* node) {
     return false;
 }
 
-void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Node* node) {
+void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) {
     // try to set 3D attributes
-    if (instance && _is_fmod_valid(node) && node->is_inside_tree()) {
+    if (instance && _is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
         if (auto *ci {Node::cast_to<CanvasItem>(node)}) {
             auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
@@ -433,7 +433,7 @@ void Fmod::set_listener_number(int p_listenerNumber) {
     }
 }
 
-void Fmod::add_listener(int index, Node* gameObj) {
+void Fmod::add_listener(int index, Object* gameObj) {
     if(!_is_fmod_valid(gameObj)) {
         return;
     }
@@ -557,12 +557,12 @@ bool Fmod::get_listener_lock(int index) {
     }
 }
 
-Node*  Fmod::get_object_attached_to_listener(int index) {
+Object*  Fmod::get_object_attached_to_listener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
     } else {
-        Node* node = listeners[index].gameObj;
+        Object* node = listeners[index].gameObj;
         if (!node) {
             GODOT_LOG(1, "No node was set on listener")
         }
@@ -1218,7 +1218,7 @@ bool Fmod::check_event_path(const String& eventPath) {
     return eventDescriptions.has(eventPath);
 }
 
-FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, bool isOneShot, Node* gameObject) {
+FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
     FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
     FMOD::Studio::EventInstance* eventInstance = nullptr;
     ERROR_CHECK(instance->createInstance(&eventInstance));
@@ -1238,7 +1238,7 @@ EventInfo *Fmod::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
     return eventInfo;
 }
 
-void Fmod::play_one_shot(const String& eventName, Node* gameObj) {
+void Fmod::play_one_shot(const String& eventName, Object* gameObj) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1250,7 +1250,7 @@ void Fmod::play_one_shot(const String& eventName, Node* gameObj) {
     }
 }
 
-void Fmod::play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
+void Fmod::play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1269,7 +1269,7 @@ void Fmod::play_one_shot_with_params(const String& eventName, Node* gameObj, con
     }
 }
 
-void Fmod::play_one_shot_attached(const String& eventName, Node* gameObj) {
+void Fmod::play_one_shot_attached(const String& eventName, Object* gameObj) {
     if (_is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
@@ -1278,7 +1278,7 @@ void Fmod::play_one_shot_attached(const String& eventName, Node* gameObj) {
     }
 }
 
-void Fmod::play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
+void Fmod::play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
     if (_is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
@@ -1294,7 +1294,7 @@ void Fmod::play_one_shot_attached_with_params(const String& eventName, Node* gam
     }
 }
 
-void Fmod::attach_instance_to_node(uint64_t instanceId, Node* gameObj) {
+void Fmod::attach_instance_to_node(uint64_t instanceId, Object* gameObj) {
     if (!_is_fmod_valid(gameObj)) {
         GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Node3D or CanvasItem")
         return;
@@ -1308,8 +1308,8 @@ void Fmod::detach_instance_from_node(const uint64_t instanceId) {
     _get_event_info(instance)->gameObj = nullptr;
 }
 
-Node*  Fmod::get_object_attached_to_instance(uint64_t instanceId) {
-    Node* node = nullptr;
+Object*  Fmod::get_object_attached_to_instance(uint64_t instanceId) {
+    Object* node = nullptr;
     FIND_AND_CHECK(instanceId, events, node)
     EventInfo *eventInfo = _get_event_info(instance);
     if (eventInfo) {

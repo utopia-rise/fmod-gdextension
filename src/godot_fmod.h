@@ -9,7 +9,7 @@
 #include <fmod.hpp>
 #include <core/object.hpp>
 #include <classes/canvas_item.hpp>
-#include <classes/node.hpp>
+#include <classes/object.hpp>
 #include <classes/mutex.hpp>
 #include "callback/event_callbacks.h"
 #include "callback/file_callbacks.h"
@@ -78,7 +78,7 @@ namespace godot {
         //Is the event oneshot
         bool isOneShot = false;
         //GameObject to which this event is attached
-        Node* gameObj = nullptr;
+        Object* gameObj = nullptr;
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
@@ -89,13 +89,13 @@ namespace godot {
     };
 
     struct Listener {
-        Node* gameObj = nullptr;
+        Object* gameObj = nullptr;
         bool listenerLock = false;
         float weight = 1.0;
     };
 
-    class Fmod : public Node {
-    GDCLASS(Fmod, Node)
+    class Fmod : public Object {
+    GDCLASS(Fmod, Object)
 
     protected:
         static void _bind_methods();
@@ -141,12 +141,12 @@ namespace godot {
         Dictionary _get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
         Dictionary _get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
 
-        static bool _is_dead(Node* node);
-        static bool _is_fmod_valid(Node* node);
-        void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Node* node);
+        static bool _is_dead(Object* node);
+        static bool _is_fmod_valid(Object* node);
+        void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node);
         void _run_callbacks();
 
-        FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Node* gameObject);
+        FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
         static EventInfo *_get_event_info(FMOD::Studio::EventInstance* eventInstance);
         void _release_one_event(FMOD::Studio::EventInstance* eventInstance);
         void _load_bank_data(LoadingBank* loadingBank);
@@ -174,7 +174,7 @@ namespace godot {
         void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);
         void set_software_format(int sampleRate, int speakerMode, int numRawSpeakers);
 
-        void add_listener(int index, Node* gameObj);
+        void add_listener(int index, Object* gameObj);
         void remove_listener(int index);
         void set_listener_number(int listenerNumber);
         int get_system_num_listeners() const;
@@ -186,7 +186,7 @@ namespace godot {
         void set_system_listener_2d_attributes(int index, const Transform2D& transform);
         void set_listener_lock(int index, bool isLocked);
         bool get_listener_lock(int index);
-        Node* get_object_attached_to_listener(int index);
+        Object* get_object_attached_to_listener(int index);
         void set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers);
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
@@ -266,13 +266,13 @@ namespace godot {
         float get_vca_volume(const String& VCAPath);
         void set_vca_volume(const String& VCAPath, float volume);
         /* Helper methods */
-        void play_one_shot(const String& eventName, Node* gameObj);
-        void play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
-        void play_one_shot_attached(const String& eventName, Node* gameObj);
-        void play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
-        void attach_instance_to_node(uint64_t instanceId, Node* gameObj);
+        void play_one_shot(const String& eventName, Object* gameObj);
+        void play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
+        void play_one_shot_attached(const String& eventName, Object* gameObj);
+        void play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
+        void attach_instance_to_node(uint64_t instanceId, Object* gameObj);
         void detach_instance_from_node(const uint64_t instanceId);
-        Node* get_object_attached_to_instance(uint64_t instanceId);
+        Object* get_object_attached_to_instance(uint64_t instanceId);
         void pause_all_events(bool pause);
         void mute_all_events();
         void unmute_all_events();

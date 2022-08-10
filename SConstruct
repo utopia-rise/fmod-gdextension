@@ -203,7 +203,7 @@ if env['platform'] == 'linux':
     if env['use_llvm']:
         env['CXX'] = 'clang++'
 
-    env.Append(CCFLAGS=['-fPIC', '-std=c++14', '-Wwrite-strings'])
+    env.Append(CCFLAGS=['-fPIC', '-std=c++17', '-Wwrite-strings'])
     env.Append(LINKFLAGS=["-Wl,-R,'$$ORIGIN'"])
 
     if env['target'] == 'debug':
@@ -235,7 +235,7 @@ elif env['platform'] == 'osx':
         env.Append(LINKFLAGS=["-arch", env["macos_arch"]])
         env.Append(CCFLAGS=["-arch", env["macos_arch"]])
 
-    env.Append(CCFLAGS=['-std=c++14'])
+    env.Append(CCFLAGS=['-std=c++17'])
 
     env.Append(LINKFLAGS=[
         '-framework',
@@ -269,7 +269,7 @@ elif env['platform'] == 'ios':
     env['AR'] = compiler_path + 'ar'
     env['RANLIB'] = compiler_path + 'ranlib'
 
-    env.Append(CCFLAGS=['-g', '-std=c++14', '-arch', env['ios_arch'], '-isysroot', sdk_path])
+    env.Append(CCFLAGS=['-g', '-std=c++17', '-arch', env['ios_arch'], '-isysroot', sdk_path])
     env.Append(LINKFLAGS=[
         '-arch',
         env['ios_arch'],
@@ -312,13 +312,15 @@ elif env['platform'] == 'windows':
 
     # Native or cross-compilation using MinGW
     if host_platform == 'linux' or host_platform == 'osx' or env['use_mingw']:
-        env.Append(CCFLAGS=['-g', '-O3', '-std=c++14', '-Wwrite-strings'])
+        env.Append(CCFLAGS=['-g', '-O3', '-std=c++17', '-Wwrite-strings'])
         env.Append(LINKFLAGS=[
             '--static',
             '-Wl,--no-undefined',
             '-static-libgcc',
             '-static-libstdc++',
         ])
+
+    env.Append(CPPDEFINES=["TYPED_METHOD_BIND"])
 elif env['platform'] == 'android':
     if host_platform == 'windows':
         env = env.Clone(tools=['mingw'])
