@@ -1,5 +1,5 @@
 #include "file_callbacks.h"
-#include <OS.hpp>
+#include <classes/os.hpp>
 
 namespace Callbacks{
 
@@ -66,7 +66,7 @@ namespace Callbacks{
 
                 //We read and store the requested data in an array.
                 godot::PackedByteArray buffer {file->get_buffer(current_request->sizebytes)};
-                int size {buffer.size()};
+                int size {static_cast<int>(buffer.size())};
                 const uint8_t* data {buffer.ptr()};
 
                 //We copy the data to FMOD buffer
