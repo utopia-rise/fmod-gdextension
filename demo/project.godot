@@ -41,10 +41,6 @@ run/main_scene="res://Scenes/FmodScriptTest.tscn"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
-[autoload]
-
-Fmod="*res://addons/fmod/Fmod.tscn"
-
 [editor_plugins]
 
 enabled=PackedStringArray("fmod")

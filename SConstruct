@@ -2,7 +2,7 @@
 import os
 import sys
 
-target_path = ARGUMENTS.pop("target_path", "bin/")
+target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/bin/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
 fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
