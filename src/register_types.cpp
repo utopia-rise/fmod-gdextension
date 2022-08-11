@@ -2,9 +2,9 @@
 
 #include <godot/gdnative_interface.h>
 
-#include <core/class_db.hpp>
-#include <core/defs.hpp>
-#include <godot.hpp>
+#include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/godot.hpp>
 
 #include "godot_fmod.h"
 

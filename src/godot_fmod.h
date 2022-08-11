@@ -1,22 +1,22 @@
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
-#include <godot.hpp>
-#include <classes/global_constants.hpp>
+#include <godot_cpp/godot.hpp>
+#include <godot_cpp/classes/global_constants.hpp>
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
 #include <fmod.hpp>
-#include <core/object.hpp>
-#include <classes/canvas_item.hpp>
-#include <classes/object.hpp>
-#include <classes/mutex.hpp>
+#include <godot_cpp/core/object.hpp>
+#include <godot_cpp/classes/canvas_item.hpp>
+#include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/mutex.hpp>
 #include "callback/event_callbacks.h"
 #include "callback/file_callbacks.h"
 #include "helpers/containers.h"
 #include "helpers/constants.h"
 #include "helpers/current_function.h"
-#include <variant/utility_functions.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
 
 #define CUSTOM_FILESYSTEM
 

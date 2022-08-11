@@ -3,7 +3,7 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <classes/file.hpp>
+#include <godot_cpp/classes/file.hpp>
 #include "../helpers/containers.h"
 #include <thread>
 #include <condition_variable>

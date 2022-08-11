@@ -3,10 +3,10 @@
 //
 
 #include "godot_fmod.h"
-#include <core/class_db.hpp>
-#include <variant/utility_functions.hpp>
-#include <variant/transform3d.hpp>
-#include <classes/node3d.hpp>
+#include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/variant/utility_functions.hpp>
+#include <godot_cpp/variant/transform3d.hpp>
+#include <godot_cpp/classes/node3d.hpp>
 
 using namespace godot;
 
