@@ -31,15 +31,15 @@ This project uses [SEMVER](https://semver.org/).
 
 #### OS Compatibility matrix :
 
-| Driver Version | Windows | Linux | OSX | Android | iOS |
-|----------------|---------|-------|-----|---------|-----|
-|      0.0.0     |    X    |   X   |  X  |         |     |
-|      1.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.1     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.2     |    X    |   X   |  X  |    X    |  X  |
-|      3.x.x     |    X    |   X   |  X  |    X    |  X  |
-|      4.x.x     |    X    |   X   |  X  |         |     |
+| Driver Version | Windows | Linux | OSX | Android | iOS | Web (HTML5) |
+|----------------|---------|-------|-----|---------|-----|-------------|
+|      0.0.0     |    X    |   X   |  X  |         |     |             |
+|      1.0.0     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.0     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.1     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.2     |    X    |   X   |  X  |    X    |  X  |             |
+|      3.x.x     |    X    |   X   |  X  |    X    |  X  |             |
+|      4.x.x     |    X    |   X   |  X  |    X    |  X  |             |
 
 #### Godot compatibility matrix
 
