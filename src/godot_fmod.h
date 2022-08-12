@@ -97,6 +97,8 @@ namespace godot {
     class Fmod : public Object {
     GDCLASS(Fmod, Object)
 
+    static Fmod *singleton;
+
     protected:
         static void _bind_methods();
 
@@ -166,6 +168,8 @@ namespace godot {
         enum {
             DECLARE_ALL_CONSTANTS
         };
+
+        static Fmod *get_singleton();
 
         void _init();
         void _process(float delta);

@@ -5,24 +5,29 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
+#include <godot_cpp/classes/engine.hpp>
 
 #include "godot_fmod.h"
 
 using namespace godot;
 
+static Fmod *_fmod_singleton;
+
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
+		 Callbacks::GodotFileRunner::get_singleton();
+
+		ClassDB::register_class<Fmod>();
+		_fmod_singleton = memnew(Fmod);
+		Engine::get_singleton()->register_singleton("Fmod", Fmod::get_singleton());
 	}
-
-    Callbacks::GodotFileRunner::get_singleton();
-
-    ClassDB::register_class<Fmod>();
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		return;
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
+	{
+		Engine::get_singleton()->unregister_singleton("Fmod");
+		memdelete(_fmod_singleton);
 	}
 }
 
