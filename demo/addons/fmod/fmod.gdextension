@@ -6,8 +6,10 @@ entry_symbol = "fmod_library_init"
 
 macos.debug = "res://addons/fmod/bin/libGodotFmod.osx.debug.framework"
 macos.release = "res://addons/fmod/bin/libGodotFmod.osx.release.framework"
-windows.debug.x86_64 = "res://addons/fmod/bin/libGodotFmod.windows.debug.x86_64.dll"
-windows.release.x86_64 = "res://addons/fmod/bin/libGodotFmod.windows.release.x86_64.dll"
+windows.debug.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.debug.x86_32.dll"
+windows.release.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.release.x86_32.dll"
+windows.debug.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.debug.x86_64.dll"
+windows.release.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.release.x86_64.dll"
 linux.debug.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.debug.x86_64.so"
 linux.release.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.release.x86_64.so"
 linux.debug.arm64 = "res://addons/fmod/bin/libGodotFmod.linux.debug.arm64.so"
@@ -17,16 +19,12 @@ linux.release.rv64 = "res://addons/fmod/bin/libGodotFmod.linux.release.rv64.so"
 
 [dependencies]
 
-windows.debug.x86_64 = {
-    "res://addons/fmod/bin/fmod.dll":"fmod.dll",
-    "res://addons/fmod/bin/fmodstudio.dll":"fmodstudio.dll"
-}
-windows.release.x86_64 = {
-    "res://addons/fmod/bin/fmod.dll":"fmod.dll",
-    "res://addons/fmod/bin/fmodstudio.dll":"fmodstudio.dll"
-}
 macos.debug = {}
 macos.release = {}
+windows.debug.x86_32 = {}
+windows.release.x86_32 = {}
+windows.debug.x86_64 = {}
+windows.release.x86_64 = {}
 linux.debug.x86_64 = {}
 linux.release.x86_64 = {}
 linux.debug.arm64 = {}
