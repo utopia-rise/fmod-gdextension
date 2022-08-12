@@ -46,7 +46,7 @@ elif env["platform"] == "windows":
     libfmodstudio = 'fmodstudio%s_vc'% lfix
     fmod_info_table = {
         "x86_64" : "x64",
-        "x86_32" : "x86",
+        "x86_32" : "x64",
     }
     arch_suffix_override = fmod_info_table[env["arch_suffix"]]
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
