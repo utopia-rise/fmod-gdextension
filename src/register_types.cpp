@@ -14,12 +14,12 @@ using namespace godot;
 static Fmod *_fmod_singleton;
 
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
-	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
-		 Callbacks::GodotFileRunner::get_singleton();
-
+	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
+	{
+		Callbacks::GodotFileRunner::get_singleton();
 		ClassDB::register_class<Fmod>();
 		_fmod_singleton = memnew(Fmod);
-		Engine::get_singleton()->register_singleton("Fmod", Fmod::get_singleton());
+		Engine::get_singleton()->register_singleton("Fmod", _fmod_singleton);
 	}
 }
 

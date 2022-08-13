@@ -10,22 +10,12 @@
 
 using namespace godot;
 
-Fmod *Fmod::singleton = nullptr;
-
 Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
-    ERR_FAIL_COND(singleton != nullptr);
-	singleton = this;
+
 }
 
 Fmod::~Fmod() {
     Callbacks::GodotFileRunner::get_singleton()->finish();
-    ERR_FAIL_COND(singleton != this);
-	singleton = nullptr;
-}
-
-Fmod *Fmod::get_singleton()
-{
-	return singleton;
 }
 
 void Fmod::_bind_methods() {
@@ -141,8 +131,8 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_sound_3D_settings", "dopplerScale", "distanceFactor", "rollOffScale"), &Fmod::set_sound_3d_settings);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &Fmod::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("get_available_drivers"), &Fmod::get_available_drivers);
-    ClassDB::bind_method(D_METHOD("get_driver", "id"), &Fmod::get_driver);
-    ClassDB::bind_method(D_METHOD("set_driver"), &Fmod::set_driver);
+    ClassDB::bind_method(D_METHOD("get_driver"), &Fmod::get_driver);
+    ClassDB::bind_method(D_METHOD("set_driver", "id"), &Fmod::set_driver);
     ClassDB::bind_method(D_METHOD("get_performance_data"), &Fmod::get_performance_data);
     ClassDB::bind_method(D_METHOD("set_global_parameter_by_name", "parameterName", "value"), &Fmod::set_global_parameter_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_by_name", "parameterName"), &Fmod::get_global_parameter_by_name);
@@ -152,10 +142,10 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id", "idPair"), &Fmod::get_global_parameter_desc_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &Fmod::get_global_parameter_desc_count);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_list"), &Fmod::get_global_parameter_desc_list);
-    ClassDB::bind_method(D_METHOD("set_dsp_buffer_size", "bufferlength", "numbuffers"), &Fmod::set_system_dsp_buffer_size);
-    ClassDB::bind_method(D_METHOD("get_dsp_buffer_size", "index"), &Fmod::get_system_dsp_buffer_size);
-    ClassDB::bind_method(D_METHOD("get_dsp_buffer_length"), &Fmod::get_system_dsp_buffer_length);
-    ClassDB::bind_method(D_METHOD("get_dsp_num_buffers"), &Fmod::get_system_dsp_num_buffers);
+    ClassDB::bind_method(D_METHOD("set_system_dsp_buffer_size", "bufferlength", "numbuffers"), &Fmod::set_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_size"), &Fmod::get_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &Fmod::get_system_dsp_buffer_length);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &Fmod::get_system_dsp_num_buffers);
     ClassDB::bind_method(D_METHOD("_process", "delta"), &Fmod::_process);
 
     ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
