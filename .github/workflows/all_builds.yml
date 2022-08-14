@@ -1,7 +1,7 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master, godot-4.0-adaption ]
+    branches: [ master, godot-4.x ]
     tags:
       - "v*"
   pull_request:
