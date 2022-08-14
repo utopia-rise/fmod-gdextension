@@ -10,12 +10,25 @@ using namespace godot;
 const String EVENT_PREFIX = "event:/";
 const int UNDEFINED = -1;
 
-FmodEventEmitter2D::FmodEventEmitter2D() : event_name(EVENT_PREFIX) {
-
+FmodEventEmitter2D::FmodEventEmitter2D() {
+    
 }
 
 FmodEventEmitter2D::~FmodEventEmitter2D() {
 
+}
+
+void FmodEventEmitter2D::_ready() {
+    for (int i = 0; i < params.keys().size(); i++) {
+        auto key = params.keys()[i];
+        _set_param_internally(key, params[key]);
+    }
+    if (preload_event) {
+        Fmod::get_singleton()->desc_load_sample_data(event_name);
+    }
+    if (autoplay) {
+        play();
+    }
 }
 
 void FmodEventEmitter2D::_bind_methods() {
@@ -23,6 +36,25 @@ void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("is_paused"), &FmodEventEmitter2D::is_paused);
     ClassDB::bind_method(D_METHOD("play"), &FmodEventEmitter2D::play);
     ClassDB::bind_method(D_METHOD("pause"), &FmodEventEmitter2D::pause);
+    ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &FmodEventEmitter2D::set_event_name);
+    ClassDB::bind_method(D_METHOD("get_event_name"), &FmodEventEmitter2D::get_event_name);
+    ClassDB::bind_method(D_METHOD("set_attached", "attached"), &FmodEventEmitter2D::set_attached);
+    ClassDB::bind_method(D_METHOD("get_attached"), &FmodEventEmitter2D::is_attached);
+    ClassDB::bind_method(D_METHOD("set_autoplay", "autoplay"), &FmodEventEmitter2D::set_autoplay);
+    ClassDB::bind_method(D_METHOD("is_autoplay"), &FmodEventEmitter2D::is_autoplay);
+    ClassDB::bind_method(D_METHOD("set_looped", "looped"), &FmodEventEmitter2D::set_looped);
+    ClassDB::bind_method(D_METHOD("is_looped"), &FmodEventEmitter2D::is_looped);
+    ClassDB::bind_method(D_METHOD("set_allow_fadeout", "allow_fadeout"), &FmodEventEmitter2D::set_allow_fadeout);
+    ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &FmodEventEmitter2D::is_allow_fadeout);
+    ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &FmodEventEmitter2D::set_preload_event);
+    ClassDB::bind_method(D_METHOD("is_preload_event"), &FmodEventEmitter2D::is_preload_event);
+
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name"), "set_event_name", "get_event_name");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached"), "set_attached", "is_attached");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay"), "set_autoplay", "is_autoplay");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped"), "set_looped", "is_looped");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout"), "set_allow_fadeout", "is_allow_fadeout");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event"), "set_preload_event", "is_preload_event");
 }
 
 void FmodEventEmitter2D::set_param(const String &key, const float &value) {
@@ -51,6 +83,58 @@ void FmodEventEmitter2D::pause() {
     if (event_id != UNDEFINED) {
         Fmod::get_singleton()->set_event_paused(event_id, true);
     }
+}
+
+void FmodEventEmitter2D::set_event_name(const String &name) {
+    if (name.begins_with(EVENT_PREFIX)) {
+        event_name = name;
+    } else {
+        event_name = EVENT_PREFIX + name;
+    }
+}
+
+String FmodEventEmitter2D::get_event_name() const {
+    return event_name;
+}
+
+void FmodEventEmitter2D::set_attached(const bool &attached) {
+    this->attached = attached;
+}
+
+bool FmodEventEmitter2D::is_attached() const {
+    return attached;
+}
+
+void FmodEventEmitter2D::set_autoplay(const bool &autoplay) {
+    this->autoplay = autoplay;
+}
+
+bool FmodEventEmitter2D::is_autoplay() const {
+    return autoplay;
+}
+
+void FmodEventEmitter2D::set_looped(const bool &looped) {
+    this->looped = looped;
+}
+
+bool FmodEventEmitter2D::is_looped() const {
+    return looped;
+}
+
+void FmodEventEmitter2D::set_allow_fadeout(const bool &allow_fadeout) {
+    this->allow_fadeout = allow_fadeout;
+}
+
+bool FmodEventEmitter2D::is_allow_fadeout() const {
+    return allow_fadeout;
+}
+
+void FmodEventEmitter2D::set_preload_event(const bool &preload_event) {
+    this->preload_event = preload_event;
+}
+
+bool FmodEventEmitter2D::is_preload_event() const {
+    return preload_event;
 }
 
 void FmodEventEmitter2D::_unpause() {
@@ -87,15 +171,6 @@ void FmodEventEmitter2D::_play_looped() {
     for (int i = 0; i < params.keys().size(); i++) {
         auto key = params.keys()[i];
         Fmod::get_singleton()->set_event_parameter_by_name(event_id, key, params[key]);
-    }
-}
-
-// FIXME: THIS SHOULD BE A SETGET ON EXPORT
-void FmodEventEmitter2D::_set_event_name(const String &name) {
-    if (name.begins_with(EVENT_PREFIX)) {
-        event_name = name;
-    } else {
-        event_name = EVENT_PREFIX + name;
     }
 }
 

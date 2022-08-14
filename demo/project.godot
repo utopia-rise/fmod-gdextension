@@ -9,11 +9,6 @@
 config_version=5
 
 _global_script_classes=[{
-"base": "Node2D",
-"class": &"FmodEventEmitter",
-"language": &"GDScript",
-"path": "res://addons/fmod/nodes/FmodEventEmitter.gd"
-}, {
 "base": "RefCounted",
 "class": &"GutHookScript",
 "language": &"GDScript",
@@ -25,7 +20,6 @@ _global_script_classes=[{
 "path": "res://addons/gut/test.gd"
 }]
 _global_script_class_icons={
-"FmodEventEmitter": "res://addons/fmod/nodes/fmod.svg",
 "GutHookScript": "",
 "GutTest": ""
 }

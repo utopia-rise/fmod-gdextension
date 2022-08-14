@@ -2,4 +2,4 @@
 extends EditorPlugin
 
 func _init():
-    pass
+	pass
