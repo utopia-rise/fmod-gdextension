@@ -8,6 +8,7 @@
 #include <godot_cpp/classes/engine.hpp>
 
 #include "godot_fmod.h"
+#include "nodes/fmod_event_emitter_2d.h"
 
 using namespace godot;
 
@@ -16,8 +17,14 @@ static Fmod *_fmod_singleton;
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
+		// initialise filerunner singleton by calling it.
 		Callbacks::GodotFileRunner::get_singleton();
+
+		// register all classes
 		ClassDB::register_class<Fmod>();
+		ClassDB::register_class<FmodEventEmitter2D>();
+
+		// setup Fmod singleton
 		_fmod_singleton = memnew(Fmod);
 		Engine::get_singleton()->register_singleton("Fmod", Fmod::get_singleton());
 	}

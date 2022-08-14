@@ -23,7 +23,7 @@ target = "{}{}.{}.{}".format(
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
-sources = [Glob('src/*.cpp'), Glob('src/callback/*.cpp')]
+sources = [Glob('src/*.cpp'), Glob('src/callback/*.cpp'), Glob('src/nodes/*.cpp')]
 
 lfix = ""
 if env["target"] == "debug":
