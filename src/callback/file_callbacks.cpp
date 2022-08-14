@@ -98,12 +98,11 @@ namespace Callbacks{
         fileThread = std::thread(&GodotFileRunner::run, this);
     }
 
-    void GodotFileRunner::finish(){
+    void GodotFileRunner::finish() {
         stop = true;
         //we need to notify the loop one last time, otherwise it will stay stuck in the wait method.
         read_cv.notify_one();
-        fileThread.join();
-
+        //fileThread.join();
     }
 
 
