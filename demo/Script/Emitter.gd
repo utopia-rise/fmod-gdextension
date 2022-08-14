@@ -1,4 +1,4 @@
-extends Sprite
+extends Sprite2D
 
 var isPlaying: bool = true
 var id: int = 0

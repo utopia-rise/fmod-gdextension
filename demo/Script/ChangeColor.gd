@@ -5,7 +5,7 @@ var id: int = 0
 # Called when the node enters the scene tree for the first time.
 func _ready():
 # warning-ignore:return_value_discarded
-	Fmod.connect("timeline_beat", self, "change_color")
+	Fmod.timeline_beat.connect(change_color)
 # warning-ignore:return_value_discarded
 	body_entered.connect(enter)
 # warning-ignore:return_value_discarded

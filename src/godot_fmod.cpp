@@ -10,12 +10,20 @@
 
 using namespace godot;
 
-Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
+Fmod* Fmod::singleton = nullptr;
 
+Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
+    ERR_FAIL_COND(singleton != nullptr);
+    singleton = this;
 }
 
 Fmod::~Fmod() {
-    Callbacks::GodotFileRunner::get_singleton()->finish();
+    ERR_FAIL_COND(singleton != this);
+    singleton = nullptr;
+}
+
+Fmod* Fmod::get_singleton() {
+    return singleton;
 }
 
 void Fmod::_bind_methods() {

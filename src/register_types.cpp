@@ -19,13 +19,14 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 		Callbacks::GodotFileRunner::get_singleton();
 		ClassDB::register_class<Fmod>();
 		_fmod_singleton = memnew(Fmod);
-		Engine::get_singleton()->register_singleton("Fmod", _fmod_singleton);
+		Engine::get_singleton()->register_singleton("Fmod", Fmod::get_singleton());
 	}
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE)
 	{
+		Callbacks::GodotFileRunner::get_singleton()->finish();
 		Engine::get_singleton()->unregister_singleton("Fmod");
 		memdelete(_fmod_singleton);
 	}

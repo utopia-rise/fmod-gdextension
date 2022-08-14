@@ -169,6 +169,8 @@ namespace godot {
             DECLARE_ALL_CONSTANTS
         };
 
+        static Fmod* get_singleton();
+
         void _init();
         void _process(float delta);
         void shutdown();
