@@ -1,7 +1,7 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master, godot-4.0-adaption-actions-2 ]
+    branches: [ master, godot-4.0-adaption ]
     tags:
       - "v*"
   pull_request:
@@ -43,6 +43,20 @@ jobs:
             artifact-extension: framework
             fmod-executable: fmodstudioapi20203osx.dmg
 
+          - name: Android Compilation
+            os: "ubuntu-20.04"
+            artifact-name: android
+            artifact-extension: so
+            fmod-executable: fmodstudioapi20203android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+
+          - name: iOS Compilation
+            os: "macos-11"
+            artifact-name: ios
+            artifact-extension: dylib
+            fmod-executable: fmodstudioapi20203ios.dmg
+            flags: arch=arm64
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -78,7 +92,7 @@ jobs:
           mv api/ windows
           cd ../../
 
-      - name : Installing FMOD on Linux
+      - name : Installing FMOD on Linux & Android
         if: runner.os == 'Linux'
         run: |
           cd ..
@@ -86,10 +100,10 @@ jobs:
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ${{matrix.artifact-name}} ${{env.FMOD_VERSION}}
           tar -xvf ${{matrix.fmod-executable}}
-          mv fmodstudioapi${{env.FMOD_VERSION}}linux/api linux
+          mv fmodstudioapi${{env.FMOD_VERSION}}${{matrix.artifact-name}}/api ${{matrix.artifact-name}}
           cd ../../
 
-      - name : Installing FMOD on MacOS
+      - name : Installing FMOD on MacOS & iOS
         if: runner.os == 'MacOS'
         run: |
           cd ..
@@ -97,13 +111,14 @@ jobs:
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ${{matrix.artifact-name}} ${{env.FMOD_VERSION}}
           hdiutil attach ${{matrix.fmod-executable}}
-          cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          [[ ${{matrix.artifact-name}} = "macos" ]] && cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+          [[ ${{matrix.artifact-name}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
 
       - name: Compilation
         run: |
           cd ../${{env.PROJECT_FOLDER}}
-          scons platform=${{ matrix.artifact-name }} target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }}
+          scons platform=${{ matrix.artifact-name }} target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j6 ${{ matrix.flags }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
