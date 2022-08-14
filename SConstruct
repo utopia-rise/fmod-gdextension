@@ -35,12 +35,14 @@ if env["platform"] == "macos":
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/'])
+
 elif env["platform"] == "linux":
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch_suffix"], env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch_suffix"]])
+
 elif env["platform"] == "windows":
     libfmod = 'fmod%s_vc'% lfix
     libfmodstudio = 'fmodstudio%s_vc'% lfix
@@ -52,6 +54,27 @@ elif env["platform"] == "windows":
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override])
+
+elif env["platform"] == "ios":
+    libfmod = 'libfmod%s_iphoneos.a' % lfix
+    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
+
+elif env["platform"] == "android":
+    libfmod = 'libfmod%s.so' % lfix
+    libfmodstudio = 'libfmodstudio%s.so' % lfix
+    fmod_info_table = {
+        "armv7": "armeabi-v7a",
+        "arm64": "arm64-v8a",
+        "x86": "x86",
+        "x86_64": "x86_64"
+    }
+    arch_dir = fmod_info_table[env["arch_suffix"]]
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
 if env["platform"] == "macos":
     target = "{}.framework/{}.{}.{}".format(

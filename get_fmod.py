@@ -14,7 +14,7 @@ if platform == 'linux':
     # linux
     filename = f'fmodstudioapi{fmod_version}linux.tar.gz'
     downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/Linux/&filename=fmodstudioapi{fmod_version}linux.tar.gz&user='
-elif platform == 'osx':
+elif platform == 'macos':
     # OS X
     filename = f'fmodstudioapi{fmod_version}osx.dmg'
     downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/Mac/&filename=fmodstudioapi{fmod_version}mac-installer.dmg&user='
