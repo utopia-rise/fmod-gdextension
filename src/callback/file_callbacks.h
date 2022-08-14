@@ -7,6 +7,7 @@
 #include "../helpers/containers.h"
 #include <thread>
 #include <condition_variable>
+#include <cstring> // This include is required for both Linux and MacOS targets as they don't include the necessary headers for 'memcpy' by default
 
 namespace Callbacks {
     struct GodotFileHandle {
