@@ -13,7 +13,7 @@ namespace godot {
 
     protected:
         static void _bind_methods();
-
+        void _notification(int p_what);
     private:
         String event_name;
         uint64_t event_id = -1;

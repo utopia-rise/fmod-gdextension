@@ -9,6 +9,8 @@ using namespace godot;
 
 const String EVENT_PREFIX = "event:/";
 const int UNDEFINED = -1;
+const int NOTIFICATION_PAUSED = 14;
+const int NOTIFICATION_UNPAUSED = 15;
 
 FmodEventEmitter2D::FmodEventEmitter2D() {
     
@@ -55,6 +57,17 @@ void FmodEventEmitter2D::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped"), "set_looped", "is_looped");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout"), "set_allow_fadeout", "is_allow_fadeout");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event"), "set_preload_event", "is_preload_event");
+}
+
+void FmodEventEmitter2D::_notification(int p_what) {
+    switch (p_what) {
+        case NOTIFICATION_PAUSED: {
+            pause();
+        } break;
+        case NOTIFICATION_UNPAUSED: {
+            play();
+        } break;
+    }
 }
 
 void FmodEventEmitter2D::set_param(const String &key, const float &value) {
