@@ -20,6 +20,10 @@ FmodEventEmitter2D::~FmodEventEmitter2D() {
 
 }
 
+void FmodEventEmitter2D::_init() {
+
+}
+
 void FmodEventEmitter2D::_ready() {
     for (int i = 0; i < params.keys().size(); i++) {
         auto key = params.keys()[i];
@@ -70,12 +74,12 @@ void FmodEventEmitter2D::_notification(int p_what) {
     }
 }
 
-void FmodEventEmitter2D::set_param(const String &key, const float &value) {
+void FmodEventEmitter2D::set_param(const String &key, const float value) {
     params[key] = value;
     _set_param_internally(key, value);
 }
 
-bool FmodEventEmitter2D::is_paused() const {
+bool FmodEventEmitter2D::is_paused() {
     if (event_id == UNDEFINED) {
         return false;
     }
@@ -106,47 +110,47 @@ void FmodEventEmitter2D::set_event_name(const String &name) {
     }
 }
 
-String FmodEventEmitter2D::get_event_name() const {
+String FmodEventEmitter2D::get_event_name() {
     return event_name;
 }
 
-void FmodEventEmitter2D::set_attached(const bool &attached) {
+void FmodEventEmitter2D::set_attached(const bool attached) {
     this->attached = attached;
 }
 
-bool FmodEventEmitter2D::is_attached() const {
+bool FmodEventEmitter2D::is_attached() {
     return attached;
 }
 
-void FmodEventEmitter2D::set_autoplay(const bool &autoplay) {
+void FmodEventEmitter2D::set_autoplay(const bool autoplay) {
     this->autoplay = autoplay;
 }
 
-bool FmodEventEmitter2D::is_autoplay() const {
+bool FmodEventEmitter2D::is_autoplay() {
     return autoplay;
 }
 
-void FmodEventEmitter2D::set_looped(const bool &looped) {
+void FmodEventEmitter2D::set_looped(const bool looped) {
     this->looped = looped;
 }
 
-bool FmodEventEmitter2D::is_looped() const {
+bool FmodEventEmitter2D::is_looped() {
     return looped;
 }
 
-void FmodEventEmitter2D::set_allow_fadeout(const bool &allow_fadeout) {
+void FmodEventEmitter2D::set_allow_fadeout(const bool allow_fadeout) {
     this->allow_fadeout = allow_fadeout;
 }
 
-bool FmodEventEmitter2D::is_allow_fadeout() const {
+bool FmodEventEmitter2D::is_allow_fadeout() {
     return allow_fadeout;
 }
 
-void FmodEventEmitter2D::set_preload_event(const bool &preload_event) {
+void FmodEventEmitter2D::set_preload_event(const bool preload_event) {
     this->preload_event = preload_event;
 }
 
-bool FmodEventEmitter2D::is_preload_event() const {
+bool FmodEventEmitter2D::is_preload_event() {
     return preload_event;
 }
 
@@ -187,7 +191,7 @@ void FmodEventEmitter2D::_play_looped() {
     }
 }
 
-void FmodEventEmitter2D::_set_param_internally(const String &key, const float &value) {
+void FmodEventEmitter2D::_set_param_internally(const String &key, const float value) {
     if (event_id != UNDEFINED) {
         Fmod::get_singleton()->set_event_parameter_by_name(event_id, key, value);
     }
