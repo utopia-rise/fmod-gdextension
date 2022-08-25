@@ -35,6 +35,7 @@ script = ExtResource("3")
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
+grow_vertical = 2
 size_flags_stretch_ratio = 0.0
 text = "Press Space to pause/unpause
 Come closer to hear it"
@@ -55,6 +56,7 @@ shape = SubResource("1")
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
+grow_horizontal = 2
 size_flags_stretch_ratio = 0.0
 text = "Listener
 Kill it with K key!"

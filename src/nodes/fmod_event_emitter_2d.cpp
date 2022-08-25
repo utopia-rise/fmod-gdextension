@@ -40,7 +40,7 @@ void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &FmodEventEmitter2D::set_event_name);
     ClassDB::bind_method(D_METHOD("get_event_name"), &FmodEventEmitter2D::get_event_name);
     ClassDB::bind_method(D_METHOD("set_attached", "attached"), &FmodEventEmitter2D::set_attached);
-    ClassDB::bind_method(D_METHOD("get_attached"), &FmodEventEmitter2D::is_attached);
+    ClassDB::bind_method(D_METHOD("is_attached"), &FmodEventEmitter2D::is_attached);
     ClassDB::bind_method(D_METHOD("set_autoplay", "autoplay"), &FmodEventEmitter2D::set_autoplay);
     ClassDB::bind_method(D_METHOD("is_autoplay"), &FmodEventEmitter2D::is_autoplay);
     ClassDB::bind_method(D_METHOD("set_looped", "looped"), &FmodEventEmitter2D::set_looped);
