@@ -29,7 +29,6 @@ namespace godot {
         void _play_one_shot();
         void _play_looped();
         void _set_param_internally(const String &key, const float value);
-
     public:
         FmodEventEmitter2D();
 

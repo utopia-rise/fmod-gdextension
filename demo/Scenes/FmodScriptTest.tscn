@@ -32,6 +32,7 @@ texture = ExtResource("2")
 script = ExtResource("3")
 
 [node name="Label" type="Label" parent="Node2D"]
+anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
 size_flags_stretch_ratio = 0.0
@@ -51,6 +52,7 @@ position = Vector2(0.440125, 0.440125)
 shape = SubResource("1")
 
 [node name="Label" type="Label" parent="Listener"]
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 size_flags_stretch_ratio = 0.0

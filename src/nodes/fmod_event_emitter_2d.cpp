@@ -7,11 +7,6 @@
 
 using namespace godot;
 
-const String EVENT_PREFIX = "event:/";
-const int UNDEFINED = -1;
-const int NOTIFICATION_PAUSED = 14;
-const int NOTIFICATION_UNPAUSED = 15;
-
 FmodEventEmitter2D::FmodEventEmitter2D() {
     
 }
@@ -65,10 +60,10 @@ void FmodEventEmitter2D::_bind_methods() {
 
 void FmodEventEmitter2D::_notification(int p_what) {
     switch (p_what) {
-        case NOTIFICATION_PAUSED: {
+        case 14: { // PAUSED
             pause();
         } break;
-        case NOTIFICATION_UNPAUSED: {
+        case 15: { // UNPAUSED
             play();
         } break;
     }
@@ -80,7 +75,7 @@ void FmodEventEmitter2D::set_param(const String &key, const float value) {
 }
 
 bool FmodEventEmitter2D::is_paused() {
-    if (event_id == UNDEFINED) {
+    if (event_id == -1) {
         return false;
     }
     return Fmod::get_singleton()->get_event_paused(event_id);
@@ -97,16 +92,16 @@ void FmodEventEmitter2D::play() {
 }
 
 void FmodEventEmitter2D::pause() {
-    if (event_id != UNDEFINED) {
+    if (event_id != -1) {
         Fmod::get_singleton()->set_event_paused(event_id, true);
     }
 }
 
 void FmodEventEmitter2D::set_event_name(const String &name) {
-    if (name.begins_with(EVENT_PREFIX)) {
+    if (name.begins_with("event:/")) {
         event_name = name;
     } else {
-        event_name = EVENT_PREFIX + name;
+        event_name = "event:/" + name;
     }
 }
 
@@ -155,7 +150,7 @@ bool FmodEventEmitter2D::is_preload_event() {
 }
 
 void FmodEventEmitter2D::_unpause() {
-    if (event_id != UNDEFINED) {
+    if (event_id != -1) {
         Fmod::get_singleton()->set_event_paused(event_id, false);
     }
 }
@@ -177,7 +172,7 @@ void FmodEventEmitter2D::_play_one_shot() {
 }
 
 void FmodEventEmitter2D::_play_looped() {
-    if (event_id != UNDEFINED) {
+    if (event_id != -1) {
         return;
     }
     event_id = Fmod::get_singleton()->create_event_instance(event_name);
@@ -192,7 +187,7 @@ void FmodEventEmitter2D::_play_looped() {
 }
 
 void FmodEventEmitter2D::_set_param_internally(const String &key, const float value) {
-    if (event_id != UNDEFINED) {
+    if (event_id != -1) {
         Fmod::get_singleton()->set_event_parameter_by_name(event_id, key, value);
     }
 }
