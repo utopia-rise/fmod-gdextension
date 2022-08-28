@@ -37,7 +37,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PackedStringArray("fmod")
+enabled=PackedStringArray("res://addons/fmod/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [input]
 

@@ -44,7 +44,6 @@ static func INSTANCE_NAME():
 # if we don't have a main loop ready to go yet.
 # ------------------------------------------------------------------------------
 static func get_root_node():
-	var to_return = null
 	var main_loop = Engine.get_main_loop()
 	if(main_loop != null):
 		return main_loop.root
@@ -54,6 +53,9 @@ static func get_root_node():
 
 # ------------------------------------------------------------------------------
 # Get the ONE instantiate of utils
+# Since we can't have static variables we have to store the instance in the
+# tree.  This means you have to wait a bit for the main loop to be up and
+# running.
 # ------------------------------------------------------------------------------
 static func get_instance():
 	var the_root = get_root_node()
@@ -99,7 +101,7 @@ var TestCollector = load('res://addons/gut/test_collector.gd')
 var ThingCounter = load('res://addons/gut/thing_counter.gd')
 
 # Source of truth for the GUT version
-var version = '7.3.0'
+var version = '7.4.1'
 # The required Godot version as an array.
 var req_godot = [3, 2, 0]
 # Used for doing file manipulation stuff so as to not keep making File instances.
@@ -129,12 +131,13 @@ func _ready() -> void:
 	_http_request_latest_version()
 
 func _http_request_latest_version() -> void:
+	return
 	var http_request = HTTPRequest.new()
 	http_request.name = "http_request"
 	add_child(http_request)
 	http_request.connect("request_completed",Callable(self,"_on_http_request_latest_version_completed"))
 	# Perform a GET request. The URL below returns JSON as of writing.
-	var error = http_request.request("https://api.github.com/repos/bitwes/Gut/releases/latest")
+	var __error = http_request.request("https://api.github.com/repos/bitwes/Gut/releases/latest")
 
 func _on_http_request_latest_version_completed(result, response_code, headers, body):
 	if not result == HTTPRequest.RESULT_SUCCESS:
@@ -203,6 +206,32 @@ func is_version_ok(engine_info=Engine.get_version_info(),required=req_godot):
 
 	# still null means each index was the same.
 	return nvl(is_ok, true)
+
+
+func godot_version(engine_info=Engine.get_version_info()):
+	return str(engine_info.major, '.', engine_info.minor, '.', engine_info.patch)
+
+
+func is_godot_version(expected, engine_info=Engine.get_version_info()):
+	var engine_array = [engine_info.major, engine_info.minor, engine_info.patch]
+	var expected_array = expected.split('.')
+
+	if(expected_array.size() > engine_array.size()):
+		return false
+
+	var is_version = true
+	var i = 0
+	while(i < expected_array.size() and i < engine_array.size() and is_version):
+		if(expected_array[i] == str(engine_array[i])):
+			i += 1
+		else:
+			is_version = false
+
+	return is_version
+
+
+func is_godot_version_gte(expected, engine_info=Engine.get_version_info()):
+	return is_version_ok(engine_info, expected.split('.'))
 
 
 # ------------------------------------------------------------------------------
@@ -354,21 +383,31 @@ func search_array(ar, prop_method, value):
 	var found = false
 	var idx = 0
 
+	print('getting ', prop_method, ' with value ', value)
 	while(idx < ar.size() and !found):
 		var item = ar[idx]
-		if(item.get(prop_method) != null):
+		var prop = item.get(prop_method)
+		print('  prop = ', prop)
+		if(!(prop is Callable)):
+			print('  prop is not callable')
 			if(item.get(prop_method) == value):
 				found = true
-		elif(item.has_method(prop_method)):
-			if(item.call(prop_method) == value):
+		elif(prop != null):
+			var called_val = prop.call()
+			print('  called value = ', called_val)
+			print(typeof(called_val), '::', typeof(value))
+			print(called_val, '::', value)
+			if(called_val == value):
 				found = true
 
 		if(!found):
 			idx += 1
 
 	if(found):
+		print('  FOUND')
 		return ar[idx]
 	else:
+		print('  NOT FOUND')
 		return null
 
 
@@ -377,7 +416,7 @@ func are_datatypes_same(got, expected):
 
 
 func pretty_print(dict):
-	print(str(json.print(dict, ' ')))
+	print(json.stringify(dict, ' '))
 
 
 func get_script_text(obj):

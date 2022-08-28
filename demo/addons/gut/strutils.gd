@@ -36,6 +36,7 @@ func _init_types_dictionary():
 	types[TYPE_PACKED_VECTOR3_ARRAY] = 'TYPE_PACKED_VECTOR3_ARRAY'
 	types[TYPE_PACKED_COLOR_ARRAY] = 'TYPE_PACKED_COLOR_ARRAY'
 	types[TYPE_MAX] = 'TYPE_MAX'
+	types[TYPE_STRING_NAME] = 'TYPE_STRING_NAME'
 
 # Types to not be formatted when using _str
 var _str_ignore_types = [
@@ -75,7 +76,7 @@ func _get_obj_filename(thing):
 	elif(!_utils.is_native_class(thing)):
 		var dict = inst2dict(thing)
 		filename = _get_filename(dict['@path'])
-		if(dict['@subpath'] != ''):
+		if(str(dict['@subpath']) != ''):
 			filename += str('/', dict['@subpath'])
 
 	return filename

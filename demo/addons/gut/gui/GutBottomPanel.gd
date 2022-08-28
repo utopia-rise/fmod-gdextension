@@ -52,8 +52,8 @@ func _init():
 
 
 func _ready():
-	_ctrls.results.bar.connect('draw',Callable(self,'_on_results_bar_draw'),[_ctrls.results.bar])
-	hide_settings(!_ctrls.settings_button.pressed)
+	_ctrls.results.bar.connect('draw', _on_results_bar_draw.bind(_ctrls.results.bar))
+	hide_settings(!_ctrls.settings_button.button_pressed)
 	_gut_config_gui = GutConfigGui.new(_ctrls.settings)
 	_gut_config_gui.set_options(_gut_config.options)
 
@@ -119,7 +119,7 @@ func _is_test_script(script):
 
 func _show_errors(errs):
 	_ctrls.output_ctrl.clear()
-	var text = "Cannot run tests, you have a conrfiguration error:\n"
+	var text = "Cannot run tests, you have a configuration error:\n"
 	for e in errs:
 		text += str('*  ', e, "\n")
 	text += "Check your settings ----->"
@@ -130,9 +130,9 @@ func _show_errors(errs):
 
 func _save_config():
 	_gut_config.options = _gut_config_gui.get_options(_gut_config.options)
-	_gut_config.options.panel_options.hide_settings = !_ctrls.settings_button.pressed
-	_gut_config.options.panel_options.hide_result_tree = !_ctrls.run_results_button.pressed
-	_gut_config.options.panel_options.hide_output_text = !_ctrls.output_button.pressed
+	_gut_config.options.panel_options.hide_settings = !_ctrls.settings_button.button_pressed
+	_gut_config.options.panel_options.hide_result_tree = !_ctrls.run_results_button.button_pressed
+	_gut_config.options.panel_options.hide_output_text = !_ctrls.output_button.button_pressed
 	_gut_config.options.panel_options.use_colors = _ctrls.output_ctrl.get_use_colors()
 
 	var w_result = _gut_config.write_options(RUNNER_JSON_PATH)
@@ -185,12 +185,12 @@ func _run_all():
 # Events
 # ---------------
 func _on_results_bar_draw(bar):
-	bar.draw_rect(Rect2(Vector2(0, 0), bar.rect_size), Color(0, 0, 0, .2))
+	bar.draw_rect(Rect2(Vector2(0, 0), bar.size), Color(0, 0, 0, .2))
 
 
 func _on_Light_draw():
 	var l = _ctrls.light
-	l.draw_circle(Vector2(l.rect_size.x / 2, l.rect_size.y / 2), l.rect_size.x / 2, _light_color)
+	l.draw_circle(Vector2(l.size.x / 2, l.size.y / 2), l.size.x / 2, _light_color)
 
 
 func _on_editor_script_changed(script):
@@ -218,17 +218,17 @@ func _on_RunAtCursor_run_tests(what):
 
 
 func _on_Settings_pressed():
-	hide_settings(!_ctrls.settings_button.pressed)
+	hide_settings(!_ctrls.settings_button.button_pressed)
 	_save_config()
 
 
 func _on_OutputBtn_pressed():
-	hide_output_text(!_ctrls.output_button.pressed)
+	hide_output_text(!_ctrls.output_button.button_pressed)
 	_save_config()
 
 
 func _on_RunResultsBtn_pressed():
-	hide_result_tree(! _ctrls.run_results_button.pressed)
+	hide_result_tree(! _ctrls.run_results_button.button_pressed)
 	_save_config()
 
 
@@ -242,7 +242,7 @@ func _on_UseColors_pressed():
 # ---------------
 func hide_result_tree(should):
 	_ctrls.run_results.visible = !should
-	_ctrls.run_results_button.pressed = !should
+	_ctrls.run_results_button.button_pressed = !should
 
 
 func hide_settings(should):
@@ -257,12 +257,12 @@ func hide_settings(should):
 		s_scroll.get_parent().move_child(s_scroll, 1)
 
 	$layout/RSplit.collapsed = should
-	_ctrls.settings_button.pressed = !should
+	_ctrls.settings_button.button_pressed = !should
 
 
 func hide_output_text(should):
 	$layout/RSplit/CResults/TabBar/OutputText.visible = !should
-	_ctrls.output_button.pressed = !should
+	_ctrls.output_button.button_pressed = !should
 
 
 func load_result_output():
@@ -270,14 +270,13 @@ func load_result_output():
 
 	var summary = get_file_as_text(RESULT_JSON)
 	var test_json_conv = JSON.new()
-	test_json_conv.parse(summary)
-	var results = test_json_conv.get_data()
-	if(results.error != OK):
+	if (test_json_conv.parse(summary) != OK):
 		return
+	var results = test_json_conv.get_data()
 
-	_ctrls.run_results.load_json_results(results.result)
+	_ctrls.run_results.load_json_results(results)
 
-	var summary_json = results.result['test_scripts']['props']
+	var summary_json = results['test_scripts']['props']
 	_ctrls.results.passing.text = str(summary_json.passing)
 	_ctrls.results.passing.get_parent().visible = true
 

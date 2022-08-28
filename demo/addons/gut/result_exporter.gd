@@ -80,7 +80,7 @@ func get_results_dictionary(gut, include_scripts=true):
 		props.tests = totals.tests
 		props.errors = gut.get_logger().get_errors().size()
 		props.warnings = gut.get_logger().get_warnings().size()
-		props.time = gut.get_gui().elapsed_time_as_str().replace('s', '')
+		props.time =  gut.get_elapsed_time()
 		props.orphans = gut.get_orphan_counter().get_counter('total')
 		result.test_scripts.scripts = scripts
 
@@ -89,7 +89,7 @@ func get_results_dictionary(gut, include_scripts=true):
 
 func write_json_file(gut, path):
 	var dict = get_results_dictionary(gut)
-	var json_text = json.print(dict, ' ')
+	var json_text = json.stringify(dict, ' ')
 
 	var f_result = _utils.write_file(path, json_text)
 	if(f_result != OK):
@@ -102,7 +102,7 @@ func write_json_file(gut, path):
 
 func write_summary_file(gut, path):
 	var dict = get_results_dictionary(gut, false)
-	var json_text = json.print(dict, ' ')
+	var json_text = json.stringify(dict, ' ')
 
 	var f_result = _utils.write_file(path, json_text)
 	if(f_result != OK):

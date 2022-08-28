@@ -27,6 +27,7 @@ var default_options = {
 	junit_xml_timestamp = false,
 	log_level = 1,
 	opacity = 100,
+	paint_after = .1,
 	post_run_script = '',
 	pre_run_script = '',
 	prefix = 'test_',
@@ -85,7 +86,7 @@ func _load_options_from_config_file(file_path, into):
 	test_json_conv.parse(json)
 	var results = test_json_conv.get_data()
 	# SHORTCIRCUIT
-	if(results.error != OK):
+	if(results == null):
 		print("\n\n",'!! ERROR parsing file:  ', file_path)
 		print('    at line ', results.error_line, ':')
 		print('    ', results.error_string)
@@ -93,7 +94,7 @@ func _load_options_from_config_file(file_path, into):
 
 	# Get all the options out of the config file using the option name.  The
 	# options hash is now the default source of truth for the name of an option.
-	_load_dict_into(results.result, into)
+	_load_dict_into(results, into)
 
 	return 1
 
@@ -110,7 +111,7 @@ func _load_dict_into(source, dest):
 
 
 func write_options(path):
-	var content = json.print(options, ' ')
+	var content = json.stringify(options, ' ')
 
 	var f = File.new()
 	var result = f.open(path, f.WRITE)
@@ -123,7 +124,6 @@ func write_options(path):
 # Apply all the options specified to _tester.  This is where the rubber meets
 # the road.
 func _apply_options(opts, _tester):
-	_tester.set_yield_between_tests(true)
 	_tester.set_modulate(Color(1.0, 1.0, 1.0, min(1.0, float(opts.opacity) / 100)))
 	_tester.show()
 
@@ -132,13 +132,17 @@ func _apply_options(opts, _tester):
 	if(opts.should_maximize):
 		_tester.maximize()
 
-	if(opts.compact_mode):
-		_tester.get_gui().compact_mode(true)
+#	if(opts.compact_mode):
+#		_tester.get_gui().compact_mode(true)
 
 	if(opts.inner_class != ''):
 		_tester.set_inner_class_name(opts.inner_class)
 	_tester.set_log_level(opts.log_level)
 	_tester.set_ignore_pause_before_teardown(opts.ignore_pause)
+
+	if(opts.selected != ''):
+		_tester.select_script(opts.selected)
+		# _run_single = true
 
 	for i in range(opts.dirs.size()):
 		_tester.add_directory(opts.dirs[i], opts.prefix, opts.suffix)
@@ -146,9 +150,6 @@ func _apply_options(opts, _tester):
 	for i in range(opts.tests.size()):
 		_tester.add_script(opts.tests[i])
 
-	if(opts.selected != ''):
-		_tester.select_script(opts.selected)
-		# _run_single = true
 
 	if(opts.double_strategy == 'full'):
 		_tester.set_double_strategy(DOUBLE_STRATEGY.FULL)
@@ -162,13 +163,8 @@ func _apply_options(opts, _tester):
 	_tester.show_orphans(!opts.hide_orphans)
 	_tester.set_junit_xml_file(opts.junit_xml_file)
 	_tester.set_junit_xml_timestamp(opts.junit_xml_timestamp)
+	_tester.paint_after = str(opts.paint_after).to_float()
 
-	_tester.get_gui().set_font_size(opts.font_size)
-	_tester.get_gui().set_font(opts.font_name)
-	if(opts.font_color != null and opts.font_color.is_valid_html_color()):
-		_tester.get_gui().set_default_font_color(Color(opts.font_color))
-	if(opts.background_color != null and opts.background_color.is_valid_html_color()):
-		_tester.get_gui().set_background_color(Color(opts.background_color))
 
 	return _tester
 

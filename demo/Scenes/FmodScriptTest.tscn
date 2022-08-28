@@ -122,3 +122,7 @@ text = "File loaded as Music
 Start when entering
 Stop when exiting
 Only one instance of that music can be played "
+
+[node name="FmodEventEmitter2D" type="FmodEventEmitter2D" parent="SoundArea3"]
+event_name = "event:/Vehicles/Car Engine"
+autoplay = true

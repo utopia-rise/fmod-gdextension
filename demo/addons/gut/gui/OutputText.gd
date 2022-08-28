@@ -123,7 +123,7 @@ func _ready():
 # Private
 # ------------------
 func _setup_colors():
-	_ctrls.output.clear_colors()
+	_ctrls.output.clear()
 	var keywords = [
 		['Failed', Color.RED],
 		['Passed', Color.GREEN],
@@ -134,9 +134,15 @@ func _setup_colors():
 	]
 
 	for keyword in keywords:
-		_ctrls.output.add_keyword_color(keyword[0], keyword[1])
+		if (_ctrls.output.syntax_highlighter == null) :
+			_ctrls.output.syntax_highlighter = CodeHighlighter.new()
+		_ctrls.output.syntax_highlighter.add_keyword_color(keyword[0], keyword[1])
 
-	var f_color = _ctrls.output.get_color("font_color")
+	var f_color = null
+	if (_ctrls.output.theme == null) :
+		f_color = get_theme_color("font_color")
+	else :
+		f_color = _ctrls.output.theme.font_color
 	_ctrls.output.add_theme_color_override("font_color_readonly", f_color)
 	_ctrls.output.add_theme_color_override("function_color", f_color)
 	_ctrls.output.add_theme_color_override("member_variable_color", f_color)
@@ -148,12 +154,14 @@ func _set_font(font_name, custom_name):
 	if(font_name == null):
 		rtl.set('custom_fonts/' + custom_name, null)
 	else:
-		var dyn_font = FontFile.new()
-		var font_data = FontFile.new()
-		font_data.font_path = 'res://addons/gut/fonts/' + font_name + '.ttf'
-		font_data.antialiased = true
-		dyn_font.font_data = font_data
-		rtl.set('custom_fonts/' + custom_name, dyn_font)
+		pass
+		# cuasing issues in 4.0
+		# var dyn_font = FontFile.new()
+		# var font_data = FontFile.new()
+		# font_data.font_path = 'res://addons/gut/fonts/' + font_name + '.ttf'
+		# font_data.antialiased = true
+		# dyn_font.font_data = font_data
+		# rtl.set('custom_fonts/' + custom_name, dyn_font)
 
 
 # ------------------
@@ -164,7 +172,7 @@ func _on_CopyButton_pressed():
 
 
 func _on_UseColors_pressed():
-	_ctrls.output.syntax_highlighter = _ctrls.use_colors.pressed
+	_ctrls.output.syntax_highlighter = _ctrls.use_colors.button_pressed
 
 
 func _on_ClearButton_pressed():
@@ -172,7 +180,7 @@ func _on_ClearButton_pressed():
 
 
 func _on_ShowSearch_pressed():
-	show_search(_ctrls.show_search.pressed)
+	show_search(_ctrls.show_search.button_pressed)
 
 
 func _on_SearchTerm_focus_entered():
@@ -216,7 +224,7 @@ func show_search(should):
 	if(should):
 		_ctrls.search_bar.search_term.grab_focus()
 		_ctrls.search_bar.search_term.select_all()
-	_ctrls.show_search.pressed = should
+	_ctrls.show_search.button_pressed = should
 
 
 func search(text, start_pos, highlight=true):

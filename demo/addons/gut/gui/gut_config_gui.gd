@@ -5,9 +5,10 @@ class DirectoryCtrl:
 
 	var text = '':
 		get:
-			return get_text()
+			return _txt_path.text
 		set(val):
-			set_text(val)
+			_txt_path.text = val
+
 	var _txt_path = LineEdit.new()
 	var _btn_dir = Button.new()
 	var _dialog = FileDialog.new()
@@ -19,13 +20,13 @@ class DirectoryCtrl:
 		_txt_path.size_flags_horizontal = _txt_path.SIZE_EXPAND_FILL
 
 		_dialog.mode = _dialog.FILE_MODE_OPEN_DIR
-		_dialog.resizable = true
+		_dialog.unresizable = false
 		_dialog.connect("dir_selected",Callable(self,'_on_selected'))
 		_dialog.connect("file_selected",Callable(self,'_on_selected'))
-		_dialog.rect_size = Vector2(1000, 700)
+		_dialog.size = Vector2(1000, 700)
 
 	func _on_selected(path):
-		set_text(path)
+		text = path
 
 
 	func _on_dir_button_pressed():
@@ -38,12 +39,6 @@ class DirectoryCtrl:
 		add_child(_btn_dir)
 		add_child(_dialog)
 
-	func get_text():
-		return _txt_path.text
-
-	func set_text(t):
-		text = t
-		_txt_path.text = text
 
 	func get_line_edit():
 		return _txt_path
@@ -139,7 +134,7 @@ func _init(cont):
 # ------------------
 func _new_row(key, disp_text, value_ctrl, hint):
 	var ctrl = _base_control.duplicate()
-	var lbl = ctrl.get_node("Label")
+	var lbl = ctrl.get_child(0)
 
 	lbl.hint_tooltip = hint
 	lbl.text = disp_text
@@ -149,7 +144,7 @@ func _new_row(key, disp_text, value_ctrl, hint):
 	ctrl.add_child(value_ctrl)
 
 	var rpad = CenterContainer.new()
-	rpad.rect_min_size.x = 5
+	# rpad.rect_min_size.x = 5
 	ctrl.add_child(rpad)
 
 	return ctrl
@@ -157,13 +152,13 @@ func _new_row(key, disp_text, value_ctrl, hint):
 
 func _add_title(text):
 	var row = _base_control.duplicate()
-	var lbl = row.get_node('Label')
+	var lbl = row.get_child(0)
 
 	lbl.text = text
-	lbl.align = Label.ALIGNMENT_CENTER
+	# lbl.align = Label.ALIGNMENT_CENTER
 	_base_container.add_child(row)
 
-	row.connect('draw',Callable(self,'_on_title_cell_draw'),[row])
+	row.connect('draw', _on_title_cell_draw.bind(row))
 
 
 func _add_number(key, value, disp_text, v_min, v_max, hint=''):
@@ -201,7 +196,7 @@ func _add_value(key, value, disp_text, hint=''):
 
 func _add_boolean(key, value, disp_text, hint=''):
 	var value_ctrl = CheckBox.new()
-	value_ctrl.pressed = value
+	value_ctrl.button_pressed = value
 
 	_new_row(key, disp_text, value_ctrl, hint)
 
@@ -247,8 +242,9 @@ func _add_vector2(key, value, disp_text, hint=''):
 # Events
 # ------------------
 func _wire_select_on_focus(which):
-	which.connect('focus_entered',Callable(self,'_on_ctrl_focus_highlight'),[which])
-	which.connect('focus_exited',Callable(self,'_on_ctrl_focus_unhighlight'),[which])
+	pass
+	which.connect('focus_entered', _on_ctrl_focus_highlight.bind(which))
+	which.connect('focus_exited', _on_ctrl_focus_unhighlight.bind(which))
 
 
 func _on_ctrl_focus_highlight(which):
@@ -262,7 +258,7 @@ func _on_ctrl_focus_unhighlight(which):
 
 
 func _on_title_cell_draw(which):
-	which.draw_rect(Rect2(Vector2(0, 0), which.rect_size), Color(0, 0, 0, .15))
+	which.draw_rect(Rect2(Vector2(0, 0), which.size), Color(0, 0, 0, .15))
 
 
 # ------------------
@@ -284,8 +280,8 @@ func get_config_issues():
 	if(!has_directory):
 		to_return.append('You do not have any directories set.')
 
-	if(_cfg_ctrls['prefix'].text == ''):
-		to_return.append("You must set a Script prefix or GUT won't find any scripts")
+	if(!_cfg_ctrls['suffix'].text.ends_with('.gd')):
+		to_return.append("Script suffix must end in '.gd'")
 
 	return to_return
 
@@ -366,17 +362,26 @@ func set_options(options):
 	_add_title('Misc')
 	_add_value('prefix', options.prefix, 'Script Prefix',
 		"The filename prefix for all test scripts.")
+	_add_value('suffix', options.suffix, 'Script Suffix',
+		"Script suffix, including .gd extension.  For example '_foo.gd'.")
+	_add_number('paint_after', options.paint_after, 'Paint After', 0.0, 1.0,
+		"How long GUT will wait before pausing for 1 frame to paint the screen.  0 is never.")
+	# since _add_number doesn't set step property, it will default to a step of
+	# 1 and cast values to int.  Give it a .5 step and re-set the value.
+	_cfg_ctrls.paint_after.step = .05
+	_cfg_ctrls.paint_after.value = options.paint_after
 
+	print('paint after = ', options.paint_after)
 
 func get_options(base_opts):
 	var to_return = base_opts.duplicate()
 
 	# Settings
 	to_return.log_level = _cfg_ctrls.log_level.value
-	to_return.ignore_pause = _cfg_ctrls.ignore_pause.pressed
-	to_return.hide_orphans = _cfg_ctrls.hide_orphans.pressed
-	to_return.should_exit = _cfg_ctrls.should_exit.pressed
-	to_return.should_exit_on_success = _cfg_ctrls.should_exit_on_success.pressed
+	to_return.ignore_pause = _cfg_ctrls.ignore_pause.button_pressed
+	to_return.hide_orphans = _cfg_ctrls.hide_orphans.button_pressed
+	to_return.should_exit = _cfg_ctrls.should_exit.button_pressed
+	to_return.should_exit_on_success = _cfg_ctrls.should_exit_on_success.button_pressed
 
 	#Output
 	to_return.panel_options.font_name = _cfg_ctrls.output_font_name.get_item_text(
@@ -387,17 +392,18 @@ func get_options(base_opts):
 	to_return.font_name = _cfg_ctrls.font_name.get_item_text(
 		_cfg_ctrls.font_name.selected)
 	to_return.font_size = _cfg_ctrls.font_size.value
-	to_return.should_maximize = _cfg_ctrls.should_maximize.pressed
-	to_return.compact_mode = _cfg_ctrls.compact_mode.pressed
+	to_return.should_maximize = _cfg_ctrls.should_maximize.button_pressed
+	to_return.compact_mode = _cfg_ctrls.compact_mode.button_pressed
 	to_return.opacity = _cfg_ctrls.opacity.value
 	to_return.background_color = _cfg_ctrls.background_color.color.to_html()
 	to_return.font_color = _cfg_ctrls.font_color.color.to_html()
-	to_return.disable_colors = _cfg_ctrls.disable_colors.pressed
-	to_return.gut_on_top = _cfg_ctrls.gut_on_top.pressed
+	to_return.disable_colors = _cfg_ctrls.disable_colors.button_pressed
+	to_return.gut_on_top = _cfg_ctrls.gut_on_top.button_pressed
+	to_return.paint_after = _cfg_ctrls.paint_after.value
 
 
 	# Directories
-	to_return.include_subdirs = _cfg_ctrls.include_subdirs.pressed
+	to_return.include_subdirs = _cfg_ctrls.include_subdirs.button_pressed
 	var dirs = []
 	for i in range(DIRS_TO_LIST):
 		var key = str('directory_', i)
@@ -408,7 +414,7 @@ func get_options(base_opts):
 
 	# XML Output
 	to_return.junit_xml_file = _cfg_ctrls.junit_xml_file.text
-	to_return.junit_xml_timestamp = _cfg_ctrls.junit_xml_timestamp.pressed
+	to_return.junit_xml_timestamp = _cfg_ctrls.junit_xml_timestamp.button_pressed
 
 	# Hooks
 	to_return.pre_run_script = _cfg_ctrls.pre_run_script.text
@@ -416,5 +422,6 @@ func get_options(base_opts):
 
 	# Misc
 	to_return.prefix = _cfg_ctrls.prefix.text
+	to_return.suffix = _cfg_ctrls.suffix.text
 
 	return to_return

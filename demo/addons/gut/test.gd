@@ -63,7 +63,7 @@ class DoubleInfo:
 	#   (object_to_double, subpath, strategy)
 	func _init(thing,p2=null,p3=null):
 		strategy = p2
-
+		print(thing, ' is ', typeof(thing), ' = ', TYPE_OBJECT)
 		# short-circuit and ensure that is_valid
 		# is not set to true.
 		if(_utils.is_instance(thing)):
@@ -79,7 +79,7 @@ class DoubleInfo:
 				_is_native = true
 				extension = 'native_class_not_used'
 			else:
-				path = thing.resource_path
+				path = thing.get('resource_path')
 		else:
 			path = thing
 
@@ -97,6 +97,16 @@ class DoubleInfo:
 	func is_native():
 		return _is_native
 
+	func to_s():
+		return str(path, "\n",
+			subpath, "\n",
+			strategy, "\n",
+			make_partial, "\n",
+			extension, "\n",
+			_is_native, "\n",
+			is_valid, "\n")
+
+
 # ------------------------------------------------------------------------------
 # Begin test.gd
 # ------------------------------------------------------------------------------
@@ -105,6 +115,7 @@ var _compare = _utils.Comparator.new()
 
 # constant for signal when calling yield_for
 const YIELD = 'timeout'
+signal timeout
 
 # Need a reference to the instantiate that is running the tests.  This
 # is set by the gut class when it runs the tests.  This gets you
@@ -194,6 +205,8 @@ func _do_datatypes_match__fail_if_not(got, expected, text):
 			if([2, 3].has(got_type) and [2, 3].has(expect_type)):
 				_lgr.warn(str('Warn:  Float/Int comparison.  Got ', _strutils.types[got_type],
 					' but expected ', _strutils.types[expect_type]))
+			elif([TYPE_STRING, TYPE_STRING_NAME].has(got_type) and [TYPE_STRING, TYPE_STRING_NAME].has(expect_type)):
+				pass
 			else:
 				_fail('Cannot compare ' + _strutils.types[got_type] + '[' + _str(got) + '] to ' + \
 					_strutils.types[expect_type] + '[' + _str(expected) + '].  ' + text)
@@ -718,7 +731,7 @@ func assert_signal_emitted_with_parameters(object, signal_name, parameters, inde
 		if(_signal_watcher.did_emit(object, signal_name)):
 			var parms_got = _signal_watcher.get_signal_parameters(object, signal_name, index)
 			var diff_result = _compare.deep(parameters, parms_got)
-			if(diff_result.are_equal()):
+			if(diff_result.are_equal):
 				_pass(str(disp, parms_got))
 			else:
 				_fail(str('Expected object ', _str(object), ' to emit signal [', signal_name, '] with parameters ', diff_result.summarize()))
@@ -1350,6 +1363,7 @@ func _smart_double(double_info):
 # ------------------------------------------------------------------------------
 func double(thing, p2=null, p3=null):
 	var double_info = DoubleInfo.new(thing, p2, p3)
+	print(double_info.to_s())
 	if(!double_info.is_valid):
 		_lgr.error('double requires a class or path, you passed an instantiate:  ' + _str(thing))
 		return null
@@ -1513,7 +1527,7 @@ func use_parameters(params):
 		ph = _utils.ParameterHandler.new(params)
 		gut.set_parameter_handler(ph)
 
-	var output = str('(call #', ph.get_call_count() + 1, ') with paramters:  ', ph.get_current_parameters())
+	var output = str('(call #', ph.get_call_count() + 1, ') with parameters:  ', ph.get_current_parameters())
 	_lgr.log(output)
 	_lgr.inc_indent()
 	return ph.next_parameters()
@@ -1651,3 +1665,37 @@ func assert_ne_shallow(v1, v2):
 		_pass(result.get_short_summary())
 	else:
 		_fail(result.get_short_summary())
+
+
+# ------------------------------------------------------------------------------
+# Checks the passed in version string (x.x.x) against the engine version to see
+# if the engine version is less than the expected version.  If it is then the
+# test is mareked as passed (for a lack of anything better to do).  The result
+# of the check is returned.
+#
+# Example:
+# if(skip_if_godot_version_lt('3.5.0')):
+# 	return
+# ------------------------------------------------------------------------------
+func skip_if_godot_version_lt(expected):
+	var should_skip = !_utils.is_godot_version_gte(expected)
+	if(should_skip):
+		_pass(str('Skipping ', _utils.godot_version(), ' is less than ', expected))
+	return should_skip
+
+
+# ------------------------------------------------------------------------------
+# Checks if the passed in version matches the engine version.  The passed in
+# version can contain just the major, major.minor or major.minor.path.  If
+# the version is not the same then the test is marked as passed.  The result of
+# the check is returned.
+#
+# Example:
+# if(skip_if_godot_version_ne('3.4')):
+# 	return
+# ------------------------------------------------------------------------------
+func skip_if_godot_version_ne(expected):
+	var should_skip = !_utils.is_godot_version(expected)
+	if(should_skip):
+		_pass(str('Skipping ', _utils.godot_version(), ' is not ', expected))
+	return should_skip

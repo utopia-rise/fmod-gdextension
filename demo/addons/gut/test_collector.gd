@@ -38,6 +38,7 @@ class TestScript:
 	var path:String
 	var _utils = null
 	var _lgr = null
+	var is_loaded = false
 
 	func _init(utils=null,logger=null):
 		_utils = utils
@@ -56,26 +57,27 @@ class TestScript:
 		return load_script().new()
 
 	func load_script():
-		#print('loading:  ', get_full_name())
 		var to_return = load(path)
-		if(inner_class_name != null):
+
+		if(inner_class_name != null and inner_class_name != ''):
 			# If we wanted to do inner classes in inner classses
 			# then this would have to become some kind of loop or recursive
 			# call to go all the way down the chain or this class would
 			# have to change to hold onto the loaded class instead of
 			# just path information.
 			to_return = to_return.get(inner_class_name)
+
 		return to_return
 
 	func get_filename_and_inner():
 		var to_return = get_filename()
-		if(inner_class_name != null):
+		if(inner_class_name != ''):
 			to_return += '.' + String(inner_class_name)
 		return to_return
 
 	func get_full_name():
 		var to_return = path
-		if(inner_class_name != null):
+		if(inner_class_name != ''):
 			to_return += '.' + String(inner_class_name)
 		return to_return
 
@@ -83,7 +85,8 @@ class TestScript:
 		return path.get_file()
 
 	func has_inner_class():
-		return inner_class_name != null
+		return inner_class_name != ''
+
 
 	# Note:  although this no longer needs to export the inner_class names since
 	#        they are pulled from metadata now, it is easier to leave that in
@@ -95,6 +98,7 @@ class TestScript:
 		for i in range(tests.size()):
 			names.append(tests[i].name)
 		config_file.set_value(section, 'tests', names)
+
 
 	func _remap_path(source_path):
 		var to_return = source_path
@@ -108,6 +112,7 @@ class TestScript:
 			else:
 				_lgr.warn('Could not find remap file ' + remap_path)
 		return to_return
+
 
 	func import_from(config_file, section):
 		path = config_file.get_value(section, 'path')
@@ -145,8 +150,14 @@ func _does_inherit_from_test(thing):
 			to_return = _does_inherit_from_test(base_script)
 	return to_return
 
+
 func _populate_tests(test_script:TestScript):
 	var script =  test_script.load_script()
+	if(script == null):
+		print('  !!! ', test_script.path, ' could not be loaded')
+		return false
+
+	test_script.is_loaded = true
 	var methods = script.get_script_method_list()
 	for i in range(methods.size()):
 		var name = methods[i]['name']
@@ -202,6 +213,7 @@ func _parse_script(test_script):
 # Public
 # -----------------
 func add_script(path):
+	# print('Adding ', path)
 	# SHORTCIRCUIT
 	if(has_script(path)):
 		return []
