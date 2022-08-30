@@ -1,6 +1,10 @@
 # FMOD Studio integration for Godot using GDNative
 
-A Godot C++ GDNative that provides an integration for the FMOD Studio API.
+**A Godot C++ GDNative that provides an integration for the FMOD Studio API.**
+
+[![All builds](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml/badge.svg?branch=master)](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml) [![](https://img.shields.io/discord/1012326818365325352.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/u2NM2vTGMn)
+
+---
 
 FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many
 titles such as Transistor, Into the Breach and Celeste. [More on FMOD's website](https://www.fmod.com/).
