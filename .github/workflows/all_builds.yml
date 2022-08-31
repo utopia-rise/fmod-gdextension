@@ -11,8 +11,8 @@ on:
 env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET: release
-  GODOT_VERSION: 3.4
-  UTOPIA_GODOT_CPP_REF: godot-3.4-stable
+  GODOT_VERSION: 3.5
+  UTOPIA_GODOT_CPP_REF: godot-3.5-stable
   FMOD_VERSION: 20203
 
 jobs:
