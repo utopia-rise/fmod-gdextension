@@ -183,9 +183,6 @@ if host_platform == 'windows':
             env = Environment(TARGET_ARCH='x86')
     opts.Update(env)
 
-if env["headers_dir"] == 'default':
-    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot-headers/")
-
 if env['bits'] == 'default':
     env['bits'] = '64' if is64 else '32'
 
@@ -321,7 +318,8 @@ elif env['platform'] == 'windows':
         ])
 elif env['platform'] == 'android':
     if host_platform == 'windows':
-        env = env.Clone(tools=['mingw'])
+        env = Environment(ENV=os.environ, tools=['mingw'])
+        opts.Update(env)
         env["SPAWN"] = mySpawn
 
     # Verify NDK root
@@ -378,8 +376,7 @@ elif env['platform'] == 'android':
     env["RANLIB"] = toolchain + "/bin/llvm-ranlib"
     env['OBJCOPY'] = toolchain + "/bin/llvm-objcopy"
     env['LINK'] = toolchain + "/bin/clang++"
-    target_platform = env['ANDROID_NDK_ROOT'] + ("/platforms/android-%s" % api_level) + ('/%s/usr/lib' % arch_info['target_platform'])
-    env['SHLINKFLAGS'] = ["-Wl", "-shared", "--sysroot=%s" % target_platform]
+    env["SHLIBSUFFIX"] = ".so"
 
     env.Append(CCFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march'], '-fPIC'])
     env.Append(CCFLAGS= arch_info['ccflags'])
@@ -392,6 +389,9 @@ elif env['platform'] == 'android':
         env.Append(CCFLAGS=["-Og", "-g"])
     elif env["target"] == "release":
         env.Append(CCFLAGS=["-O3"])
+
+if env["headers_dir"] == 'default':
+    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot-headers/")
 
 
 #####################
@@ -449,8 +449,8 @@ elif platform == "ios":
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
 elif platform == "android":
     cpp_bindings_libname += '.a'
-    libfmod = 'libfmod' + lfix + '.so'
-    libfmodstudio = 'libfmodstudio' + lfix + '.so'
+    libfmod = 'libfmod' + lfix
+    libfmodstudio = 'libfmodstudio' + lfix
     fmod_info_table = {
         "armv7": "armeabi-v7a",
         "arm64v8": "arm64-v8a",
