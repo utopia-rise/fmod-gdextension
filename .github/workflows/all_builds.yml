@@ -11,8 +11,8 @@ on:
 env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET: release
-  GODOT_VERSION: 3.4
-  UTOPIA_GODOT_CPP_REF: godot-3.4-stable
+  GODOT_VERSION: 3.5
+  UTOPIA_GODOT_CPP_REF: godot-3.5-stable
   FMOD_VERSION: 20203
 
 jobs:
@@ -272,14 +272,14 @@ jobs:
 
       - name: Compilation
         env:
-          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/23.2.8568313
         run: |
           cp -r godot-cpp ../godot-cpp
           cd ../godot-cpp
           scons platform=android bits=64 android_arch=armv7 target=${{env.TARGET}} generate_bindings=yes -j4
           scons platform=android bits=64 android_arch=arm64v8 target=${{env.TARGET}} generate_bindings=yes -j4
           cd ../${{env.PROJECT_FOLDER}}
-          $ANDROID_NDK_ROOT/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-21 NDK_LIBS_OUT=bin/
+          $ANDROID_NDK_ROOT/ndk-build NDK_PROJECT_PATH=. APP_BUILD_SCRIPT=Android.mk APP_PLATFORM=android-27 NDK_LIBS_OUT=bin/
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v2

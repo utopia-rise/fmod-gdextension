@@ -183,9 +183,6 @@ if host_platform == 'windows':
             env = Environment(TARGET_ARCH='x86')
     opts.Update(env)
 
-if env["headers_dir"] == 'default':
-    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot-headers/")
-
 if env['bits'] == 'default':
     env['bits'] = '64' if is64 else '32'
 
@@ -321,7 +318,8 @@ elif env['platform'] == 'windows':
         ])
 elif env['platform'] == 'android':
     if host_platform == 'windows':
-        env = env.Clone(tools=['mingw'])
+        env = Environment(ENV=os.environ, tools=['mingw'])
+        opts.Update(env)
         env["SPAWN"] = mySpawn
 
     # Verify NDK root
@@ -371,19 +369,29 @@ elif env['platform'] == 'android':
     # Setup tools
     env['CC'] = toolchain + "/bin/clang"
     env['CXX'] = toolchain + "/bin/clang++"
-    env['AR'] = toolchain + "/bin/" + arch_info['tool_path'] + "-ar"
-    env["AS"] = toolchain + "/bin/" + arch_info['tool_path'] + "-as"
-    env["LD"] = toolchain + "/bin/" + arch_info['tool_path'] + "-ld"
-    env["STRIP"] = toolchain + "/bin/" + arch_info['tool_path'] + "-strip"
-    env["RANLIB"] = toolchain + "/bin/" + arch_info['tool_path'] + "-ranlib"
-    env['OBJCOPY'] = toolchain + "/bin/" + arch_info['tool_path'] + "-objcopy"
+    env['AR'] = toolchain + "/bin/llvm-ar"
+    env["AS"] = toolchain + "/bin/llvm-as"
+    env["LD"] = toolchain + "/bin/llvm-ld"
+    env["STRIP"] = toolchain + "/bin/llvm-strip"
+    env["RANLIB"] = toolchain + "/bin/llvm-ranlib"
+    env['OBJCOPY'] = toolchain + "/bin/llvm-objcopy"
     env['LINK'] = toolchain + "/bin/clang++"
-    target_platform = env['ANDROID_NDK_ROOT'] + ("/platforms/android-%s" % api_level) + ('/%s/usr/lib' % arch_info['target_platform'])
-    env['SHLINKFLAGS'] = ["-Wl", "-shared", "--sysroot=%s" % target_platform, "-Wl", "-z", "noexecstack"]
+    env["SHLIBSUFFIX"] = ".so"
 
     env.Append(CCFLAGS=['--target=' + arch_info['target'] + env['android_api_level'], '-march=' + arch_info['march'], '-fPIC'])
     env.Append(CCFLAGS= arch_info['ccflags'])
+
+    env.Append(LINKFLAGS=["--target=" + arch_info["target"] + env["android_api_level"], "-march=" + arch_info["march"]])
+
     env.Append(CPPDEFINES = "-DANDROID")
+
+    if env["target"] == "debug":
+        env.Append(CCFLAGS=["-Og", "-g"])
+    elif env["target"] == "release":
+        env.Append(CCFLAGS=["-O3"])
+
+if env["headers_dir"] == 'default':
+    env["headers_dir"] = os.environ.get("GODOT_HEADERS", env["cpp_bindings_dir"] + "godot-headers/")
 
 
 #####################
@@ -441,8 +449,8 @@ elif platform == "ios":
     env.Append(LIBPATH=[ env['cpp_bindings_dir'] + 'bin/', env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
 elif platform == "android":
     cpp_bindings_libname += '.a'
-    libfmod = 'libfmod%.so' % lfix
-    libfmodstudio = 'libfmodstudio%.so' % lfix
+    libfmod = 'libfmod' + lfix
+    libfmodstudio = 'libfmodstudio' + lfix
     fmod_info_table = {
         "armv7": "armeabi-v7a",
         "arm64v8": "arm64-v8a",
@@ -484,7 +492,7 @@ if platform == "osx":
 
     AddPostAction(library, change_id_action)
 elif platform == "android":
-    library = env.SharedLibrary(target=lib_name +".dll", source=sources)
+    library = env.SharedLibrary(target=lib_name +".so", source=sources)
 elif platform == "linux":
     library = env.SharedLibrary(target=lib_name +".so", source=sources)
 elif platform == "windows":
