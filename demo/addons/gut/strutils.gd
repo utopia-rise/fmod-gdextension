@@ -74,7 +74,7 @@ func _get_obj_filename(thing):
 			# we do nothing.  This just read better.
 			pass
 	elif(!_utils.is_native_class(thing)):
-		var dict = inst2dict(thing)
+		var dict = inst_to_dict(thing)
 		filename = _get_filename(dict['@path'])
 		if(str(dict['@subpath']) != ''):
 			filename += str('/', dict['@subpath'])
