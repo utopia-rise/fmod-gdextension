@@ -2,7 +2,7 @@
 
 **A Godot C++ GDNative that provides an integration for the FMOD Studio API.**
 
-[![All builds](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml/badge.svg?branch=master)](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml) [![](https://img.shields.io/discord/1012326818365325352.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/u2NM2vTGMn)
+![](https://img.shields.io/badge/Godot%20Compatible-3.1%2B-%234385B5) [![All builds](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml/badge.svg?branch=master)](https://github.com/utopia-rise/fmod-gdnative/actions/workflows/all_builds.yml) [![](https://img.shields.io/discord/1012326818365325352.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/u2NM2vTGMn)
 
 ---
 
