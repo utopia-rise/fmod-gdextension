@@ -59,13 +59,12 @@ void FmodEventEmitter2D::_bind_methods() {
 }
 
 void FmodEventEmitter2D::_notification(int p_what) {
-    switch (p_what) {
-        case 14: { // PAUSED
-            pause();
-        } break;
-        case 15: { // UNPAUSED
+    if (p_what == NOTIFICATION_PAUSED) {
+        pause();
+    } else if (p_what == NOTIFICATION_UNPAUSED) {
+        if (is_paused()) {
             play();
-        } break;
+        }
     }
 }
 
