@@ -59,7 +59,7 @@ namespace Callbacks{
 
                 //We get the Godot File object from the handle
                 GodotFileHandle* handle {reinterpret_cast<GodotFileHandle*>(current_request->handle)};
-                godot::Ref<godot::File> file {handle->file};
+                godot::Ref<godot::FileAccess> file {handle->file};
 
                 //update the position of the cursor
                 file->seek(current_request->offset);
@@ -112,16 +112,13 @@ namespace Callbacks{
             void **handle,
             void *userdata
     ) {
-        godot::Ref<godot::File> file;
-        file.instantiate();
 
-        GodotFileHandle* fileHandle {new GodotFileHandle{file}};
+        godot::Ref<godot::FileAccess> access = godot::FileAccess::open(name, godot::FileAccess::ModeFlags::READ);
 
-        godot::Error err = file->open(name, godot::File::ModeFlags::READ);
-        *filesize = file->get_length();
-        *handle = reinterpret_cast<void *>(fileHandle);
-
-        if(err == godot::Error::OK) {
+        if(access->get_error() == godot::Error::OK) {
+            *filesize = access->get_length();
+            GodotFileHandle* fileHandle {new GodotFileHandle{access}};
+            *handle = reinterpret_cast<void *>(fileHandle);
             return FMOD_RESULT::FMOD_OK;
         }
         return FMOD_RESULT::FMOD_ERR_FILE_BAD;
@@ -131,8 +128,7 @@ namespace Callbacks{
             void *handle,
             void *userdata
     ) {
-        godot::Ref<godot::File> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
-        file->close();
+        godot::Ref<godot::FileAccess> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
         delete reinterpret_cast<GodotFileHandle*>(handle);
         return FMOD_RESULT::FMOD_OK;
     }

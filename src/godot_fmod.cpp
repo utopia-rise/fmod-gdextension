@@ -341,8 +341,8 @@ FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_V
 
 FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes_from_transform(const Transform3D& transform) const {
     Vector3 pos = transform.get_origin() / distanceScale;
-    Vector3 up = transform.get_basis().elements[1];
-    Vector3 forward = transform.get_basis().elements[2];
+    Vector3 up = transform.get_basis().rows[1];
+    Vector3 forward = transform.get_basis().rows[2];
     Vector3 vel(0, 0, 0);
     return _get_3d_attributes(_to_fmod_vector(pos), _to_fmod_vector(up), _to_fmod_vector(forward), _to_fmod_vector(vel));
 }
@@ -351,7 +351,7 @@ FMOD_3D_ATTRIBUTES Fmod::_get_3d_attributes_from_transform_2d(const Transform2D&
     Vector2 posVector = transform.get_origin() / distanceScale;
     Vector3 pos(posVector.x, 0.0f, posVector.y);
     Vector3 up(0, 1, 0);
-    Vector3 forward = Vector3(transform.elements[1].x, 0, transform.elements[1].y).normalized();
+    Vector3 forward = Vector3(transform.columns[1].x, 0, transform.columns[1].y).normalized();
     Vector3 vel(0, 0, 0); // TODO: add doppler
     const FMOD_VECTOR& posFmodVector = _to_fmod_vector(pos);
     return _get_3d_attributes(posFmodVector, _to_fmod_vector(up), _to_fmod_vector(forward), _to_fmod_vector(vel));
@@ -362,10 +362,10 @@ Dictionary Fmod::_get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attr) 
     Transform3D transform;
     transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
     const Vector3& upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
-    transform.basis.elements[1] = upVector;
+    transform.basis.rows[1] = upVector;
     const Vector3& forwardVector = Vector3(attr.forward.x, attr.forward.y, attr.forward.z);
-    transform.basis.elements[2] = forwardVector;
-    transform.basis.elements[0] = upVector.cross(forwardVector);
+    transform.basis.rows[2] = forwardVector;
+    transform.basis.rows[0] = upVector.cross(forwardVector);
     Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
     _3Dattr["transform"] = transform;
     _3Dattr["velocity"] = velocity;
@@ -377,8 +377,8 @@ Dictionary Fmod::_get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& att
     Transform2D transform;
     transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
     const Vector2 &forward = Vector2(attr.forward.x, attr.forward.z);
-    transform.elements[1] = forward;
-    transform.elements[0] = Vector2(forward.y, -forward.x);
+    transform.columns[1] = forward;
+    transform.columns[0] = Vector2(forward.y, -forward.x);
     Vector2 velocity(attr.velocity.x, attr.velocity.z);
     _2Dattr["transform"] = transform;
     _2Dattr["velocity"] = velocity;

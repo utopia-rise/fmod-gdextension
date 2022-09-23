@@ -3,7 +3,7 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <godot_cpp/classes/file.hpp>
+#include <godot_cpp/classes/file_access.hpp>
 #include "../helpers/containers.h"
 #include <thread>
 #include <condition_variable>
@@ -11,7 +11,7 @@
 
 namespace Callbacks {
     struct GodotFileHandle {
-        godot::Ref<godot::File> file;
+        godot::Ref<godot::FileAccess> file;
     };
 
     class GodotFileRunner {
