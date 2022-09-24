@@ -166,7 +166,7 @@ void Fmod::_bind_methods() {
 
 bool Fmod::checkErrors(FMOD_RESULT result, const char *function, const char *file, int line) {
     if (result != FMOD_OK) {
-        UtilityFunctions::printerr(FMOD_ErrorString(result), function, file, line);
+        UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
         return false;
     }
     return true;
@@ -1524,11 +1524,13 @@ void Fmod::set_sound_pitch(const uint64_t instanceId, float pitch) {
 }
 
 void Fmod::set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale) {
-    if (distanceFactor > 0 && ERROR_CHECK(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+    if (distanceFactor <= 0) {
+        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
+    } else if (ERROR_CHECK(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
         GODOT_LOG(0, "FMOD Sound System: Successfully set global 3D settings")
     } else {
-        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings :|")
+        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings")
     }
 }
 

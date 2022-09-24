@@ -5,6 +5,7 @@
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/node2d.hpp>
 #include <godot_cpp/variant/dictionary.hpp>
+#include <godot_cpp/classes/engine.hpp>
 
 namespace godot {
 

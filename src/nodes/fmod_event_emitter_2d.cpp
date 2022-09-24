@@ -20,6 +20,10 @@ void FmodEventEmitter2D::_init() {
 }
 
 void FmodEventEmitter2D::_ready() {
+    // ensure we only run FMOD when the game is running!
+    if (Engine::get_singleton()->is_editor_hint()) {
+        return;
+    }
     for (int i = 0; i < params.keys().size(); i++) {
         auto key = params.keys()[i];
         _set_param_internally(key, params[key]);
@@ -59,6 +63,10 @@ void FmodEventEmitter2D::_bind_methods() {
 }
 
 void FmodEventEmitter2D::_notification(int p_what) {
+    // ensure we only run FMOD when the game is running!
+    if (Engine::get_singleton()->is_editor_hint()) {
+        return;
+    }
     if (p_what == NOTIFICATION_PAUSED) {
         pause();
     } else if (p_what == NOTIFICATION_UNPAUSED) {
