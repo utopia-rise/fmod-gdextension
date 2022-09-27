@@ -123,7 +123,6 @@ void Fmod::_register_methods() {
     register_method("get_sound_volume", &Fmod::get_sound_volume);
     register_method("set_sound_pitch", &Fmod::set_sound_pitch);
     register_method("get_sound_pitch", &Fmod::get_sound_pitch);
-    register_method("set_callback", &Fmod::set_callback);
     register_method("set_sound_3D_settings", &Fmod::set_sound_3d_settings);
     register_method("wait_for_all_loads", &Fmod::wait_for_all_loads);
     register_method("get_available_drivers", &Fmod::get_available_drivers);

@@ -121,14 +121,6 @@ namespace godot {
         Map<String, FMOD::Studio::Bus*> buses;
         Map<String, FMOD::Studio::VCA*> VCAs;
 
-
-        Vector<LoadingBank *> loadingBanks;
-        Map<String, FMOD::Studio::Bank *> banks;
-        Map<String, FMOD::Studio::EventDescription *> eventDescriptions;
-        Map<String, FMOD::Sound *> sounds;
-        Map<String, FMOD::Studio::Bus *> buses;
-        Map<String, FMOD::Studio::VCA *> VCAs;
-
         Vector<FMOD::Channel*> channels;
         Vector<FMOD::Studio::EventInstance*> events;
 
