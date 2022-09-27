@@ -142,9 +142,9 @@ void Fmod::_register_methods() {
     register_method("get_dsp_buffer_length", &Fmod::get_system_dsp_buffer_length);
     register_method("get_dsp_num_buffers", &Fmod::get_system_dsp_num_buffers);
     register_method("_process", &Fmod::_process);
-    register_method("set_callback", &Fmod::setCallback);
-    register_method("set_desc_callback", &Fmod::setEventDescriptionCallback);
-    register_method("set_default_callback", &Fmod::setDefaultCallback);
+    register_method("set_callback", &Fmod::set_callback);
+    register_method("set_desc_callback", &Fmod::set_desc_callback);
+    register_method("set_default_callback", &Fmod::set_default_callback);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -1042,7 +1042,7 @@ Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index)
     return propDesc;
 }
 
-void Fmod::setEventDescriptionCallback(const String eventPath, int callbackMask) {
+void Fmod::set_desc_callback(String eventPath, int callbackMask) {
     FIND_AND_CHECK(eventPath, eventDescriptions)
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
     GODOT_LOG(0, String("Default callBack set on description event ") + eventPath)
@@ -1700,7 +1700,7 @@ void Fmod::set_callback(const uint64_t instanceId, int callbackMask) {
     GODOT_LOG(0, String("CallBack set on event ") + String::num(instanceId, 0))
 }
 
-void Fmod::setDefaultCallback(int p_callbackMask) {
+void Fmod::set_default_callback(int p_callbackMask) {
     defaultCallbackMask = p_callbackMask;
 }
 
