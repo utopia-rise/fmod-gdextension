@@ -143,6 +143,9 @@ void Fmod::_register_methods() {
     register_method("get_dsp_buffer_length", &Fmod::get_system_dsp_buffer_length);
     register_method("get_dsp_num_buffers", &Fmod::get_system_dsp_num_buffers);
     register_method("_process", &Fmod::_process);
+    register_method("set_callback", &Fmod::setCallback);
+    register_method("set_desc_callback", &Fmod::setEventDescriptionCallback);
+    register_method("set_default_callback", &Fmod::setDefaultCallback);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -278,7 +281,7 @@ void Fmod::_set_listener_attributes() {
     }
 
     for (int i = 0; i < systemListenerNumber; i++) {
-        Listener* listener = &listeners[i];
+        Listener *listener = &listeners[i];
         if (listener->listenerLock) {
             continue;
         }
@@ -288,18 +291,18 @@ void Fmod::_set_listener_attributes() {
             continue;
         }
 
-        Node* node {listener->gameObj};
+        Node *node{listener->gameObj};
         if (!node->is_inside_tree()) {
             return;
         }
 
-        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
+        if (auto* ci{Node::cast_to<CanvasItem>(node)}) {
             auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
         }
 
-        if (auto* s {Node::cast_to<Spatial>(node)}) {
+        if (auto* s{Node::cast_to<Spatial>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
@@ -393,12 +396,12 @@ bool Fmod::_is_fmod_valid(Node* node) {
 void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Node* node) {
     // try to set 3D attributes
     if (instance && _is_fmod_valid(node) && node->is_inside_tree()) {
-        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
+        if (auto* ci{Node::cast_to<CanvasItem>(node)}) {
             auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
-        if (auto* s {Node::cast_to<Spatial>(node)}) {
+        if (auto* s{Node::cast_to<Spatial>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
@@ -549,7 +552,7 @@ bool Fmod::get_listener_lock(int index) {
     }
 }
 
-Node* Fmod::get_object_attached_to_listener(int index) {
+Node *Fmod::get_object_attached_to_listener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
@@ -945,8 +948,7 @@ float Fmod::desc_get_sound_size(const String& eventPath) {
 Dictionary Fmod::desc_get_parameter_description_by_name(const String& eventPath, const String& name) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -964,8 +966,7 @@ Dictionary Fmod::desc_get_parameter_description_by_id(const String& eventPath, c
     FMOD_STUDIO_PARAMETER_ID paramId;
     paramId.data1 = (unsigned int) idPair[0];
     paramId.data2 = (unsigned int) idPair[1];
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByID(paramId, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -987,8 +988,7 @@ int Fmod::desc_get_parameter_description_count(const String& eventPath) {
 Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath, int index) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByIndex(index, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1003,8 +1003,7 @@ Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath
 Dictionary Fmod::desc_get_user_property(const String& eventPath, const String& name) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY
-    uProp;
+    FMOD_STUDIO_USER_PROPERTY uProp;
     if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1029,8 +1028,7 @@ int Fmod::desc_get_user_property_count(const String& eventPath) {
 Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY
-    uProp;
+    FMOD_STUDIO_USER_PROPERTY uProp;
     if (ERROR_CHECK(instance->getUserPropertyByIndex(index, &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1042,8 +1040,13 @@ Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index)
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
             propDesc[String(uProp.name)] = String(uProp.stringvalue);
     }
-
     return propDesc;
+}
+
+void Fmod::setEventDescriptionCallback(const String eventPath, int callbackMask) {
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
+    GODOT_LOG(0, String("Default callBack set on description event ") + eventPath)
 }
 
 bool Fmod::get_bus_mute(const String& busPath) {
@@ -1213,12 +1216,17 @@ FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, boo
     FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
     FMOD::Studio::EventInstance* eventInstance = nullptr;
     ERROR_CHECK(instance->createInstance(&eventInstance));
-    if (eventInstance && (!isOneShot || gameObject)) {
-        auto* eventInfo = new EventInfo();
-        eventInfo->gameObj = gameObject;
-        eventInfo->isOneShot = isOneShot;
-        eventInstance->setUserData(eventInfo);
-        events.append(eventInstance);
+    if (eventInstance) {
+        if(defaultCallbackMask != 0x00000000){
+            eventInstance->setCallback(Callbacks::eventCallback, defaultCallbackMask);
+        }
+        if (!isOneShot || gameObject)) {
+            auto* eventInfo = new EventInfo();
+            eventInfo->gameObj = gameObject;
+            eventInfo->isOneShot = isOneShot;
+            eventInstance->setUserData(eventInfo);
+            events.append(eventInstance);
+        }
     }
     return eventInstance;
 }
@@ -1299,7 +1307,7 @@ void Fmod::detach_instance_from_node(const uint64_t instanceId) {
     _get_event_info(instance)->gameObj = nullptr;
 }
 
-Node* Fmod::get_object_attached_to_instance(uint64_t instanceId) {
+Node *Fmod::get_object_attached_to_instance(uint64_t instanceId) {
     Node* node = nullptr;
     FIND_AND_CHECK(instanceId, events, node)
     EventInfo* eventInfo = _get_event_info(instance);
@@ -1411,7 +1419,8 @@ void Fmod::load_file_as_music(const String& path) {
     DRIVE_PATH(path)
     FMOD::Sound* sound = sounds.get(path);
     if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
+        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr,
+                                            &sound));
         if (sound) {
             sounds[path] << sound;
             Godot::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
@@ -1690,6 +1699,10 @@ void Fmod::set_callback(const uint64_t instanceId, int callbackMask) {
     FIND_AND_CHECK(instanceId, events)
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
     GODOT_LOG(0, String("CallBack set on event ") + String::num(instanceId, 0))
+}
+
+void Fmod::setDefaultCallback(int p_callbackMask) {
+    defaultCallbackMask = p_callbackMask;
 }
 
 // runs on the game thread

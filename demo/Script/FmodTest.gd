@@ -7,6 +7,7 @@ func _enter_tree():
 	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.set_sound_3D_settings(1, 32, 1)
 	Fmod.set_listener_number(2)
+	Fmod.set_default_callback(Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	
 	# load banks
 # warning-ignore:return_value_discarded
