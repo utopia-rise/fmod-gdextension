@@ -1220,7 +1220,7 @@ FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, boo
         if(defaultCallbackMask != 0x00000000){
             eventInstance->setCallback(Callbacks::eventCallback, defaultCallbackMask);
         }
-        if (!isOneShot || gameObject)) {
+        if (!isOneShot || gameObject) {
             auto* eventInfo = new EventInfo();
             eventInfo->gameObj = gameObject;
             eventInfo->isOneShot = isOneShot;
