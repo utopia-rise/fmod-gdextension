@@ -1042,7 +1042,7 @@ Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index)
     return propDesc;
 }
 
-void Fmod::set_desc_callback(String eventPath, int callbackMask) {
+void Fmod::set_desc_callback(const String& eventPath, int callbackMask) {
     FIND_AND_CHECK(eventPath, eventDescriptions)
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
     GODOT_LOG(0, String("Default callBack set on description event ") + eventPath)
