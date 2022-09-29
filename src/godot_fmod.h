@@ -250,7 +250,7 @@ namespace godot {
         Dictionary desc_get_user_property(const String& eventPath, const String& name);
         int desc_get_user_property_count(const String& eventPath);
         Dictionary desc_user_property_by_index(const String& eventPath, int index);
-        void set_desc_callback(String eventPath, int callbackMask);
+        void set_desc_callback(const String& eventPath, int callbackMask);
 
         /* bus functions */
         bool get_bus_mute(const String& busPath);

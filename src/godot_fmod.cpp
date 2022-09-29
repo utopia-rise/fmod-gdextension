@@ -280,7 +280,7 @@ void Fmod::_set_listener_attributes() {
     }
 
     for (int i = 0; i < systemListenerNumber; i++) {
-        Listener *listener = &listeners[i];
+        Listener* listener = &listeners[i];
         if (listener->listenerLock) {
             continue;
         }
