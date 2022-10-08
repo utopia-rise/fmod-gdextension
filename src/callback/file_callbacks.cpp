@@ -42,10 +42,6 @@ namespace Callbacks{
     }
 
     void GodotFileRunner::run() {
-        // ensure we only run FMOD when the game is running!
-        if (godot::Engine::get_singleton()->is_editor_hint()) {
-            return;
-        }
         while(!stop) {
 
             //waiting for the container to have one request
@@ -104,10 +100,6 @@ namespace Callbacks{
     }
 
     void GodotFileRunner::finish() {
-        // ensure we only run FMOD when the game is running!
-        if (godot::Engine::get_singleton()->is_editor_hint()) {
-            return;
-        }
         stop = true;
         //we need to notify the loop one last time, otherwise it will stay stuck in the wait method.
         read_cv.notify_one();

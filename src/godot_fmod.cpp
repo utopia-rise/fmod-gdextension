@@ -15,6 +15,7 @@ Fmod* Fmod::singleton = nullptr;
 Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
+    _init();
 }
 
 Fmod::~Fmod() {
@@ -202,7 +203,7 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
 #endif
 }
 
-void Fmod::_process(float delta) {
+void Fmod::_process(double delta) {
     if (!isInitialized) {
         if (!isNotinitPrinted) {
             GODOT_LOG(2, "FMOD Sound System: Fmod should be initialized before calling update")
@@ -1763,5 +1764,5 @@ void Fmod::_init() {
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
     distanceScale = 1.0;
-
+    GODOT_LOG(2, "INIT CALLED!!")
 }

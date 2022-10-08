@@ -8,7 +8,7 @@
 using namespace godot;
 
 FmodEventEmitter2D::FmodEventEmitter2D() {
-    
+    _init();
 }
 
 FmodEventEmitter2D::~FmodEventEmitter2D() {
