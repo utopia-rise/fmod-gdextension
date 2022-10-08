@@ -1,9 +1,9 @@
 name: 🌈 All Builds
 on:
   push:
-    branches: [ master, godot-4.x ]
+    branches: [ godot-4.x ]
     tags:
-      - "v*"
+      - "v2*"
   pull_request:
     branches: "*"
 
@@ -12,8 +12,8 @@ env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET_PATH: demo/addons/fmod/bin/
   TARGET_NAME: libGodotFmod
-  TARGET: release
-  GODOT_VERSION: 3.4
+  TARGET: editor
+  GODOT_VERSION: 4.0
   FMOD_VERSION: 20203
 
 jobs:
