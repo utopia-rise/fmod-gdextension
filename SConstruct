@@ -41,7 +41,7 @@ elif env["platform"] == "linux":
     libfmodstudio = 'libfmodstudio%s.so'% lfix
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch_suffix"], env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch_suffix"]])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"], env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]])
 
 elif env["platform"] == "windows":
     libfmod = 'fmod%s_vc'% lfix
@@ -50,7 +50,7 @@ elif env["platform"] == "windows":
         "x86_64" : "x64",
         "x86_32" : "x64",
     }
-    arch_suffix_override = fmod_info_table[env["arch_suffix"]]
+    arch_suffix_override = fmod_info_table[env["arch"]]
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override])
@@ -71,7 +71,7 @@ elif env["platform"] == "android":
         "x86": "x86",
         "x86_64": "x86_64"
     }
-    arch_dir = fmod_info_table[env["arch_suffix"]]
+    arch_dir = fmod_info_table[env["arch"]]
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
@@ -86,7 +86,7 @@ if env["platform"] == "macos":
 else:
     target = "{}.{}{}".format(
         target,
-        env["arch_suffix"],
+        env["arch"],
         env["SHLIBSUFFIX"]
     )
 
