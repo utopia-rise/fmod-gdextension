@@ -43,7 +43,7 @@ config/icon="res://icon.png"
 
 [autoload]
 
-FmodAutoloader="*res://addons/fmod/fmod-autoloader.gd"
+FmodAutoloader="*res://addons/fmod/FmodManager.gd"
 
 [editor_plugins]
 

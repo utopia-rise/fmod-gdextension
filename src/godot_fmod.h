@@ -94,8 +94,8 @@ namespace godot {
         float weight = 1.0;
     };
 
-    class Fmod : public Node {
-    GDCLASS(Fmod, Node)
+    class Fmod : public Object {
+    GDCLASS(Fmod, Object)
 
     static Fmod *singleton;
 
@@ -171,8 +171,7 @@ namespace godot {
 
         static Fmod* get_singleton();
 
-        void _init();
-        void _process(double delta) override;
+        void update();
         void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);

@@ -15,7 +15,16 @@ Fmod* Fmod::singleton = nullptr;
 Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
-    _init();
+
+    system = nullptr;
+    coreSystem = nullptr;
+    isInitialized = false;
+    isNotinitPrinted = false;
+    Callbacks::GodotFileRunner::get_singleton()->start();
+    performanceData["CPU"] = Dictionary();
+    performanceData["memory"] = Dictionary();
+    performanceData["file"] = Dictionary();
+    distanceScale = 1.0;
 }
 
 Fmod::~Fmod() {
@@ -28,7 +37,6 @@ Fmod* Fmod::get_singleton() {
 }
 
 void Fmod::_bind_methods() {
-    ClassDB::bind_static_method("Fmod", D_METHOD("get_singleton"), &Fmod::get_singleton);
     ClassDB::bind_method(D_METHOD("init", "numOfChannels", "studioFlag", "flag"), &Fmod::init);
     ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
     ClassDB::bind_method(D_METHOD("add_listener", "index", "gameObj"), &Fmod::add_listener);
@@ -156,6 +164,7 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_size"), &Fmod::get_system_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &Fmod::get_system_dsp_buffer_length);
     ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &Fmod::get_system_dsp_num_buffers);
+    ClassDB::bind_method(D_METHOD("update"), &Fmod::update);
 
     ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
     ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));
@@ -203,7 +212,7 @@ void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned
 #endif
 }
 
-void Fmod::_process(double delta) {
+void Fmod::update() {
     if (!isInitialized) {
         if (!isNotinitPrinted) {
             GODOT_LOG(2, "FMOD Sound System: Fmod should be initialized before calling update")
@@ -1752,16 +1761,4 @@ void Fmod::_run_callbacks() {
             GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
         }
     }
-}
-
-void Fmod::_init() {
-    system = nullptr;
-    coreSystem = nullptr;
-    isInitialized = false;
-    isNotinitPrinted = false;
-    Callbacks::GodotFileRunner::get_singleton()->start();
-    performanceData["CPU"] = Dictionary();
-    performanceData["memory"] = Dictionary();
-    performanceData["file"] = Dictionary();
-    distanceScale = 1.0;
 }

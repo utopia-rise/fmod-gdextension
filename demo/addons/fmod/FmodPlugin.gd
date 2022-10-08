@@ -11,4 +11,4 @@ func _ready() -> void:
 	theme.set_icon("FmodEventEmitter2D", "EditorIcons", iconFmodEventEmitter)
 
 func _init():
-	add_autoload_singleton("FmodAutoloader", "res://addons/fmod/fmod-autoloader.gd")
+	add_autoload_singleton("FmodManager", "res://addons/fmod/FmodManager.gd")
