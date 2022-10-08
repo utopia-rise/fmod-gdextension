@@ -4,30 +4,18 @@ entry_symbol = "fmod_library_init"
 
 [libraries]
 
-macos.debug = "res://addons/fmod/bin/libGodotFmod.osx.debug.framework"
-macos.release = "res://addons/fmod/bin/libGodotFmod.osx.release.framework"
-windows.debug.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.debug.x86_32.dll"
-windows.release.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.release.x86_32.dll"
-windows.debug.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.debug.x86_64.dll"
-windows.release.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.release.x86_64.dll"
-linux.debug.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.debug.x86_64.so"
-linux.release.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.release.x86_64.so"
-linux.debug.arm64 = "res://addons/fmod/bin/libGodotFmod.linux.debug.arm64.so"
-linux.release.arm64 = "res://addons/fmod/bin/libGodotFmod.linux.release.arm64.so"
-linux.debug.rv64 = "res://addons/fmod/bin/libGodotFmod.linux.debug.rv64.so"
-linux.release.rv64 = "res://addons/fmod/bin/libGodotFmod.linux.release.rv64.so"
+macos.editor = "res://addons/fmod/bin/libGodotFmod.osx.editor.framework"
+windows.editor.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.editor.x86_32.dll"
+windows.editor.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.editor.x86_64.dll"
+linux.editor.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.x86_64.so"
+linux.editor.arm64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.arm64.so"
+linux.editor.rv64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.rv64.so"
 
 [dependencies]
 
-macos.debug = {}
-macos.release = {}
-windows.debug.x86_32 = {}
-windows.release.x86_32 = {}
-windows.debug.x86_64 = {}
-windows.release.x86_64 = {}
-linux.debug.x86_64 = {}
-linux.release.x86_64 = {}
-linux.debug.arm64 = {}
-linux.release.arm64 = {}
-linux.debug.rv64 = {}
-linux.release.rv64 = {}
+macos.editor = {}
+windows.editor.x86_32 = {}
+windows.editor.x86_64 = {}
+linux.editor.x86_64 = {}
+linux.editor.arm64 = {}
+linux.editor.rv64 = {}

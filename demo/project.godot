@@ -14,6 +14,11 @@ _global_script_classes=[{
 "language": &"GDScript",
 "path": "res://addons/gut/hook_script.gd"
 }, {
+"base": "RefCounted",
+"class": &"GutStringUtils",
+"language": &"GDScript",
+"path": "res://addons/gut/strutils.gd"
+}, {
 "base": "Node",
 "class": &"GutTest",
 "language": &"GDScript",
@@ -21,6 +26,7 @@ _global_script_classes=[{
 }]
 _global_script_class_icons={
 "GutHookScript": "",
+"GutStringUtils": "",
 "GutTest": ""
 }
 
@@ -37,7 +43,7 @@ config/icon="res://icon.png"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/fmod/plugin.cfg")
+enabled=PackedStringArray()
 
 [input]
 
