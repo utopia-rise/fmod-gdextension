@@ -28,6 +28,7 @@ Fmod* Fmod::get_singleton() {
 }
 
 void Fmod::_bind_methods() {
+    ClassDB::bind_static_method("Fmod", D_METHOD("get_singleton"), &Fmod::get_singleton);
     ClassDB::bind_method(D_METHOD("init", "numOfChannels", "studioFlag", "flag"), &Fmod::init);
     ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
     ClassDB::bind_method(D_METHOD("add_listener", "index", "gameObj"), &Fmod::add_listener);

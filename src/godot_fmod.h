@@ -172,7 +172,7 @@ namespace godot {
         static Fmod* get_singleton();
 
         void _init();
-        void _process(double delta);
+        void _process(double delta) override;
         void shutdown();
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);

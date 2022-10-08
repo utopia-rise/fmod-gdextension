@@ -9,3 +9,6 @@ const ADDON_PATH = "res://addons/fmod"
 func _ready() -> void:
 	# configure icons
 	theme.set_icon("FmodEventEmitter2D", "EditorIcons", iconFmodEventEmitter)
+
+func _init():
+	add_autoload_singleton("FmodAutoloader", "res://addons/fmod/fmod-autoloader.gd")

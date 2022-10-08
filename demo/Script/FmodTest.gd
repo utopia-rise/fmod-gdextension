@@ -2,6 +2,7 @@ extends Node
 
 # Called when the node enters the scene tree for the first time.
 func _enter_tree():
+	
 	# set up FMOD
 	Fmod.set_software_format(0, Fmod.GD_FMOD_SPEAKERMODE_STEREO, 0)
 	Fmod.init(1024, Fmod.GD_FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.GD_FMOD_INIT_NORMAL)
