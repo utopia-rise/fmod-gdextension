@@ -155,7 +155,6 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_size"), &Fmod::get_system_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &Fmod::get_system_dsp_buffer_length);
     ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &Fmod::get_system_dsp_num_buffers);
-    ClassDB::bind_method(D_METHOD("_process", "delta"), &Fmod::_process);
 
     ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
     ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));
@@ -1764,5 +1763,4 @@ void Fmod::_init() {
     performanceData["memory"] = Dictionary();
     performanceData["file"] = Dictionary();
     distanceScale = 1.0;
-    GODOT_LOG(2, "INIT CALLED!!")
 }
