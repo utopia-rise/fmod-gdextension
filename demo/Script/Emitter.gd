@@ -10,7 +10,6 @@ func _ready():
 	Fmod.set_event_parameter_by_name(id, "RPM", 600)
 	Fmod.set_event_volume(id, 2)
 	Fmod.start_event(id)
-	print("Event Started.")
 	
 # warning-ignore:unused_argument
 func _process(delta):

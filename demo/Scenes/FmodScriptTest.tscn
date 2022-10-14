@@ -126,5 +126,5 @@ Only one instance of that music can be played "
 [node name="FmodEventEmitter2d" type="FmodEventEmitter2D" parent="."]
 event_name = "event:/Vehicles/Car Engine"
 attached = false
-autoplay = true
-looped = true
+allow_fadeout = false
+preload_event = false
