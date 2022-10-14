@@ -165,10 +165,6 @@ namespace godot {
 
         ~Fmod();
 
-        enum {
-            DECLARE_ALL_CONSTANTS
-        };
-
         static Fmod* get_singleton();
 
         void update();
