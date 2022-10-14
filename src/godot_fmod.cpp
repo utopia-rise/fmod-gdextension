@@ -290,18 +290,18 @@ void Fmod::_set_listener_attributes() {
             continue;
         }
 
-        Node *node{listener->gameObj};
+        Node* node {listener->gameObj};
         if (!node->is_inside_tree()) {
             return;
         }
 
-        if (auto* ci{Node::cast_to<CanvasItem>(node)}) {
+        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
         }
 
-        if (auto* s{Node::cast_to<Spatial>(node)}) {
+        if (auto* s {Node::cast_to<Spatial>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
@@ -395,12 +395,12 @@ bool Fmod::_is_fmod_valid(Node* node) {
 void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Node* node) {
     // try to set 3D attributes
     if (instance && _is_fmod_valid(node) && node->is_inside_tree()) {
-        if (auto* ci{Node::cast_to<CanvasItem>(node)}) {
+        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
-        if (auto* s{Node::cast_to<Spatial>(node)}) {
+        if (auto* s {Node::cast_to<Spatial>(node)}) {
             auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
@@ -551,7 +551,7 @@ bool Fmod::get_listener_lock(int index) {
     }
 }
 
-Node *Fmod::get_object_attached_to_listener(int index) {
+Node* Fmod::get_object_attached_to_listener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
@@ -1216,7 +1216,7 @@ FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, boo
     FMOD::Studio::EventInstance* eventInstance = nullptr;
     ERROR_CHECK(instance->createInstance(&eventInstance));
     if (eventInstance) {
-        if(defaultCallbackMask != 0x00000000){
+        if (defaultCallbackMask != 0x00000000) {
             eventInstance->setCallback(Callbacks::eventCallback, defaultCallbackMask);
         }
         if (!isOneShot || gameObject) {
@@ -1306,7 +1306,7 @@ void Fmod::detach_instance_from_node(const uint64_t instanceId) {
     _get_event_info(instance)->gameObj = nullptr;
 }
 
-Node *Fmod::get_object_attached_to_instance(uint64_t instanceId) {
+Node* Fmod::get_object_attached_to_instance(uint64_t instanceId) {
     Node* node = nullptr;
     FIND_AND_CHECK(instanceId, events, node)
     EventInfo* eventInfo = _get_event_info(instance);
@@ -1418,8 +1418,7 @@ void Fmod::load_file_as_music(const String& path) {
     DRIVE_PATH(path)
     FMOD::Sound* sound = sounds.get(path);
     if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr,
-                                            &sound));
+        ERROR_CHECK(coreSystem->createSound(path.alloc_c_string(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
         if (sound) {
             sounds[path] << sound;
             Godot::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
