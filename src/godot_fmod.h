@@ -1,32 +1,30 @@
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/classes/global_constants.hpp>
+#include "callback/event_callbacks.h"
+#include "callback/file_callbacks.h"
+#include "helpers/constants.h"
+#include "helpers/containers.h"
+#include "helpers/current_function.h"
+#include <fmod.hpp>
 #include <fmod_common.h>
 #include <fmod_errors.h>
 #include <fmod_studio.hpp>
-#include <fmod.hpp>
-#include <godot_cpp/core/object.hpp>
 #include <godot_cpp/classes/canvas_item.hpp>
-#include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/classes/mutex.hpp>
-#include "callback/event_callbacks.h"
-#include "callback/file_callbacks.h"
-#include "helpers/containers.h"
-#include "helpers/constants.h"
-#include "helpers/current_function.h"
+#include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/core/object.hpp>
+#include <godot_cpp/godot.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #define CUSTOM_FILESYSTEM
 
 #ifndef CUSTOM_FILESYSTEM
     #ifdef __ANDROID__
-        #define DRIVE_PATH(path)\
-path = path.replace("res://", "file:///android_asset/");
+        #define DRIVE_PATH(path) path = path.replace("res://", "file:///android_asset/");
     #else
-        #define DRIVE_PATH(path)\
-path = path.replace("res://", "./");
+        #define DRIVE_PATH(path) path = path.replace("res://", "./");
     #endif
 #else
     #define DRIVE_PATH(path)
@@ -41,25 +39,25 @@ path = path.replace("res://", "./");
 
 namespace godot {
 
-#define GODOT_LOG(level, message)\
-    switch (level) {\
-        case 0:\
-            UtilityFunctions::print(message);\
-            break;\
-        case 1:\
-            UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
-            break;\
-        case 2:\
-            UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);\
-            break;\
-    }\
+#define GODOT_LOG(level, message)                                                                \
+    switch (level) {                                                                             \
+        case 0:                                                                                  \
+            UtilityFunctions::print(message);                                                    \
+            break;                                                                               \
+        case 1:                                                                                  \
+            UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
+            break;                                                                               \
+        case 2:                                                                                  \
+            UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);   \
+            break;                                                                               \
+    }
 
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn) \
-    auto instance = (cont).get(instanceId); \
-    if (!instance) { \
-        String message = String("FMOD Sound System: cannot find instance in ##cont collection.");\
-        GODOT_LOG(2, message)\
-        return defaultReturn; \
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn)                               \
+    auto instance = (cont).get(instanceId);                                                       \
+    if (!instance) {                                                                              \
+        String message = String("FMOD Sound System: cannot find instance in ##cont collection."); \
+        GODOT_LOG(2, message)                                                                     \
+        return defaultReturn;                                                                     \
     }
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
 #define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
@@ -67,24 +65,24 @@ namespace godot {
 #define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
 #define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
 
-#define CHECK_SIZE(maxSize, actualSize, type) \
-    if((actualSize) > (maxSize)){\
-        String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries";\
-        GODOT_LOG(2, message)\
-        (actualSize) = maxSize;\
-    }\
+#define CHECK_SIZE(maxSize, actualSize, type)                                                                                                                  \
+    if ((actualSize) > (maxSize)) {                                                                                                                            \
+        String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries"; \
+        GODOT_LOG(2, message)                                                                                                                                  \
+        (actualSize) = maxSize;                                                                                                                                \
+    }
 
     struct EventInfo {
-        //Is the event oneshot
+        // Is the event oneshot
         bool isOneShot = false;
-        //GameObject to which this event is attached
+        // GameObject to which this event is attached
         Object* gameObj = nullptr;
         // Callback info associated with this event
         Callbacks::CallbackInfo callbackInfo = Callbacks::CallbackInfo();
     };
 
     struct LoadingBank {
-        FMOD::Studio::Bank*  bank;
+        FMOD::Studio::Bank* bank;
         String godotPath;
     };
 
@@ -95,16 +93,16 @@ namespace godot {
     };
 
     class Fmod : public Object {
-    GDCLASS(Fmod, Object)
+        GDCLASS(Fmod, Object)
 
-    static Fmod *singleton;
+        static Fmod* singleton;
 
     protected:
         static void _bind_methods();
 
     private:
-        FMOD::Studio::System *system;
-        FMOD::System *coreSystem;
+        FMOD::Studio::System* system;
+        FMOD::System* coreSystem;
 
         bool isInitialized;
         bool isNotinitPrinted;
@@ -116,7 +114,7 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
-        Vector<LoadingBank* > loadingBanks;
+        Vector<LoadingBank*> loadingBanks;
         Map<String, FMOD::Studio::Bank*> banks;
         Map<String, FMOD::Studio::EventDescription*> eventDescriptions;
         Map<String, FMOD::Sound*> sounds;
@@ -126,18 +124,17 @@ namespace godot {
         Vector<FMOD::Channel*> channels;
         Vector<FMOD::Studio::EventInstance*> events;
 
-        //Store dictionary of performance data
+        // Store dictionary of performance data
         Dictionary performanceData;
 
         void _check_loading_banks();
         void _set_listener_attributes();
 
-        static bool checkErrors(FMOD_RESULT result, const char *function, const char *file, int line);
+        static bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line);
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
         static FMOD_VECTOR _to_fmod_vector(Vector3& vec);
-        static FMOD_3D_ATTRIBUTES _get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward,
-                                                     const FMOD_VECTOR& vel);
+        static FMOD_3D_ATTRIBUTES _get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward, const FMOD_VECTOR& vel);
         FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform(const Transform3D& transform) const;
         FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform_2d(const Transform2D& transform) const;
         Dictionary _get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
@@ -149,7 +146,7 @@ namespace godot {
         void _run_callbacks();
 
         FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
-        static EventInfo *_get_event_info(FMOD::Studio::EventInstance* eventInstance);
+        static EventInfo* _get_event_info(FMOD::Studio::EventInstance* eventInstance);
         void _release_one_event(FMOD::Studio::EventInstance* eventInstance);
         void _load_bank_data(LoadingBank* loadingBank);
         void _load_all_vca(FMOD::Studio::Bank* bank);
@@ -277,17 +274,16 @@ namespace godot {
         void unmute_all_events();
         bool banks_still_loading();
 
-
-        //LOW LEVEL API
-        //Load and release memory
+        // LOW LEVEL API
+        // Load and release memory
         void load_file_as_sound(const String& path);
         void load_file_as_music(const String& path);
         void unload_file(const String& path);
-        //Check validity of an instance
+        // Check validity of an instance
         uint64_t create_sound_instance(const String& path);
         bool check_sound_instance(const uint64_t instanceId);
         void release_sound(const uint64_t instanceId);
-        //Setting the sound
+        // Setting the sound
         void set_sound_paused(const uint64_t instanceId, bool paused);
         void stop_sound(const uint64_t instanceId);
         bool is_sound_playing(const uint64_t instanceId);
@@ -295,10 +291,10 @@ namespace godot {
         float get_sound_volume(const uint64_t instanceId);
         float get_sound_pitch(const uint64_t instanceId);
         void set_sound_pitch(const uint64_t instanceId, float pitch);
-        //Playing a sound
+        // Playing a sound
         void play_sound(const uint64_t instanceId);
 
-        //MISC
+        // MISC
         void wait_for_all_loads();
         Array get_available_drivers();
         int get_driver();
@@ -315,6 +311,6 @@ namespace godot {
 
         void set_callback(const uint64_t instanceId, int callbackMask);
     };
-}
+}// namespace godot
 
-#endif //GODOTFMOD_GODOT_FMOD_H
+#endif// GODOTFMOD_GODOT_FMOD_H

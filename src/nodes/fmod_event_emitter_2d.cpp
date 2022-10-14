@@ -11,13 +11,9 @@ FmodEventEmitter2D::FmodEventEmitter2D() {
     _init();
 }
 
-FmodEventEmitter2D::~FmodEventEmitter2D() {
+FmodEventEmitter2D::~FmodEventEmitter2D() {}
 
-}
-
-void FmodEventEmitter2D::_init() {
-
-}
+void FmodEventEmitter2D::_init() {}
 
 void FmodEventEmitter2D::_ready() {
     // ensure we only run FMOD when the game is running!
@@ -76,7 +72,7 @@ void FmodEventEmitter2D::_notification(int p_what) {
     }
 }
 
-void FmodEventEmitter2D::set_param(const String &key, const float value) {
+void FmodEventEmitter2D::set_param(const String& key, const float value) {
     params[key] = value;
     _set_param_internally(key, value);
 }
@@ -104,7 +100,7 @@ void FmodEventEmitter2D::pause() {
     }
 }
 
-void FmodEventEmitter2D::set_event_name(const String &name) {
+void FmodEventEmitter2D::set_event_name(const String& name) {
     if (name.begins_with("event:/")) {
         event_name = name;
     } else {
@@ -193,7 +189,7 @@ void FmodEventEmitter2D::_play_looped() {
     }
 }
 
-void FmodEventEmitter2D::_set_param_internally(const String &key, const float value) {
+void FmodEventEmitter2D::_set_param_internally(const String& key, const float value) {
     if (event_id != -1) {
         Fmod::get_singleton()->set_event_parameter_by_name(event_id, key, value);
     }
