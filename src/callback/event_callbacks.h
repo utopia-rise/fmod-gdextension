@@ -3,8 +3,8 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <godot_cpp/variant/dictionary.hpp>
 #include <mutex>
+#include <variant/dictionary.hpp>
 
 namespace Callbacks {
     struct CallbackInfo {

@@ -2,7 +2,7 @@
 BasedOnStyle: LLVM
 AccessModifierOffset: '-4'
 AlignAfterOpenBracket: Align
-AlignEscapedNewlines: Right
+AlignEscapedNewlines: Left
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortIfStatementsOnASingleLine: Always
 AllowShortLambdasOnASingleLine: All

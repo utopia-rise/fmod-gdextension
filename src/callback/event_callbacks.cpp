@@ -1,6 +1,5 @@
-#include "event_callbacks.h"
-#include "../godot_fmod.h"
-#include <fmod_studio.hpp>
+#include <callback/event_callbacks.h>
+#include <godot_fmod.h>
 
 namespace Callbacks {
     std::mutex callback_mut;

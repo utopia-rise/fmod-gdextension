@@ -5,8 +5,8 @@
 #ifndef GODOTFMOD_CONSTANTS_H
 #define GODOTFMOD_CONSTANTS_H
 
+#include <core/class_db.hpp>
 #include <fmod_common.h>
-#include <godot_cpp/core/class_db.hpp>
 
 #define REGISTER_ALL_CONSTANTS                                         \
     BIND_CONSTANT(FMOD_INIT_3D_RIGHTHANDED)                            \

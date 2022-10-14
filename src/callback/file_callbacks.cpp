@@ -1,6 +1,4 @@
 #include "file_callbacks.h"
-#include <godot_cpp/classes/engine.hpp>
-#include <godot_cpp/classes/os.hpp>
 
 namespace Callbacks {
 

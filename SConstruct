@@ -7,6 +7,18 @@ target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
 fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
 env = SConscript("godot-cpp/SConstruct")
+
+# Replace the source directory so we can include godot_cpp/ in them when possible
+# Quite hacky. A better would be nice if Scons API allows
+new_cpppath = []
+for directories in env["CPPPATH"]:
+  new_directories = []
+  for directory in directories:
+    new_directory = env.Dir(os.path.join(directory.get_path(), "godot_cpp"))
+    new_directories.append(new_directory if new_directory.exists() else directory)
+  new_cpppath.append(new_directories)
+env.Append(CPPPATH=new_cpppath)
+
 env.Replace(fmod_lib_dir = fmod_lib_dir)
 
 target = "{}{}.{}.{}".format(

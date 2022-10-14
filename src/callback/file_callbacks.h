@@ -1,12 +1,13 @@
 #ifndef GODOTFMOD_FILE_CALLBACKS_H
 #define GODOTFMOD_FILE_CALLBACKS_H
 
-#include "../helpers/containers.h"
+#include <classes/file_access.hpp>
+#include <classes/ref.hpp>
 #include <condition_variable>
 #include <cstring>// This include is required for both Linux and MacOS targets as they don't include the necessary headers for 'memcpy' by default
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <godot_cpp/classes/file_access.hpp>
+#include <helpers/containers.h>
 #include <thread>
 
 namespace Callbacks {

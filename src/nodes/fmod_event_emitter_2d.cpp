@@ -2,8 +2,9 @@
 // Created by bitbrain on 2022-08-14.
 //
 
-#include "fmod_event_emitter_2d.h"
-#include "../godot_fmod.h"
+#include <nodes/fmod_event_emitter_2d.h>
+#include <godot_fmod.h>
+#include <classes/engine.hpp>
 
 using namespace godot;
 

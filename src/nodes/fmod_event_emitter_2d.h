@@ -1,11 +1,8 @@
 #ifndef FMOD_EVENT_EMITTER_2D_GODOT_FMOD_H
 #define FMOD_EVENT_EMITTER_2D_GODOT_FMOD_H
 
-#include <godot_cpp/classes/engine.hpp>
-#include <godot_cpp/classes/global_constants.hpp>
-#include <godot_cpp/classes/node2d.hpp>
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/variant/dictionary.hpp>
+
+#include <classes/node2d.hpp>
 
 namespace godot {
 

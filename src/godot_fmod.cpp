@@ -2,18 +2,14 @@
 // Created by Pierre-Thomas Meisels on 2019-01-01.
 //
 
-#include "godot_fmod.h"
-#include <godot_cpp/classes/node3d.hpp>
-#include <godot_cpp/core/class_db.hpp>
-#include <godot_cpp/variant/transform3d.hpp>
-#include <godot_cpp/variant/utility_functions.hpp>
+#include <classes/node3d.hpp>
+#include <godot_fmod.h>
 
 using namespace godot;
 
 Fmod* Fmod::singleton = nullptr;
 
-Fmod::Fmod() :
-    system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
+Fmod::Fmod() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
 

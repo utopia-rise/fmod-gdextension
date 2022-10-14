@@ -5,9 +5,9 @@
 #ifndef GODOTFMOD_POINTERARRAY_H
 #define GODOTFMOD_POINTERARRAY_H
 
-#include "current_function.h"
-#include <godot_cpp/godot.hpp>
-#include <godot_cpp/variant/array.hpp>
+#include <godot.hpp>
+#include <helpers/current_function.h>
+#include <variant/array.hpp>
 
 namespace godot {
 
@@ -63,7 +63,7 @@ namespace godot {
 
     template<typename V>
     void operator<<(Variant& var, V& value) {
-        var = (uint64_t) value;
+        var = Variant((uint64_t) value);
     }
 
     template<typename K, typename V>
