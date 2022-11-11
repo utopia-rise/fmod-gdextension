@@ -123,7 +123,6 @@ void Fmod::_register_methods() {
     register_method("get_sound_volume", &Fmod::get_sound_volume);
     register_method("set_sound_pitch", &Fmod::set_sound_pitch);
     register_method("get_sound_pitch", &Fmod::get_sound_pitch);
-    register_method("set_callback", &Fmod::set_callback);
     register_method("set_sound_3D_settings", &Fmod::set_sound_3d_settings);
     register_method("wait_for_all_loads", &Fmod::wait_for_all_loads);
     register_method("get_available_drivers", &Fmod::get_available_drivers);
@@ -143,6 +142,9 @@ void Fmod::_register_methods() {
     register_method("get_dsp_buffer_length", &Fmod::get_system_dsp_buffer_length);
     register_method("get_dsp_num_buffers", &Fmod::get_system_dsp_num_buffers);
     register_method("_process", &Fmod::_process);
+    register_method("set_callback", &Fmod::set_callback);
+    register_method("set_desc_callback", &Fmod::set_desc_callback);
+    register_method("set_default_callback", &Fmod::set_default_callback);
 
     register_signal<Fmod>("timeline_beat", "params", GODOT_VARIANT_TYPE_DICTIONARY);
     register_signal<Fmod>("timeline_marker", "params", GODOT_VARIANT_TYPE_DICTIONARY);
@@ -945,8 +947,7 @@ float Fmod::desc_get_sound_size(const String& eventPath) {
 Dictionary Fmod::desc_get_parameter_description_by_name(const String& eventPath, const String& name) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -964,8 +965,7 @@ Dictionary Fmod::desc_get_parameter_description_by_id(const String& eventPath, c
     FMOD_STUDIO_PARAMETER_ID paramId;
     paramId.data1 = (unsigned int) idPair[0];
     paramId.data2 = (unsigned int) idPair[1];
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByID(paramId, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -987,8 +987,7 @@ int Fmod::desc_get_parameter_description_count(const String& eventPath) {
 Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath, int index) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
     if (ERROR_CHECK(instance->getParameterDescriptionByIndex(index, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
@@ -1003,8 +1002,7 @@ Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath
 Dictionary Fmod::desc_get_user_property(const String& eventPath, const String& name) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY
-    uProp;
+    FMOD_STUDIO_USER_PROPERTY uProp;
     if (ERROR_CHECK(instance->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1029,8 +1027,7 @@ int Fmod::desc_get_user_property_count(const String& eventPath) {
 Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
-    FMOD_STUDIO_USER_PROPERTY
-    uProp;
+    FMOD_STUDIO_USER_PROPERTY uProp;
     if (ERROR_CHECK(instance->getUserPropertyByIndex(index, &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER)
@@ -1042,8 +1039,13 @@ Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index)
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_STRING)
             propDesc[String(uProp.name)] = String(uProp.stringvalue);
     }
-
     return propDesc;
+}
+
+void Fmod::set_desc_callback(const String& eventPath, int callbackMask) {
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
+    GODOT_LOG(0, String("Default callBack set on description event ") + eventPath)
 }
 
 bool Fmod::get_bus_mute(const String& busPath) {
@@ -1213,12 +1215,17 @@ FMOD::Studio::EventInstance* Fmod::_create_instance(const String& eventName, boo
     FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
     FMOD::Studio::EventInstance* eventInstance = nullptr;
     ERROR_CHECK(instance->createInstance(&eventInstance));
-    if (eventInstance && (!isOneShot || gameObject)) {
-        auto* eventInfo = new EventInfo();
-        eventInfo->gameObj = gameObject;
-        eventInfo->isOneShot = isOneShot;
-        eventInstance->setUserData(eventInfo);
-        events.append(eventInstance);
+    if (eventInstance) {
+        if (defaultCallbackMask != 0x00000000) {
+            eventInstance->setCallback(Callbacks::eventCallback, defaultCallbackMask);
+        }
+        if (!isOneShot || gameObject) {
+            auto* eventInfo = new EventInfo();
+            eventInfo->gameObj = gameObject;
+            eventInfo->isOneShot = isOneShot;
+            eventInstance->setUserData(eventInfo);
+            events.append(eventInstance);
+        }
     }
     return eventInstance;
 }
@@ -1690,6 +1697,10 @@ void Fmod::set_callback(const uint64_t instanceId, int callbackMask) {
     FIND_AND_CHECK(instanceId, events)
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
     GODOT_LOG(0, String("CallBack set on event ") + String::num(instanceId, 0))
+}
+
+void Fmod::set_default_callback(int p_callbackMask) {
+    defaultCallbackMask = p_callbackMask;
 }
 
 // runs on the game thread

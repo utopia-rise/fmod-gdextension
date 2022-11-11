@@ -112,6 +112,8 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
+        int defaultCallbackMask = 0x00000000;
+
         Vector<LoadingBank*> loadingBanks;
         Map<String, FMOD::Studio::Bank*> banks;
         Map<String, FMOD::Studio::EventDescription*> eventDescriptions;
@@ -224,6 +226,7 @@ namespace godot {
         Dictionary get_event_3d_attributes(uint64_t instanceId);
         Dictionary get_event_2d_attributes(uint64_t instanceId);
         void set_event_2d_attributes(uint64_t instanceId, Transform2D position);
+        void set_callback(uint64_t instanceId, int callbackMask);
 
         /* event descriptions functions */
         int desc_get_length(const String& eventPath);
@@ -247,6 +250,7 @@ namespace godot {
         Dictionary desc_get_user_property(const String& eventPath, const String& name);
         int desc_get_user_property_count(const String& eventPath);
         Dictionary desc_user_property_by_index(const String& eventPath, int index);
+        void set_desc_callback(const String& eventPath, int callbackMask);
 
         /* bus functions */
         bool get_bus_mute(const String& busPath);
@@ -307,8 +311,7 @@ namespace godot {
         Dictionary get_global_parameter_desc_by_id(const Array& idPair);
         int get_global_parameter_desc_count();
         Array get_global_parameter_desc_list();
-
-        void set_callback(const uint64_t instanceId, int callbackMask);
+        void set_default_callback(int p_callbackMask);
     };
 }// namespace godot
 

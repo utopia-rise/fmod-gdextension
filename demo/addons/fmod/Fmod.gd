@@ -396,6 +396,12 @@ func unmute_all_events() -> void:
 func set_callback(instanceId: int, callbackMask: int) -> void:
 	godot_fmod.set_callback(instanceId, callbackMask)
 
+func set_default_callback(callbackMask: int) -> void:
+	godot_fmod.set_default_callback(callbackMask)
+	
+func set_desc_callback(path: String, callbackMask: int) -> void:
+	godot_fmod.set_desc_callback(path, callbackMask)
+	
 ###########
 ###SOUND###
 ###########

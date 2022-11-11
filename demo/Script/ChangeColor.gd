@@ -11,7 +11,6 @@ func _ready():
 # warning-ignore:return_value_discarded
 	self.connect("body_exited", self, "leave")
 	id = Fmod.create_event_instance("event:/Music/Level 02")
-	Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	Fmod.start_event(id)
 	Fmod.set_event_paused(id, true)
 
