@@ -125,3 +125,5 @@ config.log
 .sconf_temp
 
 # End of https://www.gitignore.io/api/clion,cmake,scons
+demo/addons/fmod/libs/windows/fmod_vc.lib
+demo/addons/fmod/libs/windows/fmodstudio_vc.lib
