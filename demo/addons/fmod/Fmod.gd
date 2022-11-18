@@ -150,8 +150,8 @@ func _ready():
 	
 	#Initalise FMOD
 	init(config.get_value("Init", "NumChannels"), studio_init_mode, FMOD_INIT_NORMAL)
-	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), 32, config.get_value("3D", "RolloffScale"))
-	set_listener_number(2)
+	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), config.get_value("3D", "DistanceFactor"), config.get_value("3D", "RolloffScale"))
+	set_listener_number(config.get_value("Init", "NumListeners"))
 	
 	#Load FMOD Autoload Banks
 	var banks = config.get_value("Banks", "Autoload").split("\n", false)

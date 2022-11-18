@@ -38,6 +38,7 @@ func load_file():
 	get_node("%BanksToLoad").text = config.get_value("Banks", "Autoload")
 	
 	get_node("%DoplerScaleSlider").value = config.get_value("3D", "DoplerScale")
+	get_node("%DistFactorValue").value = config.get_value("3D", "DistanceFactor")
 	get_node("%RolloffValue").value = config.get_value("3D", "RolloffScale")
 
 	config.save("res://addons/fmod/fmod_config.cfg")
@@ -57,6 +58,7 @@ func apply_changes():
 	config.set_value("Banks", "Autoload", get_node("%BanksToLoad").text)
 	
 	config.set_value("3D", "DoplerScale", get_node("%DoplerScaleSlider").value)
+	config.set_value("3D", "DistanceFactor", get_node("%DistFactorValue").value)
 	config.set_value("3D", "RolloffScale", get_node("%RolloffValue").value)
 	
 	config.save("res://addons/fmod/fmod_config.cfg")

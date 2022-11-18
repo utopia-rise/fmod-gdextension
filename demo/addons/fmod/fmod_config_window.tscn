@@ -381,10 +381,42 @@ max_value = 1.0
 step = 0.01
 value = 1.0
 
-[node name="RolloffScale" type="HBoxContainer" parent="."]
+[node name="DistanceFactor" type="HBoxContainer" parent="."]
 margin_top = 436.0
 margin_right = 1024.0
 margin_bottom = 460.0
+
+[node name="Label" type="Label" parent="DistanceFactor"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+hint_tooltip = "How many engine units is equal to 1 meter.
+
+In 2D: How many pixels represent 1 meter
+In3D: Set to 1 as one unit in Godot 3D is equal to 1 meter."
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Distance Factor"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="DistanceFactor"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="DistFactorValue" type="SpinBox" parent="DistanceFactor"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+max_value = 100000.0
+value = 32.0
+
+[node name="RolloffScale" type="HBoxContainer" parent="."]
+margin_top = 464.0
+margin_right = 1024.0
+margin_bottom = 488.0
 
 [node name="Label" type="Label" parent="RolloffScale"]
 margin_top = 5.0
@@ -415,12 +447,12 @@ step = 0.1
 value = 1.0
 
 [node name="HSeparator" type="HSeparator" parent="."]
-margin_top = 464.0
+margin_top = 492.0
 margin_right = 1024.0
-margin_bottom = 468.0
+margin_bottom = 496.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_top = 472.0
+margin_top = 500.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_vertical = 3
