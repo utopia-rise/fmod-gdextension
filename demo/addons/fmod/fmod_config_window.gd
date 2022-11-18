@@ -31,8 +31,12 @@ func load_file():
 	get_node("%LiveUpdateCheck").pressed = config.get_value("Init", "LiveUpdate")
 	get_node("%NumChannelsBox").value = config.get_value("Init", "NumChannels")
 	get_node("%NumListenersValue").value = config.get_value("Init", "NumListeners")
+	get_node("%DSPBufferSize").value = config.get_value("Init", "DSPBufferSize")
+	get_node("%DebugChecker").pressed = config.get_value("Init", "ShowDebug")
+	
 	get_node("%BankFilePath").text = config.get_value("Banks", "Location")
 	get_node("%BanksToLoad").text = config.get_value("Banks", "Autoload")
+	
 	get_node("%DoplerScaleSlider").value = config.get_value("3D", "DoplerScale")
 	get_node("%RolloffValue").value = config.get_value("3D", "RolloffScale")
 
@@ -46,8 +50,12 @@ func apply_changes():
 	config.set_value("Init", "LiveUpdate", get_node("%LiveUpdateCheck").pressed)
 	config.set_value("Init", "NumChannels", int(get_node("%NumChannelsBox").value))
 	config.set_value("Init", "NumListeners", int(get_node("%NumListenersValue").value))
+	config.set_value("Init", "DSPBufferSize", int(get_node("%DSPBufferSize").value))
+	config.set_value("Init", "ShowDebug", get_node("%DebugChecker").pressed)
+	
 	config.set_value("Banks", "Location", get_node("%BankFilePath").text)
 	config.set_value("Banks", "Autoload", get_node("%BanksToLoad").text)
+	
 	config.set_value("3D", "DoplerScale", get_node("%DoplerScaleSlider").value)
 	config.set_value("3D", "RolloffScale", get_node("%RolloffValue").value)
 	

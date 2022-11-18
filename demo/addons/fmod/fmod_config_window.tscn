@@ -174,22 +174,79 @@ size_flags_horizontal = 3
 max_value = 16.0
 value = 1.0
 
-[node name="Bank Group" type="HSeparator" parent="."]
+[node name="DSPBuffer" type="HBoxContainer" parent="."]
 margin_top = 176.0
 margin_right = 1024.0
-margin_bottom = 180.0
+margin_bottom = 200.0
+
+[node name="Label" type="Label" parent="DSPBuffer"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+hint_tooltip = "Size of DSP buffer (In samples)
+
+Smaller buffer size reduces latency, but increases CPU load and chance of playback errors. "
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "DSP Buffer Size"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="DSPBuffer"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="DSPBufferSize" type="SpinBox" parent="DSPBuffer"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+min_value = 16.0
+max_value = 2048.0
+value = 512.0
+
+[node name="ShowDebug" type="HBoxContainer" parent="."]
+margin_top = 204.0
+margin_right = 1024.0
+margin_bottom = 228.0
+
+[node name="Label" type="Label" parent="ShowDebug"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+text = "Show Debug Panel When Running"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="ShowDebug"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="DebugChecker" type="CheckBox" parent="ShowDebug"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="Bank Group" type="HSeparator" parent="."]
+margin_top = 232.0
+margin_right = 1024.0
+margin_bottom = 236.0
 
 [node name="Banks" type="Label" parent="."]
-margin_top = 184.0
+margin_top = 240.0
 margin_right = 1024.0
-margin_bottom = 198.0
+margin_bottom = 254.0
 text = "Banks"
 align = 1
 
 [node name="BankLocation" type="HBoxContainer" parent="."]
-margin_top = 202.0
+margin_top = 258.0
 margin_right = 1024.0
-margin_bottom = 226.0
+margin_bottom = 282.0
 
 [node name="Label" type="Label" parent="BankLocation"]
 margin_top = 5.0
@@ -214,9 +271,9 @@ text = "res://assets/Banks/"
 placeholder_text = "res://resources/FmodBanks/Desktop/"
 
 [node name="AutoLoadBanks" type="HBoxContainer" parent="."]
-margin_top = 230.0
+margin_top = 286.0
 margin_right = 1024.0
-margin_bottom = 330.0
+margin_bottom = 386.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="AutoLoadBanks"]
 margin_right = 506.0
@@ -281,21 +338,21 @@ Vehicles
 "
 
 [node name="3DSettings" type="HSeparator" parent="."]
-margin_top = 334.0
+margin_top = 390.0
 margin_right = 1024.0
-margin_bottom = 338.0
+margin_bottom = 394.0
 
 [node name="Label3" type="Label" parent="."]
-margin_top = 342.0
+margin_top = 398.0
 margin_right = 1024.0
-margin_bottom = 356.0
+margin_bottom = 412.0
 text = "3D Settings"
 align = 1
 
 [node name="DoplerScale" type="HBoxContainer" parent="."]
-margin_top = 360.0
+margin_top = 416.0
 margin_right = 1024.0
-margin_bottom = 376.0
+margin_bottom = 432.0
 
 [node name="Label" type="Label" parent="DoplerScale"]
 margin_top = 1.0
@@ -325,9 +382,9 @@ step = 0.01
 value = 1.0
 
 [node name="RolloffScale" type="HBoxContainer" parent="."]
-margin_top = 380.0
+margin_top = 436.0
 margin_right = 1024.0
-margin_bottom = 404.0
+margin_bottom = 460.0
 
 [node name="Label" type="Label" parent="RolloffScale"]
 margin_top = 5.0
@@ -358,12 +415,12 @@ step = 0.1
 value = 1.0
 
 [node name="HSeparator" type="HSeparator" parent="."]
-margin_top = 408.0
+margin_top = 464.0
 margin_right = 1024.0
-margin_bottom = 412.0
+margin_bottom = 468.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_top = 416.0
+margin_top = 472.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_vertical = 3

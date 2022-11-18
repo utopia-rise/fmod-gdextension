@@ -134,26 +134,35 @@ func _notification(what):
 #		godot_fmod.free()
 
 func _ready():
-	#Set Up FMOD
+	###SETUP FMOD###
+	
 	var config = ConfigFile.new()
 	var err = config.load("res://addons/fmod/fmod_config.cfg")
 	
+	#Set software format and set DSP buffer
 	set_software_format(config.get_value("Init", "SampleRate"), config.get_value("Init", "SpeakerMode"), 0)
+	set_dsp_buffer_size(config.get_value("Init", "DSPBufferSize"), 4)
 	
+	#Set mode for studio to init in (Normal or Live Update)
 	var studio_init_mode = FMOD_STUDIO_INIT_LIVEUPDATE
 	if !config.get_value("Init", "LiveUpdate"):
 		studio_init_mode = FMOD_STUDIO_INIT_NORMAL
 	
+	#Initalise FMOD
 	init(config.get_value("Init", "NumChannels"), studio_init_mode, FMOD_INIT_NORMAL)
 	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), 32, config.get_value("3D", "RolloffScale"))
 	set_listener_number(2)
 	
-	#Load FMOD Banks
+	#Load FMOD Autoload Banks
 	var banks = config.get_value("Banks", "Autoload").split("\n", false)
 	for bank in banks:
 		if bank == "Master":
 			load_bank(config.get_value("Banks", "Location") + bank + ".strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
 		load_bank(config.get_value("Banks", "Location") + bank + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	#Show or Hide FMOD debug panel
+	get_node("%FMODDebugPanel").visible = config.get_value("Init", "ShowDebug")
+
 
 func _process(delta):
 	if started:
