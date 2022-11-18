@@ -109,6 +109,8 @@ iOS.arm64=[ "res://addons/fmod/libs/iOS/libfmodstudio_iphoneos.a", "res://addons
 
 You should now be ready to go with Fmod and Godot !
 
+NOTE: The Fmod singleton must be the first autoload otherwise issues can arise from calling the Fmod singleton from other autoloaded scripts. 
+
 ### Fmod on android with GDNative
 
 Fmod require a specific .jar to run on Android + some additionnal setup lines in the godot java wrapper for Android.
