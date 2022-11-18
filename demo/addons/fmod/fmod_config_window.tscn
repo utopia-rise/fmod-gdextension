@@ -1,0 +1,374 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://addons/fmod/fmod_config_window.gd" type="Script" id=1]
+
+[node name="VBoxContainer" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 1024.0
+margin_bottom = 14.0
+text = "FMOD CONFIG"
+align = 1
+
+[node name="Init Group" type="HSeparator" parent="."]
+margin_top = 18.0
+margin_right = 1024.0
+margin_bottom = 22.0
+
+[node name="Label2" type="Label" parent="."]
+margin_top = 26.0
+margin_right = 1024.0
+margin_bottom = 40.0
+text = "Initialisation"
+align = 1
+
+[node name="SampleRate" type="HBoxContainer" parent="."]
+margin_top = 44.0
+margin_right = 1024.0
+margin_bottom = 64.0
+
+[node name="Label" type="Label" parent="SampleRate"]
+margin_top = 3.0
+margin_right = 506.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Sample Rate"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="SampleRate"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 20.0
+
+[node name="SampleRateSelector" type="OptionButton" parent="SampleRate"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "44100"
+flat = true
+clip_text = true
+items = [ "22050", null, false, 0, null, "44100", null, false, 1, null, "48000", null, false, 2, null, "88200", null, false, 3, null ]
+selected = 1
+
+[node name="SpeakerMode" type="HBoxContainer" parent="."]
+margin_top = 68.0
+margin_right = 1024.0
+margin_bottom = 88.0
+
+[node name="Label" type="Label" parent="SpeakerMode"]
+margin_top = 3.0
+margin_right = 506.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Speaker Mode"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="SpeakerMode"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 20.0
+
+[node name="SpeakerModeSelector" type="OptionButton" parent="SpeakerMode"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+text = "Default"
+flat = true
+clip_text = true
+items = [ "Default", null, false, 0, null, "Raw", null, false, 2, null, "Mono", null, false, 2, null, "Stereo", null, false, 3, null, "Quad", null, false, 4, null, "Surround", null, false, 5, null, "5.1", null, false, 6, null, "7.1", null, false, 7, null, "7.1.1", null, false, 8, null ]
+selected = 0
+
+[node name="LiveUpdate" type="HBoxContainer" parent="."]
+margin_top = 92.0
+margin_right = 1024.0
+margin_bottom = 116.0
+
+[node name="Label" type="Label" parent="LiveUpdate"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+hint_tooltip = "Run FMOD in Live Update Mode"
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Live Update"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="LiveUpdate"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="LiveUpdateCheck" type="CheckBox" parent="LiveUpdate"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+pressed = true
+
+[node name="NumChannels" type="HBoxContainer" parent="."]
+margin_top = 120.0
+margin_right = 1024.0
+margin_bottom = 144.0
+
+[node name="Label" type="Label" parent="NumChannels"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Number of Channels"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="NumChannels"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="NumChannelsBox" type="SpinBox" parent="NumChannels"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+max_value = 256.0
+value = 16.0
+
+[node name="NumListeners" type="HBoxContainer" parent="."]
+margin_top = 148.0
+margin_right = 1024.0
+margin_bottom = 172.0
+
+[node name="Label" type="Label" parent="NumListeners"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+hint_tooltip = "Number of "
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Number of Listeners"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="NumListeners"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="NumListenersValue" type="SpinBox" parent="NumListeners"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+max_value = 16.0
+value = 1.0
+
+[node name="Bank Group" type="HSeparator" parent="."]
+margin_top = 176.0
+margin_right = 1024.0
+margin_bottom = 180.0
+
+[node name="Banks" type="Label" parent="."]
+margin_top = 184.0
+margin_right = 1024.0
+margin_bottom = 198.0
+text = "Banks"
+align = 1
+
+[node name="BankLocation" type="HBoxContainer" parent="."]
+margin_top = 202.0
+margin_right = 1024.0
+margin_bottom = 226.0
+
+[node name="Label" type="Label" parent="BankLocation"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+text = "Bank Location"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="BankLocation"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="BankFilePath" type="LineEdit" parent="BankLocation"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+text = "res://assets/Banks/"
+placeholder_text = "res://resources/FmodBanks/Desktop/"
+
+[node name="AutoLoadBanks" type="HBoxContainer" parent="."]
+margin_top = 230.0
+margin_right = 1024.0
+margin_bottom = 330.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="AutoLoadBanks"]
+margin_right = 506.0
+margin_bottom = 100.0
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="Label" type="Label" parent="AutoLoadBanks/VBoxContainer"]
+margin_top = 19.0
+margin_right = 506.0
+margin_bottom = 33.0
+hint_tooltip = "Banks to be loaded at runtime.
+
+(Master bank is mandatory)"
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Autoload Banks"
+align = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="AutoLoadBanks/VBoxContainer"]
+margin_top = 37.0
+margin_right = 506.0
+margin_bottom = 81.0
+alignment = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="AutoLoadBanks/VBoxContainer/HBoxContainer"]
+margin_left = 401.0
+margin_right = 506.0
+margin_bottom = 44.0
+
+[node name="LoadBanksButton" type="Button" parent="AutoLoadBanks/VBoxContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+margin_right = 105.0
+margin_bottom = 20.0
+size_flags_horizontal = 0
+text = "Load All Banks"
+
+[node name="ClearBanksButton" type="Button" parent="AutoLoadBanks/VBoxContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+margin_top = 24.0
+margin_right = 105.0
+margin_bottom = 44.0
+text = "Clear Banks"
+
+[node name="VSeparator" type="VSeparator" parent="AutoLoadBanks"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 100.0
+
+[node name="BanksToLoad" type="TextEdit" parent="AutoLoadBanks"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 0, 100 )
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Master
+Music
+SFX
+Vehicles
+"
+
+[node name="3DSettings" type="HSeparator" parent="."]
+margin_top = 334.0
+margin_right = 1024.0
+margin_bottom = 338.0
+
+[node name="Label3" type="Label" parent="."]
+margin_top = 342.0
+margin_right = 1024.0
+margin_bottom = 356.0
+text = "3D Settings"
+align = 1
+
+[node name="DoplerScale" type="HBoxContainer" parent="."]
+margin_top = 360.0
+margin_right = 1024.0
+margin_bottom = 376.0
+
+[node name="Label" type="Label" parent="DoplerScale"]
+margin_top = 1.0
+margin_right = 506.0
+margin_bottom = 15.0
+hint_tooltip = "Strength of the Dopler Effect on 3D audio.
+
+Default range from 0 (No Effect) - 1 (Default Effect)"
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Dopler Scale"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="DoplerScale"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 16.0
+
+[node name="DoplerScaleSlider" type="HSlider" parent="DoplerScale"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="RolloffScale" type="HBoxContainer" parent="."]
+margin_top = 380.0
+margin_right = 1024.0
+margin_bottom = 404.0
+
+[node name="Label" type="Label" parent="RolloffScale"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+hint_tooltip = "The scale at which audio will rolloff due to distance.
+
+Default Range: 0.1(Longer Rolloff) - 5(Shorter Rolloff)"
+mouse_filter = 1
+size_flags_horizontal = 3
+text = "Rolloff Scale"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="RolloffScale"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="RolloffValue" type="SpinBox" parent="RolloffScale"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+min_value = 0.1
+max_value = 5.0
+step = 0.1
+value = 1.0
+
+[node name="HSeparator" type="HSeparator" parent="."]
+margin_top = 408.0
+margin_right = 1024.0
+margin_bottom = 412.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_top = 416.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_vertical = 3
+alignment = 2
+
+[node name="ApplyChanges" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+margin_right = 1024.0
+margin_bottom = 20.0
+size_flags_horizontal = 3
+size_flags_vertical = 0
+text = "Apply Changes"

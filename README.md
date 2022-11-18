@@ -135,15 +135,6 @@ And finally you have to setup the android export template.
 extends Node
 
 func _ready():
-	# set up FMOD
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	
-	# load banks
-	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-
 	# register listener
 	Fmod.add_listener(0, self)
 
@@ -159,17 +150,7 @@ Following is an example of an event instance called manually (ie. not directly m
 These instances are refered by an int id, returned when created. Remember to release the instance once you're done with it.
 
 ```gdscript
-func _ready():
-	# set up FMOD
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
-	
-	# load banks
-	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	
+func _ready():	
 	# register listener
 	Fmod.add_listener(0, self)
 	
@@ -232,16 +213,7 @@ Here is an example where we attach event and listener to instances. In the [exam
 you have a scene `AttachToInstanceTest` where you can play with listener position, using mouse cursor.
 
 ```gdscript
-func _ready():
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.set_sound_3D_settings(1.0, 64.0, 1.0)
-	
-	# load banks
-	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	
+func _ready():	
 	# register listener
 	Fmod.add_listener(0, $Listener)
 	
@@ -299,8 +271,6 @@ Note that instances of file loaded as sound are automatically release by FMOD on
 ```gdscript
 func _ready():
 	# set up FMOD
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
 	Fmod.add_listener(0, self)
 	
 	Fmod.load_file_as_music("res://assets/Music/jingles_SAX07.ogg")
@@ -325,15 +295,6 @@ You can mute all event using `mute_all_events`. This will mute the master bus.
 
 ```gdscript
 func _ready():
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.set_sound_3d_settings(1.0, 64.0, 1.0)
-	
-	# load banks
-	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	
 	# register listener
 	Fmod.add_listener(0, self)
 	
@@ -361,16 +322,6 @@ func _ready():
 
 ```gdscript
 func _ready():
-	# set up FMOD
-	Fmod.set_software_format(0, Fmod.FMOD_SPEAKERMODE_STEREO, 0)
-	Fmod.init(1024, Fmod.FMOD_STUDIO_INIT_LIVEUPDATE, Fmod.FMOD_INIT_NORMAL)
-	Fmod.set_sound_3d_settings(1/0, 64.0, 1.0)
-	
-	# load banks
-	Fmod.load_bank("res://Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	Fmod.load_bank("res://Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	
 	# register listener
 	Fmod.add_listener(0, self)
 	

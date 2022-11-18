@@ -9,12 +9,24 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "VBoxContainer",
+"class": "FMOD_Config",
+"language": "GDScript",
+"path": "res://addons/fmod/fmod_config_window.gd"
+}, {
+"base": "Node2D",
+"class": "FmodEventEmitter",
+"language": "GDScript",
+"path": "res://addons/fmod/nodes/FmodEventEmitter.gd"
+}, {
 "base": "",
 "class": "FmodNative",
 "language": "NativeScript",
 "path": "res://addons/fmod/Fmod.gdns"
 } ]
 _global_script_class_icons={
+"FMOD_Config": "",
+"FmodEventEmitter": "res://addons/fmod/nodes/fmod.svg",
 "FmodNative": ""
 }
 
@@ -34,7 +46,7 @@ Fmod="*res://addons/fmod/Fmod.tscn"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "fmod" )
+enabled=PoolStringArray( "res://addons/fmod/plugin.cfg" )
 
 [input]
 

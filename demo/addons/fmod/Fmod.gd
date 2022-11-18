@@ -125,12 +125,35 @@ func _init() -> void:
 	godot_fmod.connect("sound_played", self, "on_sound_played")
 	godot_fmod.connect("sound_stopped", self, "on_sound_stopped")
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
-	
+
+
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
 		if started:
 			shutdown()
-		godot_fmod.free()
+#		godot_fmod.free()
+
+func _ready():
+	#Set Up FMOD
+	var config = ConfigFile.new()
+	var err = config.load("res://addons/fmod/fmod_config.cfg")
+	
+	set_software_format(config.get_value("Init", "SampleRate"), config.get_value("Init", "SpeakerMode"), 0)
+	
+	var studio_init_mode = FMOD_STUDIO_INIT_LIVEUPDATE
+	if !config.get_value("Init", "LiveUpdate"):
+		studio_init_mode = FMOD_STUDIO_INIT_NORMAL
+	
+	init(config.get_value("Init", "NumChannels"), studio_init_mode, FMOD_INIT_NORMAL)
+	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), 32, config.get_value("3D", "RolloffScale"))
+	set_listener_number(2)
+	
+	#Load FMOD Banks
+	var banks = config.get_value("Banks", "Autoload").split("\n", false)
+	for bank in banks:
+		if bank == "Master":
+			load_bank(config.get_value("Banks", "Location") + bank + ".strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+		load_bank(config.get_value("Banks", "Location") + bank + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 func _process(delta):
 	if started:
@@ -396,12 +419,6 @@ func unmute_all_events() -> void:
 func set_callback(instanceId: int, callbackMask: int) -> void:
 	godot_fmod.set_callback(instanceId, callbackMask)
 
-func set_default_callback(callbackMask: int) -> void:
-	godot_fmod.set_default_callback(callbackMask)
-	
-func set_desc_callback(path: String, callbackMask: int) -> void:
-	godot_fmod.set_desc_callback(path, callbackMask)
-	
 ###########
 ###SOUND###
 ###########
@@ -507,14 +524,14 @@ func desc_get_parameter_description_count(event_path: String) -> int:
 func desc_get_parameter_description_by_index(event_path: String) -> Dictionary:
 	return godot_fmod.desc_get_parameter_description_by_index(event_path)
 
-func desc_get_user_property(event_path: String, property_name: String) -> Dictionary:
-	return godot_fmod.desc_get_user_property(event_path, property_name)
+func desc_get_user_property(event_path: String) -> Dictionary:
+	return godot_fmod.desc_get_user_property(event_path)
 
 func desc_get_user_property_count(event_path: String) -> int:
 	return godot_fmod.desc_get_user_property_count(event_path)
 
-func desc_user_property_by_index(event_path: String, index: int) -> Dictionary:
-	return godot_fmod.desc_user_property_by_index(event_path, index)
+func desc_user_property_by_index(event_path: String) -> Dictionary:
+	return godot_fmod.desc_user_property_by_index(event_path)
 
 
 ###########
