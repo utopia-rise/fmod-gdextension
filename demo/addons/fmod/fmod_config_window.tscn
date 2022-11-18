@@ -215,6 +215,10 @@ margin_bottom = 228.0
 margin_top = 5.0
 margin_right = 506.0
 margin_bottom = 19.0
+hint_tooltip = "Show FMOD debug overlay when running in game.
+
+WARNING: TURN OFF WHEN BUIDLING GAMES"
+mouse_filter = 1
 size_flags_horizontal = 3
 text = "Show Debug Panel When Running"
 align = 2

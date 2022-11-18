@@ -21,10 +21,6 @@ as C# support is required and performance might not be on the same level as a C+
 which uses godot module to integrate fmod in the engine. We thank [alexfonseka](https://github.com/alexfonseka) for the work he did.
 This fork was designed to be able to use Fmod without building Godot Engine !
 
-**Note:** The video tutorial below will guide you through the integration on Windows, including the basics of FMOD Studio and basic Godot usage. The tutorial uses driver 3.1.1, is for Godot 3.3.4 and 3.4.4, and uses FMOD 2.02.07.
-
-[![Integration Tutorial Video Thumbnail](https://img.youtube.com/vi/Zhh7B2Ggr_g/0.jpg)](https://www.youtube.com/watch?v=Zhh7B2Ggr_g)
-
 ![wowmeme]
 
 ### Continuous delivery
