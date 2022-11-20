@@ -83,11 +83,11 @@ margin_left = 518.0
 margin_right = 1024.0
 margin_bottom = 20.0
 size_flags_horizontal = 3
-text = "Default"
+text = "Stereo"
 flat = true
 clip_text = true
 items = [ "Default", null, false, 0, null, "Raw", null, false, 2, null, "Mono", null, false, 2, null, "Stereo", null, false, 3, null, "Quad", null, false, 4, null, "Surround", null, false, 5, null, "5.1", null, false, 6, null, "7.1", null, false, 7, null, "7.1.1", null, false, 8, null ]
-selected = 0
+selected = 3
 
 [node name="LiveUpdate" type="HBoxContainer" parent="."]
 margin_top = 92.0
@@ -115,7 +115,6 @@ margin_left = 518.0
 margin_right = 1024.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
-pressed = true
 
 [node name="NumChannels" type="HBoxContainer" parent="."]
 margin_top = 120.0
@@ -172,7 +171,7 @@ margin_right = 1024.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
 max_value = 16.0
-value = 1.0
+value = 2.0
 
 [node name="DSPBuffer" type="HBoxContainer" parent="."]
 margin_top = 176.0
@@ -204,7 +203,7 @@ margin_bottom = 24.0
 size_flags_horizontal = 3
 min_value = 16.0
 max_value = 2048.0
-value = 512.0
+value = 1048.0
 
 [node name="ShowDebug" type="HBoxContainer" parent="."]
 margin_top = 204.0
@@ -234,6 +233,7 @@ margin_left = 518.0
 margin_right = 1024.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
+pressed = true
 
 [node name="Bank Group" type="HSeparator" parent="."]
 margin_top = 232.0
@@ -356,12 +356,12 @@ align = 1
 [node name="DoplerScale" type="HBoxContainer" parent="."]
 margin_top = 416.0
 margin_right = 1024.0
-margin_bottom = 432.0
+margin_bottom = 440.0
 
 [node name="Label" type="Label" parent="DoplerScale"]
-margin_top = 1.0
+margin_top = 5.0
 margin_right = 506.0
-margin_bottom = 15.0
+margin_bottom = 19.0
 hint_tooltip = "Strength of the Dopler Effect on 3D audio.
 
 Default range from 0 (No Effect) - 1 (Default Effect)"
@@ -373,22 +373,35 @@ align = 2
 [node name="VSeparator" type="VSeparator" parent="DoplerScale"]
 margin_left = 510.0
 margin_right = 514.0
-margin_bottom = 16.0
+margin_bottom = 24.0
 
-[node name="DoplerScaleSlider" type="HSlider" parent="DoplerScale"]
-unique_name_in_owner = true
+[node name="HBoxContainer" type="HBoxContainer" parent="DoplerScale"]
 margin_left = 518.0
 margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="DoplerScaleSlider" type="HSlider" parent="DoplerScale/HBoxContainer"]
+unique_name_in_owner = true
+margin_right = 444.0
 margin_bottom = 16.0
 size_flags_horizontal = 3
-max_value = 1.0
-step = 0.01
+max_value = 10.0
+step = 0.1
 value = 1.0
 
+[node name="DopScaleNum" type="LineEdit" parent="DoplerScale/HBoxContainer"]
+unique_name_in_owner = true
+margin_left = 448.0
+margin_right = 506.0
+margin_bottom = 24.0
+text = "1"
+editable = false
+
 [node name="DistanceFactor" type="HBoxContainer" parent="."]
-margin_top = 436.0
+margin_top = 444.0
 margin_right = 1024.0
-margin_bottom = 460.0
+margin_bottom = 468.0
 
 [node name="Label" type="Label" parent="DistanceFactor"]
 margin_top = 5.0
@@ -418,15 +431,15 @@ max_value = 100000.0
 value = 32.0
 
 [node name="RolloffScale" type="HBoxContainer" parent="."]
-margin_top = 464.0
+margin_top = 472.0
 margin_right = 1024.0
-margin_bottom = 488.0
+margin_bottom = 496.0
 
 [node name="Label" type="Label" parent="RolloffScale"]
 margin_top = 5.0
 margin_right = 506.0
 margin_bottom = 19.0
-hint_tooltip = "The scale at which audio will rolloff due to distance.
+hint_tooltip = "The scale at which audio will rolloff due to distance. A value of 1 will match real audio roll off times.
 
 Default Range: 0.1(Longer Rolloff) - 5(Shorter Rolloff)"
 mouse_filter = 1
@@ -439,33 +452,55 @@ margin_left = 510.0
 margin_right = 514.0
 margin_bottom = 24.0
 
-[node name="RolloffValue" type="SpinBox" parent="RolloffScale"]
-unique_name_in_owner = true
+[node name="HBoxContainer" type="HBoxContainer" parent="RolloffScale"]
 margin_left = 518.0
 margin_right = 1024.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
+
+[node name="RolloffValue" type="HSlider" parent="RolloffScale/HBoxContainer"]
+unique_name_in_owner = true
+margin_right = 444.0
+margin_bottom = 16.0
+size_flags_horizontal = 3
 min_value = 0.1
-max_value = 5.0
+max_value = 10.0
 step = 0.1
 value = 1.0
 
+[node name="RolloffScaleNum" type="LineEdit" parent="RolloffScale/HBoxContainer"]
+unique_name_in_owner = true
+margin_left = 448.0
+margin_right = 506.0
+margin_bottom = 24.0
+text = "1"
+editable = false
+
 [node name="HSeparator" type="HSeparator" parent="."]
-margin_top = 492.0
+margin_top = 500.0
 margin_right = 1024.0
-margin_bottom = 496.0
+margin_bottom = 504.0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
-margin_top = 500.0
+margin_top = 508.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_vertical = 3
 alignment = 2
 
+[node name="UndoChanges" type="Button" parent="HBoxContainer"]
+unique_name_in_owner = true
+margin_left = 819.0
+margin_right = 922.0
+margin_bottom = 20.0
+hint_tooltip = "Reverts to the last saved changes"
+size_flags_vertical = 0
+text = "Undo Changes"
+
 [node name="ApplyChanges" type="Button" parent="HBoxContainer"]
 unique_name_in_owner = true
+margin_left = 926.0
 margin_right = 1024.0
 margin_bottom = 20.0
-size_flags_horizontal = 3
 size_flags_vertical = 0
-text = "Apply Changes"
+text = "Save Changes"

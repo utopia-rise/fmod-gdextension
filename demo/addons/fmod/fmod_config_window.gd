@@ -5,8 +5,11 @@ class_name FMOD_Config
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_node("%ApplyChanges").connect("pressed", self, "apply_changes")
+	get_node("%UndoChanges").connect("pressed", self, "load_file")
 	get_node("%LoadBanksButton").connect("pressed", self, "load_bank_names")
 	get_node("%ClearBanksButton").connect("pressed", self, "clear_bank_names")
+	get_node("%DoplerScaleSlider").connect("value_changed", self, "update_dop_val_label")
+	get_node("%RolloffValue").connect("value_changed", self, "update_rolloff_scale_label")
 	
 	load_file()
 
@@ -87,3 +90,8 @@ func load_bank_names():
 func clear_bank_names():
 	get_node("%BanksToLoad").text = "Master\n"
 
+func update_dop_val_label(val):
+	get_node("%DopScaleNum").text = str(val)
+
+func update_rolloff_scale_label(val):
+	get_node("%RolloffScaleNum").text = str(val)
