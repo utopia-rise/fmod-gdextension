@@ -19,3 +19,6 @@ extends Node
 ## warning-ignore:return_value_discarded
 #	Fmod.load_bank("res://assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
 #	print("Fmod initialised.")
+
+#func _ready():
+#	Fmod.load_configuration("res://addons/fmod/fmod_config.cfg")

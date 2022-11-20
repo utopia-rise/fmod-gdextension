@@ -233,7 +233,6 @@ margin_left = 518.0
 margin_right = 1024.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
-pressed = true
 
 [node name="Bank Group" type="HSeparator" parent="."]
 margin_top = 232.0
@@ -481,8 +480,33 @@ margin_top = 500.0
 margin_right = 1024.0
 margin_bottom = 504.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="LoadFMODOnStart" type="HBoxContainer" parent="."]
 margin_top = 508.0
+margin_right = 1024.0
+margin_bottom = 532.0
+
+[node name="Label" type="Label" parent="LoadFMODOnStart"]
+margin_top = 5.0
+margin_right = 506.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+text = "Load FMOD On Start"
+align = 2
+
+[node name="VSeparator" type="VSeparator" parent="LoadFMODOnStart"]
+margin_left = 510.0
+margin_right = 514.0
+margin_bottom = 24.0
+
+[node name="LoadFMODOnStartCheck" type="CheckBox" parent="LoadFMODOnStart"]
+unique_name_in_owner = true
+margin_left = 518.0
+margin_right = 1024.0
+margin_bottom = 24.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_top = 536.0
 margin_right = 1024.0
 margin_bottom = 600.0
 size_flags_vertical = 3

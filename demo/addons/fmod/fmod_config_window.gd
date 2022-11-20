@@ -36,6 +36,7 @@ func load_file():
 	get_node("%NumListenersValue").value = config.get_value("Init", "NumListeners")
 	get_node("%DSPBufferSize").value = config.get_value("Init", "DSPBufferSize")
 	get_node("%DebugChecker").pressed = config.get_value("Init", "ShowDebug")
+	get_node("%LoadFMODOnStartCheck").pressed = config.get_value("Init", "LoadFMODOnStart")
 	
 	get_node("%BankFilePath").text = config.get_value("Banks", "Location")
 	get_node("%BanksToLoad").text = config.get_value("Banks", "Autoload")
@@ -43,7 +44,8 @@ func load_file():
 	get_node("%DoplerScaleSlider").value = config.get_value("3D", "DoplerScale")
 	get_node("%DistFactorValue").value = config.get_value("3D", "DistanceFactor")
 	get_node("%RolloffValue").value = config.get_value("3D", "RolloffScale")
-
+	
+	
 	config.save("res://addons/fmod/fmod_config.cfg")
 
 func apply_changes():
@@ -56,6 +58,7 @@ func apply_changes():
 	config.set_value("Init", "NumListeners", int(get_node("%NumListenersValue").value))
 	config.set_value("Init", "DSPBufferSize", int(get_node("%DSPBufferSize").value))
 	config.set_value("Init", "ShowDebug", get_node("%DebugChecker").pressed)
+	config.set_value("Init", "LoadFMODOnStart", get_node("%LoadFMODOnStartCheck").pressed)
 	
 	config.set_value("Banks", "Location", get_node("%BankFilePath").text)
 	config.set_value("Banks", "Autoload", get_node("%BanksToLoad").text)
