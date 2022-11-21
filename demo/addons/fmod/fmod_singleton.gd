@@ -6,14 +6,14 @@ var main_pan_inst
 func _enter_tree():
 	add_autoload_singleton("Fmod", "res://addons/fmod/Fmod.tscn")
 	main_pan_inst = preload("res://addons/fmod/fmod_config_window.tscn").instance()
-	get_editor_interface().get_editor_viewport().add_child(main_pan_inst)
+	add_control_to_bottom_panel(main_pan_inst, "FMOD")
+	#get_editor_interface().get_editor_viewport().add_child(main_pan_inst)
 	make_visible(false)
 
 func _exit_tree():
+	remove_control_from_bottom_panel(main_pan_inst)
 	remove_autoload_singleton("Fmod")
-
-func has_main_screen():
-	return true
+	main_pan_inst.free()
 
 func make_visible(visible: bool):
 	if main_pan_inst:

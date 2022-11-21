@@ -131,7 +131,7 @@ func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
 		if started:
 			shutdown()
-#		godot_fmod.free()
+		godot_fmod.free()
 
 func _ready():
 	###SETUP FMOD###
