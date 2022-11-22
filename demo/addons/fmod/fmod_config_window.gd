@@ -2,6 +2,25 @@ tool
 extends VBoxContainer
 class_name FMOD_Config
 
+###Init variables
+onready var sample_rate_selector = get_node("%SampleRateSelector")
+onready var speaker_mode_selector = get_node("%SpeakerModeSelector")
+onready var LU_check = get_node("%LiveUpdateCheck")
+onready var num_channels_box = get_node("%NumChannelsBox")
+onready var num_listeners_value = get_node("%NumListenersValue")
+onready var dsp_buffer_size = get_node("%DSPBufferSize")
+onready var debug_checker = get_node("%DebugChecker")
+onready var load_fmod_on_start_check = get_node("%LoadFMODOnStartCheck")
+
+onready var banks_file_path = get_node("%BankFilePath")
+onready var banks_to_load = get_node("%BanksToLoad")
+
+onready var dopler_scale_slider = get_node("%DoplerScaleSlider")
+onready var dist_factor_value = get_node("%DistFactorValue")
+onready var rolloff_value = get_node("%RolloffValue")
+
+var config_file_path = "res://fmod/fmod_config.cfg"
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_node("%ApplyChanges").connect("pressed", self, "apply_changes")
@@ -16,7 +35,7 @@ func _ready():
 func load_file():
 	var config = ConfigFile.new()
 	
-	var err = config.load("res://addons/fmod/fmod_config.cfg")
+	var err = config.load(config_file_path)
 
 	if err != OK:
 		#Set Default Values
@@ -24,55 +43,63 @@ func load_file():
 		config.set_value("Init", "SampleRate", 44100)
 		config.set_value("Init", "LiveUpdate", false)
 		config.set_value("Init", "SpeakerMode", 3)
-		config.set_value("Banks", "Location", "Hello There Friend")
-		config.set_value("Init", "NumChannels", 64)
-		return
+		config.set_value("Init", "NumChannels", 16)
+		config.set_value("Init", "NumListeners", 2)
+		config.set_value("Init", "DSPBufferSize", 1048)
+		config.set_value("Init", "ShowDebug", false)
+		config.set_value("Init", "LoadFMODOnStart", true)
+		
+		config.set_value("Banks", "Location", "")
+		config.set_value("Banks", "Autoload", "Master\n")
+		
+		config.set_value("3D", "DoplerScale", 1.0)
+		config.set_value("3D", "DistanceFactor", 32.0)
+		config.set_value("3D", "RolloffScale", 1.0)
+		
+		config.save(config_file_path)
 
 	#Change input locations to show loaded values
-	get_node("%SampleRateSelector").selected = config.get_value("Init", "SRIndex")
-	get_node("%SpeakerModeSelector").selected = config.get_value("Init", "SpeakerMode")
-	get_node("%LiveUpdateCheck").pressed = config.get_value("Init", "LiveUpdate")
-	get_node("%NumChannelsBox").value = config.get_value("Init", "NumChannels")
-	get_node("%NumListenersValue").value = config.get_value("Init", "NumListeners")
-	get_node("%DSPBufferSize").value = config.get_value("Init", "DSPBufferSize")
-	get_node("%DebugChecker").pressed = config.get_value("Init", "ShowDebug")
-	get_node("%LoadFMODOnStartCheck").pressed = config.get_value("Init", "LoadFMODOnStart")
+	sample_rate_selector.selected = config.get_value("Init", "SRIndex")
+	speaker_mode_selector.selected = config.get_value("Init", "SpeakerMode")
+	LU_check.pressed = config.get_value("Init", "LiveUpdate")
+	num_channels_box.value = config.get_value("Init", "NumChannels")
+	num_listeners_value.value = config.get_value("Init", "NumListeners")
+	dsp_buffer_size.value = config.get_value("Init", "DSPBufferSize")
+	debug_checker.pressed = config.get_value("Init", "ShowDebug")
+	load_fmod_on_start_check.pressed = config.get_value("Init", "LoadFMODOnStart")
 	
-	get_node("%BankFilePath").text = config.get_value("Banks", "Location")
-	get_node("%BanksToLoad").text = config.get_value("Banks", "Autoload")
+	banks_file_path.text = config.get_value("Banks", "Location")
+	banks_to_load.text = config.get_value("Banks", "Autoload")
 	
-	get_node("%DoplerScaleSlider").value = config.get_value("3D", "DoplerScale")
-	get_node("%DistFactorValue").value = config.get_value("3D", "DistanceFactor")
-	get_node("%RolloffValue").value = config.get_value("3D", "RolloffScale")
-	
-	
-	config.save("res://addons/fmod/fmod_config.cfg")
+	dopler_scale_slider.value = config.get_value("3D", "DoplerScale")
+	dist_factor_value.value = config.get_value("3D", "DistanceFactor")
+	rolloff_value.value = config.get_value("3D", "RolloffScale")
 
 func apply_changes():
 	var config = ConfigFile.new()
-	config.set_value("Init", "SRIndex", get_node("%SampleRateSelector").selected)
-	config.set_value("Init", "SampleRate", int(get_node("%SampleRateSelector").text))
-	config.set_value("Init", "SpeakerMode", get_node("%SpeakerModeSelector").selected)
-	config.set_value("Init", "LiveUpdate", get_node("%LiveUpdateCheck").pressed)
-	config.set_value("Init", "NumChannels", int(get_node("%NumChannelsBox").value))
-	config.set_value("Init", "NumListeners", int(get_node("%NumListenersValue").value))
-	config.set_value("Init", "DSPBufferSize", int(get_node("%DSPBufferSize").value))
-	config.set_value("Init", "ShowDebug", get_node("%DebugChecker").pressed)
-	config.set_value("Init", "LoadFMODOnStart", get_node("%LoadFMODOnStartCheck").pressed)
+	config.set_value("Init", "SRIndex", sample_rate_selector.selected)
+	config.set_value("Init", "SampleRate", int(sample_rate_selector.text))
+	config.set_value("Init", "SpeakerMode", speaker_mode_selector.selected)
+	config.set_value("Init", "LiveUpdate", LU_check.pressed)
+	config.set_value("Init", "NumChannels", int(num_channels_box.value))
+	config.set_value("Init", "NumListeners", int(num_listeners_value.value))
+	config.set_value("Init", "DSPBufferSize", int(dsp_buffer_size.value))
+	config.set_value("Init", "ShowDebug", debug_checker.pressed)
+	config.set_value("Init", "LoadFMODOnStart", load_fmod_on_start_check.pressed)
 	
-	config.set_value("Banks", "Location", get_node("%BankFilePath").text)
-	config.set_value("Banks", "Autoload", get_node("%BanksToLoad").text)
+	config.set_value("Banks", "Location", banks_file_path.text)
+	config.set_value("Banks", "Autoload", banks_to_load.text)
 	
-	config.set_value("3D", "DoplerScale", get_node("%DoplerScaleSlider").value)
-	config.set_value("3D", "DistanceFactor", get_node("%DistFactorValue").value)
-	config.set_value("3D", "RolloffScale", get_node("%RolloffValue").value)
+	config.set_value("3D", "DoplerScale", dopler_scale_slider.value)
+	config.set_value("3D", "DistanceFactor", dist_factor_value.value)
+	config.set_value("3D", "RolloffScale", rolloff_value.value)
 	
-	config.save("res://addons/fmod/fmod_config.cfg")
+	config.save(config_file_path)
 
 func load_bank_names():
 	var files = []
 	var dir = Directory.new()
-	dir.open(get_node("%BankFilePath").text)
+	dir.open(banks_file_path.text)
 	dir.list_dir_begin()
 	
 	while true:
@@ -86,12 +113,12 @@ func load_bank_names():
 				files.append(file)
 	dir.list_dir_end()
 	
-	get_node("%BanksToLoad").text = ""
+	banks_to_load.text = ""
 	for file in files:
-		get_node("%BanksToLoad").text += (file + "\n")
+		banks_to_load.text += (file + "\n")
 
 func clear_bank_names():
-	get_node("%BanksToLoad").text = "Master\n"
+	banks_to_load.text = "Master\n"
 
 func update_dop_val_label(val):
 	get_node("%DopScaleNum").text = str(val)

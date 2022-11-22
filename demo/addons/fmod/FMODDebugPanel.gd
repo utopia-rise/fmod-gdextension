@@ -12,5 +12,6 @@ func _physics_process(delta):
 	if Fmod.started:
 		dsp_usage.text = "dsp = " + "%.1f" % Fmod.get_performance_data()['CPU']['dsp'] + "%, studio = " + "%.1f" % Fmod.get_performance_data()['CPU']['studio'] + "%"
 		mem_usage.text = "cur = " + "%.f" % (Fmod.get_performance_data()['memory']['currently_allocated'] / 1024 / 1024) + "MB, max = " + "%.f" % (Fmod.get_performance_data()['memory']['max_allocated'] / 1024 / 1024) + "MB"
-	#rms_val.text = Fmod.get_VCA_volume()
-	#print(Fmod.get_performance_data())
+	else:
+		dsp_usage.text = "FMOD Not Started"
+		mem_usage.text = "FMOD Not Started"

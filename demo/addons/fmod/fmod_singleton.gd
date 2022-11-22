@@ -4,10 +4,14 @@ extends EditorPlugin
 var main_pan_inst
 
 func _enter_tree():
+	var dir = Directory.new()
+	if !dir.dir_exists("res://fmod/"):
+		dir.open("res://")
+		dir.make_dir("fmod")
+	
 	add_autoload_singleton("Fmod", "res://addons/fmod/Fmod.tscn")
 	main_pan_inst = preload("res://addons/fmod/fmod_config_window.tscn").instance()
 	add_control_to_bottom_panel(main_pan_inst, "FMOD")
-	#get_editor_interface().get_editor_viewport().add_child(main_pan_inst)
 	make_visible(false)
 
 func _exit_tree():
@@ -22,6 +26,3 @@ func make_visible(visible: bool):
 func get_plugin_name():
 	return "FMOD"
 
-func get_plugin_icon():
-	return load("res://addons/fmod/nodes/fmod.svg")
-	#get_editor_interface().get_base_control().get_icon("Node", "EditorIcons")
