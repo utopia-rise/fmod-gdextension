@@ -135,7 +135,7 @@ func _notification(what):
 
 func _ready():
 	###SETUP FMOD###
-	load_configuration("res://addons/fmod/fmod_config.cfg", true)
+	load_configuration("res://fmod/fmod_config.cfg", true)
 
 func _process(delta):
 	if started:
@@ -184,9 +184,10 @@ func load_configuration(file_path: String, loaded_from_ready: bool = false) -> v
 	#Load FMOD Autoload Banks
 	var banks = config.get_value("Banks", "Autoload").split("\n", false)
 	for bank in banks:
+		var path = config.get_value("Banks", "Location") + bank
 		if bank == "Master":
-			load_bank(config.get_value("Banks", "Location") + bank + ".strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
-		load_bank(config.get_value("Banks", "Location") + bank + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+			load_bank(path + ".strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+		load_bank(path + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	#Show or Hide FMOD debug panel
 	get_node("%FMODDebugPanel").visible = config.get_value("Init", "ShowDebug")

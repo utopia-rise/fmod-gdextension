@@ -7,6 +7,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
+[node name="FileDialog" type="FileDialog" parent="."]
+unique_name_in_owner = true
+margin_right = 1024.0
+margin_bottom = 130.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+window_title = "Open a Directory"
+mode = 2
+
 [node name="Settings" type="HBoxContainer" parent="."]
 margin_right = 1024.0
 margin_bottom = 202.0
@@ -270,12 +279,19 @@ margin_bottom = 24.0
 [node name="BankFilePath" type="LineEdit" parent="Settings/Banks/BankLocation"]
 unique_name_in_owner = true
 margin_left = 132.0
-margin_right = 333.0
+margin_right = 265.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
 placeholder_text = "res://resources/FmodBanks/Desktop/"
 caret_blink = true
 caret_blink_speed = 0.5
+
+[node name="FolderSelect" type="Button" parent="Settings/Banks/BankLocation"]
+unique_name_in_owner = true
+margin_left = 269.0
+margin_right = 333.0
+margin_bottom = 24.0
+text = "Folder..."
 
 [node name="AutoLoadBanks" type="HBoxContainer" parent="Settings/Banks"]
 margin_top = 46.0
@@ -447,7 +463,7 @@ margin_top = 5.0
 margin_right = 115.0
 margin_bottom = 19.0
 rect_min_size = Vector2( 115, 0 )
-hint_tooltip = "The scale at which audio will rolloff due to distance. A value of 1 will match real audio roll off times.
+hint_tooltip = "The scale at which audio will rolloff due to distance. A value of 1 will match real world audio roll off times.
 
 Default Range: 0.1(Longer Rolloff) - 5(Shorter Rolloff)"
 mouse_filter = 1

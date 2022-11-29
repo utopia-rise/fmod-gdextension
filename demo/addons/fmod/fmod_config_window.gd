@@ -29,6 +29,8 @@ func _ready():
 	get_node("%ClearBanksButton").connect("pressed", self, "clear_bank_names")
 	get_node("%DoplerScaleSlider").connect("value_changed", self, "update_dop_val_label")
 	get_node("%RolloffValue").connect("value_changed", self, "update_rolloff_scale_label")
+	get_node("%FolderSelect").connect("pressed", self, "show_file_dialogue")
+	get_node("%FileDialog").connect("dir_selected", self, "update_bank_path")
 	
 	load_file()
 
@@ -97,8 +99,13 @@ func apply_changes():
 	config.save(config_file_path)
 
 func load_bank_names():
-	var files = []
+	var files = ["Master"]
 	var dir = Directory.new()
+	
+	if !dir.file_exists(banks_file_path.text + "/Master.bank"):
+		banks_to_load.text = "Incorrect Bank Location"
+		return
+	
 	dir.open(banks_file_path.text)
 	dir.list_dir_begin()
 	
@@ -125,3 +132,9 @@ func update_dop_val_label(val):
 
 func update_rolloff_scale_label(val):
 	get_node("%RolloffScaleNum").text = str(val)
+
+func show_file_dialogue():
+	get_node("%FileDialog").popup(Rect2(50, 50, 500, 500))
+
+func update_bank_path(path):
+	banks_file_path.text = path + "/"
