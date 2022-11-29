@@ -90,7 +90,10 @@ func apply_changes():
 	config.set_value("Init", "LoadFMODOnStart", load_fmod_on_start_check.pressed)
 	
 	config.set_value("Banks", "Location", banks_file_path.text)
-	config.set_value("Banks", "Autoload", banks_to_load.text)
+	if !banks_to_load.text == "Incorrect Bank Location":
+		config.set_value("Banks", "Autoload", banks_to_load.text)
+	else:
+		config.set_value("Banks", "Autoload", "")
 	
 	config.set_value("3D", "DoplerScale", dopler_scale_slider.value)
 	config.set_value("3D", "DistanceFactor", dist_factor_value.value)
@@ -103,7 +106,9 @@ func load_bank_names():
 	var dir = Directory.new()
 	
 	if !dir.file_exists(banks_file_path.text + "/Master.bank"):
-		banks_to_load.text = "Incorrect Bank Location"
+		#banks_to_load.text = "Incorrect Bank Location"
+		get_node("%BankErrorPopup").popup_centered(Vector2(500, 50))
+		banks_to_load.text = ""
 		return
 	
 	dir.open(banks_file_path.text)
@@ -125,7 +130,7 @@ func load_bank_names():
 		banks_to_load.text += (file + "\n")
 
 func clear_bank_names():
-	banks_to_load.text = "Master\n"
+	banks_to_load.text = ""
 
 func update_dop_val_label(val):
 	get_node("%DopScaleNum").text = str(val)
@@ -134,7 +139,7 @@ func update_rolloff_scale_label(val):
 	get_node("%RolloffScaleNum").text = str(val)
 
 func show_file_dialogue():
-	get_node("%FileDialog").popup(Rect2(50, 50, 500, 500))
+	get_node("%FileDialog").popup_centered(Vector2(500, 500))
 
 func update_bank_path(path):
 	banks_file_path.text = path + "/"

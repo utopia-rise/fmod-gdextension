@@ -7,6 +7,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
+[node name="BankErrorPopup" type="AcceptDialog" parent="."]
+unique_name_in_owner = true
+margin_top = 599.0
+margin_right = 1024.0
+margin_bottom = 600.0
+window_title = "Incorrect Bank Path"
+
 [node name="FileDialog" type="FileDialog" parent="."]
 unique_name_in_owner = true
 margin_right = 1024.0
@@ -282,6 +289,7 @@ margin_left = 132.0
 margin_right = 265.0
 margin_bottom = 24.0
 size_flags_horizontal = 3
+text = "res://assets/Banks/"
 placeholder_text = "res://resources/FmodBanks/Desktop/"
 caret_blink = true
 caret_blink_speed = 0.5
@@ -355,6 +363,9 @@ rect_min_size = Vector2( 0, 100 )
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "Master
+Music
+SFX
+Vehicles
 "
 
 [node name="VSeparator2" type="VSeparator" parent="Settings"]

@@ -190,7 +190,7 @@ func load_configuration(file_path: String, loaded_from_ready: bool = false) -> v
 		load_bank(path + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
 	
 	#Show or Hide FMOD debug panel
-	get_node("%FMODDebugPanel").visible = config.get_value("Init", "ShowDebug")
+	get_node("%FMODDebugPanel").set_visibility(config.get_value("Init", "ShowDebug"))
 
 
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
