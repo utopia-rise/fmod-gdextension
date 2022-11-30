@@ -180,6 +180,7 @@ func load_configuration(file_path: String, loaded_from_ready: bool = false) -> v
 	init(config.get_value("Init", "NumChannels"), studio_init_mode, FMOD_INIT_NORMAL)
 	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), config.get_value("3D", "DistanceFactor"), config.get_value("3D", "RolloffScale"))
 	set_listener_number(config.get_value("Init", "NumListeners"))
+	set_default_callback(FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	
 	#Load FMOD Autoload Banks
 	var banks = config.get_value("Banks", "Autoload").split("\n", false)
@@ -438,6 +439,12 @@ func unmute_all_events() -> void:
 func set_callback(instanceId: int, callbackMask: int) -> void:
 	godot_fmod.set_callback(instanceId, callbackMask)
 
+func set_default_callback(callbackMask: int) -> void:
+	godot_fmod.set_default_callback(callbackMask)
+
+func set_desc_callback(path: String, callbackMask: int) -> void:
+	godot_fmod.set_desc_callback(path, callbackMask)
+
 ###########
 ###SOUND###
 ###########
@@ -543,14 +550,14 @@ func desc_get_parameter_description_count(event_path: String) -> int:
 func desc_get_parameter_description_by_index(event_path: String) -> Dictionary:
 	return godot_fmod.desc_get_parameter_description_by_index(event_path)
 
-func desc_get_user_property(event_path: String) -> Dictionary:
-	return godot_fmod.desc_get_user_property(event_path)
+func desc_get_user_property(event_path: String, property_name: String) -> Dictionary:
+	return godot_fmod.desc_get_user_property(event_path, property_name)
 
 func desc_get_user_property_count(event_path: String) -> int:
 	return godot_fmod.desc_get_user_property_count(event_path)
 
-func desc_user_property_by_index(event_path: String) -> Dictionary:
-	return godot_fmod.desc_user_property_by_index(event_path)
+func desc_user_property_by_index(event_path: String, index: int) -> Dictionary:
+	return godot_fmod.desc_user_property_by_index(event_path, index)
 
 
 ###########
