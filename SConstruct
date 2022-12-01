@@ -61,8 +61,6 @@ elif env["platform"] == "windows":
 
 elif env["platform"] == "ios":
     env.Append(LINKFLAGS=[
-        '-framework',
-        'Cocoa',
         '-Wl,-undefined,dynamic_lookup',
     ])
 

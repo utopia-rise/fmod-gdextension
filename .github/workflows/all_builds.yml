@@ -51,7 +51,7 @@ jobs:
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
 
           - name: iOS Compilation
-            os: "macos-12"
+            os: "macos-11"
             artifact-name: ios
             artifact-extension: dylib
             fmod-executable-suffix: ios.dmg
