@@ -14,7 +14,7 @@ env:
   TARGET_NAME: libGodotFmod
   TARGET: editor
   GODOT_VERSION: 4.0
-  FMOD_VERSION: 20203
+  FMOD_VERSION: 20210
 
 jobs:
   build:
@@ -29,32 +29,32 @@ jobs:
             artifact-name: windows
             artifact-extension: dll
             additional-python-packages: pywin32
-            fmod-executable: fmodstudioapi20203win-installer.exe
+            fmod-executable-suffix: win-installer.exe
 
           - name: Ubuntu Compilation
             os: "ubuntu-20.04"
             artifact-name: linux
             artifact-extension: so
-            fmod-executable: fmodstudioapi20203linux.tar.gz
+            fmod-executable-suffix: linux.tar.gz
 
           - name: MacOS Compilation
             os: "macos-11"
             artifact-name: macos
             artifact-extension: framework
-            fmod-executable: fmodstudioapi20203osx.dmg
+            fmod-executable-suffix: osx.dmg
 
           - name: Android Compilation
             os: "ubuntu-20.04"
             artifact-name: android
             artifact-extension: so
-            fmod-executable: fmodstudioapi20203android.tar.gz
+            fmod-executable-suffix: android.tar.gz
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
 
           - name: iOS Compilation
             os: "macos-12"
             artifact-name: ios
             artifact-extension: dylib
-            fmod-executable: fmodstudioapi20203ios.dmg
+            fmod-executable-suffix: ios.dmg
             flags: arch=arm64
 
     steps:
@@ -88,7 +88,7 @@ jobs:
           New-Item -ItemType directory -Path libs; cd libs
           New-Item -ItemType directory -Path fmod; cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ${{matrix.artifact-name}} ${{env.FMOD_VERSION}}
-          7z x ${{matrix.fmod-executable}}
+          7z x fmodstudioapi${{env.FMOD_VERSION}}${{matrix.fmod-executable-suffix}}
           mv api/ windows
           cd ../../
 
@@ -99,7 +99,7 @@ jobs:
           mkdir libs && cd libs
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ${{matrix.artifact-name}} ${{env.FMOD_VERSION}}
-          tar -xvf ${{matrix.fmod-executable}}
+          tar -xvf fmodstudioapi${{env.FMOD_VERSION}}${{matrix.fmod-executable-suffix}}
           mv fmodstudioapi${{env.FMOD_VERSION}}${{matrix.artifact-name}}/api ${{matrix.artifact-name}}
           cd ../../
 
@@ -110,7 +110,7 @@ jobs:
           mkdir libs && cd libs
           mkdir fmod && cd fmod
           python ../../${{env.PROJECT_FOLDER}}/get_fmod.py ${{secrets.FMODUSER}} ${{secrets.FMODPASS}} ${{matrix.artifact-name}} ${{env.FMOD_VERSION}}
-          hdiutil attach ${{matrix.fmod-executable}}
+          hdiutil attach fmodstudioapi${{env.FMOD_VERSION}}${{matrix.fmod-executable-suffix}}
           [[ ${{matrix.artifact-name}} = "macos" ]] && cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
           [[ ${{matrix.artifact-name}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
