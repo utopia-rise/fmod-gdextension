@@ -135,7 +135,8 @@ func _notification(what):
 
 func _ready():
 	###SETUP FMOD###
-	load_configuration("res://fmod/fmod_config.cfg", true)
+	if not started:
+		load_configuration("res://fmod/fmod_config.cfg", true)
 
 func _process(delta):
 	if started:
