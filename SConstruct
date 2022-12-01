@@ -17,10 +17,6 @@ env.Append(CPPPATH=[env.Dir(d) for d in source_path])
 
 env.Replace(fmod_lib_dir = fmod_lib_dir)
 
-target = "{}{}.{}.{}".format(
-    target_path, target_name, env["platform"], env["target"]
-)
-
 # For the reference:
 # - CCFLAGS are compilation flags shared between C and C++
 # - CFLAGS are for C-specific compilation flags
@@ -34,7 +30,7 @@ env.Append(CPPPATH=["src/"])
 sources = [Glob('src/*.cpp'), Glob('src/callback/*.cpp'), Glob('src/nodes/*.cpp')]
 
 lfix = ""
-if env["target"] == "debug":
+if env["target"] == "debug" or env["target"] == "editor":
     lfix = "L"
 
 if env["platform"] == "macos":
@@ -64,6 +60,12 @@ elif env["platform"] == "windows":
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override])
 
 elif env["platform"] == "ios":
+    env.Append(LINKFLAGS=[
+        '-framework',
+        'Cocoa',
+        '-Wl,-undefined,dynamic_lookup',
+    ])
+
     libfmod = 'libfmod%s_iphoneos.a' % lfix
     libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
@@ -84,9 +86,12 @@ elif env["platform"] == "android":
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
+target = "{}{}.{}.{}".format(
+    target_path, target_name, env["platform"], env["target"]
+)
 if env["platform"] == "macos":
     target = "{}.framework/{}.{}.{}".format(
-        target, 
+        target,
         target_name,
         env["platform"],
         env["target"]
