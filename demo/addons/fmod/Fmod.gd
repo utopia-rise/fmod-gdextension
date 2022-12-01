@@ -125,12 +125,17 @@ func _init() -> void:
 	godot_fmod.connect("sound_played", self, "on_sound_played")
 	godot_fmod.connect("sound_stopped", self, "on_sound_stopped")
 	print("Fmod Gdnative interface managed by a GDScript wrapper")
-	
+
+
 func _notification(what):
 	if what == NOTIFICATION_PREDELETE:
 		if started:
 			shutdown()
 		godot_fmod.free()
+
+func _ready():
+	###SETUP FMOD###
+	load_configuration("res://fmod/fmod_config.cfg", true)
 
 func _process(delta):
 	if started:
@@ -150,6 +155,44 @@ func shutdown() -> void:
 		godot_fmod.shutdown()
 	else:
 		print("Fmod not started, can't shutdown'")
+
+func load_configuration(file_path: String, loaded_from_ready: bool = false) -> void:
+	if started:
+		shutdown()
+	
+	var config = ConfigFile.new()
+	var err = config.load(file_path)
+	
+	if loaded_from_ready:
+		if !config.get_value("Init", "LoadFMODOnStart"):
+			return
+	
+	#Set software format and set DSP buffer
+	set_software_format(config.get_value("Init", "SampleRate"), config.get_value("Init", "SpeakerMode"), 0)
+	set_dsp_buffer_size(config.get_value("Init", "DSPBufferSize"), 4)
+		
+	#Set mode for studio to init in (Normal or Live Update)
+	var studio_init_mode = FMOD_STUDIO_INIT_LIVEUPDATE
+	if !config.get_value("Init", "LiveUpdate"):
+		studio_init_mode = FMOD_STUDIO_INIT_NORMAL
+		
+	#Initalise FMOD
+	init(config.get_value("Init", "NumChannels"), studio_init_mode, FMOD_INIT_NORMAL)
+	set_sound_3D_settings(config.get_value("3D", "DoplerScale"), config.get_value("3D", "DistanceFactor"), config.get_value("3D", "RolloffScale"))
+	set_listener_number(config.get_value("Init", "NumListeners"))
+	set_default_callback(FMOD_STUDIO_EVENT_CALLBACK_ALL)
+	
+	#Load FMOD Autoload Banks
+	var banks = config.get_value("Banks", "Autoload").split("\n", false)
+	for bank in banks:
+		var path = config.get_value("Banks", "Location") + bank
+		if bank == "Master":
+			load_bank(path + ".strings.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+		load_bank(path + ".bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+	
+	#Show or Hide FMOD debug panel
+	get_node("%FMODDebugPanel").set_visibility(config.get_value("Init", "ShowDebug"))
+
 
 func set_software_format(sampleRate: int, speakerMode: int, numRowSpeakers: int) -> void:
 	godot_fmod.set_software_format(sampleRate, speakerMode, numRowSpeakers)
@@ -398,10 +441,10 @@ func set_callback(instanceId: int, callbackMask: int) -> void:
 
 func set_default_callback(callbackMask: int) -> void:
 	godot_fmod.set_default_callback(callbackMask)
-	
+
 func set_desc_callback(path: String, callbackMask: int) -> void:
 	godot_fmod.set_desc_callback(path, callbackMask)
-	
+
 ###########
 ###SOUND###
 ###########

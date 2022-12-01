@@ -1,6 +1,103 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://addons/fmod/Fmod.gd" type="Script" id=1]
+[ext_resource path="res://addons/fmod/FMODDebugPanel.gd" type="Script" id=2]
 
 [node name="Fmod" type="Node"]
 script = ExtResource( 1 )
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -20.0
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+margin_right = 984.0
+margin_bottom = 560.0
+alignment = 2
+
+[node name="FMODDebugPanel" type="Panel" parent="MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color( 1, 1, 1, 0.827451 )
+margin_left = 728.0
+margin_right = 984.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 256, 128 )
+size_flags_horizontal = 0
+size_flags_vertical = 0
+script = ExtResource( 2 )
+
+[node name="MarginContainer" type="MarginContainer" parent="MarginContainer/HBoxContainer/FMODDebugPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 5.0
+margin_right = -4.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer"]
+margin_right = 248.0
+margin_bottom = 123.0
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer"]
+margin_right = 248.0
+margin_bottom = 14.0
+text = "FMOD DEBUG"
+align = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer"]
+margin_top = 18.0
+margin_right = 248.0
+margin_bottom = 22.0
+
+[node name="CPU Usage" type="HBoxContainer" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer"]
+margin_top = 26.0
+margin_right = 248.0
+margin_bottom = 40.0
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/CPU Usage"]
+margin_right = 34.0
+margin_bottom = 14.0
+text = "CPU: "
+
+[node name="DSPUsage" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/CPU Usage"]
+unique_name_in_owner = true
+margin_left = 38.0
+margin_right = 38.0
+margin_bottom = 14.0
+
+[node name="Mem Usage" type="HBoxContainer" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 248.0
+margin_bottom = 58.0
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/Mem Usage"]
+margin_right = 65.0
+margin_bottom = 14.0
+text = "MEMORY: "
+
+[node name="MemUsage" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/Mem Usage"]
+unique_name_in_owner = true
+margin_left = 69.0
+margin_right = 69.0
+margin_bottom = 14.0
+
+[node name="Volume" type="HBoxContainer" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer"]
+visible = false
+margin_top = 62.0
+margin_right = 248.0
+margin_bottom = 76.0
+
+[node name="Label" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/Volume"]
+margin_right = 63.0
+margin_bottom = 14.0
+text = "VOLUME: "
+
+[node name="RMSValue" type="Label" parent="MarginContainer/HBoxContainer/FMODDebugPanel/MarginContainer/VBoxContainer/Volume"]
+unique_name_in_owner = true
+margin_left = 67.0
+margin_right = 67.0
+margin_bottom = 14.0
