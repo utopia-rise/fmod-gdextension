@@ -135,7 +135,8 @@ func _notification(what):
 
 func _ready():
 	###SETUP FMOD###
-	load_configuration("res://fmod/fmod_config.cfg", true)
+	if not started:
+		load_configuration("res://fmod/fmod_config.cfg", true)
 
 func _process(delta):
 	if started:
@@ -297,8 +298,8 @@ func get_object_attached_to_listener(index: int) -> Node:
 ##########
 ###BANK###
 ##########
-func load_bank(pathTo_bank: String, load_bankFlag: int) -> String:
-	return godot_fmod.load_bank(pathTo_bank, load_bankFlag)
+func load_bank(pathTo_bank: String, load_bankFlag: int) -> void:
+	godot_fmod.load_bank(pathTo_bank, load_bankFlag)
 
 func unload_bank(pathTo_bank: String) -> void:
 	godot_fmod.unload_bank(pathTo_bank)

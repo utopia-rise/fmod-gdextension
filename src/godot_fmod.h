@@ -189,7 +189,7 @@ namespace godot {
         int get_system_dsp_num_buffers();
         Array get_system_dsp_buffer_size();
 
-        String load_bank(const String& pathToBank, unsigned int flag);
+        void load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
         bool check_vca_path(const String& vcaPath);
         bool check_bus_path(const String& busPath);
