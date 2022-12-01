@@ -572,9 +572,9 @@ void Fmod::set_software_format(int sampleRate, const int speakerMode, int numRaw
     ERROR_CHECK(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
-String Fmod::load_bank(const String& pathToBank, unsigned int flag) {
+void Fmod::load_bank(const String& pathToBank, unsigned int flag) {
     DRIVE_PATH(pathToBank)
-    if (banks.has(pathToBank)) return pathToBank;// bank is already loaded
+    if (banks.has(pathToBank)) return;// bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(pathToBank.alloc_c_string(), flag, &bank));
     if (bank) {
@@ -588,7 +588,6 @@ String Fmod::load_bank(const String& pathToBank, unsigned int flag) {
             loadingBanks.append(loadingBank);
         }
     }
-    return pathToBank;
 }
 
 void Fmod::unload_bank(const String& pathToBank) {
