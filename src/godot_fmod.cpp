@@ -514,7 +514,7 @@ Dictionary Fmod::get_system_listener_2d_attributes(int index) {
     return _2Dattr;
 }
 
-void Fmod::set_system_listener_3d_attributes(int index, const Transform& transform) {
+void Fmod::set_system_listener_3d_attributes(int index, Transform transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
         attr = _get_3d_attributes_from_transform(transform);
@@ -524,7 +524,7 @@ void Fmod::set_system_listener_3d_attributes(int index, const Transform& transfo
     }
 }
 
-void Fmod::set_system_listener_2d_attributes(int index, const Transform2D& transform) {
+void Fmod::set_system_listener_2d_attributes(int index, Transform2D transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
         attr = _get_3d_attributes_from_transform_2d(transform);
@@ -572,7 +572,7 @@ void Fmod::set_software_format(int sampleRate, const int speakerMode, int numRaw
     ERROR_CHECK(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
 }
 
-void Fmod::load_bank(const String& pathToBank, unsigned int flag) {
+void Fmod::load_bank(String pathToBank, unsigned int flag) {
     DRIVE_PATH(pathToBank)
     if (banks.has(pathToBank)) return;// bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
@@ -590,7 +590,7 @@ void Fmod::load_bank(const String& pathToBank, unsigned int flag) {
     }
 }
 
-void Fmod::unload_bank(const String& pathToBank) {
+void Fmod::unload_bank(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks)
     _unload_all_buses(instance);
@@ -601,7 +601,7 @@ void Fmod::unload_bank(const String& pathToBank) {
     banks.erase(pathToBank);
 }
 
-int Fmod::get_bank_loading_state(const String& pathToBank) {
+int Fmod::get_bank_loading_state(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     FMOD_STUDIO_LOADING_STATE state;
@@ -609,7 +609,7 @@ int Fmod::get_bank_loading_state(const String& pathToBank) {
     return state;
 }
 
-int Fmod::get_bank_bus_count(const String& pathToBank) {
+int Fmod::get_bank_bus_count(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
@@ -617,7 +617,7 @@ int Fmod::get_bank_bus_count(const String& pathToBank) {
     return count;
 }
 
-int Fmod::get_bank_event_count(const String& pathToBank) {
+int Fmod::get_bank_event_count(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
@@ -625,7 +625,7 @@ int Fmod::get_bank_event_count(const String& pathToBank) {
     return count;
 }
 
-int Fmod::get_bank_string_count(const String& pathToBank) {
+int Fmod::get_bank_string_count(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
@@ -633,7 +633,7 @@ int Fmod::get_bank_string_count(const String& pathToBank) {
     return count;
 }
 
-int Fmod::get_bank_vca_count(const String& pathToBank) {
+int Fmod::get_bank_vca_count(String pathToBank) {
     DRIVE_PATH(pathToBank)
     FIND_AND_CHECK(pathToBank, banks, -1)
     int count = -1;
@@ -641,7 +641,7 @@ int Fmod::get_bank_vca_count(const String& pathToBank) {
     return count;
 }
 
-uint64_t Fmod::create_event_instance(const String& eventPath) {
+uint64_t Fmod::create_event_instance(String eventPath) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventPath, false, nullptr);
     if (instance) {
         return (uint64_t) instance;
@@ -649,19 +649,19 @@ uint64_t Fmod::create_event_instance(const String& eventPath) {
     return 0;
 }
 
-float Fmod::get_event_parameter_by_name(uint64_t instanceId, const String& parameterName) {
+float Fmod::get_event_parameter_by_name(uint64_t instanceId, String parameterName) {
     float p = -1;
     FIND_AND_CHECK(instanceId, events, p)
     ERROR_CHECK(instance->getParameterByName(parameterName.utf8().get_data(), &p));
     return p;
 }
 
-void Fmod::set_event_parameter_by_name(uint64_t instanceId, const String& parameterName, float value) {
+void Fmod::set_event_parameter_by_name(uint64_t instanceId, String parameterName, float value) {
     FIND_AND_CHECK(instanceId, events)
     ERROR_CHECK(instance->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
-float Fmod::get_event_parameter_by_id(uint64_t instanceId, const Array& idPair) {
+float Fmod::get_event_parameter_by_id(uint64_t instanceId, Array idPair) {
     float value = -1.0f;
     FIND_AND_CHECK(instanceId, events, value)
     FMOD_STUDIO_PARAMETER_ID id;
@@ -671,7 +671,7 @@ float Fmod::get_event_parameter_by_id(uint64_t instanceId, const Array& idPair) 
     return value;
 }
 
-void Fmod::set_event_parameter_by_id(uint64_t instanceId, const Array& idPair, float value) {
+void Fmod::set_event_parameter_by_id(uint64_t instanceId, Array idPair, float value) {
     FIND_AND_CHECK(instanceId, events)
     FMOD_STUDIO_PARAMETER_ID id;
     id.data1 = idPair[0];
@@ -810,7 +810,7 @@ Dictionary Fmod::get_event_2d_attributes(uint64_t instanceId) {
     return _2Dattr;
 }
 
-void Fmod::set_event_3d_attributes(uint64_t instanceId, const Transform& transform) {
+void Fmod::set_event_3d_attributes(uint64_t instanceId, Transform transform) {
     FIND_AND_CHECK(instanceId, events)
     auto attr = _get_3d_attributes_from_transform(transform);
     ERROR_CHECK(instance->set3DAttributes(&attr));
@@ -826,14 +826,14 @@ Dictionary Fmod::get_event_3d_attributes(uint64_t instanceId) {
     return _3Dattr;
 }
 
-int Fmod::desc_get_length(const String& eventPath) {
+int Fmod::desc_get_length(String eventPath) {
     int length = -1;
     FIND_AND_CHECK(eventPath, eventDescriptions, length)
     ERROR_CHECK(instance->getLength(&length));
     return length;
 }
 
-Array Fmod::desc_get_instance_list(const String& eventPath) {
+Array Fmod::desc_get_instance_list(String eventPath) {
     Array array;
     FIND_AND_CHECK(eventPath, eventDescriptions, array)
     FMOD::Studio::EventInstance* instances[MAX_EVENT_INSTANCE];
@@ -846,14 +846,14 @@ Array Fmod::desc_get_instance_list(const String& eventPath) {
     return array;
 }
 
-int Fmod::desc_get_instance_count(const String& eventPath) {
+int Fmod::desc_get_instance_count(String eventPath) {
     int count = -1;
     FIND_AND_CHECK(eventPath, eventDescriptions, count)
     ERROR_CHECK(instance->getInstanceCount(&count));
     return count;
 }
 
-void Fmod::desc_release_all_instances(const String& eventPath) {
+void Fmod::desc_release_all_instances(String eventPath) {
     std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
     FIND_AND_CHECK(eventPath, eventDescriptions)
     FMOD::Studio::EventInstance* instances[MAX_EVENT_INSTANCE];
@@ -872,59 +872,59 @@ void Fmod::desc_release_all_instances(const String& eventPath) {
     ERROR_CHECK(instance->releaseAllInstances());
 }
 
-void Fmod::desc_load_sample_data(const String& eventPath) {
+void Fmod::desc_load_sample_data(String eventPath) {
     FIND_AND_CHECK(eventPath, eventDescriptions)
     ERROR_CHECK(instance->loadSampleData());
 }
 
-void Fmod::desc_unload_sample_data(const String& eventPath) {
+void Fmod::desc_unload_sample_data(String eventPath) {
     FIND_AND_CHECK(eventPath, eventDescriptions)
     ERROR_CHECK(instance->unloadSampleData());
 }
 
-int Fmod::desc_get_sample_loading_state(const String& eventPath) {
+int Fmod::desc_get_sample_loading_state(String eventPath) {
     FIND_AND_CHECK(eventPath, eventDescriptions, -1)
     FMOD_STUDIO_LOADING_STATE s;
     ERROR_CHECK(instance->getSampleLoadingState(&s));
     return s;
 }
 
-bool Fmod::desc_is_3d(const String& eventPath) {
+bool Fmod::desc_is_3d(String eventPath) {
     bool is3D = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, is3D)
     ERROR_CHECK(instance->is3D(&is3D));
     return is3D;
 }
 
-bool Fmod::desc_is_one_shot(const String& eventPath) {
+bool Fmod::desc_is_one_shot(String eventPath) {
     bool isOneShot = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, isOneShot)
     ERROR_CHECK(instance->isOneshot(&isOneShot));
     return isOneShot;
 }
 
-bool Fmod::desc_is_snapshot(const String& eventPath) {
+bool Fmod::desc_is_snapshot(String eventPath) {
     bool isSnapshot = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, isSnapshot)
     ERROR_CHECK(instance->isSnapshot(&isSnapshot));
     return isSnapshot;
 }
 
-bool Fmod::desc_is_stream(const String& eventPath) {
+bool Fmod::desc_is_stream(String eventPath) {
     bool isStream = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, isStream)
     ERROR_CHECK(instance->isStream(&isStream));
     return isStream;
 }
 
-bool Fmod::desc_has_sustain_point(const String& eventPath) {
+bool Fmod::desc_has_sustain_point(String eventPath) {
     bool hasSustainPoint = false;
     FIND_AND_CHECK(eventPath, eventDescriptions, hasSustainPoint)
     ERROR_CHECK(instance->hasSustainPoint(&hasSustainPoint));
     return hasSustainPoint;
 }
 
-Array Fmod::desc_get_min_max_distance(const String& eventPath) {
+Array Fmod::desc_get_min_max_distance(String eventPath) {
     float minDistance;
     float maxDistance;
     Array ret;
@@ -936,14 +936,14 @@ Array Fmod::desc_get_min_max_distance(const String& eventPath) {
     return ret;
 }
 
-float Fmod::desc_get_sound_size(const String& eventPath) {
+float Fmod::desc_get_sound_size(String eventPath) {
     float soundSize = 0.f;
     FIND_AND_CHECK(eventPath, eventDescriptions, soundSize)
     ERROR_CHECK(instance->getSoundSize(&soundSize));
     return soundSize;
 }
 
-Dictionary Fmod::desc_get_parameter_description_by_name(const String& eventPath, const String& name) {
+Dictionary Fmod::desc_get_parameter_description_by_name(String eventPath, String name) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
@@ -958,7 +958,7 @@ Dictionary Fmod::desc_get_parameter_description_by_name(const String& eventPath,
     return paramDesc;
 }
 
-Dictionary Fmod::desc_get_parameter_description_by_id(const String& eventPath, const Array& idPair) {
+Dictionary Fmod::desc_get_parameter_description_by_id(String eventPath, Array idPair) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_ID paramId;
@@ -976,14 +976,14 @@ Dictionary Fmod::desc_get_parameter_description_by_id(const String& eventPath, c
     return paramDesc;
 }
 
-int Fmod::desc_get_parameter_description_count(const String& eventPath) {
+int Fmod::desc_get_parameter_description_count(String eventPath) {
     int count = 0;
     FIND_AND_CHECK(eventPath, eventDescriptions, count)
     ERROR_CHECK(instance->getParameterDescriptionCount(&count));
     return count;
 }
 
-Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath, int index) {
+Dictionary Fmod::desc_get_parameter_description_by_index(String eventPath, int index) {
     Dictionary paramDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, paramDesc)
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
@@ -998,7 +998,7 @@ Dictionary Fmod::desc_get_parameter_description_by_index(const String& eventPath
     return paramDesc;
 }
 
-Dictionary Fmod::desc_get_user_property(const String& eventPath, const String& name) {
+Dictionary Fmod::desc_get_user_property(String eventPath, String name) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
     FMOD_STUDIO_USER_PROPERTY uProp;
@@ -1016,14 +1016,14 @@ Dictionary Fmod::desc_get_user_property(const String& eventPath, const String& n
     return propDesc;
 }
 
-int Fmod::desc_get_user_property_count(const String& eventPath) {
+int Fmod::desc_get_user_property_count(String eventPath) {
     int count = 0;
     FIND_AND_CHECK(eventPath, eventDescriptions, count)
     ERROR_CHECK(instance->getUserPropertyCount(&count));
     return count;
 }
 
-Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index) {
+Dictionary Fmod::desc_user_property_by_index(String eventPath, int index) {
     Dictionary propDesc;
     FIND_AND_CHECK(eventPath, eventDescriptions, propDesc)
     FMOD_STUDIO_USER_PROPERTY uProp;
@@ -1041,49 +1041,49 @@ Dictionary Fmod::desc_user_property_by_index(const String& eventPath, int index)
     return propDesc;
 }
 
-void Fmod::set_desc_callback(const String& eventPath, int callbackMask) {
+void Fmod::set_desc_callback(String eventPath, int callbackMask) {
     FIND_AND_CHECK(eventPath, eventDescriptions)
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
     GODOT_LOG(0, String("Default callBack set on description event ") + eventPath)
 }
 
-bool Fmod::get_bus_mute(const String& busPath) {
+bool Fmod::get_bus_mute(String busPath) {
     bool mute = false;
     FIND_AND_CHECK(busPath, buses, mute)
     ERROR_CHECK(instance->getMute(&mute));
     return mute;
 }
 
-bool Fmod::get_bus_paused(const String& busPath) {
+bool Fmod::get_bus_paused(String busPath) {
     bool paused = false;
     FIND_AND_CHECK(busPath, buses, paused)
     ERROR_CHECK(instance->getPaused(&paused));
     return paused;
 }
 
-float Fmod::get_bus_volume(const String& busPath) {
+float Fmod::get_bus_volume(String busPath) {
     float volume = 0.0f;
     FIND_AND_CHECK(busPath, buses, volume)
     ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
-void Fmod::set_bus_mute(const String& busPath, bool mute) {
+void Fmod::set_bus_mute(String busPath, bool mute) {
     FIND_AND_CHECK(busPath, buses)
     ERROR_CHECK(instance->setMute(mute));
 }
 
-void Fmod::set_bus_paused(const String& busPath, bool paused) {
+void Fmod::set_bus_paused(String busPath, bool paused) {
     FIND_AND_CHECK(busPath, buses)
     ERROR_CHECK(instance->setPaused(paused));
 }
 
-void Fmod::set_bus_volume(const String& busPath, float volume) {
+void Fmod::set_bus_volume(String busPath, float volume) {
     FIND_AND_CHECK(busPath, buses)
     ERROR_CHECK(instance->setVolume(volume));
 }
 
-void Fmod::stop_all_bus_events(const String& busPath, int stopMode) {
+void Fmod::stop_all_bus_events(String busPath, int stopMode) {
     FIND_AND_CHECK(busPath, buses)
     ERROR_CHECK(instance->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
@@ -1198,15 +1198,15 @@ void Fmod::_unload_all_event_descriptions(FMOD::Studio::Bank* bank) {
     }
 }
 
-bool Fmod::check_vca_path(const String& vcaPath) {
+bool Fmod::check_vca_path(String vcaPath) {
     return VCAs.has(vcaPath);
 }
 
-bool Fmod::check_bus_path(const String& busPath) {
+bool Fmod::check_bus_path(String busPath) {
     return buses.has(busPath);
 }
 
-bool Fmod::check_event_path(const String& eventPath) {
+bool Fmod::check_event_path(String eventPath) {
     return eventDescriptions.has(eventPath);
 }
 
@@ -1235,7 +1235,7 @@ EventInfo* Fmod::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
     return eventInfo;
 }
 
-void Fmod::play_one_shot(const String& eventName, Node* gameObj) {
+void Fmod::play_one_shot(String eventName, Node* gameObj) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1247,7 +1247,7 @@ void Fmod::play_one_shot(const String& eventName, Node* gameObj) {
     }
 }
 
-void Fmod::play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
+void Fmod::play_one_shot_with_params(String eventName, Node* gameObj, Dictionary parameters) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
@@ -1266,7 +1266,7 @@ void Fmod::play_one_shot_with_params(const String& eventName, Node* gameObj, con
     }
 }
 
-void Fmod::play_one_shot_attached(const String& eventName, Node* gameObj) {
+void Fmod::play_one_shot_attached(String eventName, Node* gameObj) {
     if (_is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
@@ -1275,7 +1275,7 @@ void Fmod::play_one_shot_attached(const String& eventName, Node* gameObj) {
     }
 }
 
-void Fmod::play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
+void Fmod::play_one_shot_attached_with_params(String eventName, Node* gameObj, Dictionary parameters) {
     if (_is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
@@ -1389,19 +1389,19 @@ bool Fmod::banks_still_loading() {
     return false;
 }
 
-float Fmod::get_vca_volume(const String& VCAPath) {
+float Fmod::get_vca_volume(String VCAPath) {
     float volume = 0.0f;
     FIND_AND_CHECK(VCAPath, VCAs, volume)
     ERROR_CHECK(instance->getVolume(&volume));
     return volume;
 }
 
-void Fmod::set_vca_volume(const String& VCAPath, float volume) {
+void Fmod::set_vca_volume(String VCAPath, float volume) {
     FIND_AND_CHECK(VCAPath, VCAs)
     ERROR_CHECK(instance->setVolume(volume));
 }
 
-void Fmod::load_file_as_sound(const String& path) {
+void Fmod::load_file_as_sound(String path) {
     DRIVE_PATH(path)
     FMOD::Sound* sound = sounds.get(path);
     if (!sound) {
@@ -1413,7 +1413,7 @@ void Fmod::load_file_as_sound(const String& path) {
     }
 }
 
-void Fmod::load_file_as_music(const String& path) {
+void Fmod::load_file_as_music(String path) {
     DRIVE_PATH(path)
     FMOD::Sound* sound = sounds.get(path);
     if (!sound) {
@@ -1425,7 +1425,7 @@ void Fmod::load_file_as_music(const String& path) {
     }
 }
 
-void Fmod::unload_file(const String& path) {
+void Fmod::unload_file(String path) {
     DRIVE_PATH(path)
     FIND_AND_CHECK(path, sounds)
     ERROR_CHECK(instance->release());
@@ -1433,7 +1433,7 @@ void Fmod::unload_file(const String& path) {
     Godot::print("FMOD Sound System: UNLOADING FILE" + String(path));
 }
 
-uint64_t Fmod::create_sound_instance(const String& path) {
+uint64_t Fmod::create_sound_instance(String path) {
     DRIVE_PATH(path)
     FIND_AND_CHECK(path, sounds, 0)
     FMOD::Channel* channel = nullptr;
@@ -1593,17 +1593,17 @@ Dictionary Fmod::get_performance_data() {
     return performanceData;
 }
 
-void Fmod::set_global_parameter_by_name(const String& parameterName, float value) {
+void Fmod::set_global_parameter_by_name(String parameterName, float value) {
     ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
-float Fmod::get_global_parameter_by_name(const String& parameterName) {
+float Fmod::get_global_parameter_by_name(String parameterName) {
     float value = 0.f;
     ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
     return value;
 }
 
-void Fmod::set_global_parameter_by_id(const Array& idPair, const float value) {
+void Fmod::set_global_parameter_by_id(Array idPair, const float value) {
     if (idPair.size() != 2) {
         GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
         return;
@@ -1614,7 +1614,7 @@ void Fmod::set_global_parameter_by_id(const Array& idPair, const float value) {
     ERROR_CHECK(system->setParameterByID(id, value));
 }
 
-float Fmod::get_global_parameter_by_id(const Array& idPair) {
+float Fmod::get_global_parameter_by_id(Array idPair) {
     if (idPair.size() != 2) {
         GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
         return -1.f;
@@ -1627,7 +1627,7 @@ float Fmod::get_global_parameter_by_id(const Array& idPair) {
     return value;
 }
 
-Dictionary Fmod::get_global_parameter_desc_by_name(const String& parameterName) {
+Dictionary Fmod::get_global_parameter_desc_by_name(String parameterName) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
     pDesc;
@@ -1643,7 +1643,7 @@ Dictionary Fmod::get_global_parameter_desc_by_name(const String& parameterName) 
     return paramDesc;
 }
 
-Dictionary Fmod::get_global_parameter_desc_by_id(const Array& idPair) {
+Dictionary Fmod::get_global_parameter_desc_by_id(Array idPair) {
     if (idPair.size() != 2) {
         GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
         return {};
