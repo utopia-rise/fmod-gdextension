@@ -33,12 +33,12 @@ This project uses [SEMVER](https://semver.org/).
 
 This plugin is compatible with Windows, Linux, OSX, Android and iOS. No WASM/HTML 5 support is available for now.
 
-#### Godot compatibility matrix
+#### Godot compatibility:
 
 This plugin should run on any 3.1+ version of Godot (Godot 4 not supported yet and will break compatibility when it comes). 
 New releases are build and tested against recent version of Godot but no breaking changes should happen.
 
-#### Fmod compatibility matrix
+#### Fmod compatibility matrix:
 
 | Driver Version | Api Version |
 |----------------|-------------|
