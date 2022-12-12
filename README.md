@@ -29,39 +29,21 @@ This project uses github actions to continuously deploy released drivers. If you
 can compile from sources by looking to [compile from sources section](./docs/COMPILING.md).  
 This project uses [SEMVER](https://semver.org/).
 
-#### OS Compatibility matrix :
+#### OS Compatibility:
 
-| Driver Version | Windows | Linux | OSX | Android | iOS |
-|----------------|---------|-------|-----|---------|-----|
-|      0.0.0     |    X    |   X   |  X  |         |     |
-|      1.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.1     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.2     |    X    |   X   |  X  |    X    |  X  |
-|      3.x.x     |    X    |   X   |  X  |    X    |  X  |
+This plugin is compatible with Windows, Linux, OSX, Android and iOS. No WASM/HTML 5 support is available for now.
 
-#### Godot compatibility matrix
+#### Godot compatibility:
 
-| Driver Version | Godot 3.0 | Godot 3.1 | Godot 3.2 | Godot 3.3 | Godot 3.4 |
-|----------------|-----------|-----------|-----------|-----------|-----------|
-|      0.0.0     |           |      X    |           |           |           |
-|      1.0.0     |           |      X    |           |           |           |
-|      2.0.0     |           |      X    |           |           |           |
-|      2.0.1     |           |      X    |           |           |           |
-|      2.0.2     |           |      X    |           |           |           |
-|      3.x.x     |           |      X    |     X     |     X     |     X     |
+This plugin should run on any 3.1+ version of Godot (Godot 4 not supported yet and will break compatibility when it comes). 
+New releases are build and tested against recent version of Godot but no breaking changes should happen.
 
-#### Fmod compatibility matrix
+#### Fmod compatibility matrix:
 
-| Driver Version | 1.10.13 | 2.00.XX | 2.0X.XX |
-|----------------|---------|---------|---------|
-|      0.0.0     |    X    |         |         |
-|      1.0.0     |    X    |         |         |
-|      2.0.0     |    X    |         |         |
-|      2.0.1     |    X    |         |         |
-|      2.0.2     |    X    |         |         |
-|      3.0.0     |         |    X    |         |
-|      3.x.x     |         |         |    X    |
+| Driver Version | Api Version |
+|----------------|-------------|
+|      3.0.x     |   2.00.XX   | 
+|      3.1+      |   2.02.XX   |
 
 ## Installing the plugin in your project
 
