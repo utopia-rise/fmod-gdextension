@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 import os
-import sys
+import subprocess
 
-target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/bin/")
+target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
 fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
@@ -84,8 +84,10 @@ elif env["platform"] == "android":
     env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
-target = "{}{}.{}.{}".format(
-    target_path, target_name, env["platform"], env["target"]
+
+#Output is placed in the addons directory of the demo project directly
+target = "{}{}/{}.{}.{}".format(
+    target_path, env["platform"], target_name, env["platform"], env["target"]
 )
 if env["platform"] == "macos":
     target = "{}.framework/{}.{}.{}".format(
@@ -102,4 +104,28 @@ else:
     )
 
 library = env.SharedLibrary(target=target, source=sources)
+
+#Necessary so the extension library can find the Fmod libraries
+if env["platform"] == "macos":
+    def sys_exec(args):
+        proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+        (out, err) = proc.communicate()
+        return out.rstrip("\r\n").lstrip()
+
+    
+    lib_name = "{}.{}.{}".format(
+        target,
+        target_name,
+        env["platform"],
+        env["target"]
+    )
+
+    def change_id(self, arg, env, executor = None):
+        sys_exec(["install_name_tool", "-id", "@rpath/%s" % lib_name , target])
+        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmodstudio, "@loader_path/../%s" % libfmodstudio, target])
+        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmod, "@loader_path/../%s" % libfmod, target])
+    change_id_action = Action('', change_id)
+
+    AddPostAction(library, change_id_action)
+
 Default(library)
