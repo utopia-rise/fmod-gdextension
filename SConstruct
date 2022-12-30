@@ -89,6 +89,7 @@ elif env["platform"] == "android":
 target = "{}{}/{}.{}.{}".format(
     target_path, env["platform"], target_name, env["platform"], env["target"]
 )
+
 if env["platform"] == "macos":
     target = "{}.framework/{}.{}.{}".format(
         target,
