@@ -10,7 +10,7 @@ on:
 # Global Settings
 env:
   PROJECT_FOLDER: fmod-gdnative
-  TARGET_PATH: demo/addons/fmod/bin/
+  TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
   TARGET: editor
   GODOT_VERSION: 4.0
@@ -124,5 +124,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ env.TARGET_PATH }}*.${{ matrix.artifact-extension }}
+          path: ${{ env.TARGET_PATH }}${{ matrix.artifact-name }}/*.${{ matrix.artifact-extension }}
           if-no-files-found: error
