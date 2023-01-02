@@ -4,9 +4,9 @@ entry_symbol = "fmod_library_init"
 
 [libraries]
 
-macos.editor = "res://addons/fmod/libs/macos/libGodotFmod.macos.editor.framework"
-windows.editor.x86_32 = "res://addons/fmod/libs/windows/x86/libGodotFmod.windows.editor.x86_32.dll"
-windows.editor.x86_64 = "res://addons/fmod/libs/windows/x64/libGodotFmod.windows.editor.x86_64.dll"
+macos.editor = "res://addons/fmod/bin/libGodotFmod.osx.editor.framework"
+windows.editor.x86_32 = "res://addons/fmod/bin/windows/x86_32/libGodotFmod.windows.editor.x86_32.dll"
+windows.editor.x86_64 = "res://addons/fmod/bin/windows/x86_64/libGodotFmod.windows.editor.x86_64.dll"
 linux.editor.x86_64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.x86_64.so"
 linux.editor.arm64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.arm64.so"
 linux.editor.rv64 = "res://addons/fmod/bin/libGodotFmod.linux.editor.rv64.so"
