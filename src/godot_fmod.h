@@ -172,8 +172,8 @@ namespace godot {
 
         void add_listener(int index, Object* gameObj);
         void remove_listener(int index);
-        void set_listener_number(int listenerNumber);
-        int get_system_num_listeners() const;
+        void set_system_listener_number(int listenerNumber);
+        int get_system_listener_number() const;
         float get_system_listener_weight(int index);
         void set_system_listener_weight(int index, float weight);
         Dictionary get_system_listener_3d_attributes(int index);

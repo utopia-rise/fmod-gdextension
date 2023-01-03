@@ -38,8 +38,8 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("shutdown"), &Fmod::shutdown);
     ClassDB::bind_method(D_METHOD("add_listener", "index", "gameObj"), &Fmod::add_listener);
     ClassDB::bind_method(D_METHOD("remove_listener", "index"), &Fmod::remove_listener);
-    ClassDB::bind_method(D_METHOD("set_listener_number", "listenerNumber"), &Fmod::set_listener_number);
-    ClassDB::bind_method(D_METHOD("get_listener_number"), &Fmod::get_system_num_listeners);
+    ClassDB::bind_method(D_METHOD("set_listener_number", "listenerNumber"), &Fmod::set_system_listener_number);
+    ClassDB::bind_method(D_METHOD("get_listener_number"), &Fmod::get_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &Fmod::get_system_listener_weight);
     ClassDB::bind_method(D_METHOD("set_listener_weight", "index", "weight"), &Fmod::set_system_listener_weight);
     ClassDB::bind_method(D_METHOD("get_listener_3D_attributs", "index"), &Fmod::get_system_listener_3d_attributes);
@@ -432,7 +432,7 @@ void Fmod::shutdown() {
     GODOT_LOG(0, "FMOD Sound System: System released")
 }
 
-void Fmod::set_listener_number(int p_listenerNumber) {
+void Fmod::set_system_listener_number(int p_listenerNumber) {
     if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
         if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) {
             systemListenerNumber = p_listenerNumber;
@@ -477,7 +477,7 @@ void Fmod::remove_listener(int index) {
     }
 }
 
-int Fmod::get_system_num_listeners() const {
+int Fmod::get_system_listener_number() const {
     return systemListenerNumber;
 }
 
