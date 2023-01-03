@@ -33,6 +33,19 @@ void FmodEventEmitter2D::_ready() {
     }
 }
 
+void FmodEventEmitter2D::_exit_tree() {
+    if (event_id != -1) {
+        if (attached) {
+            Fmod::get_singleton()->detach_instance_from_node(event_id);
+        }
+        if (allow_fadeout) {
+            Fmod::get_singleton()->stop_event(event_id, FMOD_STUDIO_STOP_ALLOWFADEOUT);
+        } else {
+            Fmod::get_singleton()->stop_event(event_id, FMOD_STUDIO_STOP_IMMEDIATE);
+        }
+    }
+}
+
 void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_param", "key", "value"), &FmodEventEmitter2D::set_param);
     ClassDB::bind_method(D_METHOD("is_paused"), &FmodEventEmitter2D::is_paused);

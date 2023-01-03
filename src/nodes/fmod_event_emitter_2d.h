@@ -37,6 +37,7 @@ namespace godot {
         void _init();
 
         void _ready() override;
+        void _exit_tree() override;
 
         void set_param(const String& key, const float value);
         bool is_paused();
