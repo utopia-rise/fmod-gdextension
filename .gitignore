@@ -20,6 +20,9 @@ bin/
 *.o
 *.obj
 
+*.exp
+*.lib
+
 # Clion specific
 
 .idea/*
