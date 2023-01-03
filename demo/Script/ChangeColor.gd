@@ -11,9 +11,9 @@ func _ready():
 # warning-ignore:return_value_discarded
 	body_exited.connect(leave)
 	id = Fmod.create_event_instance("event:/Music/Level 02")
-	Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED)
+	Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	Fmod.start_event(id)
-	Fmod.set_event_paused(id, false)
+	Fmod.set_event_paused(id, true)
 
 # warning-ignore:unused_argument
 func enter(area):

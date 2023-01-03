@@ -70,8 +70,8 @@ shape = SubResource("2")
 
 [node name="icon" type="Sprite2D" parent="SoundArea1"]
 self_modulate = Color(0.113725, 0.823529, 0.317647, 1)
-scale = Vector2(3, 3)
 z_index = -1
+scale = Vector2(3, 3)
 texture = ExtResource("2")
 
 [node name="Label2" type="Label" parent="SoundArea1"]
@@ -91,9 +91,9 @@ shape = SubResource("3")
 
 [node name="icon" type="Sprite2D" parent="SoundArea2"]
 self_modulate = Color(0.0117647, 0.956863, 0.0156863, 1)
+z_index = -1
 position = Vector2(52.3218, 46.0544)
 scale = Vector2(3, 3)
-z_index = -1
 texture = ExtResource("2")
 
 [node name="Label3" type="Label" parent="SoundArea2"]
@@ -111,9 +111,9 @@ shape = SubResource("3")
 
 [node name="icon" type="Sprite2D" parent="SoundArea3"]
 self_modulate = Color(0.827451, 0.345098, 0.0941176, 1)
+z_index = -1
 position = Vector2(52.3218, 46.0544)
 scale = Vector2(3, 3)
-z_index = -1
 texture = ExtResource("2")
 
 [node name="Label3" type="Label" parent="SoundArea3"]
