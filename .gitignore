@@ -130,3 +130,4 @@ config.log
 # End of https://www.gitignore.io/api/clion,cmake,scons
 
 demo/.godot
+**/*.editor

@@ -8,28 +8,6 @@
 
 config_version=5
 
-_global_script_classes=[{
-"base": "RefCounted",
-"class": &"GutHookScript",
-"language": &"GDScript",
-"path": "res://addons/gut/hook_script.gd"
-}, {
-"base": "RefCounted",
-"class": &"GutStringUtils",
-"language": &"GDScript",
-"path": "res://addons/gut/strutils.gd"
-}, {
-"base": "Node",
-"class": &"GutTest",
-"language": &"GDScript",
-"path": "res://addons/gut/test.gd"
-}]
-_global_script_class_icons={
-"GutHookScript": "",
-"GutStringUtils": "",
-"GutTest": ""
-}
-
 [android]
 
 modules="org/godotengine/godot/FmodSingleton"
@@ -45,6 +23,10 @@ config/icon="res://icon.png"
 
 FmodAutoloader="*res://addons/fmod/FmodManager.gd"
 FmodManager="*res://addons/fmod/FmodManager.gd"
+
+[editor]
+
+export/convert_text_resources_to_binary=true
 
 [editor_plugins]
 
