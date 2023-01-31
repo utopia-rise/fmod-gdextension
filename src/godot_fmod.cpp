@@ -391,7 +391,7 @@ bool Fmod::_is_dead(Object* node) {
     if (!node) {
         return true;
     }
-    return UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
+    return !UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
 }
 
 bool Fmod::_is_fmod_valid(Object* node) {

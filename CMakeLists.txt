@@ -10,7 +10,7 @@ include_directories("godot-cpp/include/")
 include_directories("godot-cpp/gen/include/")
 include_directories("godot-cpp/include/godot_cpp")
 include_directories("godot-cpp/gen/include/godot_cpp")
-include_directories("godot-cpp/godot-headers")
+include_directories("godot-cpp/gdextension")
 
 link_directories("../libs/fmod/${OS}/core/lib/${ARCH}")
 link_directories("../libs/fmod/${OS}/studio/lib/${ARCH}")

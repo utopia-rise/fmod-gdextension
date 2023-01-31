@@ -52,12 +52,12 @@ namespace godot {
             break;                                                                               \
     }
 
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn)                               \
-    auto instance = (cont).get(instanceId);                                                       \
-    if (!instance) {                                                                              \
-        String message = String("FMOD Sound System: cannot find instance in ##cont collection."); \
-        GODOT_LOG(2, message)                                                                     \
-        return defaultReturn;                                                                     \
+#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn)                                   \
+    auto instance = (cont).get(instanceId);                                                           \
+    if (!instance) {                                                                                  \
+        String message = vformat("FMOD Sound System: cannot find instance in %s collection.", #cont); \
+        GODOT_LOG(2, message)                                                                         \
+        return defaultReturn;                                                                         \
     }
 #define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
 #define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
