@@ -1,348 +1,225 @@
-extends Panel
+extends Node2D
 
-onready var _script_list = $ScriptsList
-onready var _nav = {
-	prev = $Navigation/Previous,
-	next = $Navigation/Next,
-	run = $Navigation/Run,
-	current_script = $Navigation/CurrentScript,
-	show_scripts = $Navigation/ShowScripts
-}
-onready var _progress = {
-	script = $ScriptProgress,
-	test = $TestProgress
-}
-onready var _summary = {
-	failing = $Summary/Failing,
-	passing = $Summary/Passing
-}
 
-onready var _extras = $ExtraOptions
-onready var _ignore_pauses = $ExtraOptions/IgnorePause
-onready var _continue_button = $Continue/Continue
-onready var _text_box = $TextDisplay/RichTextLabel
+class GuiHandler:
+	var _gui = null
+	var _gut = null
 
-onready var _titlebar = {
-	bar = $TitleBar,
-	time = $TitleBar/Time,
-	label = $TitleBar/Title
-}
+	var _ctrls = {
+		btn_continue = null,
+		path_dir = null,
+		path_file = null,
+		prog_script = null,
+		prog_test = null,
+		rtl = null,
+		rtl_bg = null,
+		time_label = null
+	}
 
-var _mouse = {
-	down = false,
-	in_title = false,
-	down_pos = null,
-	in_handle = false
-}
-var _is_running = false
-var _start_time = 0.0
-var _time = 0.0
+	func _init(gui):
+		_gui = gui
 
-const DEFAULT_TITLE = 'Gut: The Godot Unit Testing tool.'
-var _utils = load('res://addons/gut/utils.gd').new()
-var _text_box_blocker_enabled = true
-var _pre_maximize_size = null
+		# Brute force, but flexible.
+		_ctrls.btn_continue = _get_first_child_named('Continue', _gui)
+		_ctrls.path_dir = _get_first_child_named('Path', _gui)
+		_ctrls.path_file = _get_first_child_named('File', _gui)
+		_ctrls.prog_script = _get_first_child_named('ProgressScript', _gui)
+		_ctrls.prog_test = _get_first_child_named('ProgressTest', _gui)
+		_ctrls.rtl = _get_first_child_named('Output', _gui)
+		_ctrls.rtl_bg = _get_first_child_named('OutputBG', _gui)
+		_ctrls.time_label = _get_first_child_named('TimeLabel', _gui)
 
-signal end_pause
-signal ignore_pause
-signal log_level_changed
-signal run_script
-signal run_single_script
-signal script_selected
+		_ctrls.btn_continue.visible = false
+		_ctrls.btn_continue.pressed.connect(_on_continue_pressed)
+
+		_ctrls.prog_script.value = 0
+		_ctrls.prog_test.value = 0
+		_ctrls.path_dir.text = ''
+		_ctrls.path_file.text = ''
+		_ctrls.time_label.text = ''
+
+
+	# ------------------
+	# Events
+	# ------------------
+	func _on_continue_pressed():
+		_ctrls.btn_continue.visible = false
+		_gut.end_teardown_pause()
+
+
+	func _on_gut_start_run():
+		if(_ctrls.rtl != null):
+			_ctrls.rtl.clear()
+		set_num_scripts(_gut.get_test_collector().scripts.size())
+
+
+	func _on_gut_end_run():
+		_ctrls.time_label.text = ''
+
+
+	func _on_gut_start_script(script_obj):
+		next_script(script_obj.get_full_name(), script_obj.tests.size())
+
+
+	func _on_gut_end_script():
+		pass
+
+
+	func _on_gut_start_test(test_name):
+		next_test(test_name)
+
+
+	func _on_gut_end_test():
+		pass
+
+
+	func _on_gut_start_pause():
+		pause_before_teardown()
+
+	func _on_gut_end_pause():
+		pass
+	# ------------------
+	# Private
+	# ------------------
+	func _get_first_child_named(obj_name, parent_obj):
+		if(parent_obj == null):
+			return null
+
+		var kids = parent_obj.get_children()
+		var index = 0
+		var to_return = null
+
+		while(index < kids.size() and to_return == null):
+			if(str(kids[index]).find(str(obj_name, ':')) != -1):
+				to_return = kids[index]
+			else:
+				to_return = _get_first_child_named(obj_name, kids[index])
+				if(to_return == null):
+					index += 1
+
+		return to_return
+
+	# ------------------
+	# Public
+	# ------------------
+	func set_num_scripts(val):
+		_ctrls.prog_script.value = 0
+		_ctrls.prog_script.max_value = val
+
+
+	func next_script(path, num_tests):
+		_ctrls.prog_script.value += 1
+		_ctrls.prog_test.value = 0
+		_ctrls.prog_test.max_value = num_tests
+
+		_ctrls.path_dir.text = path.get_base_dir()
+		_ctrls.path_file.text = path.get_file()
+
+
+	func next_test(test_name):
+		_ctrls.prog_test.value += 1
+
+
+	func pause_before_teardown():
+		_ctrls.btn_continue.visible = true
+
+
+	func set_gut(g):
+		_gut = g
+		g.start_run.connect(_on_gut_start_run)
+		g.end_run.connect(_on_gut_end_run)
+
+		g.start_script.connect(_on_gut_start_script)
+		g.end_script.connect(_on_gut_end_script)
+
+		g.start_test.connect(_on_gut_start_test)
+		g.end_test.connect(_on_gut_end_test)
+
+		g.start_pause_before_teardown.connect(_on_gut_start_pause)
+		g.end_pause_before_teardown.connect(_on_gut_end_pause)
+
+	func get_textbox():
+		return _ctrls.rtl
+
+	func set_elapsed_time(t):
+		_ctrls.time_label.text = str(t, 's')
+
+
+	func set_bg_color(c):
+		_ctrls.rtl_bg.color = c
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+var _large_handler = null
+var _min_handler = null
+var gut = null :
+	set(val):
+		gut = val
+		_set_gut(val)
+
 
 func _ready():
-	_pre_maximize_size = rect_size
-	_hide_scripts()
-	_update_controls()
-	_nav.current_script.set_text("No scripts available")
-	set_title()
-	clear_summary()
-	$TitleBar/Time.set_text("")
-	$ExtraOptions/DisableBlocker.pressed = !_text_box_blocker_enabled
-	_extras.visible = false
-	update()
+	_large_handler = GuiHandler.new($Large)
+	_min_handler = GuiHandler.new($Min)
 
-func _process(delta):
-	if(_is_running):
-		_time = OS.get_unix_time() - _start_time
-		var disp_time = round(_time * 100)/100
-		$TitleBar/Time.set_text(str(disp_time))
+	$Min.visible = false
+	$Large.visible = !$Min.visible
 
-func _draw(): # needs get_size()
-	# Draw the lines in the corner to show where you can
-	# drag to resize the dialog
-	var grab_margin = 3
-	var line_space = 3
-	var grab_line_color = Color(.4, .4, .4)
-	for i in range(1, 10):
-		var x = rect_size - Vector2(i * line_space, grab_margin)
-		var y = rect_size - Vector2(grab_margin, i * line_space)
-		draw_line(x, y, grab_line_color, 1, true)
+func _process(_delta):
+	if(gut != null and gut.is_running()):
+		_large_handler.set_elapsed_time(gut.get_elapsed_time())
+		_min_handler.set_elapsed_time(gut.get_elapsed_time())
 
-func _on_Maximize_draw():
-	# draw the maximize square thing.
-	var btn = $TitleBar/Maximize
-	btn.set_text('')
-	var w = btn.get_size().x
-	var h = btn.get_size().y
-	btn.draw_rect(Rect2(0, 0, w, h), Color(0, 0, 0, 1))
-	btn.draw_rect(Rect2(2, 4, w - 4, h - 6), Color(1,1,1,1))
+func _set_gut(val):
+	_large_handler.set_gut(val)
+	_min_handler.set_gut(val)
 
-func _on_ShowExtras_draw():
-	var btn = $Continue/ShowExtras
-	btn.set_text('')
-	var start_x = 20
-	var start_y = 15
-	var pad = 5
-	var color = Color(.1, .1, .1, 1)
-	var width = 2
-	for i in range(3):
-		var y = start_y + pad * i
-		btn.draw_line(Vector2(start_x, y), Vector2(btn.get_size().x - start_x, y), color, width, true)
+func get_textbox():
+	return _large_handler.get_textbox()
 
-# ####################
-# GUI Events
-# ####################
-func _on_Run_pressed():
-	_run_mode()
-	emit_signal('run_script', get_selected_index())
 
-func _on_CurrentScript_pressed():
-	_run_mode()
-	emit_signal('run_single_script', get_selected_index())
+func set_font_size(new_size):
+	var rtl = _large_handler.get_textbox()
+	if(rtl.get('custom_fonts/normal_font') != null):
+		rtl.get('custom_fonts/bold_italics_font').size = new_size
+		rtl.get('custom_fonts/bold_font').size = new_size
+		rtl.get('custom_fonts/italics_font').size = new_size
+		rtl.get('custom_fonts/normal_font').size = new_size
 
-func _on_Previous_pressed():
-	_select_script(get_selected_index() - 1)
-
-func _on_Next_pressed():
-	_select_script(get_selected_index() + 1)
-
-func _on_LogLevelSlider_value_changed(value):
-	emit_signal('log_level_changed', $LogLevelSlider.value)
-
-func _on_Continue_pressed():
-	_continue_button.disabled = true
-	emit_signal('end_pause')
-
-func _on_IgnorePause_pressed():
-	var checked = _ignore_pauses.is_pressed()
-	emit_signal('ignore_pause', checked)
-	if(checked):
-		emit_signal('end_pause')
-		_continue_button.disabled = true
-
-func _on_ShowScripts_pressed():
-	_toggle_scripts()
-
-func _on_ScriptsList_item_selected(index):
-	_select_script(index)
-
-func _on_TitleBar_mouse_entered():
-	_mouse.in_title = true
-
-func _on_TitleBar_mouse_exited():
-	_mouse.in_title = false
-
-func _input(event):
-	if(event is InputEventMouseButton):
-		if(event.button_index == 1):
-			_mouse.down = event.pressed
-			if(_mouse.down):
-				_mouse.down_pos = event.position
-
-	if(_mouse.in_title):
-		if(event is InputEventMouseMotion and _mouse.down):
-			set_position(get_position() + (event.position - _mouse.down_pos))
-			_mouse.down_pos = event.position
-
-	if(_mouse.in_handle):
-		if(event is InputEventMouseMotion and _mouse.down):
-			var new_size = rect_size + event.position - _mouse.down_pos
-			var new_mouse_down_pos = event.position
-			rect_size = new_size
-			_mouse.down_pos = new_mouse_down_pos
-			_pre_maximize_size = rect_size
-
-func _on_ResizeHandle_mouse_entered():
-	_mouse.in_handle = true
-
-func _on_ResizeHandle_mouse_exited():
-	_mouse.in_handle = false
-
-# Send scroll type events through to the text box
-func _on_FocusBlocker_gui_input(ev):
-	if(_text_box_blocker_enabled):
-		if(ev is InputEventPanGesture):
-			get_text_box()._gui_input(ev)
-		# convert a drag into a pan gesture so it scrolls.
-		elif(ev is InputEventScreenDrag):
-			var converted = InputEventPanGesture.new()
-			converted.delta = Vector2(0, ev.relative.y)
-			converted.position = Vector2(0, 0)
-			get_text_box()._gui_input(converted)
-		elif(ev is InputEventMouseButton and (ev.button_index == BUTTON_WHEEL_DOWN or ev.button_index == BUTTON_WHEEL_UP)):
-			get_text_box()._gui_input(ev)
-	else:
-		get_text_box()._gui_input(ev)
-		print(ev)
-
-func _on_RichTextLabel_gui_input(ev):
+func set_font(font_name):
 	pass
-	# leaving this b/c it is wired up and might have to send
-	# more signals through
-	print(ev)
+	#_set_all_fonts_in_rtl(_large_handler.get_textbox(), font_name)
 
-func _on_Copy_pressed():
-	_text_box.select_all()
-	_text_box.copy()
-	_text_box.deselect()
+# Needs rework for 4.0, DynamicFont DNE
+func _set_font(rtl, font_name, custom_name):
+	pass
+	# if(font_name == null):
+	# 	rtl.set('custom_fonts/' + custom_name, null)
+	# else:
+	# 	var dyn_font = DynamicFont.new()
+	# 	var font_data = DynamicFontData.new()
+	# 	font_data.font_path = 'res://addons/gut/fonts/' + font_name + '.ttf'
+	# 	font_data.antialiased = true
+	# 	dyn_font.font_data = font_data
+	# 	rtl.set('custom_fonts/' + custom_name, dyn_font)
 
-func _on_DisableBlocker_toggled(button_pressed):
-	_text_box_blocker_enabled = !button_pressed
 
-func _on_ShowExtras_toggled(button_pressed):
-	_extras.visible = button_pressed
-
-func _on_Maximize_pressed():
-	if(rect_size == _pre_maximize_size):
-		maximize()
+func _set_all_fonts_in_rtl(rtl, base_name):
+	if(base_name == 'Default'):
+		_set_font(rtl, null, 'normal_font')
+		_set_font(rtl, null, 'bold_font')
+		_set_font(rtl, null, 'italics_font')
+		_set_font(rtl, null, 'bold_italics_font')
 	else:
-		rect_size = _pre_maximize_size
-# ####################
-# Private
-# ####################
-func _run_mode(is_running=true):
-	if(is_running):
-		_start_time = OS.get_unix_time()
-		_time = _start_time
-		_summary.failing.set_text("0")
-		_summary.passing.set_text("0")
-	_is_running = is_running
-
-	_hide_scripts()
-	var ctrls = $Navigation.get_children()
-	for i in range(ctrls.size()):
-		ctrls[i].disabled = is_running
-
-func _select_script(index):
-	$Navigation/CurrentScript.set_text(_script_list.get_item_text(index))
-	_script_list.select(index)
-	_update_controls()
-
-func _toggle_scripts():
-	if(_script_list.visible):
-		_hide_scripts()
-	else:
-		_show_scripts()
-
-func _show_scripts():
-	_script_list.show()
-
-func _hide_scripts():
-	_script_list.hide()
-
-func _update_controls():
-	var is_empty = _script_list.get_selected_items().size() == 0
-	if(is_empty):
-		_nav.next.disabled = true
-		_nav.prev.disabled = true
-	else:
-		var index = get_selected_index()
-		_nav.prev.disabled = index <= 0
-		_nav.next.disabled = index >= _script_list.get_item_count() - 1
-
-	_nav.run.disabled = is_empty
-	_nav.current_script.disabled = is_empty
-	_nav.show_scripts.disabled = is_empty
+		_set_font(rtl, base_name + '-Regular', 'normal_font')
+		_set_font(rtl, base_name + '-Bold', 'bold_font')
+		_set_font(rtl, base_name + '-Italic', 'italics_font')
+		_set_font(rtl, base_name + '-BoldItalic', 'bold_italics_font')
 
 
-# ####################
-# Public
-# ####################
-func run_mode(is_running=true):
-	_run_mode(is_running)
+func set_default_font_color(color):
+	_large_handler.get_textbox().set('custom_colors/default_color', color)
 
-func set_scripts(scripts):
-	_script_list.clear()
-	for i in range(scripts.size()):
-		_script_list.add_item(scripts[i])
-	_select_script(0)
-	_update_controls()
 
-func select_script(index):
-	_select_script(index)
-
-func get_selected_index():
-	return _script_list.get_selected_items()[0]
-
-func get_log_level():
-	return $LogLevelSlider.value
-
-func set_log_level(value):
-	$LogLevelSlider.value = _utils.nvl(value, 0)
-
-func set_ignore_pause(should):
-	_ignore_pauses.pressed = should
-
-func get_ignore_pause():
-	return _ignore_pauses.pressed
-
-func get_text_box():
-	return $TextDisplay/RichTextLabel
-
-func end_run():
-	_run_mode(false)
-	_update_controls()
-
-func set_progress_script_max(value):
-	_progress.script.set_max(value)
-
-func set_progress_script_value(value):
-	_progress.script.set_value(value)
-
-func set_progress_test_max(value):
-	_progress.test.set_max(value)
-
-func set_progress_test_value(value):
-	_progress.test.set_value(value)
-
-func clear_progress():
-	_progress.test.set_value(0)
-	_progress.script.set_value(0)
-
-func pause():
-	print('we got here')
-	_continue_button.disabled = false
-
-func set_title(title=null):
-	if(title == null):
-		$TitleBar/Title.set_text(DEFAULT_TITLE)
-	else:
-		$TitleBar/Title.set_text(title)
-
-func get_run_duration():
-	return $TitleBar/Time.text.to_float()
-
-func add_passing(amount=1):
-	if(!_summary):
-		return
-	_summary.passing.set_text(str(_summary.passing.get_text().to_int() + amount))
-	$Summary.show()
-
-func add_failing(amount=1):
-	if(!_summary):
-		return
-	_summary.failing.set_text(str(_summary.failing.get_text().to_int() + amount))
-	$Summary.show()
-
-func clear_summary():
-	_summary.passing.set_text("0")
-	_summary.failing.set_text("0")
-	$Summary.hide()
-
-func maximize():
-	if(is_inside_tree()):
-		var vp_size_offset = get_viewport().size
-		rect_size = vp_size_offset / get_scale()
-		set_position(Vector2(0, 0))
-
+func set_background_color(color):
+	_large_handler.set_bg_color(color)

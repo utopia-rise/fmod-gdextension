@@ -3,7 +3,7 @@ extends "res://addons/gut/test.gd"
 class TestCallbacks:
 	extends "res://addons/gut/test.gd"
 	
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks
@@ -38,10 +38,10 @@ class TestCallbacks:
 		Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED)
 		Fmod.set_event_volume(id, 0)
 		Fmod.start_event(id)
-		yield(yield_for(2), YIELD)
+		await yield_for(2)
 		assert_signal_not_emitted(Fmod, "timeline_beat", "Fmod should not have emitted timeline_beat signal")
 		Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
-		yield(yield_to(Fmod, "timeline_beat", 3), YIELD)
+		await yield_to(Fmod, "timeline_beat", 3)
 		assert_signal_emitted(Fmod, "timeline_beat", "Fmod should have emitted timeline_beat signal")
 		Fmod.stop_event(id, Fmod.FMOD_STUDIO_STOP_IMMEDIATE)
 		Fmod.release_event(id)

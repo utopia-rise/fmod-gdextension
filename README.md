@@ -1,11 +1,11 @@
-# FMOD Studio integration for Godot using GDNative
+![logo](.README/fmod-gdextension-logo.png)
 
-A Godot C++ GDNative that provides an integration for the FMOD Studio API.
+Godot C++ GDExtension for Godot 4 that provides an integration for the FMOD Studio API.
 
 FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many
 titles such as Transistor, Into the Breach and Celeste. [More on FMOD's website](https://www.fmod.com/).
 
-This GDNative exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
+This GDExtension exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
 common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a
 work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
 
@@ -31,25 +31,27 @@ This project uses [SEMVER](https://semver.org/).
 
 #### OS Compatibility matrix :
 
-| Driver Version | Windows | Linux | OSX | Android | iOS |
-|----------------|---------|-------|-----|---------|-----|
-|      0.0.0     |    X    |   X   |  X  |         |     |
-|      1.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.0     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.1     |    X    |   X   |  X  |    X    |  X  |
-|      2.0.2     |    X    |   X   |  X  |    X    |  X  |
-|      3.x.x     |    X    |   X   |  X  |    X    |  X  |
+| Driver Version | Windows | Linux | OSX | Android | iOS | Web (HTML5) |
+|----------------|---------|-------|-----|---------|-----|-------------|
+|      0.0.0     |    X    |   X   |  X  |         |     |             |
+|      1.0.0     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.0     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.1     |    X    |   X   |  X  |    X    |  X  |             |
+|      2.0.2     |    X    |   X   |  X  |    X    |  X  |             |
+|      3.x.x     |    X    |   X   |  X  |    X    |  X  |             |
+|      4.x.x     |    X    |   X   |  X  |    X    |  X  |             |
 
 #### Godot compatibility matrix
 
-| Driver Version | Godot 3.0 | Godot 3.1 | Godot 3.2 | Godot 3.3 | Godot 3.4 |
-|----------------|-----------|-----------|-----------|-----------|-----------|
-|      0.0.0     |           |      X    |           |           |           |
-|      1.0.0     |           |      X    |           |           |           |
-|      2.0.0     |           |      X    |           |           |           |
-|      2.0.1     |           |      X    |           |           |           |
-|      2.0.2     |           |      X    |           |           |           |
-|      3.x.x     |           |      X    |     X     |     X     |     X     |
+| Driver Version | Godot 3.0 | Godot 3.1 | Godot 3.2 | Godot 3.3 | Godot 3.4 | Godot 4.0 |
+|----------------|-----------|-----------|-----------|-----------|-----------|-----------|
+|      0.0.0     |           |      X    |           |           |           |           |
+|      1.0.0     |           |      X    |           |           |           |           |
+|      2.0.0     |           |      X    |           |           |           |           |
+|      2.0.1     |           |      X    |           |           |           |           |
+|      2.0.2     |           |      X    |           |           |           |           |
+|      3.x.x     |           |      X    |     X     |     X     |     X     |           |
+|      4.x.x     |           |           |           |           |           |     X     |
 
 #### Fmod compatibility matrix
 
@@ -62,6 +64,7 @@ This project uses [SEMVER](https://semver.org/).
 |      2.0.2     |    X    |         |         |
 |      3.0.0     |         |    X    |         |
 |      3.x.x     |         |         |    X    |
+|      4.x.x     |         |         |    X    |
 
 ## Installing the plugin in your project
 

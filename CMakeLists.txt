@@ -5,15 +5,24 @@ set(CMAKE_CXX_STANDARD 14)
 set(OS "windows")
 set(ARCH "")
 
-link_directories("../godot-cpp/bin/")
-include_directories("../godot-cpp/include/")
-include_directories("../godot-cpp/include/core")
-include_directories("../godot-cpp/include/gen")
-include_directories("../godot-cpp/godot-headers")
+link_directories("godot-cpp/bin/")
+include_directories("godot-cpp/include/")
+include_directories("godot-cpp/gen/include/")
+include_directories("godot-cpp/include/godot_cpp")
+include_directories("godot-cpp/gen/include/godot_cpp")
+include_directories("godot-cpp/gdextension")
+
 link_directories("../libs/fmod/${OS}/core/lib/${ARCH}")
 link_directories("../libs/fmod/${OS}/studio/lib/${ARCH}")
 include_directories(../libs/fmod/${OS}/core/inc ../libs/fmod/${OS}/studio/inc)
-add_library(GodotFmod SHARED src/godot_fmod.cpp src/godot_fmod.h src/gdlibrary.cpp src/helpers/current_function.h src/helpers/containers.h src/callback/event_callbacks.h src/callback/file_callbacks.h src/callback/file_callbacks.cpp src/callback/event_callbacks.cpp)
+
+include_directories("src")
+
+file(GLOB_RECURSE SOURCES src/*.c**)
+file(GLOB_RECURSE HEADERS src/*.h**)
+
+add_library(GodotFmod SHARED ${SOURCES} ${HEADERS})
+
 if (${OS} EQUAL "osx")
     target_link_libraries(GodotFmod libgodot-cpp.osx.64.a libfmod.dylib libfmodstudio.dylib)
 endif ()

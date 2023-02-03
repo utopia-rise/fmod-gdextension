@@ -4,7 +4,7 @@ class TestEvent:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks
@@ -58,7 +58,7 @@ class TestEvent:
 		var desired_value: int = 10
 		Fmod.set_event_paused(id, true)
 		Fmod.set_event_timeline_position(id, desired_value)
-		yield(yield_for(2), YIELD)
+		await yield_for(2)
 		assert_eq(Fmod.get_event_timeline_position(id), 10, "Event timeline should be at " + str(desired_value))
 	
 	func test_assert_event_reverb():

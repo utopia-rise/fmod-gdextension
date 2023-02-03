@@ -9,8 +9,20 @@
 #   },
 # }
 var _calls = {}
-var _utils = load('res://addons/gut/utils.gd').new()
+var _utils = load('res://addons/gut/utils.gd').get_instance()
 var _lgr = _utils.get_logger()
+var _compare = _utils.Comparator.new()
+
+func _find_parameters(call_params, params_to_find):
+	var found = false
+	var idx = 0
+	while(idx < call_params.size() and !found):
+		var result = _compare.deep(call_params[idx], params_to_find)
+		if(result.are_equal):
+			found = true
+		else:
+			idx += 1
+	return found
 
 func _get_params_as_string(params):
 	var to_return = ''
@@ -42,7 +54,7 @@ func was_called(variant, method_name, parameters=null):
 	var to_return = false
 	if(_calls.has(variant) and _calls[variant].has(method_name)):
 		if(parameters):
-			to_return =  _calls[variant][method_name].has(parameters)
+			to_return = _find_parameters(_calls[variant][method_name], parameters)
 		else:
 			to_return = true
 	return to_return
@@ -63,7 +75,7 @@ func get_call_parameters(variant, method_name, index=-1):
 			to_return = _calls[variant][method_name][get_index]
 		else:
 			_lgr.error(str('Specified index ', index, ' is outside range of the number of registered calls:  ', call_size))
-			
+
 	return to_return
 
 func call_count(instance, method_name, parameters=null):

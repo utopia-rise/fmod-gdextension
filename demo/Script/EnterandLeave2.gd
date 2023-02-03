@@ -8,9 +8,9 @@ var music: int = 0
 func _ready():
 	Fmod.load_file_as_music("res://assets/Music/jingles_SAX07.ogg")
 # warning-ignore:return_value_discarded
-	connect("body_entered", self, "enter")
+	body_entered.connect(enter)
 # warning-ignore:return_value_discarded
-	connect("body_exited", self, "leave")
+	body_exited.connect(leave)
 
 # warning-ignore:unused_argument
 func enter(area):

@@ -4,7 +4,7 @@ class TestEventDescription:
 	extends "res://addons/gut/test.gd"
 	
 	var id: int
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks
@@ -36,7 +36,7 @@ class TestEventDescription:
 		assert_eq(instance_list.size(), desired_value, "Event description list size should be " + str(desired_value))
 		Fmod.release_event(id2)
 		desired_value = 1
-		yield(yield_for(2), YIELD)
+		await yield_for(2)
 		assert_eq(Fmod.desc_get_instance_list("event:/Vehicles/Car Engine").size(), desired_value, "Event description list size should be " + str(desired_value))
 		id2 = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 		var id3: int = Fmod.create_event_instance("event:/Vehicles/Car Engine")
@@ -44,7 +44,7 @@ class TestEventDescription:
 		assert_eq(Fmod.desc_get_instance_list("event:/Vehicles/Car Engine").size(), desired_value, "Event description list size should be " + str(desired_value))
 		Fmod.desc_release_all_instances("event:/Vehicles/Car Engine")
 		desired_value = 0
-		yield(yield_for(2), YIELD)
+		await yield_for(2)
 		assert_eq(Fmod.desc_get_instance_count("event:/Vehicles/Car Engine"), desired_value, "Event description list size should be " + str(desired_value))
 		id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
 	

@@ -3,7 +3,7 @@ extends "res://addons/gut/test.gd"
 class TestGlobal:
 	extends "res://addons/gut/test.gd"
 	
-	var sprite: Sprite = Sprite.new()
+	var sprite: Sprite2D = Sprite2D.new()
 	
 	func before_all():
 		# load banks
@@ -57,15 +57,15 @@ class TestGlobal:
 		assert_has(dict, key, "Performance data should contains " + key + " data")
 		
 	func test_assert_should_have_dsp_buffer_length():
-		var buffer_length = Fmod.get_dsp_buffer_length()
+		var buffer_length = Fmod.get_system_dsp_buffer_length()
 		assert_eq(buffer_length, 512)
 		
 	func test_assert_should_have_dsp_num_buffers():
-		var num_buffers = Fmod.get_dsp_num_buffers()
+		var num_buffers = Fmod.get_system_dsp_num_buffers()
 		assert_eq(num_buffers, 4)
 
 	func test_assert_should_have_dsp_buffer_size():
-		var buffer_size = Fmod.get_dsp_buffer_size()
+		var buffer_size = Fmod.get_system_dsp_buffer_size()
 		assert_eq(buffer_size.size(), 2)
 		assert_eq(buffer_size[0], 512)
 		assert_eq(buffer_size[1], 4)

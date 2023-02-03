@@ -20,6 +20,9 @@ bin/
 *.o
 *.obj
 
+*.exp
+*.lib
+
 # Clion specific
 
 .idea/*
@@ -125,3 +128,6 @@ config.log
 .sconf_temp
 
 # End of https://www.gitignore.io/api/clion,cmake,scons
+
+demo/.godot
+**/*.editor

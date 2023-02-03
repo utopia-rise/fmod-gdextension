@@ -1,165 +1,130 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=11 format=3 uid="uid://bq8cp78n4pk7x"]
 
-[ext_resource path="res://Script/FmodTest.gd" type="Script" id=1]
-[ext_resource path="res://icon.png" type="Texture" id=2]
-[ext_resource path="res://Script/Emitter.gd" type="Script" id=3]
-[ext_resource path="res://Script/Listener.gd" type="Script" id=4]
-[ext_resource path="res://Script/EnterAndLeave.gd" type="Script" id=5]
-[ext_resource path="res://Script/ChangeColor.gd" type="Script" id=6]
-[ext_resource path="res://Script/EnterandLeave2.gd" type="Script" id=7]
+[ext_resource type="Script" path="res://Script/FmodTest.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://ceqd5rtw6dup5" path="res://icon.png" id="2"]
+[ext_resource type="Script" path="res://Script/Emitter.gd" id="3"]
+[ext_resource type="Script" path="res://Script/Listener.gd" id="4"]
+[ext_resource type="Script" path="res://Script/EnterAndLeave.gd" id="5"]
+[ext_resource type="Script" path="res://Script/ChangeColor.gd" id="6"]
+[ext_resource type="Script" path="res://Script/EnterandLeave2.gd" id="7"]
 
-[sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 43.8519, 41.3105 )
+[sub_resource type="RectangleShape2D" id="1"]
+size = Vector2(87.7038, 82.621)
 
-[sub_resource type="RectangleShape2D" id=2]
+[sub_resource type="RectangleShape2D" id="2"]
 resource_local_to_scene = true
-extents = Vector2( 144.062, 145.983 )
+size = Vector2(288.124, 291.966)
 
-[sub_resource type="RectangleShape2D" id=3]
-extents = Vector2( 144.969, 142.48 )
+[sub_resource type="RectangleShape2D" id="3"]
+size = Vector2(289.938, 284.96)
 
 [node name="FmodTest" type="Node2D"]
-position = Vector2( 0, -3 )
-script = ExtResource( 1 )
+position = Vector2(0, -3)
+script = ExtResource("1")
 
 [node name="Node2D" type="Node2D" parent="."]
-position = Vector2( 500, 500 )
+position = Vector2(500, 500)
 
-[node name="Emitter" type="Sprite" parent="Node2D"]
-self_modulate = Color( 0.988235, 0, 0, 1 )
-position = Vector2( -3.05176e-05, 0 )
-texture = ExtResource( 2 )
-script = ExtResource( 3 )
+[node name="Emitter" type="Sprite2D" parent="Node2D"]
+self_modulate = Color(0.988235, 0, 0, 1)
+position = Vector2(-3.05176e-05, 0)
+texture = ExtResource("2")
+script = ExtResource("3")
 
 [node name="Label" type="Label" parent="Node2D"]
+anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-margin_left = 49.9
-margin_top = -69.8306
-margin_right = 249.9
-margin_bottom = 80.1694
+grow_vertical = 2
 size_flags_stretch_ratio = 0.0
 text = "Press Space to pause/unpause
 Come closer to hear it"
-align = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
-[node name="Listener" type="KinematicBody2D" parent="."]
-position = Vector2( 500, 150 )
-script = ExtResource( 4 )
+[node name="Listener" type="CharacterBody2D" parent="."]
+position = Vector2(500, 150)
+script = ExtResource("4")
 
-[node name="icon" type="Sprite" parent="Listener"]
-position = Vector2( 1.89996, 4.12415 )
-texture = ExtResource( 2 )
+[node name="icon" type="Sprite2D" parent="Listener"]
+position = Vector2(1.89996, 4.12415)
+texture = ExtResource("2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Listener"]
-position = Vector2( 0.440125, 0.440125 )
-shape = SubResource( 1 )
+position = Vector2(0.440125, 0.440125)
+shape = SubResource("1")
 
 [node name="Label" type="Label" parent="Listener"]
+anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -97.9322
-margin_top = 52.1241
-margin_right = 102.068
-margin_bottom = 139.124
+grow_horizontal = 2
 size_flags_stretch_ratio = 0.0
 text = "Listener
 Kill it with K key!"
-align = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="SoundArea1" type="Area2D" parent="."]
-position = Vector2( 146.558, 148.68 )
-script = ExtResource( 5 )
+position = Vector2(146.558, 148.68)
+script = ExtResource("5")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea1"]
-shape = SubResource( 2 )
+shape = SubResource("2")
 
-[node name="icon" type="Sprite" parent="SoundArea1"]
-self_modulate = Color( 0.113725, 0.823529, 0.317647, 1 )
-scale = Vector2( 3, 3 )
+[node name="icon" type="Sprite2D" parent="SoundArea1"]
+self_modulate = Color(0.113725, 0.823529, 0.317647, 1)
 z_index = -1
-texture = ExtResource( 2 )
+scale = Vector2(3, 3)
+texture = ExtResource("2")
 
 [node name="Label2" type="Label" parent="SoundArea1"]
-margin_left = -114.674
-margin_top = -148.68
-margin_right = 109.326
-margin_bottom = 155.32
 size_flags_stretch_ratio = 0.0
 text = "Files loaded as sounds.
 Played when entering and exiting this area.
 Several instances of the same sound can be played at the same time
 "
-align = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": true
-}
 
 [node name="SoundArea2" type="Area2D" parent="."]
-position = Vector2( 818.43, 97.5364 )
-script = ExtResource( 6 )
+position = Vector2(818.43, 97.5364)
+script = ExtResource("6")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea2"]
-position = Vector2( 52.8021, 45.8286 )
-shape = SubResource( 3 )
+position = Vector2(52.8021, 45.8286)
+shape = SubResource("3")
 
-[node name="icon" type="Sprite" parent="SoundArea2"]
-self_modulate = Color( 0.0117647, 0.956863, 0.0156863, 1 )
-position = Vector2( 52.3218, 46.0544 )
-scale = Vector2( 3, 3 )
+[node name="icon" type="Sprite2D" parent="SoundArea2"]
+self_modulate = Color(0.0117647, 0.956863, 0.0156863, 1)
 z_index = -1
-texture = ExtResource( 2 )
+position = Vector2(52.3218, 46.0544)
+scale = Vector2(3, 3)
+texture = ExtResource("2")
 
 [node name="Label3" type="Label" parent="SoundArea2"]
-margin_left = -74.0
-margin_top = -92.0
-margin_right = 176.0
-margin_bottom = -61.0
 size_flags_stretch_ratio = 0.0
 text = "Event is unpaused when entering 
 The color changes every beat"
-align = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="SoundArea3" type="Area2D" parent="."]
-position = Vector2( 91.9974, 414.5 )
-script = ExtResource( 7 )
+position = Vector2(91.9974, 414.5)
+script = ExtResource("7")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea3"]
-position = Vector2( 52.8021, 45.8286 )
-shape = SubResource( 3 )
+position = Vector2(52.8021, 45.8286)
+shape = SubResource("3")
 
-[node name="icon" type="Sprite" parent="SoundArea3"]
-self_modulate = Color( 0.827451, 0.345098, 0.0941176, 1 )
-position = Vector2( 52.3218, 46.0544 )
-scale = Vector2( 3, 3 )
+[node name="icon" type="Sprite2D" parent="SoundArea3"]
+self_modulate = Color(0.827451, 0.345098, 0.0941176, 1)
 z_index = -1
-texture = ExtResource( 2 )
+position = Vector2(52.3218, 46.0544)
+scale = Vector2(3, 3)
+texture = ExtResource("2")
 
 [node name="Label3" type="Label" parent="SoundArea3"]
-margin_left = -70.4543
-margin_top = -84.0222
-margin_right = 179.546
-margin_bottom = 95.9778
 size_flags_stretch_ratio = 0.0
 text = "File loaded as Music
 Start when entering
 Stop when exiting
 Only one instance of that music can be played "
-align = 1
-autowrap = true
-__meta__ = {
-"_edit_use_anchors_": false
-}
+
+[node name="FmodEventEmitter2d" type="FmodEventEmitter2D" parent="."]
+event_name = "event:/Vehicles/Car Engine"
+attached = false
+allow_fadeout = false
+preload_event = false
