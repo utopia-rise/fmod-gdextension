@@ -1,8 +1,8 @@
-#include "api/FmodBank.h"
-#include "api/FmodBus.h"
-#include "api/FmodEvent.h"
-#include "api/FmodEventDescription.h"
-#include "api/FmodVCA.h"
+#include "api/fmod_bank.h"
+#include "api/fmod_bus.h"
+#include "api/fmod_event.h"
+#include "api/fmod_event_description.h"
+#include "api/fmod_vca.h"
 #include <classes/engine.hpp>
 #include <godot_fmod.h>
 #include <nodes/fmod_event_emitter_2d.h>

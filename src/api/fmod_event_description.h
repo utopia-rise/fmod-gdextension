@@ -1,11 +1,12 @@
-#ifndef GODOTFMOD_FMODEVENTDESCRIPTION_H
-#define GODOTFMOD_FMODEVENTDESCRIPTION_H
+#ifndef GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
+#define GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_object.h"
 #include "fmod_studio.hpp"
 
 namespace godot {
-    class FmodEventDescription : public RefCounted {
+    class FmodEventDescription : public RefCounted, public FmodObject {
         GDCLASS(FmodEventDescription, RefCounted);
 
         FMOD::Studio::EventDescription* description;
@@ -36,4 +37,4 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
-#endif// GODOTFMOD_FMODEVENTDESCRIPTION_H
+#endif// GODOTFMOD_FMOD_EVENT_DESCRIPTION_H

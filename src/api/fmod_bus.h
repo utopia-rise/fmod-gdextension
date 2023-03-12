@@ -1,11 +1,12 @@
-#ifndef GODOTFMOD_FMODBUS_H
-#define GODOTFMOD_FMODBUS_H
+#ifndef GODOTFMOD_FMOD_BUS_H
+#define GODOTFMOD_FMOD_BUS_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_object.h"
 #include "fmod_studio.hpp"
 
 namespace godot {
-    class FmodBus : public RefCounted {
+    class FmodBus : public RefCounted, public FmodObject {
         GDCLASS(FmodBus, RefCounted);
 
         FMOD::Studio::Bus* bus;
@@ -22,4 +23,4 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
-#endif// GODOTFMOD_FMODBUS_H
+#endif// GODOTFMOD_FMOD_BUS_H

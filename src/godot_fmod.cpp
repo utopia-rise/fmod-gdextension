@@ -2,6 +2,7 @@
 // Created by Pierre-Thomas Meisels on 2019-01-01.
 //
 
+#include "helpers/common.h"
 #include <classes/node3d.hpp>
 #include <godot_fmod.h>
 
@@ -61,32 +62,6 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_bank_string_count", "pathToBank"), &Fmod::get_bank_string_count);
     ClassDB::bind_method(D_METHOD("get_bank_VCA_count", "pathToBank"), &Fmod::get_bank_vca_count);
     ClassDB::bind_method(D_METHOD("create_event_instance", "eventPath"), &Fmod::create_event_instance);
-    ClassDB::bind_method(D_METHOD("get_event_parameter_by_name", "instanceId", "parameterName"), &Fmod::get_event_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_event_parameter_by_name", "instanceId", "parameterName", "value"), &Fmod::set_event_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_event_parameter_by_id", "instanceId", "idPair"), &Fmod::get_event_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_event_parameter_by_id", "instanceId", "idPair", "value"), &Fmod::set_event_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("release_event", "instanceId"), &Fmod::release_event);
-    ClassDB::bind_method(D_METHOD("start_event", "instanceId"), &Fmod::start_event);
-    ClassDB::bind_method(D_METHOD("stop_event", "instanceId", "stopMode"), &Fmod::stop_event);
-    ClassDB::bind_method(D_METHOD("event_key_off", "instanceId"), &Fmod::event_key_off);
-    ClassDB::bind_method(D_METHOD("get_event_playback_state", "instanceId"), &Fmod::get_event_playback_state);
-    ClassDB::bind_method(D_METHOD("get_event_paused", "instanceId"), &Fmod::get_event_paused);
-    ClassDB::bind_method(D_METHOD("set_event_paused", "instanceId", "paused"), &Fmod::set_event_paused);
-    ClassDB::bind_method(D_METHOD("get_event_pitch", "instanceId"), &Fmod::get_event_pitch);
-    ClassDB::bind_method(D_METHOD("set_event_pitch", "instanceId", "pitch"), &Fmod::set_event_pitch);
-    ClassDB::bind_method(D_METHOD("get_event_volume", "instanceId"), &Fmod::get_event_volume);
-    ClassDB::bind_method(D_METHOD("set_event_volume", "instanceId", "volume"), &Fmod::set_event_volume);
-    ClassDB::bind_method(D_METHOD("get_event_timeline_position", "instanceId"), &Fmod::get_event_timeline_position);
-    ClassDB::bind_method(D_METHOD("set_event_timeline_position", "instanceId", "position"), &Fmod::set_event_timeline_position);
-    ClassDB::bind_method(D_METHOD("get_event_reverb_level", "instanceId", "index"), &Fmod::get_event_reverb_level);
-    ClassDB::bind_method(D_METHOD("set_event_reverb_level", "instanceId", "index", "level"), &Fmod::set_event_reverb_level);
-    ClassDB::bind_method(D_METHOD("is_event_virtual", "instanceId"), &Fmod::is_event_virtual);
-    ClassDB::bind_method(D_METHOD("set_event_listener_mask", "instanceId", "mask"), &Fmod::set_event_listener_mask);
-    ClassDB::bind_method(D_METHOD("get_event_listener_mask", "instanceId"), &Fmod::get_event_listener_mask);
-    ClassDB::bind_method(D_METHOD("set_event_2d_attributes", "instanceId", "position"), &Fmod::set_event_2d_attributes);
-    ClassDB::bind_method(D_METHOD("get_event_2d_attributes", "instanceId"), &Fmod::get_event_2d_attributes);
-    ClassDB::bind_method(D_METHOD("set_event_3d_attributes", "instanceId", "transform"), &Fmod::set_event_3d_attributes);
-    ClassDB::bind_method(D_METHOD("get_event_3d_attributes", "instanceId"), &Fmod::get_event_3d_attributes);
     ClassDB::bind_method(D_METHOD("desc_get_length", "eventPath"), &Fmod::desc_get_length);
     ClassDB::bind_method(D_METHOD("desc_get_instance_list", "eventPath"), &Fmod::desc_get_instance_list);
     ClassDB::bind_method(D_METHOD("desc_get_instance_count", "eventPath"), &Fmod::desc_get_instance_count);
@@ -172,14 +147,6 @@ void Fmod::_bind_methods() {
     ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
 
     REGISTER_ALL_CONSTANTS
-}
-
-bool Fmod::checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
-    if (result != FMOD_OK) {
-        UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
-        return false;
-    }
-    return true;
 }
 
 void Fmod::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
@@ -581,182 +548,7 @@ uint64_t Fmod::create_event_instance(const String& eventPath) {
     return 0;
 }
 
-float Fmod::get_event_parameter_by_name(uint64_t instanceId, const String& parameterName) {
-    float p = -1;
-    FIND_AND_CHECK(instanceId, events, p)
-    ERROR_CHECK(instance->getParameterByName(parameterName.utf8().get_data(), &p));
-    return p;
-}
 
-void Fmod::set_event_parameter_by_name(uint64_t instanceId, const String& parameterName, float value) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setParameterByName(parameterName.utf8().get_data(), value));
-}
-
-float Fmod::get_event_parameter_by_id(uint64_t instanceId, const Array& idPair) {
-    float value = -1.0f;
-    FIND_AND_CHECK(instanceId, events, value)
-    FMOD_STUDIO_PARAMETER_ID id;
-    id.data1 = idPair[0];
-    id.data2 = idPair[1];
-    ERROR_CHECK(instance->getParameterByID(id, &value));
-    return value;
-}
-
-void Fmod::set_event_parameter_by_id(uint64_t instanceId, const Array& idPair, float value) {
-    FIND_AND_CHECK(instanceId, events)
-    FMOD_STUDIO_PARAMETER_ID id;
-    id.data1 = idPair[0];
-    id.data2 = idPair[1];
-    ERROR_CHECK(instance->setParameterByID(id, value));
-}
-
-void Fmod::release_event(uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, events)
-    _release_one_event(instance);
-}
-
-void Fmod::_release_one_event(FMOD::Studio::EventInstance* eventInstance) {
-    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
-    EventInfo* eventInfo = _get_event_info(eventInstance);
-    eventInstance->setUserData(nullptr);
-    ERROR_CHECK(eventInstance->release());
-    events.erase(eventInstance);
-    delete eventInfo;
-}
-
-void Fmod::start_event(uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->start());
-}
-
-void Fmod::stop_event(uint64_t instanceId, int stopMode) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
-}
-
-void Fmod::event_key_off(uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->keyOff());
-}
-
-int Fmod::get_event_playback_state(uint64_t instanceId) {
-    int s = -1;
-    FIND_AND_CHECK(instanceId, events, s)
-    ERROR_CHECK(instance->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE*) &s));
-    return s;
-}
-
-bool Fmod::get_event_paused(uint64_t instanceId) {
-    bool paused = false;
-    FIND_AND_CHECK(instanceId, events, paused)
-    ERROR_CHECK(instance->getPaused(&paused));
-    return paused;
-}
-
-void Fmod::set_event_paused(uint64_t instanceId, bool paused) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setPaused(paused));
-}
-
-float Fmod::get_event_pitch(uint64_t instanceId) {
-    float pitch = 0.0f;
-    FIND_AND_CHECK(instanceId, events, pitch)
-    ERROR_CHECK(instance->getPitch(&pitch));
-    return pitch;
-}
-
-void Fmod::set_event_pitch(uint64_t instanceId, float pitch) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setPitch(pitch));
-}
-
-float Fmod::get_event_volume(uint64_t instanceId) {
-    float volume = 0.0f;
-    FIND_AND_CHECK(instanceId, events, volume)
-    ERROR_CHECK(instance->getVolume(&volume));
-    return volume;
-}
-
-void Fmod::set_event_volume(uint64_t instanceId, float volume) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setVolume(volume));
-}
-
-int Fmod::get_event_timeline_position(uint64_t instanceId) {
-    int tp = 0;
-    FIND_AND_CHECK(instanceId, events, tp)
-    ERROR_CHECK(instance->getTimelinePosition(&tp));
-    return tp;
-}
-
-void Fmod::set_event_timeline_position(uint64_t instanceId, int position) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setTimelinePosition(position));
-}
-
-float Fmod::get_event_reverb_level(uint64_t instanceId, int index) {
-    float rvl = 0.0f;
-    FIND_AND_CHECK(instanceId, events, rvl)
-    ERROR_CHECK(instance->getReverbLevel(index, &rvl));
-    return rvl;
-}
-
-void Fmod::set_event_reverb_level(uint64_t instanceId, int index, float level) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setReverbLevel(index, level));
-}
-
-bool Fmod::is_event_virtual(uint64_t instanceId) {
-    bool v = false;
-    FIND_AND_CHECK(instanceId, events, v)
-    ERROR_CHECK(instance->isVirtual(&v));
-    return v;
-}
-
-void Fmod::set_event_listener_mask(uint64_t instanceId, unsigned int mask) {
-    FIND_AND_CHECK(instanceId, events)
-    ERROR_CHECK(instance->setListenerMask(mask));
-}
-
-uint32_t Fmod::get_event_listener_mask(uint64_t instanceId) {
-    uint32_t mask = 0;
-    FIND_AND_CHECK(instanceId, events, mask)
-    ERROR_CHECK(instance->getListenerMask(&mask));
-    return mask;
-}
-
-void Fmod::set_event_2d_attributes(uint64_t instanceId, Transform2D position) {
-    FIND_AND_CHECK(instanceId, events)
-    auto attr = _get_3d_attributes_from_transform_2d(position);
-    ERROR_CHECK(instance->set3DAttributes(&attr));
-}
-
-Dictionary Fmod::get_event_2d_attributes(uint64_t instanceId) {
-    Dictionary _2Dattr;
-    FIND_AND_CHECK(instanceId, events, _2Dattr)
-    FMOD_3D_ATTRIBUTES
-    attr;
-    ERROR_CHECK(instance->get3DAttributes(&attr));
-    _2Dattr = _get_transform_2d_info_from_3d_attribut(attr);
-    return _2Dattr;
-}
-
-void Fmod::set_event_3d_attributes(uint64_t instanceId, const Transform3D& transform) {
-    FIND_AND_CHECK(instanceId, events)
-    auto attr = _get_3d_attributes_from_transform(transform);
-    ERROR_CHECK(instance->set3DAttributes(&attr));
-}
-
-Dictionary Fmod::get_event_3d_attributes(uint64_t instanceId) {
-    Dictionary _3Dattr;
-    FIND_AND_CHECK(instanceId, events, _3Dattr)
-    FMOD_3D_ATTRIBUTES
-    attr;
-    ERROR_CHECK(instance->get3DAttributes(&attr));
-    _3Dattr = _get_transform_info_from_3d_attribut(attr);
-    return _3Dattr;
-}
 
 int Fmod::desc_get_length(const String& eventPath) {
     int length = -1;
