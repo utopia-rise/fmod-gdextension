@@ -1,10 +1,11 @@
 #ifndef GODOTFMOD_COMMON_H
 #define GODOTFMOD_COMMON_H
 
+#include "classes/node3d.hpp"
 #include "fmod_common.h"
+#include "variant/utility_functions.hpp"
 #include <fmod_errors.h>
 #include <helpers/current_function.h>
-#include "variant/utility_functions.hpp"
 
 #define CUSTOM_FILESYSTEM
 
@@ -68,6 +69,25 @@ namespace godot {
             return false;
         }
         return true;
+    }
+
+    bool is_dead(Object* node) {
+        if (!node) {
+            return true;
+        }
+        return !UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
+    }
+
+    bool is_fmod_valid(Object* node) {
+        if (node) {
+            bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
+            if (!ret) {
+                GODOT_LOG(2, "Invalid Object. A listener has to be either a Node3D or CanvasItem.")
+            }
+            return ret;
+        }
+        GODOT_LOG(2, "Object is null")
+        return false;
     }
 
 }// namespace godot

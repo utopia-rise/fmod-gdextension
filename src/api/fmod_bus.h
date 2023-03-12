@@ -2,11 +2,10 @@
 #define GODOTFMOD_FMOD_BUS_H
 
 #include "classes/ref_counted.hpp"
-#include "fmod_object.h"
 #include "fmod_studio.hpp"
 
 namespace godot {
-    class FmodBus : public RefCounted, public FmodObject {
+    class FmodBus : public RefCounted {
         GDCLASS(FmodBus, RefCounted);
 
         FMOD::Studio::Bus* bus;
@@ -18,6 +17,10 @@ namespace godot {
         void set_bus_paused(const String& busPath, bool paused);
         void set_bus_volume(const String& busPath, float volume);
         void stop_all_bus_events(const String& busPath, int stopMode);
+
+    public:
+        FmodBus() = default;
+        ~FmodBus() = default;
 
     protected:
         static void _bind_methods();

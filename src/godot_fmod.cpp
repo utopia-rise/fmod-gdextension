@@ -1,7 +1,3 @@
-//
-// Created by Pierre-Thomas Meisels on 2019-01-01.
-//
-
 #include "helpers/common.h"
 #include <classes/node3d.hpp>
 #include <godot_fmod.h>
@@ -99,9 +95,6 @@ void Fmod::_bind_methods() {
     ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "eventName", "gameObj", "parameters"), &Fmod::play_one_shot_with_params);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached", "eventName", "gameObj"), &Fmod::play_one_shot_attached);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "eventName", "gameObj", "parameters"), &Fmod::play_one_shot_attached_with_params);
-    ClassDB::bind_method(D_METHOD("attach_instance_to_node", "instanceId", "gameObj"), &Fmod::attach_instance_to_node);
-    ClassDB::bind_method(D_METHOD("detach_instance_from_node", "instanceId"), &Fmod::detach_instance_from_node);
-    ClassDB::bind_method(D_METHOD("get_object_attached_to_instance", "instanceId"), &Fmod::get_object_attached_to_instance);
     ClassDB::bind_method(D_METHOD("pause_all_events", "pause"), &Fmod::pause_all_events);
     ClassDB::bind_method(D_METHOD("mute_all_events"), &Fmod::mute_all_events);
     ClassDB::bind_method(D_METHOD("unmute_all_events"), &Fmod::unmute_all_events);
@@ -184,8 +177,7 @@ void Fmod::update() {
     // Check if bank are loaded, load buses, vca and event descriptions.
     _check_loading_banks();
 
-    for (int i = 0; i < events.size(); i++) {
-        FMOD::Studio::EventInstance* eventInstance = events.get(i);
+    for (FMOD::Studio::EventInstance* eventInstance : events) {
         if (eventInstance) {
             EventInfo* eventInfo = _get_event_info(eventInstance);
             if (eventInfo) {
@@ -194,7 +186,6 @@ void Fmod::update() {
                         FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
                         ERROR_CHECK(eventInstance->stop(m));
                         _release_one_event(eventInstance);
-                        i--;
                         continue;
                     }
                     if (eventInfo->isOneShot) {
@@ -202,7 +193,6 @@ void Fmod::update() {
                         ERROR_CHECK(eventInstance->getPlaybackState(&s));
                         if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
                             _release_one_event(eventInstance);
-                            i--;
                             continue;
                         }
                     }
@@ -214,11 +204,9 @@ void Fmod::update() {
         }
     }
 
-    for (int i = 0; i < channels.size(); i++) {
-        FMOD::Channel* channel = channels.get(i);
+    for (FMOD::Channel* channel : channels) {
         if (channel && !_is_channel_valid(channel)) {
             channels.erase(channel);
-            i--;
         }
     }
 
@@ -232,9 +220,23 @@ void Fmod::update() {
     ERROR_CHECK(system->update());
 }
 
+EventInfo* Fmod::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
+    EventInfo* eventInfo;
+    ERROR_CHECK(eventInstance->getUserData((void**) &eventInfo));
+    return eventInfo;
+}
+
+void  Fmod::_release_one_event(FMOD::Studio::EventInstance* eventInstance) {
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
+    EventInfo* eventInfo = _get_event_info(eventInstance);
+    eventInstance->setUserData(nullptr);
+    ERROR_CHECK(eventInstance->release());
+    events.erase(eventInstance);
+    delete eventInfo;
+}
+
 void Fmod::_check_loading_banks() {
-    for (int i = 0; i < loadingBanks.size(); i++) {
-        auto loadingBank = loadingBanks.pop_front_value();
+    for (auto loadingBank : loadingBanks) {
         auto bank = loadingBank->bank;
         FMOD_STUDIO_LOADING_STATE* loading_state = nullptr;
         ERROR_CHECK(bank->getLoadingState(loading_state));
@@ -242,7 +244,7 @@ void Fmod::_check_loading_banks() {
             _load_bank_data(loadingBank);
             delete loadingBank;
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
-            loadingBanks.push_back_value(loadingBank);
+            loadingBanks.push_back(loadingBank);
         } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             bank->unload();
             delete loadingBank;
@@ -265,7 +267,7 @@ void Fmod::_set_listener_attributes() {
         if (listener->listenerLock) {
             continue;
         }
-        if (_is_dead(listener->gameObj)) {
+        if (is_dead(listener->gameObj)) {
             listener->gameObj = nullptr;
             ERROR_CHECK(system->setListenerWeight(i, 0));
             continue;
@@ -277,13 +279,13 @@ void Fmod::_set_listener_attributes() {
         }
 
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
-            auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
+            auto attr = get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
         }
 
         if (auto* s {Node::cast_to<Node3D>(node)}) {
-            auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
+            auto attr = get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(system->setListenerAttributes(i, &attr));
             continue;
         }
@@ -292,14 +294,14 @@ void Fmod::_set_listener_attributes() {
 
 void Fmod::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) {
     // try to set 3D attributes
-    if (instance && _is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
+    if (instance && is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
-            auto attr = _get_3d_attributes_from_transform_2d(ci->get_global_transform());
+            auto attr = get_3d_attributes_from_transform_2d(ci->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
         if (auto* s {Node::cast_to<Node3D>(node)}) {
-            auto attr = _get_3d_attributes_from_transform(s->get_global_transform());
+            auto attr = get_3d_attributes_from_transform(s->get_global_transform());
             ERROR_CHECK(instance->set3DAttributes(&attr));
             return;
         }
@@ -327,7 +329,7 @@ void Fmod::set_system_listener_number(int p_listenerNumber) {
 }
 
 void Fmod::add_listener(int index, Object* gameObj) {
-    if (!_is_fmod_valid(gameObj)) {
+    if (!is_fmod_valid(gameObj)) {
         return;
     }
     if (index >= 0 && index < systemListenerNumber) {
@@ -392,7 +394,7 @@ Dictionary Fmod::get_system_listener_3d_attributes(const int index) {
         FMOD_3D_ATTRIBUTES
         attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
-        _3Dattr = _get_transform_info_from_3d_attribut(attr);
+        _3Dattr = get_transform_info_from_3d_attribut(attr);
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
     }
@@ -405,7 +407,7 @@ Dictionary Fmod::get_system_listener_2d_attributes(int index) {
         FMOD_3D_ATTRIBUTES
         attr;
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
-        _2Dattr = _get_transform_2d_info_from_3d_attribut(attr);
+        _2Dattr = get_transform_2d_info_from_3d_attribut(attr);
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
     }
@@ -415,7 +417,7 @@ Dictionary Fmod::get_system_listener_2d_attributes(int index) {
 void Fmod::set_system_listener_3d_attributes(int index, const Transform3D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr = _get_3d_attributes_from_transform(transform);
+        attr = get_3d_attributes_from_transform(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
@@ -425,7 +427,7 @@ void Fmod::set_system_listener_3d_attributes(int index, const Transform3D& trans
 void Fmod::set_system_listener_2d_attributes(int index, const Transform2D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES
-        attr = _get_3d_attributes_from_transform_2d(transform);
+        attr = get_3d_attributes_from_transform_2d(transform);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
         GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
@@ -483,7 +485,7 @@ String Fmod::load_bank(const String& pathToBank, unsigned int flag) {
         if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
             _load_bank_data(loadingBank);
         } else {
-            loadingBanks.append(loadingBank);
+            loadingBanks.push_back(loadingBank);
         }
     }
     return pathToBank;
@@ -547,8 +549,6 @@ uint64_t Fmod::create_event_instance(const String& eventPath) {
     }
     return 0;
 }
-
-
 
 int Fmod::desc_get_length(const String& eventPath) {
     int length = -1;
@@ -956,7 +956,7 @@ void Fmod::play_one_shot(const String& eventName, Object* gameObj) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
-        if (_is_fmod_valid(gameObj)) {
+        if (is_fmod_valid(gameObj)) {
             _update_instance_3d_attributes(instance, gameObj);
         }
         ERROR_CHECK(instance->start());
@@ -968,7 +968,7 @@ void Fmod::play_one_shot_with_params(const String& eventName, Object* gameObj, c
     FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
     if (instance) {
         // set 3D attributes once
-        if (_is_fmod_valid(gameObj)) {
+        if (is_fmod_valid(gameObj)) {
             _update_instance_3d_attributes(instance, gameObj);
         }
         // set the initial parameter values
@@ -984,7 +984,7 @@ void Fmod::play_one_shot_with_params(const String& eventName, Object* gameObj, c
 }
 
 void Fmod::play_one_shot_attached(const String& eventName, Object* gameObj) {
-    if (_is_fmod_valid(gameObj)) {
+    if (is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
             ERROR_CHECK(instance->start());
@@ -993,7 +993,7 @@ void Fmod::play_one_shot_attached(const String& eventName, Object* gameObj) {
 }
 
 void Fmod::play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
-    if (_is_fmod_valid(gameObj)) {
+    if (is_fmod_valid(gameObj)) {
         FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
         if (instance) {
             // set the initial parameter values
@@ -1006,33 +1006,6 @@ void Fmod::play_one_shot_attached_with_params(const String& eventName, Object* g
             ERROR_CHECK(instance->start());
         }
     }
-}
-
-void Fmod::attach_instance_to_node(uint64_t instanceId, Object* gameObj) {
-    if (!_is_fmod_valid(gameObj)) {
-        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Node3D or CanvasItem")
-        return;
-    }
-    FIND_AND_CHECK(instanceId, events)
-    _get_event_info(instance)->gameObj = gameObj;
-}
-
-void Fmod::detach_instance_from_node(const uint64_t instanceId) {
-    FIND_AND_CHECK(instanceId, events)
-    _get_event_info(instance)->gameObj = nullptr;
-}
-
-Object* Fmod::get_object_attached_to_instance(uint64_t instanceId) {
-    Object* node = nullptr;
-    FIND_AND_CHECK(instanceId, events, node)
-    EventInfo* eventInfo = _get_event_info(instance);
-    if (eventInfo) {
-        node = eventInfo->gameObj;
-        if (!node) {
-            GODOT_LOG(1, "There is no node attached to event instance.")
-        }
-    }
-    return node;
 }
 
 void Fmod::set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers) {

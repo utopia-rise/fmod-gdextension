@@ -1,6 +1,12 @@
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
+#include "api/fmod_bank.h"
+#include "api/fmod_bus.h"
+#include "api/fmod_event.h"
+#include "api/fmod_event_description.h"
+#include "api/fmod_vca.h"
+#include "templates/hash_map.hpp"
 #include "variant/string.hpp"
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
@@ -10,14 +16,13 @@
 #include <classes/object.hpp>
 #include <core/object.hpp>
 #include <fmod.hpp>
-
 #include <fmod_studio.hpp>
 #include <godot.hpp>
 #include <helpers/constants.h>
-#include <helpers/containers.h>
 #include <variant/utility_functions.hpp>
 
 namespace godot {
+
     struct EventInfo {
         // Is the event oneshot
         bool isOneShot = false;
@@ -41,6 +46,13 @@ namespace godot {
     class Fmod : public Object {
         GDCLASS(Fmod, Object);
 
+        friend class FmodObject;
+        friend class FmodEvent;
+        friend class FmodEventDescription;
+        friend class FmodBus;
+        friend class FmodVCA;
+        friend class FmodBank;
+
         static Fmod* singleton;
 
     private:
@@ -57,23 +69,22 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
-        Vector<LoadingBank*> loadingBanks;
-        Map<String, FMOD::Studio::Bank*> banks;
-        Map<String, FMOD::Studio::EventDescription*> eventDescriptions;
-        Map<String, FMOD::Sound*> sounds;
-        Map<String, FMOD::Studio::Bus*> buses;
-        Map<String, FMOD::Studio::VCA*> VCAs;
+        List<LoadingBank*> loadingBanks;
 
-        Vector<FMOD::Channel*> channels;
-        Vector<FMOD::Studio::EventInstance*> events;
+        List<FMOD::Studio::EventInstance*> events;
+        HashMap<String, FMOD::Studio::Bank*> banks;
+        HashMap<String, FMOD::Studio::EventDescription*> eventDescriptions;
+        HashMap<String, FMOD::Studio::Bus*> buses;
+        HashMap<String, FMOD::Studio::VCA*> VCAs;
+
+        List<FMOD::Channel*> channels;
+        HashMap<String, FMOD::Sound*> sounds;
 
         // Store dictionary of performance data
         Dictionary performanceData;
 
         void _check_loading_banks();
         void _set_listener_attributes();
-
-
 
         void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node);
         void _run_callbacks();
@@ -133,20 +144,11 @@ namespace godot {
         int get_bank_vca_count(const String& pathToBank);
         uint64_t create_event_instance(const String& eventPath);
 
-        /* event descriptions functions */
-
-
-        /* bus functions */
-
-
-        /* VCA functions */
-
         /* Helper methods */
         void play_one_shot(const String& eventName, Object* gameObj);
         void play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
         void play_one_shot_attached(const String& eventName, Object* gameObj);
         void play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
-
 
         void pause_all_events(bool pause);
         void mute_all_events();
@@ -189,6 +191,70 @@ namespace godot {
         Array get_global_parameter_desc_list();
 
         void set_callback(const uint64_t instanceId, int callbackMask);
+
+        FMOD_VECTOR to_fmod_vector(Vector3& vec) {
+            FMOD_VECTOR fv;
+            fv.x = vec.x;
+            fv.y = vec.y;
+            fv.z = vec.z;
+            return fv;
+        }
+
+        FMOD_3D_ATTRIBUTES get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward, const FMOD_VECTOR& vel) {
+            FMOD_3D_ATTRIBUTES
+            f3d;
+            f3d.forward = forward;
+            f3d.position = pos;
+            f3d.up = up;
+            f3d.velocity = vel;
+            return f3d;
+        }
+
+        FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform(const Transform3D& transform) {
+            Vector3 pos = transform.get_origin() / distanceScale;
+            Vector3 up = transform.get_basis().rows[1];
+            Vector3 forward = transform.get_basis().rows[2];
+            Vector3 vel(0, 0, 0);
+            return get_3d_attributes(to_fmod_vector(pos), to_fmod_vector(up), to_fmod_vector(forward), to_fmod_vector(vel));
+        }
+
+        FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform_2d(const Transform2D& transform) {
+            Vector2 posVector = transform.get_origin() / distanceScale;
+            Vector3 pos(posVector.x, 0.0f, posVector.y);
+            Vector3 up(0, 1, 0);
+            Vector3 forward = Vector3(transform.columns[1].x, 0, transform.columns[1].y).normalized();
+            Vector3 vel(0, 0, 0);// TODO: add doppler
+            const FMOD_VECTOR& posFmodVector = to_fmod_vector(pos);
+            return get_3d_attributes(posFmodVector, to_fmod_vector(up), to_fmod_vector(forward), to_fmod_vector(vel));
+        }
+
+        Dictionary get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attr) {
+            Dictionary _3Dattr;
+            Transform3D transform;
+            transform.origin = Vector3(attr.position.x, attr.position.y, attr.position.z) * distanceScale;
+            const Vector3& upVector = Vector3(attr.up.x, attr.up.y, attr.up.z);
+            transform.basis.rows[1] = upVector;
+            const Vector3& forwardVector = Vector3(attr.forward.x, attr.forward.y, attr.forward.z);
+            transform.basis.rows[2] = forwardVector;
+            transform.basis.rows[0] = upVector.cross(forwardVector);
+            Vector3 velocity(attr.velocity.x, attr.velocity.y, attr.velocity.z);
+            _3Dattr["transform"] = transform;
+            _3Dattr["velocity"] = velocity;
+            return _3Dattr;
+        }
+
+        Dictionary get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attr) {
+            Dictionary _2Dattr;
+            Transform2D transform;
+            transform.set_origin(Vector2(attr.position.x, attr.position.z) * distanceScale);
+            const Vector2& forward = Vector2(attr.forward.x, attr.forward.z);
+            transform.columns[1] = forward;
+            transform.columns[0] = Vector2(forward.y, -forward.x);
+            Vector2 velocity(attr.velocity.x, attr.velocity.z);
+            _2Dattr["transform"] = transform;
+            _2Dattr["velocity"] = velocity;
+            return _2Dattr;
+        }
 
     protected:
         static void _bind_methods();

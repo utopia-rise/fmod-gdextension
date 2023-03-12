@@ -2,11 +2,10 @@
 #define GODOTFMOD_FMOD_EVENT_H
 
 #include "classes/ref_counted.hpp"
-#include "fmod_object.h"
 #include "fmod_studio.hpp"
 
 namespace godot {
-    class FmodEvent : public RefCounted, public FmodObject {
+    class FmodEvent : public RefCounted {
         GDCLASS(FmodEvent, RefCounted);
 
         FMOD::Studio::EventInstance* event;
@@ -38,10 +37,13 @@ namespace godot {
         Dictionary get_event_2d_attributes() const;
         void set_event_2d_attributes(Transform2D position) const;
 
-        void attach_instance_to_node(Object* gameObj);
-        void detach_instance_from_node();
-        Object* get_object_attached_to_instance();
+        void attach_instance_to_node(Object* gameObj) const;
+        void detach_instance_from_node() const;
+        Object* get_object_attached_to_instance() const;
 
+    public:
+        FmodEvent() = default;
+        ~FmodEvent() = default;
 
     protected:
         static void _bind_methods();
