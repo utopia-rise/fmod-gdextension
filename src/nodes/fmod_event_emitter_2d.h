@@ -7,7 +7,7 @@
 namespace godot {
 
     class FmodEventEmitter2D : public Node2D {
-        GDCLASS(FmodEventEmitter2D, Node2D)
+        GDCLASS(FmodEventEmitter2D, Node2D);
 
     protected:
         static void _bind_methods();

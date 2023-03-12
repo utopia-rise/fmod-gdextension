@@ -1,3 +1,8 @@
+#include "api/FmodBank.h"
+#include "api/FmodBus.h"
+#include "api/FmodEvent.h"
+#include "api/FmodEventDescription.h"
+#include "api/FmodVCA.h"
 #include <classes/engine.hpp>
 #include <godot_fmod.h>
 #include <nodes/fmod_event_emitter_2d.h>
@@ -11,6 +16,12 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         // register all classes
         ClassDB::register_class<Fmod>();
+        ClassDB::register_class<FmodBank>();
+        ClassDB::register_class<FmodEvent>();
+        ClassDB::register_class<FmodEventDescription>();
+        ClassDB::register_class<FmodBus>();
+        ClassDB::register_class<FmodVCA>();
+
         ClassDB::register_class<FmodEventEmitter2D>();
 
         // setup Fmod singleton

@@ -1,6 +1,7 @@
 #ifndef GODOTFMOD_GODOT_FMOD_H
 #define GODOTFMOD_GODOT_FMOD_H
 
+#include "variant/string.hpp"
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
 #include <classes/canvas_item.hpp>
@@ -93,12 +94,9 @@ namespace godot {
     };
 
     class Fmod : public Object {
-        GDCLASS(Fmod, Object)
+        GDCLASS(Fmod, Object);
 
         static Fmod* singleton;
-
-    protected:
-        static void _bind_methods();
 
     private:
         FMOD::Studio::System* system;
@@ -133,15 +131,6 @@ namespace godot {
         static bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line);
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
-        static FMOD_VECTOR _to_fmod_vector(Vector3& vec);
-        static FMOD_3D_ATTRIBUTES _get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward, const FMOD_VECTOR& vel);
-        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform(const Transform3D& transform) const;
-        FMOD_3D_ATTRIBUTES _get_3d_attributes_from_transform_2d(const Transform2D& transform) const;
-        Dictionary _get_transform_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
-        Dictionary _get_transform_2d_info_from_3d_attribut(FMOD_3D_ATTRIBUTES& attribut) const;
-
-        static bool _is_dead(Object* node);
-        static bool _is_fmod_valid(Object* node);
         void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node);
         void _run_callbacks();
 
@@ -199,76 +188,22 @@ namespace godot {
         int get_bank_string_count(const String& pathToBank);
         int get_bank_vca_count(const String& pathToBank);
         uint64_t create_event_instance(const String& eventPath);
-        float get_event_parameter_by_name(uint64_t instanceId, const String& parameterName);
-        void set_event_parameter_by_name(uint64_t instanceId, const String& parameterName, float value);
-        float get_event_parameter_by_id(uint64_t instanceId, const Array& idPair);
-        void set_event_parameter_by_id(uint64_t instanceId, const Array& idPair, float value);
-        void release_event(uint64_t instanceId);
-        void start_event(uint64_t instanceId);
-        void stop_event(uint64_t instanceId, int stopMode);
-        void event_key_off(uint64_t instanceId);
-        int get_event_playback_state(uint64_t instanceId);
-        bool get_event_paused(uint64_t instanceId);
-        void set_event_paused(uint64_t instanceId, bool paused);
-        float get_event_pitch(uint64_t instanceId);
-        void set_event_pitch(uint64_t instanceId, float pitch);
-        float get_event_volume(uint64_t instanceId);
-        void set_event_volume(uint64_t instanceId, float volume);
-        int get_event_timeline_position(uint64_t instanceId);
-        void set_event_timeline_position(uint64_t instanceId, int position);
-        float get_event_reverb_level(uint64_t instanceId, int index);
-        void set_event_reverb_level(uint64_t instanceId, int index, float level);
-        bool is_event_virtual(uint64_t instanceId);
-        void set_event_listener_mask(uint64_t instanceId, unsigned int mask);
-        uint32_t get_event_listener_mask(uint64_t instanceId);
-        void set_event_3d_attributes(uint64_t instanceId, const Transform3D& transform);
-        Dictionary get_event_3d_attributes(uint64_t instanceId);
-        Dictionary get_event_2d_attributes(uint64_t instanceId);
-        void set_event_2d_attributes(uint64_t instanceId, Transform2D position);
 
         /* event descriptions functions */
-        int desc_get_length(const String& eventPath);
-        Array desc_get_instance_list(const String& eventPath);
-        int desc_get_instance_count(const String& eventPath);
-        void desc_release_all_instances(const String& eventPath);
-        void desc_load_sample_data(const String& eventPath);
-        void desc_unload_sample_data(const String& eventPath);
-        int desc_get_sample_loading_state(const String& eventPath);
-        bool desc_is_3d(const String& eventPath);
-        bool desc_is_one_shot(const String& eventPath);
-        bool desc_is_snapshot(const String& eventPath);
-        bool desc_is_stream(const String& eventPath);
-        bool desc_has_sustain_point(const String& eventPath);
-        Array desc_get_min_max_distance(const String& eventPath);
-        float desc_get_sound_size(const String& eventPath);
-        Dictionary desc_get_parameter_description_by_name(const String& eventPath, const String& name);
-        Dictionary desc_get_parameter_description_by_id(const String& eventPath, const Array& idPair);
-        int desc_get_parameter_description_count(const String& eventPath);
-        Dictionary desc_get_parameter_description_by_index(const String& eventPath, int index);
-        Dictionary desc_get_user_property(const String& eventPath, const String& name);
-        int desc_get_user_property_count(const String& eventPath);
-        Dictionary desc_user_property_by_index(const String& eventPath, int index);
+
 
         /* bus functions */
-        bool get_bus_mute(const String& busPath);
-        bool get_bus_paused(const String& busPath);
-        float get_bus_volume(const String& busPath);
-        void set_bus_mute(const String& busPath, bool mute);
-        void set_bus_paused(const String& busPath, bool paused);
-        void set_bus_volume(const String& busPath, float volume);
-        void stop_all_bus_events(const String& busPath, int stopMode);
+
 
         /* VCA functions */
-        float get_vca_volume(const String& VCAPath);
-        void set_vca_volume(const String& VCAPath, float volume);
+
         /* Helper methods */
         void play_one_shot(const String& eventName, Object* gameObj);
         void play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
         void play_one_shot_attached(const String& eventName, Object* gameObj);
         void play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
-        void attach_instance_to_node(uint64_t instanceId, Object* gameObj);
-        void detach_instance_from_node(const uint64_t instanceId);
-        Object* get_object_attached_to_instance(uint64_t instanceId);
+
+
         void pause_all_events(bool pause);
         void mute_all_events();
         void unmute_all_events();
@@ -310,6 +245,9 @@ namespace godot {
         Array get_global_parameter_desc_list();
 
         void set_callback(const uint64_t instanceId, int callbackMask);
+
+    protected:
+        static void _bind_methods();
     };
 }// namespace godot
 

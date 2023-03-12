@@ -7,8 +7,8 @@ set(ARCH "")
 
 link_directories("godot-cpp/bin/")
 include_directories("godot-cpp/include/")
-include_directories("godot-cpp/gen/include/")
 include_directories("godot-cpp/include/godot_cpp")
+include_directories("godot-cpp/gen/include/")
 include_directories("godot-cpp/gen/include/godot_cpp")
 include_directories("godot-cpp/gdextension")
 

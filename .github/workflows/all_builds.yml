@@ -14,7 +14,7 @@ env:
   TARGET_NAME: libGodotFmod
   TARGET: editor
   GODOT_VERSION: 4.0
-  FMOD_VERSION: 20210
+  FMOD_VERSION: 20212
 
 jobs:
   build:
