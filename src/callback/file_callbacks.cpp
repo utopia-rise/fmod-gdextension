@@ -12,11 +12,11 @@ namespace Callbacks {
         if (priority == ReadPriority::HIGH) {
             // lock so we can't add and remove elements from the queue at the same time.
             std::lock_guard<std::mutex> lk(read_mut);
-            requests.push_front_value(request);
+            requests.push_front(request);
         } else {
             // lock so we can't add and remove elements from the queue at the same time.
             std::lock_guard<std::mutex> lk(read_mut);
-            requests.push_back_value(request);
+            requests.push_back(request);
         }
         read_cv.notify_one();
     }
@@ -51,7 +51,8 @@ namespace Callbacks {
                 // also store the current request so it cannot be cancel during process.
                 {
                     std::lock_guard<std::mutex> lk(read_mut);
-                    current_request = requests.pop_front_value();
+                    current_request = requests.front()->get();
+                    requests.pop_front();
                 }
 
                 // We get the Godot File object from the handle

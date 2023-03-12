@@ -7,7 +7,6 @@
 #include <cstring>// This include is required for both Linux and MacOS targets as they don't include the necessary headers for 'memcpy' by default
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <helpers/containers.h>
 #include <thread>
 
 namespace Callbacks {
@@ -37,7 +36,7 @@ namespace Callbacks {
 
         bool stop = false;
         FMOD_ASYNCREADINFO* current_request = nullptr;
-        godot::Vector<FMOD_ASYNCREADINFO*> requests = godot::Vector<FMOD_ASYNCREADINFO*>();
+        godot::List<FMOD_ASYNCREADINFO*> requests = godot::List<FMOD_ASYNCREADINFO*>();
 
         GodotFileRunner() = default;
         GodotFileRunner(const GodotFileRunner&) = delete;
