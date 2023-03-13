@@ -7,17 +7,6 @@
 #include <variant/dictionary.hpp>
 
 namespace Callbacks {
-    struct CallbackInfo {
-        bool markerSignalEmitted = true;
-        bool beatSignalEmitted = true;
-        bool soundSignalEmitted = true;
-        godot::Dictionary markerCallbackInfo;
-        godot::Dictionary beatCallbackInfo;
-        godot::Dictionary soundCallbackInfo;
-    };
-
-    extern std::mutex callback_mut;
-
     FMOD_RESULT F_CALLBACK eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE* event, void* parameters);
 }// namespace Callbacks
 
