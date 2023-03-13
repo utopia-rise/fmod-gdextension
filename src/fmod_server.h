@@ -1,5 +1,5 @@
-#ifndef GODOTFMOD_GODOT_FMOD_H
-#define GODOTFMOD_GODOT_FMOD_H
+#ifndef GODOTFMOD_FMOD_SERVER_H
+#define GODOTFMOD_FMOD_SERVER_H
 
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
@@ -36,10 +36,10 @@ namespace godot {
         float weight = 1.0;
     };
 
-    class Fmod : public Object {
-        GDCLASS(Fmod, Object);
+    class FmodServer : public Object {
+        GDCLASS(FmodServer, Object);
 
-        static Fmod* singleton;
+        static FmodServer* singleton;
 
     private:
         FMOD::Studio::System* system;
@@ -74,11 +74,11 @@ namespace godot {
         static bool _is_channel_valid(FMOD::Channel* channel);
 
     public:
-        Fmod();
+        FmodServer();
 
-        ~Fmod();
+        ~FmodServer();
 
-        static Fmod* get_singleton();
+        static FmodServer* get_singleton();
 
         // SETTINGS
         void update();
@@ -110,9 +110,9 @@ namespace godot {
         bool check_vca_path(const String& vcaPath);
         bool check_bus_path(const String& busPath);
         bool check_event_path(const String& eventPath);
-        Array Fmod::get_description_list();
-        int Fmod::get_description_count();
-        void Fmod::release_all_descriptions();
+        Array FmodServer::get_description_list();
+        int FmodServer::get_description_count();
+        void FmodServer::release_all_descriptions();
         void set_global_parameter_by_name(const String& parameterName, float value);
         float get_global_parameter_by_name(const String& parameterName);
         void set_global_parameter_by_id(const Array& idPair, const float value);
@@ -131,7 +131,7 @@ namespace godot {
         // OBJECTS
         FmodBank load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
-        FmodEvent create_event_instance(const String& eventPath);
+        Ref create_event_instance(const String& eventPath);
         void attach_instance_to_node(Object* gameObj) const;
         void detach_instance_from_node() const;
         Object* get_object_attached_to_instance() const;
@@ -228,4 +228,4 @@ namespace godot {
     };
 }// namespace godot
 
-#endif// GODOTFMOD_GODOT_FMOD_H
+#endif// GODOTFMOD_FMOD_SERVER_H

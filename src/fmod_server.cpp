@@ -1,0 +1,945 @@
+#include "helpers/common.h"
+#include <classes/node3d.hpp>
+#include <fmod_server.h>
+
+using namespace godot;
+
+FmodServer* FmodServer::singleton = nullptr;
+
+FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0) {
+    ERR_FAIL_COND(singleton != nullptr);
+    singleton = this;
+
+    system = nullptr;
+    coreSystem = nullptr;
+    isInitialized = false;
+    isNotinitPrinted = false;
+    Callbacks::GodotFileRunner::get_singleton()->start();
+    performanceData["CPU"] = Dictionary();
+    performanceData["memory"] = Dictionary();
+    performanceData["file"] = Dictionary();
+    distanceScale = 1.0;
+}
+
+FmodServer::~FmodServer() {
+    ERR_FAIL_COND(singleton != this);
+    singleton = nullptr;
+}
+
+FmodServer* FmodServer::get_singleton() {
+    return singleton;
+}
+
+void FmodServer::_bind_methods() {
+    ClassDB::bind_method(D_METHOD("init", "numOfChannels", "studioFlag", "flag"), &FmodServer::init);
+    ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
+    ClassDB::bind_method(D_METHOD("add_listener", "index", "gameObj"), &FmodServer::add_listener);
+    ClassDB::bind_method(D_METHOD("remove_listener", "index"), &FmodServer::remove_listener);
+    ClassDB::bind_method(D_METHOD("set_listener_number", "listenerNumber"), &FmodServer::set_system_listener_number);
+    ClassDB::bind_method(D_METHOD("get_listener_number"), &FmodServer::get_system_listener_number);
+    ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &FmodServer::get_system_listener_weight);
+    ClassDB::bind_method(D_METHOD("set_listener_weight", "index", "weight"), &FmodServer::set_system_listener_weight);
+    ClassDB::bind_method(D_METHOD("get_listener_3D_attributs", "index"), &FmodServer::get_system_listener_3d_attributes);
+    ClassDB::bind_method(D_METHOD("get_listener_2D_attributs", "index"), &FmodServer::get_system_listener_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_3D_attributs", "index", "transform"), &FmodServer::set_system_listener_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_2D_attributs", "index", "transform"), &FmodServer::set_system_listener_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_listener_lock", "index", "isLocked"), &FmodServer::set_listener_lock);
+    ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
+    ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
+    ClassDB::bind_method(D_METHOD("set_software_format", "sampleRate", "speakerMode", "numRawSpeakers"), &FmodServer::set_software_format);
+    ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
+    ClassDB::bind_method(D_METHOD("unload_bank", "pathToBank"), &FmodServer::unload_bank);
+    ClassDB::bind_method(D_METHOD("check_VCA_path", "cvaPath"), &FmodServer::check_vca_path);
+    ClassDB::bind_method(D_METHOD("check_bus_path", "busPath"), &FmodServer::check_bus_path);
+    ClassDB::bind_method(D_METHOD("check_event_path", "eventPath"), &FmodServer::check_event_path);
+
+    ClassDB::bind_method(D_METHOD("create_event_instance", "eventPath"), &FmodServer::create_event_instance);
+
+
+
+    ClassDB::bind_method(D_METHOD("play_one_shot", "eventName", "gameObj"), &FmodServer::play_one_shot);
+    ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "eventName", "gameObj", "parameters"), &FmodServer::play_one_shot_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_attached", "eventName", "gameObj"), &FmodServer::play_one_shot_attached);
+    ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "eventName", "gameObj", "parameters"), &FmodServer::play_one_shot_attached_with_params);
+    ClassDB::bind_method(D_METHOD("pause_all_events", "pause"), &FmodServer::pause_all_events);
+    ClassDB::bind_method(D_METHOD("mute_all_events"), &FmodServer::mute_all_events);
+    ClassDB::bind_method(D_METHOD("unmute_all_events"), &FmodServer::unmute_all_events);
+    ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
+    ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
+    ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
+    ClassDB::bind_method(D_METHOD("unload_file", "path"), &FmodServer::unload_file);
+    ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
+    ClassDB::bind_method(D_METHOD("check_sound_instance", "instanceId"), &FmodServer::check_sound_instance);
+    ClassDB::bind_method(D_METHOD("release_sound", "instanceId"), &FmodServer::release_sound);
+    ClassDB::bind_method(D_METHOD("play_sound", "instanceId"), &FmodServer::play_sound);
+    ClassDB::bind_method(D_METHOD("stop_sound", "instanceId"), &FmodServer::stop_sound);
+    ClassDB::bind_method(D_METHOD("set_sound_paused", "instanceId", "paused"), &FmodServer::set_sound_paused);
+    ClassDB::bind_method(D_METHOD("is_sound_playing", "instanceId"), &FmodServer::is_sound_playing);
+    ClassDB::bind_method(D_METHOD("set_sound_volume", "instanceId", "volume"), &FmodServer::set_sound_volume);
+    ClassDB::bind_method(D_METHOD("get_sound_volume", "instanceId"), &FmodServer::get_sound_volume);
+    ClassDB::bind_method(D_METHOD("set_sound_pitch", "instanceId", "pitch"), &FmodServer::set_sound_pitch);
+    ClassDB::bind_method(D_METHOD("get_sound_pitch", "instanceId"), &FmodServer::get_sound_pitch);
+    ClassDB::bind_method(D_METHOD("set_callback", "instanceId", "callbackMask"), &FmodServer::set_callback);
+    ClassDB::bind_method(D_METHOD("set_sound_3D_settings", "dopplerScale", "distanceFactor", "rollOffScale"), &FmodServer::set_sound_3d_settings);
+    ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
+    ClassDB::bind_method(D_METHOD("get_available_drivers"), &FmodServer::get_available_drivers);
+    ClassDB::bind_method(D_METHOD("get_driver"), &FmodServer::get_driver);
+    ClassDB::bind_method(D_METHOD("set_driver", "id"), &FmodServer::set_driver);
+    ClassDB::bind_method(D_METHOD("get_performance_data"), &FmodServer::get_performance_data);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_name", "parameterName", "value"), &FmodServer::set_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_name", "parameterName"), &FmodServer::get_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_id", "idPair", "value"), &FmodServer::set_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_id", "idPair"), &FmodServer::get_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name", "parameterName"), &FmodServer::get_global_parameter_desc_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id", "idPair"), &FmodServer::get_global_parameter_desc_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &FmodServer::get_global_parameter_desc_count);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_list"), &FmodServer::get_global_parameter_desc_list);
+    ClassDB::bind_method(D_METHOD("set_system_dsp_buffer_size", "bufferlength", "numbuffers"), &FmodServer::set_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_size"), &FmodServer::get_system_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &FmodServer::get_system_dsp_buffer_length);
+    ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &FmodServer::get_system_dsp_num_buffers);
+    ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
+
+    ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("sound_played", PropertyInfo(Variant::DICTIONARY, "params")));
+    ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
+
+    REGISTER_ALL_CONSTANTS
+}
+
+void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
+    // initialize FMOD Studio and FMOD Core System with provided flags
+    if (system == nullptr && coreSystem == nullptr) {
+        ERROR_CHECK(FMOD::Studio::System::create(&system));
+        ERROR_CHECK(system->getCoreSystem(&coreSystem));
+    }
+
+    if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
+        isInitialized = true;
+        GODOT_LOG(0, "FMOD Sound System: Successfully initialized")
+        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) {
+            GODOT_LOG(0, "FMOD Sound System: Live update enabled!")
+        }
+    }
+
+#ifdef CUSTOM_FILESYSTEM
+    if (ERROR_CHECK(coreSystem->setFileSystem(
+                &Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1))) {
+        GODOT_LOG(0, "Custom File System enabled.")
+    }
+#endif
+}
+
+void FmodServer::update() {
+    if (!isInitialized) {
+        if (!isNotinitPrinted) {
+            GODOT_LOG(2, "FMOD Sound System: Fmod should be initialized before calling update")
+            isNotinitPrinted = true;
+        }
+        return;
+    }
+
+    // Check if bank are loaded, load buses, vca and event descriptions.
+    _check_loading_banks();
+
+    for (FMOD::Studio::EventInstance* eventInstance : events) {
+        if (eventInstance) {
+            EventInfo* eventInfo = _get_event_info(eventInstance);
+            if (eventInfo) {
+                if (eventInfo->gameObj) {
+                    if (is_dead(eventInfo->gameObj)) {
+                        FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+                        ERROR_CHECK(eventInstance->stop(m));
+                        _release_one_event(eventInstance);
+                        continue;
+                    }
+                    if (eventInfo->isOneShot) {
+                        FMOD_STUDIO_PLAYBACK_STATE s;
+                        ERROR_CHECK(eventInstance->getPlaybackState(&s));
+                        if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
+                            _release_one_event(eventInstance);
+                            continue;
+                        }
+                    }
+                    _update_instance_3d_attributes(eventInstance, eventInfo->gameObj);
+                }
+            } else {
+                GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
+            }
+        }
+    }
+
+    for (FMOD::Channel* channel : channels) {
+        if (channel && !_is_channel_valid(channel)) {
+            channels.erase(channel);
+        }
+    }
+
+    // update listener position
+    _set_listener_attributes();
+
+    // run callback events
+    _run_callbacks();
+
+    // dispatch update to FMOD
+    ERROR_CHECK(system->update());
+}
+
+EventInfo* FmodServer::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
+    EventInfo* eventInfo;
+    ERROR_CHECK(eventInstance->getUserData((void**) &eventInfo));
+    return eventInfo;
+}
+
+void FmodServer::_release_one_event(FMOD::Studio::EventInstance* eventInstance) {
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
+    EventInfo* eventInfo = _get_event_info(eventInstance);
+    eventInstance->setUserData(nullptr);
+    ERROR_CHECK(eventInstance->release());
+    events.erase(eventInstance);
+    delete eventInfo;
+}
+
+void FmodServer::_set_listener_attributes() {
+    if (actualListenerNumber == 0) {
+        if (listenerWarning) {
+            GODOT_LOG(1, "FMOD Sound System: No listeners are set!")
+            listenerWarning = false;
+        }
+        return;
+    }
+
+    for (int i = 0; i < systemListenerNumber; i++) {
+        Listener* listener = &listeners[i];
+        if (listener->listenerLock) {
+            continue;
+        }
+        if (is_dead(listener->gameObj)) {
+            listener->gameObj = nullptr;
+            ERROR_CHECK(system->setListenerWeight(i, 0));
+            continue;
+        }
+
+        Node* node {Object::cast_to<Node>(listener->gameObj)};
+        if (!node->is_inside_tree()) {
+            return;
+        }
+
+        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
+            auto attr = get_3d_attributes_from_transform_2d(ci->get_global_transform());
+            ERROR_CHECK(system->setListenerAttributes(i, &attr));
+            continue;
+        }
+
+        if (auto* s {Node::cast_to<Node3D>(node)}) {
+            auto attr = get_3d_attributes_from_transform(s->get_global_transform());
+            ERROR_CHECK(system->setListenerAttributes(i, &attr));
+            continue;
+        }
+    }
+}
+
+void FmodServer::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) {
+    // try to set 3D attributes
+    if (instance && is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
+        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
+            auto attr = get_3d_attributes_from_transform_2d(ci->get_global_transform());
+            ERROR_CHECK(instance->set3DAttributes(&attr));
+            return;
+        }
+        if (auto* s {Node::cast_to<Node3D>(node)}) {
+            auto attr = get_3d_attributes_from_transform(s->get_global_transform());
+            ERROR_CHECK(instance->set3DAttributes(&attr));
+            return;
+        }
+    }
+}
+
+void FmodServer::shutdown() {
+    isInitialized = false;
+    isNotinitPrinted = false;
+    ERROR_CHECK(system->unloadAll());
+    ERROR_CHECK(system->release());
+    system = nullptr;
+    coreSystem = nullptr;
+    GODOT_LOG(0, "FMOD Sound System: System released")
+}
+
+void FmodServer::set_system_listener_number(int p_listenerNumber) {
+    if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
+        if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) {
+            systemListenerNumber = p_listenerNumber;
+        }
+    } else {
+        GODOT_LOG(2, "Number of listeners must be set between 1 and 8")
+    }
+}
+
+void FmodServer::add_listener(int index, Object* gameObj) {
+    if (!is_fmod_valid(gameObj)) {
+        return;
+    }
+    if (index >= 0 && index < systemListenerNumber) {
+        Listener* listener = &listeners[index];
+        listener->gameObj = gameObj;
+        ERROR_CHECK(system->setListenerWeight(index, listener->weight));
+        int count = 0;
+        for (int i = 0; i < systemListenerNumber; i++) {
+            if ((&listeners[i])->gameObj != nullptr) count++;
+        }
+        actualListenerNumber = count;
+        if (actualListenerNumber > 0) listenerWarning = true;
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+void FmodServer::remove_listener(int index) {
+    if (index >= 0 && index < systemListenerNumber) {
+        Listener* listener = &listeners[index];
+        listener->gameObj = nullptr;
+        ERROR_CHECK(system->setListenerWeight(index, 0));
+        int count = 0;
+        for (int i = 0; i < systemListenerNumber; i++) {
+            if ((&listeners[i])->gameObj != nullptr) count++;
+        }
+        actualListenerNumber = count;
+        if (actualListenerNumber > 0) listenerWarning = true;
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+int FmodServer::get_system_listener_number() const {
+    return systemListenerNumber;
+}
+
+float FmodServer::get_system_listener_weight(const int index) {
+    if (index >= 0 && index < systemListenerNumber) {
+        float weight = 0;
+        ERROR_CHECK(system->getListenerWeight(index, &weight));
+        listeners[index].weight = weight;
+        return weight;
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        return 0;
+    }
+}
+
+void FmodServer::set_system_listener_weight(const int index, float weight) {
+    if (index >= 0 && index < systemListenerNumber) {
+        listeners[index].weight = weight;
+        ERROR_CHECK(system->setListenerWeight(index, weight));
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+Dictionary FmodServer::get_system_listener_3d_attributes(const int index) {
+    Dictionary _3Dattr;
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr;
+        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        _3Dattr = get_transform_info_from_3d_attributes(attr);
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+    return _3Dattr;
+}
+
+Dictionary FmodServer::get_system_listener_2d_attributes(int index) {
+    Dictionary _2Dattr;
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr;
+        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        _2Dattr = get_transform_2d_info_from_3d_attributes(attr);
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+    return _2Dattr;
+}
+
+void FmodServer::set_system_listener_3d_attributes(int index, const Transform3D& transform) {
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr = get_3d_attributes_from_transform(transform);
+        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+void FmodServer::set_system_listener_2d_attributes(int index, const Transform2D& transform) {
+    if (index >= 0 && index < systemListenerNumber) {
+        FMOD_3D_ATTRIBUTES
+        attr = get_3d_attributes_from_transform_2d(transform);
+        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+void FmodServer::set_listener_lock(int index, bool isLocked) {
+    if (index >= 0 && index < systemListenerNumber) {
+        listeners[index].listenerLock = isLocked;
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+    }
+}
+
+bool FmodServer::get_listener_lock(int index) {
+    if (index >= 0 && index < systemListenerNumber) {
+        return listeners[index].listenerLock;
+    } else {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        return false;
+    }
+}
+
+Object* FmodServer::get_object_attached_to_listener(int index) {
+    if (index < 0 || index >= systemListenerNumber) {
+        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        return nullptr;
+    } else {
+        Object* node = listeners[index].gameObj;
+        if (!node) {
+            GODOT_LOG(1, "No node was set on listener")
+        }
+        return node;
+    }
+}
+
+void FmodServer::set_software_format(int sampleRate, const int speakerMode, int numRawSpeakers) {
+    if (system == nullptr && coreSystem == nullptr) {
+        ERROR_CHECK(FMOD::Studio::System::create(&system));
+        ERROR_CHECK(system->getCoreSystem(&coreSystem));
+    }
+    ERROR_CHECK(coreSystem->setSoftwareFormat(sampleRate, static_cast<FMOD_SPEAKERMODE>(speakerMode), numRawSpeakers));
+}
+
+String FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
+    DRIVE_PATH(pathToBank)
+    if (banks.has(pathToBank)) return pathToBank;// bank is already loaded
+    FMOD::Studio::Bank* bank = nullptr;
+    ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
+    if (bank) {
+        GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(pathToBank))
+        auto* loadingBank = new LoadingBank();
+        loadingBank->bank = bank;
+        loadingBank->godotPath = pathToBank;
+        if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
+            _load_bank_data(loadingBank);
+        } else {
+            loadingBanks.push_back(loadingBank);
+        }
+    }
+    return pathToBank;
+}
+
+void FmodServer::unload_bank(const String& pathToBank) {
+    DRIVE_PATH(pathToBank)
+    FIND_AND_CHECK(pathToBank, banks)
+    _unload_all_buses(instance);
+    _unload_all_vca(instance);
+    _unload_all_event_descriptions(instance);
+    ERROR_CHECK(instance->unload());
+    GODOT_LOG(0, "FMOD Sound System: BANK " + String(pathToBank) + " UNLOADED")
+    banks.erase(pathToBank);
+}
+
+Ref FmodServer::create_event_instance(const String& eventPath) {
+    FMOD::Studio::EventInstance* instance = _create_instance(eventPath, false, nullptr);
+    if (instance) {
+        return (uint64_t) instance;
+    }
+    return 0;
+}
+
+Array FmodServer::get_description_list() {
+    Array array;
+    FmodServer::Studio::Eventdescription* descriptions[MAX_EVENT_description];
+    int count = 0;
+    ERROR_CHECK(description->getdescriptionList(descriptions, MAX_EVENT_description, &count));
+    CHECK_SIZE(MAX_EVENT_description, count, events)
+    for (int i = 0; i < count; i++) {
+        array.append((uint64_t) descriptions[i]);
+    }
+    return array;
+}
+
+int FmodServer::get_description_count() {
+    int count = -1;
+    FIND_AND_CHECK(eventPath, eventDescriptions, count)
+    ERROR_CHECK(description->getdescriptionCount(&count));
+    return count;
+}
+
+void FmodServer::release_all_descriptions() {
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
+    FIND_AND_CHECK(eventPath, eventDescriptions)
+    FmodEventDescription::Studio::Eventdescription* descriptions[MAX_EVENT_description];
+    int count = 0;
+    ERROR_CHECK(description->getdescriptionList(descriptions, MAX_EVENT_description, &count));
+    CHECK_SIZE(MAX_EVENT_description, count, events)
+    for (int i = 0; i < count; i++) {
+        FmodEventDescription::Studio::Eventdescription* it = descriptions[i];
+        if (events.has(it)) {
+            EventInfo* eventInfo = _get_event_info(it);
+            it->setUserData(nullptr);
+            events.erase(it);
+            delete eventInfo;
+        }
+    }
+    ERROR_CHECK(description->releaseAlldescriptions());
+}
+
+
+
+bool FmodServer::check_vca_path(const String& vcaPath) {
+    return VCAs.has(vcaPath);
+}
+
+bool FmodServer::check_bus_path(const String& busPath) {
+    return buses.has(busPath);
+}
+
+bool FmodServer::check_event_path(const String& eventPath) {
+    return eventDescriptions.has(eventPath);
+}
+
+FMOD::Studio::EventInstance* FmodServer::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
+    FIND_AND_CHECK(eventName, eventDescriptions, nullptr)
+    FMOD::Studio::EventInstance* eventInstance = nullptr;
+    ERROR_CHECK(instance->createInstance(&eventInstance));
+    if (eventInstance && (!isOneShot || gameObject)) {
+        auto* eventInfo = new EventInfo();
+        eventInfo->gameObj = gameObject;
+        eventInfo->isOneShot = isOneShot;
+        eventInstance->setUserData(eventInfo);
+        events.append(eventInstance);
+    }
+    return eventInstance;
+}
+
+EventInfo* FmodServer::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
+    EventInfo* eventInfo;
+    ERROR_CHECK(eventInstance->getUserData((void**) &eventInfo));
+    return eventInfo;
+}
+
+void FmodServer::play_one_shot(const String& eventName, Object* gameObj) {
+    FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
+    if (instance) {
+        // set 3D attributes once
+        if (is_fmod_valid(gameObj)) {
+            _update_instance_3d_attributes(instance, gameObj);
+        }
+        ERROR_CHECK(instance->start());
+        ERROR_CHECK(instance->release());
+    }
+}
+
+void FmodServer::play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
+    FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
+    if (instance) {
+        // set 3D attributes once
+        if (is_fmod_valid(gameObj)) {
+            _update_instance_3d_attributes(instance, gameObj);
+        }
+        // set the initial parameter values
+        auto keys = parameters.keys();
+        for (int i = 0; i < keys.size(); i++) {
+            String k = keys[i];
+            float v = parameters[keys[i]];
+            ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
+        }
+        ERROR_CHECK(instance->start());
+        ERROR_CHECK(instance->release());
+    }
+}
+
+void FmodServer::play_one_shot_attached(const String& eventName, Object* gameObj) {
+    if (is_fmod_valid(gameObj)) {
+        FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
+        if (instance) {
+            ERROR_CHECK(instance->start());
+        }
+    }
+}
+
+void FmodServer::play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
+    if (is_fmod_valid(gameObj)) {
+        FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
+        if (instance) {
+            // set the initial parameter values
+            auto keys = parameters.keys();
+            for (int i = 0; i < keys.size(); i++) {
+                String k = keys[i];
+                float v = parameters[keys[i]];
+                ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
+            }
+            ERROR_CHECK(instance->start());
+        }
+    }
+}
+
+void FmodServer::set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers) {
+    if (bufferlength > 0 && numbuffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(bufferlength, numbuffers))) {
+        GODOT_LOG(0, "FMOD Sound System: Successfully set DSP buffer size")
+    } else {
+        GODOT_LOG(2, "FMOD Sound System: Failed to set DSP buffer size :|")
+    }
+}
+
+Array FmodServer::get_system_dsp_buffer_size() {
+    unsigned int bufferlength;
+    int numbuffers;
+    Array a;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    a.append(bufferlength);
+    a.append(numbuffers);
+    return a;
+}
+
+unsigned int FmodServer::get_system_dsp_buffer_length() {
+    unsigned int bufferlength;
+    int numbuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    return bufferlength;
+}
+
+int FmodServer::get_system_dsp_num_buffers() {
+    unsigned int bufferlength;
+    int numbuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
+    return numbuffers;
+}
+
+void FmodServer::pause_all_events(const bool pause) {
+    for (int i = 0; i < events.size(); i++) {
+        auto eventInstance = events.get(i);
+        if (eventInstance) {
+            ERROR_CHECK(eventInstance->setPaused(pause));
+        }
+    }
+}
+
+void FmodServer::mute_all_events() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus* masterBus = nullptr;
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(true);
+        }
+    }
+}
+
+void FmodServer::unmute_all_events() {
+    if (banks.size() > 1) {
+        FMOD::Studio::Bus* masterBus = nullptr;
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
+            masterBus->setMute(false);
+        }
+    }
+}
+
+
+
+void FmodServer::load_file_as_sound(const String& path) {
+    DRIVE_PATH(path)
+    FMOD::Sound* sound = sounds.get(path);
+    if (!sound) {
+        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
+        if (sound) {
+            sounds[path] << sound;
+            UtilityFunctions::print("FMOD Sound System: LOADING AS SOUND FILE" + String(path));
+        }
+    }
+}
+
+void FmodServer::load_file_as_music(const String& path) {
+    DRIVE_PATH(path)
+    FMOD::Sound* sound = sounds.get(path);
+    if (!sound) {
+        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
+        if (sound) {
+            sounds[path] << sound;
+            UtilityFunctions::print("FMOD Sound System: LOADING AS MUSIC FILE" + String(path));
+        }
+    }
+}
+
+void FmodServer::unload_file(const String& path) {
+    DRIVE_PATH(path)
+    FIND_AND_CHECK(path, sounds)
+    ERROR_CHECK(instance->release());
+    sounds.erase(path);
+    UtilityFunctions::print("FMOD Sound System: UNLOADING FILE" + String(path));
+}
+
+uint64_t FmodServer::create_sound_instance(const String& path) {
+    DRIVE_PATH(path)
+    FIND_AND_CHECK(path, sounds, 0)
+    FMOD::Channel* channel = nullptr;
+    ERROR_CHECK(coreSystem->playSound(instance, nullptr, true, &channel));
+    if (channel) {
+        channels.append(channel);
+        return (uint64_t) channel;
+    }
+    return 0;
+}
+
+
+
+bool FmodServer::_is_channel_valid(FMOD::Channel* channel) {
+    bool isPlaying;
+    FMOD_RESULT result = channel->isPlaying(&isPlaying);
+    return result != FMOD_ERR_INVALID_HANDLE;
+}
+
+
+
+void FmodServer::set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale) {
+    if (distanceFactor <= 0) {
+        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
+    } else if (ERROR_CHECK(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
+        distanceScale = distanceFactor;
+        GODOT_LOG(0, "FMOD Sound System: Successfully set global 3D settings")
+    } else {
+        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings")
+    }
+}
+
+void FmodServer::wait_for_all_loads() {
+    ERROR_CHECK(system->flushSampleLoading());
+    _check_loading_banks();
+}
+
+Array FmodServer::get_available_drivers() {
+    Array driverList;
+    int numDrivers = 0;
+
+    ERROR_CHECK(coreSystem->getNumDrivers(&numDrivers));
+
+    for (int i = 0; i < numDrivers; i++) {
+        char name[MAX_DRIVER_NAME_SIZE];
+        int sampleRate;
+        FMOD_SPEAKERMODE speakerMode;
+        int speakerModeChannels;
+        ERROR_CHECK(coreSystem->getDriverInfo(i, name, MAX_DRIVER_NAME_SIZE, nullptr, &sampleRate, &speakerMode, &speakerModeChannels));
+        String nameStr(name);
+
+        Dictionary driverInfo;
+        driverInfo["id"] = i;
+        driverInfo["name"] = nameStr;
+        driverInfo["sample_rate"] = sampleRate;
+        driverInfo["speaker_mode"] = (int) speakerMode;
+        driverInfo["number_of_channels"] = speakerModeChannels;
+        driverList.push_back(driverInfo);
+    }
+
+    return driverList;
+}
+
+int FmodServer::get_driver() {
+    int driverId = -1;
+    ERROR_CHECK(coreSystem->getDriver(&driverId));
+    return driverId;
+}
+
+void FmodServer::set_driver(const int id) {
+    ERROR_CHECK(coreSystem->setDriver(id));
+}
+
+Dictionary FmodServer::get_performance_data() {
+    // get the CPU usage
+    FMOD_STUDIO_CPU_USAGE studioCpuUsage;
+    FMOD_CPU_USAGE cpuUsage;
+    ERROR_CHECK(system->getCPUUsage(&studioCpuUsage, &cpuUsage));
+    Dictionary cpuPerfData = performanceData["CPU"];
+    cpuPerfData["dsp"] = cpuUsage.dsp;
+    cpuPerfData["geometry"] = cpuUsage.geometry;
+    cpuPerfData["stream"] = cpuUsage.stream;
+    cpuPerfData["update"] = cpuUsage.update;
+    cpuPerfData["convolution1"] = cpuUsage.convolution1;
+    cpuPerfData["convolution2"] = cpuUsage.convolution2;
+    cpuPerfData["studio"] = studioCpuUsage.update;
+
+    // get the memory usage
+    int currentAlloc = 0;
+    int maxAlloc = 0;
+    ERROR_CHECK(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
+    Dictionary memPerfData = performanceData["memory"];
+    memPerfData["currently_allocated"] = currentAlloc;
+    memPerfData["max_allocated"] = maxAlloc;
+
+    // get the file usage
+    long long sampleBytesRead = 0;
+    long long streamBytesRead = 0;
+    long long otherBytesRead = 0;
+    ERROR_CHECK(coreSystem->getFileUsage(&sampleBytesRead, &streamBytesRead, &otherBytesRead));
+    Dictionary filePerfData = performanceData["file"];
+    filePerfData["sample_bytes_read"] = static_cast<int64_t>(sampleBytesRead);
+    filePerfData["stream_bytes_read"] = static_cast<int64_t>(streamBytesRead);
+    filePerfData["other_bytes_read"] = static_cast<int64_t>(otherBytesRead);
+
+    return performanceData;
+}
+
+void FmodServer::set_global_parameter_by_name(const String& parameterName, float value) {
+    ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
+}
+
+float FmodServer::get_global_parameter_by_name(const String& parameterName) {
+    float value = 0.f;
+    ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
+    return value;
+}
+
+void FmodServer::set_global_parameter_by_id(const Array& idPair, const float value) {
+    if (idPair.size() != 2) {
+        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        return;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    ERROR_CHECK(system->setParameterByID(id, value));
+}
+
+float FmodServer::get_global_parameter_by_id(const Array& idPair) {
+    if (idPair.size() != 2) {
+        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        return -1.f;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    float value = -1.f;
+    ERROR_CHECK(system->getParameterByID(id, &value));
+    return value;
+}
+
+Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameterName) {
+    Dictionary paramDesc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
+    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+
+    return paramDesc;
+}
+
+Dictionary FmodServer::get_global_parameter_desc_by_id(const Array& idPair) {
+    if (idPair.size() != 2) {
+        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        return {};
+    }
+    Dictionary paramDesc;
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = idPair[0];
+    id.data2 = idPair[1];
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    pDesc;
+    if (ERROR_CHECK(system->getParameterDescriptionByID(id, &pDesc))) {
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+    }
+
+    return paramDesc;
+}
+
+int FmodServer::get_global_parameter_desc_count() {
+    int count = 0;
+    ERROR_CHECK(system->getParameterDescriptionCount(&count));
+    return count;
+}
+
+Array FmodServer::get_global_parameter_desc_list() {
+    Array a;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION
+    descList[256];
+    int count = 0;
+    ERROR_CHECK(system->getParameterDescriptionList(descList, 256, &count));
+    for (int i = 0; i < count; i++) {
+        auto pDesc = descList[i];
+        Dictionary paramDesc;
+        paramDesc["name"] = String(pDesc.name);
+        paramDesc["id_first"] = pDesc.id.data1;
+        paramDesc["id_second"] = pDesc.id.data2;
+        paramDesc["minimum"] = pDesc.minimum;
+        paramDesc["maximum"] = pDesc.maximum;
+        paramDesc["default_value"] = pDesc.defaultvalue;
+        a.append(paramDesc);
+    }
+    return a;
+}
+
+void FmodServer::attach_instance_to_node(Object* gameObj) const {
+    if (!is_fmod_valid(gameObj)) {
+        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Node3D or CanvasItem")
+        return;
+    }
+    FmodServer::_get_info(event)->gameObj = gameObj;
+}
+
+void FmodServer::detach_instance_from_node() const{
+    FmodServer::_get_info(event)->gameObj = nullptr;
+}
+
+Object* FmodServer::get_object_attached_to_instance() const{
+    Object* node = nullptr;
+    EventInfo* eventInfo = FmodServer::_get_info(event);
+    if (eventInfo) {
+        node = eventInfo->gameObj;
+        if (!node) {
+            GODOT_LOG(1, "There is no node attached to event instance.")
+        }
+    }
+    return node;
+}
+
+// runs on the game thread
+void FmodServer::_run_callbacks() {
+    std::lock_guard<std::mutex> lk(Callbacks::callback_mut);
+    for (int i = 0; i < events.size(); i++) {
+        FMOD::Studio::EventInstance* eventInstance = events.get(i);
+        auto eventInfo = _get_event_info(eventInstance);
+        if (eventInstance && eventInfo) {
+            Callbacks::CallbackInfo* cbInfo = &eventInfo->callbackInfo;
+            // check for Marker callbacks
+            if (!cbInfo->markerSignalEmitted) {
+                emit_signal("timeline_marker", cbInfo->markerCallbackInfo);
+                cbInfo->markerSignalEmitted = true;
+            }
+
+            // check for Beat callbacks
+            if (!cbInfo->beatSignalEmitted) {
+                emit_signal("timeline_beat", cbInfo->beatCallbackInfo);
+                cbInfo->beatSignalEmitted = true;
+            }
+
+            // check for Sound callbacks
+            if (!cbInfo->soundSignalEmitted) {
+                if (cbInfo->soundCallbackInfo["type"] == String("played")) emit_signal("sound_played", cbInfo->soundCallbackInfo);
+                else
+                    emit_signal("sound_stopped", cbInfo->soundCallbackInfo);
+                cbInfo->soundSignalEmitted = true;
+            }
+        } else {
+            GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
+        }
+    }
+}

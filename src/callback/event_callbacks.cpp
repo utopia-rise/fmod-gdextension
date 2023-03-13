@@ -1,5 +1,5 @@
 #include <callback/event_callbacks.h>
-#include <godot_fmod.h>
+#include <fmod_server.h>
 
 namespace Callbacks {
 

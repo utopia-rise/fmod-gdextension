@@ -1,5 +1,5 @@
 #include "fmod.h"
-#include "godot_fmod.h"
+#include "fmod_server.h"
 #include "helpers/common.h"
 
 using namespace godot;
@@ -74,7 +74,7 @@ void FmodEvent::set_parameter_by_id(const Array& idPair, float value) const {
 
 
 void FmodEvent::release() const {
-    Fmod::get_singleton()->_release_one(event);
+    FmodServer::get_singleton()->_release_one(event);
 }
 
 void FmodEvent::start() const {
@@ -162,7 +162,7 @@ uint32_t FmodEvent::get_listener_mask() const {
 }
 
 void FmodEvent::set_2d_attributes(Transform2D position) const {
-    auto attr = Fmod::get_singleton()->get_3d_attributes_from_transform_2d(position);
+    auto attr = FmodServer::get_singleton()->get_3d_attributes_from_transform_2d(position);
     ERROR_CHECK(event->set3DAttributes(&attr));
 }
 
@@ -171,12 +171,12 @@ Dictionary FmodEvent::get_2d_attributes() const {
     FMOD_3D_ATTRIBUTES
     attr;
     ERROR_CHECK(event->get3DAttributes(&attr));
-    _2Dattr = Fmod::get_singleton()->get_transform_2d_info_from_3d_attributes(attr);
+    _2Dattr = FmodServer::get_singleton()->get_transform_2d_info_from_3d_attributes(attr);
     return _2Dattr;
 }
 
 void FmodEvent::set_3d_attributes(const Transform3D& transform) const {
-    auto attr = Fmod::get_singleton()->get_3d_attributes_from_transform(transform);
+    auto attr = FmodServer::get_singleton()->get_3d_attributes_from_transform(transform);
     ERROR_CHECK(event->set3DAttributes(&attr));
 }
 
@@ -185,7 +185,7 @@ Dictionary FmodEvent::get_3d_attributes() const {
     FMOD_3D_ATTRIBUTES
     attr;
     ERROR_CHECK(event->get3DAttributes(&attr));
-    _3Dattr = Fmod::get_singleton()->get_transform_info_from_3d_attributes(attr);
+    _3Dattr = FmodServer::get_singleton()->get_transform_info_from_3d_attributes(attr);
     return _3Dattr;
 }
 

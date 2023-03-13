@@ -27,7 +27,14 @@ env.Replace(fmod_lib_dir = fmod_lib_dir)
 
 # tweak this if you want to use different folders, or more folders, to store your source code in.
 env.Append(CPPPATH=["src/"])
-sources = [Glob('src/*.cpp'), Glob('src/callback/*.cpp'), Glob('src/nodes/*.cpp')]
+sources = [
+    Glob('src/*.cpp'),
+    Glob('src/callback/*.cpp'),
+    Glob('src/core/*.cpp'),
+    Glob('src/helpers/*.cpp')
+    Glob('src/nodes/*.cpp'),
+    Glob('src/studio/*.cpp')
+    ]
 
 lfix = ""
 if env["target"] == "debug" or env["target"] == "editor":
