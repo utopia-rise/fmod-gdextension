@@ -9,7 +9,7 @@ namespace godot {
         GDCLASS(FmodEvent, RefCounted);
 
         FMOD::Studio::EventInstance* instance = nullptr;
-        Callable
+        Callable eventCallback;
 
         float get_parameter_by_name(const String& parameterName) const;
         void set_parameter_by_name(const String& parameterName, float value) const;
@@ -37,7 +37,9 @@ namespace godot {
         Dictionary get_3d_attributes() const;
         Dictionary get_2d_attributes() const;
         void set_2d_attributes(Transform2D position) const;
-        void set_callback(int callbackMask);
+
+        void set_callback(Callable& callback, int callbackMask);
+        Callable get_callback() const;
 
 
     public:

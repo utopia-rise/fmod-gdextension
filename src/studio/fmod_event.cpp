@@ -188,6 +188,12 @@ Dictionary FmodEvent::get_3d_attributes() const {
 }
 
 
-void FmodEvent::set_callback(int callbackMask) {
+void FmodEvent::set_callback(Callable& callback, int callbackMask) {
+    eventCallback = callback;
     ERROR_CHECK(instance->setCallback(Callbacks::eventCallback, callbackMask));
+}
+
+
+Callable FmodEvent::get_callback() const{
+    return eventCallback;
 }

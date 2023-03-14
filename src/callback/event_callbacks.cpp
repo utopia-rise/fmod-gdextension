@@ -31,6 +31,8 @@ namespace Callbacks {
                 dictionary["name"] = name;
                 dictionary["type"] = mType;
             }
+            godot::Callable callback = event_instance->get_callback();
+            callback.call(dictionary, type);
         }
 
         return FMOD_OK;
