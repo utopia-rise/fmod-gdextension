@@ -15,10 +15,15 @@ namespace godot {
         ~FmodBank() = default;
 
         int get_loading_state();
+        int get_event_description_count();
         int get_bus_count();
-        int get_event_count();
-        int get_string_count();
         int get_vca_count();
+        int get_string_count();
+
+        Array get_description_list();
+        Array get_bus_list();
+        Array get_vca_list();
+
 
     protected:
         static void _bind_methods();

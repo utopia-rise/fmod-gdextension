@@ -3,7 +3,16 @@
 using namespace godot;
 
 void FmodSound::_bind_methods() {
-
+    ClassDB::bind_method(D_METHOD("check_sound_instance"), &FmodSound::check_sound_instance);
+    ClassDB::bind_method(D_METHOD("release_sound"), &FmodSound::release_sound);
+    ClassDB::bind_method(D_METHOD("play_sound"), &FmodSound::play_sound);
+    ClassDB::bind_method(D_METHOD("stop_sound"), &FmodSound::stop_sound);
+    ClassDB::bind_method(D_METHOD("set_sound_paused", "paused"), &FmodSound::set_sound_paused);
+    ClassDB::bind_method(D_METHOD("is_sound_playing"), &FmodSound::is_sound_playing);
+    ClassDB::bind_method(D_METHOD("set_sound_volume", "volume"), &FmodSound::set_sound_volume);
+    ClassDB::bind_method(D_METHOD("get_sound_volume"), &FmodSound::get_sound_volume);
+    ClassDB::bind_method(D_METHOD("set_sound_pitch", "pitch"), &FmodSound::set_sound_pitch);
+    ClassDB::bind_method(D_METHOD("get_sound_pitch"), &FmodSound::get_sound_pitch);
 }
 
 void FmodSound::release_sound() {
@@ -17,7 +26,7 @@ void FmodSound::play_sound() {
     set_sound_paused(instanceId, false);
 }
 
-void FmodSound::set_sound_paused(, bool paused) {
+void FmodSound::set_sound_paused(bool paused) {
     FIND_AND_CHECK(instanceId, channels)
     ERROR_CHECK(instance->setPaused(paused));
 }
@@ -34,7 +43,7 @@ bool FmodSound::is_sound_playing() {
     return isPlaying;
 }
 
-void FmodSound::set_sound_volume(, float volume) {
+void FmodSound::set_sound_volume(float volume) {
     FIND_AND_CHECK(instanceId, channels)
     ERROR_CHECK(instance->setVolume(volume));
 }
@@ -53,7 +62,7 @@ float FmodSound::get_sound_pitch() {
     return pitch;
 }
 
-void FmodSound::set_sound_pitch(, float pitch) {
+void FmodSound::set_sound_pitch(float pitch) {
     FIND_AND_CHECK(instanceId, channels)
     ERROR_CHECK(instance->setPitch(pitch));
 }

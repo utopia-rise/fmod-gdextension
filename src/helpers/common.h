@@ -1,6 +1,7 @@
 #ifndef GODOTFMOD_COMMON_H
 #define GODOTFMOD_COMMON_H
 
+#include "classes/canvas_item.hpp"
 #include "classes/node3d.hpp"
 #include "fmod_common.h"
 #include "variant/utility_functions.hpp"
@@ -20,13 +21,12 @@
 #endif
 
 #define MAX_PATH_SIZE 512
-#define MAX_VCA_COUNT 64
-#define MAX_BUS_COUNT 64
-#define MAX_EVENT_INSTANCE 128
-#define MAX_EVENT_COUNT 256
 #define MAX_DRIVER_NAME_SIZE 256
 
-namespace godot {
+#define MAX_VCA_COUNT 64
+#define MAX_BUS_COUNT 64
+#define MAX_EVENT_DESCRIPTION_COUNT 256
+#define MAX_EVENT_INSTANCE_COUNT 128
 
 #define GODOT_LOG(level, message)                                                                \
     switch (level) {                                                                             \
@@ -41,19 +41,6 @@ namespace godot {
             break;                                                                               \
     }
 
-#define FIND_AND_CHECK_WITH_RETURN(instanceId, cont, defaultReturn)                                   \
-    auto instance = (cont).get(instanceId);                                                           \
-    if (!instance) {                                                                                  \
-        String message = vformat("FMOD Sound System: cannot find instance in %s collection.", #cont); \
-        GODOT_LOG(2, message)                                                                         \
-        return defaultReturn;                                                                         \
-    }
-#define FIND_AND_CHECK_WITHOUT_RETURN(instanceId, set) FIND_AND_CHECK_WITH_RETURN(instanceId, set, void())
-#define FUNC_CHOOSER(_f1, _f2, _f3, _f4, ...) _f4
-#define FUNC_RECOMPOSER(argsWithParentheses) FUNC_CHOOSER argsWithParentheses
-#define MACRO_CHOOSER(...) FUNC_RECOMPOSER((__VA_ARGS__, FIND_AND_CHECK_WITH_RETURN, FIND_AND_CHECK_WITHOUT_RETURN, ))
-#define FIND_AND_CHECK(...) MACRO_CHOOSER(__VA_ARGS__)(__VA_ARGS__)
-
 #define CHECK_SIZE(maxSize, actualSize, type)                                                                                                                  \
     if ((actualSize) > (maxSize)) {                                                                                                                            \
         String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " + String::num(actualSize) + " entries"; \
@@ -63,6 +50,7 @@ namespace godot {
 
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
+namespace godot {
     bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
         if (result != FMOD_OK) {
             UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
@@ -88,6 +76,13 @@ namespace godot {
         }
         GODOT_LOG(2, "Object is null")
         return false;
+    }
+
+    template<class T>
+    static inline Ref<T> init_ref() {
+        Ref<T> ref;
+        ref.instantiate();
+        return ref;
     }
 
 }// namespace godot

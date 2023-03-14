@@ -1,7 +1,3 @@
-//
-// Created by CedNaru on 18/07/2019.
-//
-
 #ifndef GODOTFMOD_CONSTANTS_H
 #define GODOTFMOD_CONSTANTS_H
 

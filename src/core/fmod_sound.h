@@ -19,6 +19,9 @@ namespace godot {
         float get_sound_pitch();
         void set_sound_pitch(float pitch);
 
+        bool check_sound_instance(const uint64_t instanceId);
+        void release_sound(const uint64_t instanceId);
+
     protected:
         static void _bind_methods();
     };

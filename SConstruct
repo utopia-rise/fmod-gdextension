@@ -31,6 +31,7 @@ sources = [
     Glob('src/*.cpp'),
     Glob('src/callback/*.cpp'),
     Glob('src/core/*.cpp'),
+    Glob('src/data/*.cpp'),
     Glob('src/helpers/*.cpp')
     Glob('src/nodes/*.cpp'),
     Glob('src/studio/*.cpp')

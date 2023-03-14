@@ -8,7 +8,7 @@ namespace godot {
     class FmodEvent : public RefCounted {
         GDCLASS(FmodEvent, RefCounted);
 
-        FMOD::Studio::EventInstance* event = nullptr;
+        FMOD::Studio::EventInstance* instance = nullptr;
         Callable
 
         float get_parameter_by_name(const String& parameterName) const;
