@@ -11,25 +11,24 @@
 
 namespace godot {
 
-    struct LoadingBank {
-        Ref<FmodBank> bank;
-        String godotPath;
-    };
-
-    struct BankData {
-        BankData() = default;
-        BankData(BankData const &other) = default;
-
-        Ref<FmodBank> bank;
-        String godotPath;
-
-        List<String> eventDescriptionPaths;
-        List<String> busesPaths;
-        List<String> VCAsPaths;
-    };
-
     class FmodCache {
-        friend class FmodServer;
+
+        struct LoadingBank {
+            Ref<FmodBank> bank;
+            String godotPath;
+        };
+
+        struct BankData {
+            BankData() = default;
+            BankData(BankData const &other) = default;
+
+            Ref<FmodBank> bank;
+            String godotPath;
+
+            List<String> eventDescriptionPaths;
+            List<String> busesPaths;
+            List<String> VCAsPaths;
+        };
 
         List<LoadingBank*> loadingBanks;
 
@@ -50,21 +49,19 @@ namespace godot {
         void _unload_all_event_descriptions(BankData* bank);
 
     public:
-        void add_bank();
-        void remove_bank();
+        void add_bank(const String& bankPath, Ref<FmodBank> bank);
+        bool has_bank(const String& bankPath);
+        bool get_bank(const String& bankPath);
+        void remove_bank(const String& bankPath);
+        void load_pending();
         void clear();
 
-        bool banks_still_loading();
-        void _check_loading_banks();
+        void force_loading();
+        bool is_loading();
 
         bool check_vca_path(const String& vcaPath);
         bool check_bus_path(const String& busPath);
         bool check_event_path(const String& eventPath);
-
-        Array get_all_vca();
-        Array get_all_buses();
-        Array get_all_event_descriptions();
-        Array get_all_banks();
     };
 }// namespace godot
 

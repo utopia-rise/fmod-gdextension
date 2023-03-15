@@ -4,32 +4,27 @@
 
 using namespace godot;
 
-bool FmodCache::banks_still_loading() {
-    for (KeyValue<FmodBank, BankData> entry : banks) {
-        FMOD_STUDIO_LOADING_STATE loadingState;
-        ERROR_CHECK(entry.key->getLoadingState(&loadingState));
-        if (loadingState == FMOD_STUDIO_LOADING_STATE_LOADING) {
-            return true;
-        }
+void FmodCache::load_pending() {
+    if (loadingBanks.size() == 0) {
+        return;
     }
-    return false;
-}
-
-void FmodCache::_check_loading_banks() {
+    List<LoadingBank*> toDelete;
     for (auto loadingBank : loadingBanks) {
-        auto bank = loadingBank->bank;
-        FMOD_STUDIO_LOADING_STATE* loading_state = nullptr;
-        ERROR_CHECK(bank->getLoadingState(loading_state));
-        if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
+        Ref<FmodBank> bank = loadingBank->bank;
+        int loading_state = bank->get_loading_state();
+        if (loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
             _load_bank_data(loadingBank);
-            delete loadingBank;
-        } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
+            toDelete.push_back(loadingBank);
+        } else if (loading_state == FMOD_STUDIO_LOADING_STATE_LOADING) {
             loadingBanks.push_back(loadingBank);
-        } else if (*loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
-            bank->unload();
-            delete loadingBank;
+        } else if (loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
+            toDelete.push_back(loadingBank);
             GODOT_LOG(2, "Fmod Sound System: Error loading bank.")
         }
+    }
+    for(auto element : toDelete){
+        loadingBanks.erase(element);
+        delete element;
     }
 }
 
@@ -53,7 +48,7 @@ void FmodCache::_load_bank_data(LoadingBank* loadingBank) {
     }
 }
 
-void FmodCache::_load_all_vca(Ref<FmodBank> bank) {
+void FmodCache::_load_all_vca(BankData* bank) {
     FMOD::Studio::VCA* array[MAX_VCA_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
@@ -68,7 +63,7 @@ void FmodCache::_load_all_vca(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_load_all_buses(Ref<FmodBank> bank) {
+void FmodCache::_load_all_buses(BankData* bank) {
     FMOD::Studio::Bus* array[MAX_BUS_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
@@ -83,7 +78,7 @@ void FmodCache::_load_all_buses(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_load_all_event_descriptions(Ref<FmodBank> bank) {
+void FmodCache::_load_all_event_descriptions(BankData* bank) {
     FMOD::Studio::EventDescription* array[MAX_EVENT_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
@@ -98,7 +93,7 @@ void FmodCache::_load_all_event_descriptions(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_unload_all_vca(Ref<FmodBank> bank) {
+void FmodCache::_unload_all_vca(BankData* bank) {
     FMOD::Studio::VCA* array[MAX_VCA_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getVCAList(array, MAX_VCA_COUNT, &size))) {
@@ -113,7 +108,7 @@ void FmodCache::_unload_all_vca(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_unload_all_buses(Ref<FmodBank> bank) {
+void FmodCache::_unload_all_buses(BankData* bank) {
     FMOD::Studio::Bus* array[MAX_BUS_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getBusList(array, MAX_BUS_COUNT, &size))) {
@@ -128,7 +123,7 @@ void FmodCache::_unload_all_buses(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_unload_all_event_descriptions(Ref<FmodBank> bank) {
+void FmodCache::_unload_all_event_descriptions(BankData* bank) {
     FMOD::Studio::EventDescription* array[MAX_EVENT_COUNT];
     int size = 0;
     if (ERROR_CHECK(bank->getEventList(array, MAX_EVENT_COUNT, &size))) {
@@ -152,13 +147,57 @@ void FmodCache::_unload_bank_data(BankData* bank) {
 }
 
 bool FmodCache::check_vca_path(const String& vcaPath) {
-    return VCAs.has(vcaPath)
+    return VCAs.has(vcaPath);
 }
 
 bool FmodCache::check_bus_path(const String& busPath) {
-    return buses.has(busPath)
+    return buses.has(busPath);
 }
 
 bool FmodCache::check_event_path(const String& eventPath) {
-    return eventDescriptions.has(eventPath)
+    return eventDescriptions.has(eventPath);
 }
+void FmodCache::add_bank(const String& bankPath, Ref<FmodBank> bank) {
+    auto* loadingBank = new LoadingBank();
+    loadingBank->bank = bank;
+    loadingBank->godotPath = bankPath;
+    loadingBanks.push_back(loadingBank);
+}
+void FmodCache::remove_bank(const String& bankPath) {
+    if (banks.has(bankPath)) {
+        _unload_bank_data(banks[bankPath]);
+    }
+}
+
+void FmodCache::force_loading() {
+    while(is_loading()){
+        load_pending();
+    }
+}
+
+bool FmodCache::is_loading() {
+    return loadingBanks.size() > 0;
+}
+
+bool FmodCache::has_bank(const String& bankPath) {
+    return banks.has(bankPath);
+}
+
+bool FmodCache::get_bank(const String& bankPath) {
+    return banks[bankPath];
+}
+
+void FmodCache::clear() {
+    force_loading();
+    for(auto entry: banks){
+        entry.value->bank.un
+    }
+    banks.clear()
+}
+
+
+Array get_all_vca() {}
+Array get_all_buses() {}
+Array get_all_event_descriptions() {}
+
+Array get_all_banks() {}

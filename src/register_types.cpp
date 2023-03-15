@@ -1,4 +1,5 @@
 #include "core/fmod_sound.h"
+#include "data/performance_data.h"
 #include "nodes/fmod_bank_loader.h"
 #include "nodes/fmod_event_emitter_3d.h"
 #include "nodes/fmod_listener_2d.h"
@@ -19,6 +20,9 @@ static FmodServer* fmod_singleton;
 
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+        //Data
+        ClassDB::register_class<FmodPerformanceData>();
+
         // Core
         ClassDB::register_class<FmodSound>();
 

@@ -1,6 +1,7 @@
 #include "fmod.h"
 #include "fmod_server.h"
 #include "helpers/common.h"
+#include "helpers/maths.h"
 
 using namespace godot;
 
@@ -31,7 +32,7 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
     ClassDB::bind_method(D_METHOD("set_3d_attributes",  "transform"), &FmodEvent::set_3d_attributes);
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
-    ClassDB::bind_method(D_METHOD("set_callback", "instanceId", "callbackMask"), &FmodServer::set_callback);
+    ClassDB::bind_method(D_METHOD("set_callback", "instanceId", "callbackMask"), &FmodEvent::set_callback);
 
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused"), "set_paused", "get_paused");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch"), "set_pitch", "get_pitch");
@@ -69,10 +70,9 @@ void FmodEvent::set_parameter_by_id(const Array& idPair, float value) const {
     ERROR_CHECK(instance->setParameterByID(id, value));
 }
 
-
-
 void FmodEvent::release() const {
-    FmodServer::get_singleton()->_release_one(instance);
+    instance->setUserData(nullptr);
+    ERROR_CHECK(instance->release());
 }
 
 void FmodEvent::start() const {
@@ -160,30 +160,28 @@ uint32_t FmodEvent::get_listener_mask() const {
 }
 
 void FmodEvent::set_2d_attributes(Transform2D position) const {
-    auto attr = FmodServer::get_singleton()->get_3d_attributes_from_transform_2d(position);
+    FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(position, distanceScale);
     ERROR_CHECK(instance->set3DAttributes(&attr));
 }
 
-Dictionary FmodEvent::get_2d_attributes() const {
-    Dictionary _2Dattr;
-    FMOD_3D_ATTRIBUTES
-    attr;
+Transform2D FmodEvent::get_2d_attributes() const {
+    Transform2D _2Dattr;
+    FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
-    _2Dattr = FmodServer::get_singleton()->get_transform_2d_info_from_3d_attributes(attr);
+    _2Dattr = get_transform2d_from_3d_attributes(attr, distanceScale);
     return _2Dattr;
 }
 
 void FmodEvent::set_3d_attributes(const Transform3D& transform) const {
-    auto attr = FmodServer::get_singleton()->get_3d_attributes_from_transform(transform);
+    FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
     ERROR_CHECK(instance->set3DAttributes(&attr));
 }
 
-Dictionary FmodEvent::get_3d_attributes() const {
-    Dictionary _3Dattr;
-    FMOD_3D_ATTRIBUTES
-    attr;
+Transform3D FmodEvent::get_3d_attributes() const {
+    Transform3D _3Dattr;
+    FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(instance->get3DAttributes(&attr));
-    _3Dattr = FmodServer::get_singleton()->get_transform_info_from_3d_attributes(attr);
+    _3Dattr = get_transform3d_from_3d_attributes(attr, distanceScale);
     return _3Dattr;
 }
 

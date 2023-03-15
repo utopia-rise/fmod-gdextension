@@ -63,10 +63,12 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_number"), &FmodServer::get_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &FmodServer::get_system_listener_weight);
     ClassDB::bind_method(D_METHOD("set_listener_weight", "index", "weight"), &FmodServer::set_system_listener_weight);
-    ClassDB::bind_method(D_METHOD("get_listener_3D_attributs", "index"), &FmodServer::get_system_listener_3d_attributes);
-    ClassDB::bind_method(D_METHOD("get_listener_2D_attributs", "index"), &FmodServer::get_system_listener_2d_attributes);
-    ClassDB::bind_method(D_METHOD("set_listener_3D_attributs", "index", "transform"), &FmodServer::set_system_listener_3d_attributes);
-    ClassDB::bind_method(D_METHOD("set_listener_2D_attributs", "index", "transform"), &FmodServer::set_system_listener_2d_attributes);
+    ClassDB::bind_method(D_METHOD("get_listener_transform3d", "index"), &FmodServer::get_listener_transform3d);
+    ClassDB::bind_method(D_METHOD("get_listener_transform2d", "index"), &FmodServer::get_listener_transform2d);
+    ClassDB::bind_method(D_METHOD("get_listener_3d_velocity", "index"), &FmodServer::get_listener_3d_velocity);
+    ClassDB::bind_method(D_METHOD("get_listener_2d_velocity", "index"), &FmodServer::get_listener_2d_velocity);
+    ClassDB::bind_method(D_METHOD("set_listener_transform3d", "index", "transform"), &FmodServer::set_listener_transform3d);
+    ClassDB::bind_method(D_METHOD("set_listener_transform2d", "index", "transform"), &FmodServer::set_listener_transform2d);
     ClassDB::bind_method(D_METHOD("set_listener_lock", "index", "isLocked"), &FmodServer::set_listener_lock);
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
@@ -132,7 +134,7 @@ void FmodServer::update() {
     }
 
     // Check if bank are loaded, load buses, vca and event descriptions.
-    cache->_check_loading_banks();
+    cache->load_pending();
 
     for (FMOD::Studio::EventInstance* eventInstance : events) {
         if (eventInstance) {
@@ -177,14 +179,6 @@ EventInfo* FmodServer::_get_event_info(FMOD::Studio::EventInstance* eventInstanc
     EventInfo* eventInfo;
     ERROR_CHECK(eventInstance->getUserData((void**) &eventInfo));
     return eventInfo;
-}
-
-void FmodServer::_release_one_event(FMOD::Studio::EventInstance* eventInstance) {
-    EventInfo* eventInfo = _get_event_info(eventInstance);
-    eventInstance->setUserData(nullptr);
-    ERROR_CHECK(eventInstance->release());
-    events.erase(eventInstance);
-    delete eventInfo;
 }
 
 void FmodServer::_set_listener_attributes() {
@@ -324,7 +318,7 @@ void FmodServer::set_system_listener_weight(const int index, float weight) {
     }
 }
 
-Transform3D FmodServer::get_listener_3d_transform(int index) {
+Transform3D FmodServer::get_listener_transform3d(int index) {
     Transform3D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
@@ -335,7 +329,7 @@ Transform3D FmodServer::get_listener_3d_transform(int index) {
     }
     return transform;
 }
-Transform2D FmodServer::get_listener_2d_transform(int index) {
+Transform2D FmodServer::get_listener_transform2d(int index) {
     Transform2D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
@@ -369,7 +363,7 @@ Vector2 FmodServer::get_listener_2d_velocity(int index) {
     return velocity;
 }
 
-void FmodServer::set_system_listener_3d_attributes(int index, const Transform3D& transform) {
+void FmodServer::set_listener_transform3d(int index, const Transform3D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
@@ -378,7 +372,7 @@ void FmodServer::set_system_listener_3d_attributes(int index, const Transform3D&
     }
 }
 
-void FmodServer::set_system_listener_2d_attributes(int index, const Transform2D& transform) {
+void FmodServer::set_listener_transform2d(int index, const Transform2D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(transform, distanceScale);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
@@ -427,20 +421,16 @@ void FmodServer::set_software_format(int sampleRate, const int speakerMode, int 
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
     DRIVE_PATH(pathToBank)
-    if (cache->banks.has(pathToBank)) return {cache->banks[pathToBank]->bank};// bank is already loaded
+    if (cache->has_bank(pathToBank)) return {cache->get_bank(pathToBank)};// bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
     Ref<FmodBank> ref = init_ref<FmodBank>();
     ref->bank = bank;
     if (bank) {
         GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(pathToBank))
-        auto* loadingBank = new LoadingBank();
-        loadingBank->bank = ref;
-        loadingBank->godotPath = pathToBank;
+        cache->add_bank(pathToBank, ref);
         if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
-            cache->_load_bank_data(loadingBank);
-        } else {
-            cache->loadingBanks.push_back(loadingBank);
+            cache->force_loading();
         }
     }
     return ref;
@@ -448,10 +438,13 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 
 void FmodServer::unload_bank(const String& pathToBank) {
     DRIVE_PATH(pathToBank)
-    if (cache->banks.has(pathToBank)) {
-        cache->_unload_bank_data(cache->banks[pathToBank]);
-    }
+    cache->remove_bank(pathToBank);
 }
+
+bool FmodServer::banks_still_loading() {
+  cache->is_loading();
+}
+
 
 bool FmodServer::check_vca_path(const String& vcaPath) {
     return cache->check_vca_path(vcaPath);
@@ -470,13 +463,15 @@ Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
     if (instance) {
         Ref<FmodEvent> event = init_ref<FmodEvent>();
         event->instance = instance;
+        instance->setUserData(event.ptr());
         return event;
     }
     return {};
 }
 
 FMOD::Studio::EventInstance* FmodServer::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
-    if (!cache->eventDescriptions.has(eventName)) {
+    Array descriptions {cache->get_all_event_descriptions()};
+    if (!descriptions.has(eventName)) {
         GODOT_LOG(1, "Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
     }
     Ref<FmodEventDescription> desc = cache->eventDescriptions[eventName];
@@ -658,12 +653,6 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     return {};
 }
 
-bool FmodServer::_is_channel_valid(FMOD::Channel* channel) {
-    bool isPlaying;
-    FMOD_RESULT result = channel->isPlaying(&isPlaying);
-    return result != FMOD_ERR_INVALID_HANDLE;
-}
-
 void FmodServer::set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale) {
     if (distanceFactor <= 0) {
         GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
@@ -677,7 +666,7 @@ void FmodServer::set_sound_3d_settings(float dopplerScale, float distanceFactor,
 
 void FmodServer::wait_for_all_loads() {
     ERROR_CHECK(system->flushSampleLoading());
-    cache->_check_loading_banks();
+    cache->load_pending();
 }
 
 Array FmodServer::get_available_drivers() {

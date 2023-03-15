@@ -24,13 +24,6 @@
 
 namespace godot {
 
-    struct EventInfo {
-        // Is the event oneshot
-        bool isOneShot = false;
-        // GameObject to which this event is attached
-        Object* gameObj = nullptr;
-    };
-
     struct Listener {
         Object* gameObj = nullptr;
         bool listenerLock = false;
@@ -71,12 +64,8 @@ namespace godot {
         void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) const;
 
         FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
-        void _release_one_event(FMOD::Studio::EventInstance* eventInstance);
 
         void _update_performance_data();
-
-        static EventInfo* _get_event_info(FMOD::Studio::EventInstance* eventInstance);
-        static bool _is_channel_valid(FMOD::Channel* channel);
 
     public:
         FmodServer();
@@ -122,12 +111,12 @@ namespace godot {
         int get_system_listener_number() const;
         float get_system_listener_weight(int index);
         void set_system_listener_weight(int index, float weight);
-        Transform3D get_listener_3d_transform(int index);
-        Transform2D get_listener_2d_transform(int index);
+        Transform3D get_listener_transform3d(int index);
+        Transform2D get_listener_transform2d(int index);
         Vector3 get_listener_3d_velocity(int index);
         Vector2 get_listener_2d_velocity(int index);
-        void set_system_listener_3d_attributes(int index, const Transform3D& transform);
-        void set_system_listener_2d_attributes(int index, const Transform2D& transform);
+        void set_listener_transform3d(int index, const Transform3D& transform);
+        void set_listener_transform2d(int index, const Transform2D& transform);
         void set_listener_lock(int index, bool isLocked);
         bool get_listener_lock(int index);
         Object* get_object_attached_to_listener(int index);
@@ -135,6 +124,7 @@ namespace godot {
         // OBJECTS
         Ref<FmodBank> load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
+        bool banks_still_loading();
         Ref<FmodEvent> create_event_instance(const String& eventPath);
         static void attach_instance_to_node(Ref<FmodEvent> event, Object* gameObj) ;
         static void detach_instance_from_node(Ref<FmodEvent> event) ;
@@ -158,10 +148,10 @@ namespace godot {
         // Check validity of an instance
         Ref<FmodSound> create_sound_instance(const String& path);
 
-        // Setting the sound
-
-        // Playing a sound
-        void play_sound(const uint64_t instanceId);
+        Array get_all_vca();
+        Array get_all_buses();
+        Array get_all_event_descriptions();
+        Array get_all_banks();
 
     protected:
         static void _bind_methods();
