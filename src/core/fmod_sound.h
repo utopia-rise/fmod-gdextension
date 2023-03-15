@@ -9,18 +9,20 @@ namespace godot {
         GDCLASS(FmodSound, RefCounted);
 
         FMOD::Sound* sound = nullptr;
+        FMOD::Channel* channel = nullptr;
 
     public:
-        void set_sound_paused(bool paused);
-        void stop_sound();
-        bool is_sound_playing();
-        void set_sound_volume(float volume);
-        float get_sound_volume();
-        float get_sound_pitch();
-        void set_sound_pitch(float pitch);
+        void set_paused(bool paused) const;
+        void stop() const;
+        bool is_playing() const;
+        void set_volume(float volume) const;
+        float get_volume() const;
+        float get_pitch() const;
+        void set_pitch(float pitch);
 
-        bool check_sound_instance(const uint64_t instanceId);
-        void release_sound(const uint64_t instanceId);
+        bool is_valid() const;
+        void play();
+        void release() const;
 
     protected:
         static void _bind_methods();

@@ -1,73 +1,68 @@
 #include "fmod_sound.h"
+#include "helpers/common.h"
 
 using namespace godot;
 
 void FmodSound::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("check_sound_instance"), &FmodSound::check_sound_instance);
-    ClassDB::bind_method(D_METHOD("release_sound"), &FmodSound::release_sound);
-    ClassDB::bind_method(D_METHOD("play_sound"), &FmodSound::play_sound);
-    ClassDB::bind_method(D_METHOD("stop_sound"), &FmodSound::stop_sound);
-    ClassDB::bind_method(D_METHOD("set_sound_paused", "paused"), &FmodSound::set_sound_paused);
-    ClassDB::bind_method(D_METHOD("is_sound_playing"), &FmodSound::is_sound_playing);
-    ClassDB::bind_method(D_METHOD("set_sound_volume", "volume"), &FmodSound::set_sound_volume);
-    ClassDB::bind_method(D_METHOD("get_sound_volume"), &FmodSound::get_sound_volume);
-    ClassDB::bind_method(D_METHOD("set_sound_pitch", "pitch"), &FmodSound::set_sound_pitch);
-    ClassDB::bind_method(D_METHOD("get_sound_pitch"), &FmodSound::get_sound_pitch);
+    ClassDB::bind_method(D_METHOD("is_valid"), &FmodSound::is_valid);
+    ClassDB::bind_method(D_METHOD("release"), &FmodSound::release);
+    ClassDB::bind_method(D_METHOD("play"), &FmodSound::play);
+    ClassDB::bind_method(D_METHOD("stop"), &FmodSound::stop);
+    ClassDB::bind_method(D_METHOD("set_paused", "paused"), &FmodSound::set_paused);
+    ClassDB::bind_method(D_METHOD("is_playing"), &FmodSound::is_playing);
+    ClassDB::bind_method(D_METHOD("set_volume", "volume"), &FmodSound::set_volume);
+    ClassDB::bind_method(D_METHOD("get_volume"), &FmodSound::get_volume);
+    ClassDB::bind_method(D_METHOD("set_pitch", "pitch"), &FmodSound::set_pitch);
+    ClassDB::bind_method(D_METHOD("get_pitch"), &FmodSound::get_pitch);
+
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch"), "set_pitch", "get_pitch");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");
 }
 
-void FmodSound::release_sound() {
-    FIND_AND_CHECK(instanceId, channels)
-    ERROR_CHECK(instance->stop());
-    channels.erase(instance);
+void FmodSound::release() const {
+    ERROR_CHECK(channel->stop());
 }
 
-void FmodSound::play_sound() {
-    FIND_AND_CHECK(instanceId, channels)
-    set_sound_paused(instanceId, false);
+void FmodSound::play() {
+    set_paused(false);
 }
 
-void FmodSound::set_sound_paused(bool paused) {
-    FIND_AND_CHECK(instanceId, channels)
-    ERROR_CHECK(instance->setPaused(paused));
+void FmodSound::set_paused(bool paused) const {
+    ERROR_CHECK(channel->setPaused(paused));
 }
 
-void FmodSound::stop_sound() {
-    FIND_AND_CHECK(instanceId, channels)
-    ERROR_CHECK(instance->stop());
+void FmodSound::stop() const {
+    ERROR_CHECK(channel->stop());
 }
 
-bool FmodSound::is_sound_playing() {
+bool FmodSound::is_playing() const {
     bool isPlaying = false;
-    FIND_AND_CHECK(instanceId, channels, isPlaying)
-    ERROR_CHECK(instance->isPlaying(&isPlaying));
+    ERROR_CHECK(channel->isPlaying(&isPlaying));
     return isPlaying;
 }
 
-void FmodSound::set_sound_volume(float volume) {
-    FIND_AND_CHECK(instanceId, channels)
-    ERROR_CHECK(instance->setVolume(volume));
+void FmodSound::set_volume(float volume) const {
+    ERROR_CHECK(channel->setVolume(volume));
 }
 
-float FmodSound::get_sound_volume() {
+float FmodSound::get_volume() const {
     float volume = 0.f;
-    FIND_AND_CHECK(instanceId, channels, volume)
-    ERROR_CHECK(instance->getVolume(&volume));
+    ERROR_CHECK(channel->getVolume(&volume));
     return volume;
 }
 
-float FmodSound::get_sound_pitch() {
+float FmodSound::get_pitch() const {
     float pitch = 0.f;
-    FIND_AND_CHECK(instanceId, channels, pitch)
-    ERROR_CHECK(instance->getPitch(&pitch));
+    ERROR_CHECK(channel->getPitch(&pitch));
     return pitch;
 }
 
-void FmodSound::set_sound_pitch(float pitch) {
-    FIND_AND_CHECK(instanceId, channels)
-    ERROR_CHECK(instance->setPitch(pitch));
+void FmodSound::set_pitch(float pitch) {
+    ERROR_CHECK(channel->setPitch(pitch));
 }
 
-bool FmodSound::check_sound_instance() {
-    FIND_AND_CHECK(instanceId, channels, false)
-    return _is_channel_valid(instance);
+bool FmodSound::is_valid() const {
+    bool isPlaying;
+    FMOD_RESULT result = channel->isPlaying(&isPlaying);
+    return result != FMOD_ERR_INVALID_HANDLE;
 }
