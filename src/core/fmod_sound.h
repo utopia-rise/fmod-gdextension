@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_SOUND_H
 
 #include "classes/ref_counted.hpp"
+#include "helpers/fmod_object.h"
 #include "fmod.hpp"
 
 namespace godot {

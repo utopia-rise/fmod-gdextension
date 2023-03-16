@@ -3,12 +3,12 @@
 
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
+#include "helpers/common.h"
+#include "helpers/fmod_object.h"
 
-namespace godot {T
-    class FmodBus : public RefCounted {
+namespace godot {
+    class FmodBus : public RefCounted, public FmodObject<FmodBus, FMOD::Studio::Bus> {
         GDCLASS(FmodBus, RefCounted);
-
-        FMOD::Studio::Bus* bus = nullptr;
 
         bool get_mute() const;
         bool get_paused() const;

@@ -424,8 +424,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
     if (cache->has_bank(pathToBank)) return {cache->get_bank(pathToBank)};// bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
-    Ref<FmodBank> ref = init_ref<FmodBank>();
-    ref->bank = bank;
+    Ref<FmodBank> ref = FmodBank::create_ref(bank);
     if (bank) {
         GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(pathToBank))
         cache->add_bank(pathToBank, ref);
@@ -461,8 +460,7 @@ bool FmodServer::check_event_path(const String& eventPath) {
 Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
     FMOD::Studio::EventInstance* instance = _create_instance(eventPath, false, nullptr);
     if (instance) {
-        Ref<FmodEvent> event = init_ref<FmodEvent>();
-        event->instance = instance;
+        Ref<FmodEvent> event = FmodEvent::create_ref(instance);
         instance->setUserData(event.ptr());
         return event;
     }

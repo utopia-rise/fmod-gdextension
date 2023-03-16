@@ -50,6 +50,7 @@
 
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
+
 namespace godot {
     bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
         if (result != FMOD_OK) {
@@ -76,13 +77,6 @@ namespace godot {
         }
         GODOT_LOG(2, "Object is null")
         return false;
-    }
-
-    template<class T>
-    static inline Ref<T> init_ref() {
-        Ref<T> ref;
-        ref.instantiate();
-        return ref;
     }
 
 }// namespace godot

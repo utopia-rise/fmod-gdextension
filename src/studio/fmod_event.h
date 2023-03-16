@@ -1,16 +1,19 @@
 #ifndef GODOTFMOD_FMOD_EVENT_H
 #define GODOTFMOD_FMOD_EVENT_H
 
-#include "classes/ref_counted.hpp"
-#include "fmod_studio.hpp"
 
 namespace godot {
-    class FmodEvent : public RefCounted {
+    class FmodEvent : public RefCounted, public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {
         GDCLASS(FmodEvent, RefCounted);
 
-        FMOD::Studio::EventInstance* instance = nullptr;
         float distanceScale = 0;
         Callable eventCallback;
+
+        FMOD::Studio::EventInstance* wrapped = nullptr;
+
+    public:
+        FmodEvent() = default;
+        ~FmodEvent() = default;
 
         float get_parameter_by_name(const String& parameterName) const;
         void set_parameter_by_name(const String& parameterName, float value) const;
@@ -41,11 +44,6 @@ namespace godot {
 
         void set_callback(Callable& callback, int callbackMask);
         Callable get_callback() const;
-
-
-    public:
-        FmodEvent() = default;
-        ~FmodEvent() = default;
 
     protected:
         static void _bind_methods();

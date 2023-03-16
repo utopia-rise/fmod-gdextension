@@ -3,12 +3,12 @@
 
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
+#include "helpers/common.h"
+#include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodEventDescription : public RefCounted {
+    class FmodEventDescription : public RefCounted, public FmodObject<FmodEventDescription, FMOD::Studio::EventDescription> {
         GDCLASS(FmodEventDescription, RefCounted);
-
-        FMOD::Studio::EventDescription* description = nullptr;
 
         int get_length();
         Array get_instance_list();
