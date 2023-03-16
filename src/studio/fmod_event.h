@@ -3,8 +3,7 @@
 
 
 namespace godot {
-    class FmodEvent : public RefCounted, public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {
-        GDCLASS(FmodEvent, RefCounted);
+    class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {
 
         float distanceScale = 0;
         Callable eventCallback;
@@ -44,9 +43,6 @@ namespace godot {
 
         void set_callback(Callable& callback, int callbackMask);
         Callable get_callback() const;
-
-    protected:
-        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_H

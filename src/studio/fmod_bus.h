@@ -1,14 +1,12 @@
 #ifndef GODOTFMOD_FMOD_BUS_H
 #define GODOTFMOD_FMOD_BUS_H
 
-#include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodBus : public RefCounted, public FmodObject<FmodBus, FMOD::Studio::Bus> {
-        GDCLASS(FmodBus, RefCounted);
+    class FmodBus : public FmodObject<FmodBus, FMOD::Studio::Bus> {
 
         bool get_mute() const;
         bool get_paused() const;
@@ -21,9 +19,6 @@ namespace godot {
     public:
         FmodBus() = default;
         ~FmodBus() = default;
-
-    protected:
-        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_BUS_H

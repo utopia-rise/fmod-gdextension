@@ -7,8 +7,7 @@
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodBank : public RefCounted, public FmodObject<FmodBank, FMOD::Studio::Bank>  {
-        GDCLASS(FmodBank, RefCounted);
+    class FmodBank : public FmodObject<FmodBank, FMOD::Studio::Bank>  {
 
     public:
         FmodBank() = default;
@@ -24,8 +23,6 @@ namespace godot {
         Array get_bus_list() const;
         Array get_vca_list() const;
 
-    protected:
-        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_BANK_H

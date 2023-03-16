@@ -7,8 +7,7 @@
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodEventDescription : public RefCounted, public FmodObject<FmodEventDescription, FMOD::Studio::EventDescription> {
-        GDCLASS(FmodEventDescription, RefCounted);
+    class FmodEventDescription : public FmodObject<FmodEventDescription, FMOD::Studio::EventDescription> {
 
         int get_length();
         Array get_instance_list();
@@ -35,9 +34,6 @@ namespace godot {
     public:
         FmodEventDescription() = default;
         ~FmodEventDescription() = default;
-
-    protected:
-        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
