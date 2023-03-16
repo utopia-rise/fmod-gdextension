@@ -39,7 +39,7 @@ namespace godot {
         Transform2D get_2d_attributes() const;
         void set_2d_attributes(Transform2D position) const;
         void set_3d_attributes(const Transform3D& transform) const;
-        void set_3d_attributes(Object* node) const;
+        void set_node_attributes(Node* node) const;
 
         void set_callback(Callable callback, int callbackMask);
         Callable get_callback() const;

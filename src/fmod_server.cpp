@@ -71,7 +71,8 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "eventName", "gameObj", "parameters"), &FmodServer::play_one_shot_with_params);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached", "eventName", "gameObj"), &FmodServer::play_one_shot_attached);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "eventName", "gameObj", "parameters"), &FmodServer::play_one_shot_attached_with_params);
-    ClassDB::bind_method(D_METHOD("pause_all_events", "pause"), &FmodServer::pause_all_events);
+    ClassDB::bind_method(D_METHOD("pause_all_events"), &FmodServer::pause_all_events);
+    ClassDB::bind_method(D_METHOD("unpause_all_events"), &FmodServer::unpause_all_events);
     ClassDB::bind_method(D_METHOD("mute_all_events"), &FmodServer::mute_all_events);
     ClassDB::bind_method(D_METHOD("unmute_all_events"), &FmodServer::unmute_all_events);
 
@@ -147,18 +148,12 @@ void FmodServer::update() {
             continue;
         }
 
-        oneShot->instance->set_3d_attributes(oneShot->gameObj);
+        oneShot->instance->set_node_attributes(oneShot->gameObj);
     }
 
-    for(Ref<FmodEvent> event : runningEvents){
+    for (Ref<FmodEvent> event : runningEvents) {
         if (!event->is_valid()) {
             runningEvents.erase(event);
-        }
-    }
-
-    for (FMOD::Channel* channel : channels) {
-        if (channel && !_is_channel_valid(channel)) {
-            channels.erase(channel);
         }
     }
 
@@ -412,7 +407,7 @@ void FmodServer::unload_bank(const String& pathToBank) {
 }
 
 bool FmodServer::banks_still_loading() {
-    cache->is_loading();
+    return cache->is_loading();
 }
 
 bool FmodServer::check_vca_path(const String& vcaPath) {
@@ -431,7 +426,7 @@ Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
     return _create_instance(eventPath, false, nullptr);
 }
 
-Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
+Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneShot, Node* gameObject) {
     bool found = cache->check_event_path(eventName);
     if (!found) {
         GODOT_LOG(1, "Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
@@ -441,7 +436,7 @@ Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneS
     FMOD::Studio::EventInstance* eventInstance = nullptr;
     ERROR_CHECK(desc->get_wrapped()->createInstance(&eventInstance));
     Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
-    if(ref.is_valid()){
+    if (ref.is_valid()) {
         runningEvents.push_back(ref);
         if (isOneShot || gameObject) {
             auto* oneShot = new OneShot();
@@ -450,28 +445,27 @@ Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneS
         }
     }
 
-
     return ref;
 }
 
-void FmodServer::play_one_shot(const String& eventName, Object* gameObj) {
+void FmodServer::play_one_shot(const String& eventName, Node* gameObj) {
     Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
     if (!ref.is_valid()) {
         return;
     }
 
-    ref->set_3d_attributes(gameObj);
+    ref->set_node_attributes(gameObj);
     ref->start();
     ref->release();
 }
 
-void FmodServer::play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
+void FmodServer::play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
     Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
     if (!ref.is_valid()) {
         return;
     }
 
-    ref->set_3d_attributes(gameObj);
+    ref->set_node_attributes(gameObj);
     // set the initial parameter values
     auto keys = parameters.keys();
     for (int i = 0; i < keys.size(); i++) {
@@ -483,7 +477,7 @@ void FmodServer::play_one_shot_with_params(const String& eventName, Object* game
     ref->release();
 }
 
-void FmodServer::play_one_shot_attached(const String& eventName, Object* gameObj) {
+void FmodServer::play_one_shot_attached(const String& eventName, Node* gameObj) {
     if (!is_fmod_valid(gameObj)) {
         return;
     }
@@ -496,7 +490,7 @@ void FmodServer::play_one_shot_attached(const String& eventName, Object* gameObj
     ref->release();
 }
 
-void FmodServer::play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
+void FmodServer::play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
     if (!is_fmod_valid(gameObj)) {
         return;
     }
@@ -549,9 +543,15 @@ int FmodServer::get_system_dsp_num_buffers() {
     return numBuffers;
 }
 
-void FmodServer::pause_all_events(const bool pause) {
+void FmodServer::pause_all_events() {
     for (Ref<FmodEvent> eventInstance : runningEvents) {
-        eventInstance->set_paused(pause);
+        eventInstance->set_paused(true);
+    }
+}
+
+void FmodServer::unpause_all_events() {
+    for (Ref<FmodEvent> eventInstance : runningEvents) {
+        eventInstance->set_paused(false);
     }
 }
 
@@ -573,55 +573,63 @@ void FmodServer::unmute_all_events() {
     }
 }
 
-void FmodServer::load_file_as_sound(const String& path) {
+Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
     DRIVE_PATH(path)
-    FMOD::Sound* sound = sounds.get(path);
-    if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
-        if (sound) {
-            sounds[path] = sound;
-            GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
-        }
+    if (!cache->has_file(path)) {
+        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
+        return {};
     }
+
+    FMOD::Sound* sound = nullptr;
+    ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
+    if (sound) {
+        Ref<FmodFile> ref = FmodFile::create_ref(sound);
+        cache->add_file(path, ref);
+        GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
+    }
+    return {};
 }
 
-void FmodServer::load_file_as_music(const String& path) {
+Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
     DRIVE_PATH(path)
-    FMOD::Sound* sound = sounds[path];
-    if (!sound) {
-        ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
-        if (sound) {
-            sounds[path] = sound;
-            GODOT_LOG(0, "FMOD Sound System: LOADING AS MUSIC FILE" + String(path))
-        }
+    if (!cache->has_file(path)) {
+        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
+        return {};
     }
+    FMOD::Sound* sound = nullptr;
+    ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
+    if (sound) {
+        Ref<FmodFile> ref = FmodFile::create_ref(sound);
+        cache->add_file(path, ref);
+        GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
+    }
+    return {};
 }
 
 void FmodServer::unload_file(const String& path) {
     DRIVE_PATH(path)
-    if (!sounds.has(path)) {
+    if (!cache->has_file(path)) {
         GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
         return;
     }
-    FMOD::Sound* sound = sounds[path];
-    ERROR_CHECK(sound->release());
-    sounds.erase(path);
+    Ref<FmodFile> ref = cache->get_file(path);
+    ERROR_CHECK(ref->get_wrapped()->release());
+    cache->remove_file(path);
     GODOT_LOG(0, "FMOD Sound System: UNLOADING FILE" + String(path))
 }
 
 Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     DRIVE_PATH(path)
-    if (!sounds.has(path)) {
+    if (!cache->has_file(path)) {
         GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded.")
         return {};
     }
-    FMOD::Sound* sound = sounds[path];
+
+    Ref<FmodFile> file = cache->get_file(path);
     FMOD::Channel* channel = nullptr;
-    ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
+    ERROR_CHECK(coreSystem->playSound(file->get_wrapped(), nullptr, true, &channel));
     if (channel) {
-        channels.push_back(channel);
-        Ref<FmodSound> ref = create_ref<FmodSound>();
-        ref->sound = sound;
+        Ref<FmodSound> ref = FmodSound::create_ref(channel);
         return ref;
     }
     return {};
@@ -810,4 +818,20 @@ Array FmodServer::get_global_parameter_desc_list() {
         a.append(paramDesc);
     }
     return a;
+}
+
+Array FmodServer::get_all_vca() {
+
+}
+
+Array FmodServer::get_all_buses() {
+
+}
+
+Array FmodServer::get_all_event_descriptions() {
+
+}
+
+Array FmodServer::get_all_banks() {
+
 }

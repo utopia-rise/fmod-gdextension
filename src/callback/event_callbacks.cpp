@@ -27,9 +27,7 @@ namespace Callbacks {
                 char n[256];
                 sound->getName(n, 256);
                 godot::String name(n);
-                godot::String mType = type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED ? "played" : "stopped";
                 dictionary["name"] = name;
-                dictionary["type"] = mType;
             }
             godot::Callable callback = event_instance->get_callback();
             callback.call(dictionary, type);

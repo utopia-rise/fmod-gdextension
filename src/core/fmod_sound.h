@@ -2,17 +2,26 @@
 #define GODOTFMOD_FMOD_SOUND_H
 
 #include "classes/ref_counted.hpp"
-#include "helpers/fmod_object.h"
 #include "fmod.hpp"
+#include "helpers/fmod_object.h"
 
 namespace godot {
     class FmodSound : public RefCounted {
         GDCLASS(FmodSound, RefCounted);
 
-        FMOD::Sound* sound = nullptr;
-        FMOD::Channel* channel = nullptr;
+        FMOD::Channel* _wrapped = nullptr;
 
     public:
+        inline static Ref<FmodSound> create_ref(FMOD::Channel* wrapped) {
+            Ref<FmodSound> ref;
+            if (wrapped) {
+                ref.instantiate();
+                ref->_wrapped = wrapped;
+                wrapped->setUserData(ref.ptr());
+            }
+            return ref;
+        }
+
         void set_paused(bool paused) const;
         void stop() const;
         bool is_playing() const;
@@ -22,7 +31,7 @@ namespace godot {
         void set_pitch(float pitch);
 
         bool is_valid() const;
-        void play();
+        void play() const;
         void release() const;
 
     protected:

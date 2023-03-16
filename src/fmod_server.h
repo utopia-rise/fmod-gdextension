@@ -25,7 +25,7 @@
 namespace godot {
 
     struct OneShot{
-        Object* gameObj = nullptr;
+        Node* gameObj = nullptr;
         Ref<FmodEvent> instance;
     };
 
@@ -59,14 +59,11 @@ namespace godot {
         List<OneShot*> oneShots;
         List<Ref<FmodEvent>> runningEvents;
 
-        List<FMOD::Channel*> channels;
-        HashMap<String, FMOD::Sound*> sounds;
-
         Ref<FmodPerformanceData> performanceData;
 
         void _set_listener_attributes();
 
-        Ref<FmodEvent> _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
+        Ref<FmodEvent> _create_instance(const String& eventName, bool isOneShot, Node* gameObject);
 
         void _update_performance_data();
 
@@ -94,10 +91,16 @@ namespace godot {
         bool check_vca_path(const String& vcaPath);
         bool check_bus_path(const String& busPath);
         bool check_event_path(const String& eventPath);
+        Array get_all_vca();
+        Array get_all_buses();
+        Array get_all_event_descriptions();
+        Array get_all_banks();
         Array get_available_drivers();
         int get_driver();
         void set_driver(int id);
         Ref<FmodPerformanceData> get_performance_data();
+
+        //GLOBAL PARAMETERS
         void set_global_parameter_by_name(const String& parameterName, float value);
         float get_global_parameter_by_name(const String& parameterName);
         void set_global_parameter_by_id(const Array& idPair, float value);
@@ -124,37 +127,28 @@ namespace godot {
         bool get_listener_lock(int index);
         Object* get_object_attached_to_listener(int index);
 
-        // OBJECTS
+        // BANKS
         Ref<FmodBank> load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
         Ref<FmodEvent> create_event_instance(const String& eventPath);
-        static void attach_instance_to_node(Ref<FmodEvent> event, Object* gameObj) ;
-        static void detach_instance_from_node(Ref<FmodEvent> event) ;
-        static Object* get_object_attached_to_instance(Ref<FmodEvent> event) ;
+
+        // SOUNDS
+        Ref<FmodFile> load_file_as_sound(const String& path);
+        Ref<FmodFile> load_file_as_music(const String& path);
+        void unload_file(const String& path);
+        Ref<FmodSound> create_sound_instance(const String& path);
 
         /* Helper methods */
-        void play_one_shot(const String& eventName, Object* gameObj);
-        void play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
-        void play_one_shot_attached(const String& eventName, Object* gameObj);
-        void play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters);
-        void pause_all_events(bool pause);
+        void play_one_shot(const String& eventName, Node* gameObj);
+        void play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void play_one_shot_attached(const String& eventName, Node* gameObj);
+        void play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
+        void pause_all_events();
+        void unpause_all_events();
         void mute_all_events();
         void unmute_all_events();
         void wait_for_all_loads();
-
-        // LOW LEVEL API
-        // Load and release memory
-        void load_file_as_sound(const String& path);
-        void load_file_as_music(const String& path);
-        void unload_file(const String& path);
-        // Check validity of an instance
-        Ref<FmodSound> create_sound_instance(const String& path);
-
-        Array get_all_vca();
-        Array get_all_buses();
-        Array get_all_event_descriptions();
-        Array get_all_banks();
 
     protected:
         static void _bind_methods();

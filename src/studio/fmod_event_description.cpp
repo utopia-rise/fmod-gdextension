@@ -29,7 +29,6 @@ void FmodEventDescription::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_user_property_count"), &FmodEventDescription::get_user_property_count);
     ClassDB::bind_method(D_METHOD("user_property_by_index", "index"), &FmodEventDescription::user_property_by_index);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEventDescription::is_valid);
-    ClassDB::bind_method(D_METHOD("release"), &FmodEventDescription::release);
 }
 
 int FmodEventDescription::get_length() {

@@ -12,7 +12,6 @@ void FmodBus::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_volume", "volume"), &FmodBus::set_volume);
     ClassDB::bind_method(D_METHOD("stop_all_events", "stopMode"), &FmodBus::stop_all_events);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodBus::is_valid);
-    ClassDB::bind_method(D_METHOD("release"), &FmodBus::release);
 
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "mute"), "set_mute", "get_mute");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused"), "set_paused", "get_paused");

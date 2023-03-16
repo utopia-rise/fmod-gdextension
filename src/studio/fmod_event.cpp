@@ -32,6 +32,7 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
     ClassDB::bind_method(D_METHOD("set_3d_attributes",  "transform"), &FmodEvent::set_3d_attributes);
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_node_attributes",  "transform"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
@@ -42,7 +43,7 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "position"), "set_timeline_position", "get_timeline_position");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask"), "set_listener_mask", "get_listener_mask");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d"), "set_2d_attributes", "get_2d_attributes");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d"), "set_3d_attributes", "get_3d_attributes");
+    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d"), "set_node_attributes", "get_3d_attributes");
 
 }
 
@@ -187,7 +188,7 @@ Transform3D FmodEvent::get_3d_attributes() const {
     return _3Dattr;
 }
 
-void FmodEvent::set_3d_attributes(Object* node) const {
+void FmodEvent::set_node_attributes(Node* node) const {
     if (is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
@@ -202,12 +203,10 @@ void FmodEvent::set_3d_attributes(Object* node) const {
     }
 }
 
-
 void FmodEvent::set_callback(Callable callback, int callbackMask) {
     eventCallback = callback;
     ERROR_CHECK(_wrapped->setCallback(Callbacks::eventCallback, callbackMask));
 }
-
 
 Callable FmodEvent::get_callback() const{
     return eventCallback;

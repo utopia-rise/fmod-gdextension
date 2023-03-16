@@ -6,7 +6,6 @@ using namespace godot;
 void FmodVCA::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_volume"), &FmodVCA::get_vca_volume);
     ClassDB::bind_method(D_METHOD("set_volume" "volume"), &FmodVCA::set_vca_volume);
-    ClassDB::bind_method(D_METHOD("release"), &FmodVCA::release);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodVCA::is_valid);
 
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");

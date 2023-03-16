@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_CACHE_H
 
 #include "classes/object.hpp"
+#include "core/fmod_file.h"
 #include "fmod_studio.hpp"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
@@ -14,6 +15,7 @@ namespace godot {
     class FmodCache {
         List<Ref<FmodBank>> loadingBanks;
 
+        HashMap<String, Ref<FmodFile>> file;
         HashMap<String, Ref<FmodBank>> banks;
         HashMap<String, Ref<FmodEventDescription>> eventDescriptions;
         HashMap<String, Ref<FmodBus>> buses;
@@ -24,6 +26,11 @@ namespace godot {
         bool has_bank(const String& bankPath);
         Ref<FmodBank> get_bank(const String& bankPath);
         void remove_bank(const String& bankPath);
+
+        void add_file(const String& filePath, Ref<FmodFile> bank);
+        bool has_file(const String& filePath);
+        Ref<FmodFile> get_file(const String& filePath);
+        void remove_file(const String& filePath);
 
         bool is_master_loaded();
         void refresh();
