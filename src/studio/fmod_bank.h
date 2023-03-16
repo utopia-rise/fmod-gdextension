@@ -7,13 +7,18 @@
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodBank : public FmodObject<FmodBank, FMOD::Studio::Bank>  {
+    class FmodBank : public FmodObjectWithPath<FmodBank, FMOD::Studio::Bank>  {
+
+        List<String> eventDescriptionPaths;
+        List<String> busesPaths;
+        List<String> VCAsPaths;
 
     public:
         FmodBank() = default;
         ~FmodBank() = default;
 
         int get_loading_state();
+
         int get_event_description_count();
         int get_bus_count();
         int get_vca_count() const;
@@ -23,6 +28,15 @@ namespace godot {
         Array get_bus_list() const;
         Array get_vca_list() const;
 
+        void update_bank_data();
+
+    private:
+        void load_all_vca();
+        void load_all_buses();
+        void load_all_event_descriptions();
+
+    protected:
+        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_BANK_H

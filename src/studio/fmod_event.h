@@ -1,14 +1,13 @@
 #ifndef GODOTFMOD_FMOD_EVENT_H
 #define GODOTFMOD_FMOD_EVENT_H
 
+#include "helpers/fmod_object.h"
 
 namespace godot {
     class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {
 
         float distanceScale = 0;
         Callable eventCallback;
-
-        FMOD::Studio::EventInstance* wrapped = nullptr;
 
     public:
         FmodEvent() = default;
@@ -36,13 +35,17 @@ namespace godot {
         bool is_virtual() const;
         void set_listener_mask(unsigned int mask) const;
         uint32_t get_listener_mask() const;
-        void set_3d_attributes(const Transform3D& transform) const;
         Transform3D get_3d_attributes() const;
         Transform2D get_2d_attributes() const;
         void set_2d_attributes(Transform2D position) const;
+        void set_3d_attributes(const Transform3D& transform) const;
+        void set_3d_attributes(Object* node) const;
 
-        void set_callback(Callable& callback, int callbackMask);
+        void set_callback(Callable callback, int callbackMask);
         Callable get_callback() const;
+
+    protected:
+        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_H

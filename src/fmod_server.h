@@ -24,6 +24,11 @@
 
 namespace godot {
 
+    struct OneShot{
+        Object* gameObj = nullptr;
+        Ref<FmodEvent> instance;
+    };
+
     struct Listener {
         Object* gameObj = nullptr;
         bool listenerLock = false;
@@ -40,7 +45,7 @@ namespace godot {
         FMOD::System* coreSystem;
 
         bool isInitialized;
-        bool isNotinitPrinted;
+        bool isNotInitializedPrinted;
 
         float distanceScale;
 
@@ -51,26 +56,24 @@ namespace godot {
         Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
 
-        List<FMOD::Studio::EventInstance*> events;
+        List<OneShot*> oneShots;
+        List<Ref<FmodEvent>> runningEvents;
 
         List<FMOD::Channel*> channels;
         HashMap<String, FMOD::Sound*> sounds;
 
-        // Store dictionary of performance data
         Ref<FmodPerformanceData> performanceData;
 
         void _set_listener_attributes();
 
-        void _update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) const;
-
-        FMOD::Studio::EventInstance* _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
+        Ref<FmodEvent> _create_instance(const String& eventName, bool isOneShot, Object* gameObject);
 
         void _update_performance_data();
 
     public:
         FmodServer();
 
-        ~FmodServer();
+        ~FmodServer() override;
 
         static FmodServer* get_singleton();
 
@@ -82,7 +85,7 @@ namespace godot {
         // SETTINGS
         void set_software_format(int sampleRate, int speakerMode, int numRawSpeakers);
         void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers);
+        void set_system_dsp_buffer_size(unsigned int bufferLength, int numBuffers);
         Array get_system_dsp_buffer_size();
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();

@@ -34,51 +34,51 @@ void FmodEventDescription::_bind_methods() {
 
 int FmodEventDescription::get_length() {
     int length = -1;
-    ERROR_CHECK(wrapped->getLength(&length));
+    ERROR_CHECK(_wrapped->getLength(&length));
     return length;
 }
 
 void FmodEventDescription::load_sample_data() {
-    ERROR_CHECK(wrapped->loadSampleData());
+    ERROR_CHECK(_wrapped->loadSampleData());
 }
 
 void FmodEventDescription::unload_sample_data() {
-    ERROR_CHECK(wrapped->unloadSampleData());
+    ERROR_CHECK(_wrapped->unloadSampleData());
 }
 
 int FmodEventDescription::get_sample_loading_state() {
     FMOD_STUDIO_LOADING_STATE s;
-    ERROR_CHECK(wrapped->getSampleLoadingState(&s));
+    ERROR_CHECK(_wrapped->getSampleLoadingState(&s));
     return s;
 }
 
 bool FmodEventDescription::is_3d() {
     bool is3D = false;
-    ERROR_CHECK(wrapped->is3D(&is3D));
+    ERROR_CHECK(_wrapped->is3D(&is3D));
     return is3D;
 }
 
 bool FmodEventDescription::is_one_shot() {
     bool isOneShot = false;
-    ERROR_CHECK(wrapped->isOneshot(&isOneShot));
+    ERROR_CHECK(_wrapped->isOneshot(&isOneShot));
     return isOneShot;
 }
 
 bool FmodEventDescription::is_snapshot() {
     bool isSnapshot = false;
-    ERROR_CHECK(wrapped->isSnapshot(&isSnapshot));
+    ERROR_CHECK(_wrapped->isSnapshot(&isSnapshot));
     return isSnapshot;
 }
 
 bool FmodEventDescription::is_stream() {
     bool isStream = false;
-    ERROR_CHECK(wrapped->isStream(&isStream));
+    ERROR_CHECK(_wrapped->isStream(&isStream));
     return isStream;
 }
 
 bool FmodEventDescription::has_sustain_point() {
     bool hasSustainPoint = false;
-    ERROR_CHECK(wrapped->hasSustainPoint(&hasSustainPoint));
+    ERROR_CHECK(_wrapped->hasSustainPoint(&hasSustainPoint));
     return hasSustainPoint;
 }
 
@@ -86,7 +86,7 @@ Array FmodEventDescription::get_min_max_distance() {
     float minDistance;
     float maxDistance;
     Array ret;
-    ERROR_CHECK(wrapped->getMinMaxDistance(&minDistance, &maxDistance));
+    ERROR_CHECK(_wrapped->getMinMaxDistance(&minDistance, &maxDistance));
     ret.append(minDistance);
     ret.append(maxDistance);
     return ret;
@@ -94,7 +94,7 @@ Array FmodEventDescription::get_min_max_distance() {
 
 float FmodEventDescription::get_sound_size() {
     float soundSize = 0.f;
-    ERROR_CHECK(wrapped->getSoundSize(&soundSize));
+    ERROR_CHECK(_wrapped->getSoundSize(&soundSize));
     return soundSize;
 }
 
@@ -102,7 +102,7 @@ Dictionary FmodEventDescription::get_parameter_by_name(const String& name) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
     pDesc;
-    if (ERROR_CHECK(wrapped->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
@@ -120,7 +120,7 @@ Dictionary FmodEventDescription::get_parameter_by_id(const Array& idPair) {
     paramId.data2 = (unsigned int) idPair[1];
     FMOD_STUDIO_PARAMETER_DESCRIPTION
     pDesc;
-    if (ERROR_CHECK(wrapped->getParameterDescriptionByID(paramId, &pDesc))) {
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByID(paramId, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
@@ -133,7 +133,7 @@ Dictionary FmodEventDescription::get_parameter_by_id(const Array& idPair) {
 
 int FmodEventDescription::get_parameter_count() {
     int count = 0;
-    ERROR_CHECK(wrapped->getParameterDescriptionCount(&count));
+    ERROR_CHECK(_wrapped->getParameterDescriptionCount(&count));
     return count;
 }
 
@@ -141,7 +141,7 @@ Dictionary FmodEventDescription::get_parameter_by_index(int index) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
     pDesc;
-    if (ERROR_CHECK(wrapped->getParameterDescriptionByIndex(index, &pDesc))) {
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByIndex(index, &pDesc))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
@@ -156,7 +156,7 @@ Dictionary FmodEventDescription::get_user_property(const String& name) {
     Dictionary propDesc;
     FMOD_STUDIO_USER_PROPERTY
     uProp;
-    if (ERROR_CHECK(wrapped->getUserProperty(name.utf8().get_data(), &uProp))) {
+    if (ERROR_CHECK(_wrapped->getUserProperty(name.utf8().get_data(), &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER) propDesc[String(uProp.name)] = uProp.intvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)
@@ -171,7 +171,7 @@ Dictionary FmodEventDescription::get_user_property(const String& name) {
 
 int FmodEventDescription::get_user_property_count() {
     int count = 0;
-    ERROR_CHECK(wrapped->getUserPropertyCount(&count));
+    ERROR_CHECK(_wrapped->getUserPropertyCount(&count));
     return count;
 }
 
@@ -179,7 +179,7 @@ Dictionary FmodEventDescription::user_property_by_index(int index) {
     Dictionary propDesc;
     FMOD_STUDIO_USER_PROPERTY
     uProp;
-    if (ERROR_CHECK(wrapped->getUserPropertyByIndex(index, &uProp))) {
+    if (ERROR_CHECK(_wrapped->getUserPropertyByIndex(index, &uProp))) {
         FMOD_STUDIO_USER_PROPERTY_TYPE fType = uProp.type;
         if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_INTEGER) propDesc[String(uProp.name)] = uProp.intvalue;
         else if (fType == FMOD_STUDIO_USER_PROPERTY_TYPE_BOOLEAN)

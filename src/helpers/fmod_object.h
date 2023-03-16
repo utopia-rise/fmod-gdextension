@@ -1,8 +1,8 @@
 #ifndef GODOTFMOD_FMOD_OBJECT_H
 #define GODOTFMOD_FMOD_OBJECT_H
 
-#include "common.h"
 #include "classes/ref_counted.hpp"
+#include "common.h"
 
 namespace godot{
 
@@ -11,36 +11,58 @@ namespace godot{
         GDCLASS(Derived, RefCounted);
 
     protected:
-        T* wrapped = nullptr;
+        T* _wrapped = nullptr;
 
     public:
-        static Ref<Derived> create_ref(T* wrapped);
-        T* get_wrapped();
-        bool is_valid();
+        static Ref<Derived> create_ref(T* wrapped) {
+            Ref<Derived> ref;
+            if (wrapped) {
+                ref.instantiate();
+                ref->_wrapped = wrapped;
+                wrapped->setUserData(ref.ptr());
+            }
+            return ref;
+        }
+
+        bool is_valid() {
+            return _wrapped != nullptr && _wrapped->isValid();
+        }
+
+        T* get_wrapped(){
+            return _wrapped;
+        }
 
     protected:
-        static void _bind_methods();
+        static void _bind_methods(){
+            Derived::_bind_methods();
+        }
     };
 
     template<class Derived, class T>
-    Ref<Derived> FmodObject<Derived, T>::create_ref(T* wrapped) {
-        Ref<Derived> ref;
-        ref.instantiate();
-        ref->wrapped = wrapped;
-        wrapped->setUserData(ref.ptr());
-        return ref;
-    }
+    class FmodObjectWithPath: public FmodObject<Derived, T> {
 
-    template<class Derived, class T>
-    bool FmodObject<Derived, T>::is_valid() {
-        return wrapped != nullptr && wrapped->isValid();
-    }
+    protected:
+        String _path;
 
-    template<class Derived, class T>
-    T* FmodObject<Derived, T>::get_wrapped(){
-        return wrapped;
-    }
+    public:
+        static Ref<Derived> create_ref(T* wrapped) {
+            Ref<Derived> ref;
+            if (wrapped) {
+                ref.instantiate();
+                ref->_wrapped = wrapped;
+                char path[MAX_PATH_SIZE];
+                ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr));
+                ref->_path = String(path);
+                wrapped->setUserData(ref.ptr());
+            }
+            return ref;
+        }
+
+        String get_path(){
+            return _path;
+        }
+    };
+
 }
-
 
 #endif// GODOTFMOD_FMOD_OBJECT_H

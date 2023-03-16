@@ -50,7 +50,6 @@
 
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
-
 namespace godot {
     bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
         if (result != FMOD_OK) {

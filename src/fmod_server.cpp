@@ -9,22 +9,6 @@ using namespace godot;
 
 FmodServer* FmodServer::singleton = nullptr;
 
-FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0), cache(nullptr) {
-    ERR_FAIL_COND(singleton != nullptr);
-    singleton = this;
-    performanceData = create_ref<FmodPerformanceData>();
-    Callbacks::GodotFileRunner::get_singleton()->start();
-}
-
-FmodServer::~FmodServer() {
-    ERR_FAIL_COND(singleton != this);
-    singleton = nullptr;
-}
-
-FmodServer* FmodServer::get_singleton() {
-    return singleton;
-}
-
 void FmodServer::_bind_methods() {
     // LIFECYCLE
     ClassDB::bind_method(D_METHOD("init", "numOfChannels", "studioFlag", "flag"), &FmodServer::init);
@@ -92,12 +76,23 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("unmute_all_events"), &FmodServer::unmute_all_events);
 
     ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
-
-    ClassDB::bind_method(D_METHOD("attach_instance_to_node", "event", "gameObj"), &FmodServer::attach_instance_to_node);
-    ClassDB::bind_method(D_METHOD("detach_instance_from_node", "event"), &FmodServer::detach_instance_from_node);
-    ClassDB::bind_method(D_METHOD("get_object_attached_to_instance", "event"), &FmodServer::get_object_attached_to_instance);
-
     REGISTER_ALL_CONSTANTS
+}
+
+FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotInitializedPrinted(false), distanceScale(1.0), cache(nullptr) {
+    ERR_FAIL_COND(singleton != nullptr);
+    singleton = this;
+    performanceData = create_ref<FmodPerformanceData>();
+    Callbacks::GodotFileRunner::get_singleton()->start();
+}
+
+FmodServer::~FmodServer() {
+    ERR_FAIL_COND(singleton != this);
+    singleton = nullptr;
+}
+
+FmodServer* FmodServer::get_singleton() {
+    return singleton;
 }
 
 void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
@@ -126,9 +121,9 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
 
 void FmodServer::update() {
     if (!isInitialized) {
-        if (!isNotinitPrinted) {
+        if (!isNotInitializedPrinted) {
             GODOT_LOG(2, "FMOD Sound System: Fmod should be initialized before calling update")
-            isNotinitPrinted = true;
+            isNotInitializedPrinted = true;
         }
         return;
     }
@@ -136,30 +131,28 @@ void FmodServer::update() {
     // Check if bank are loaded, load buses, vca and event descriptions.
     cache->update_pending();
 
-    for (FMOD::Studio::EventInstance* eventInstance : events) {
-        if (eventInstance) {
-            EventInfo* eventInfo = _get_event_info(eventInstance);
-            if (eventInfo) {
-                if (eventInfo->gameObj) {
-                    if (is_dead(eventInfo->gameObj)) {
-                        FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
-                        ERROR_CHECK(eventInstance->stop(m));
-                        _release_one_event(eventInstance);
-                        continue;
-                    }
-                    if (eventInfo->isOneShot) {
-                        FMOD_STUDIO_PLAYBACK_STATE s;
-                        ERROR_CHECK(eventInstance->getPlaybackState(&s));
-                        if (s == FMOD_STUDIO_PLAYBACK_STOPPED) {
-                            _release_one_event(eventInstance);
-                            continue;
-                        }
-                    }
-                    _update_instance_3d_attributes(eventInstance, eventInfo->gameObj);
-                }
-            } else {
-                GODOT_LOG(2, "A managed event doesn't have an EventInfoStructure")
-            }
+    for (OneShot* oneShot : oneShots) {
+        if (!oneShot->instance.is_valid()) {
+            oneShots.erase(oneShot);
+            continue;
+        }
+
+        FMOD_STUDIO_PLAYBACK_STATE s;
+        ERROR_CHECK(oneShot->instance->get_wrapped()->getPlaybackState(&s));
+
+        if (s == FMOD_STUDIO_PLAYBACK_STOPPED || is_dead(oneShot->gameObj)) {
+            FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
+            oneShot->instance->stop(m);
+            oneShots.erase(oneShot);
+            continue;
+        }
+
+        oneShot->instance->set_3d_attributes(oneShot->gameObj);
+    }
+
+    for(Ref<FmodEvent> event : runningEvents){
+        if (!event->is_valid()) {
+            runningEvents.erase(event);
         }
     }
 
@@ -173,12 +166,6 @@ void FmodServer::update() {
     _update_performance_data();
 
     ERROR_CHECK(system->update());
-}
-
-EventInfo* FmodServer::_get_event_info(FMOD::Studio::EventInstance* eventInstance) {
-    EventInfo* eventInfo;
-    ERROR_CHECK(eventInstance->getUserData((void**) &eventInfo));
-    return eventInfo;
 }
 
 void FmodServer::_set_listener_attributes() {
@@ -220,25 +207,9 @@ void FmodServer::_set_listener_attributes() {
     }
 }
 
-void FmodServer::_update_instance_3d_attributes(FMOD::Studio::EventInstance* instance, Object* node) const {
-    // try to set 3D attributes
-    if (instance && is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
-        if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
-            ERROR_CHECK(instance->set3DAttributes(&attr));
-            return;
-        }
-        if (auto* s {Node::cast_to<Node3D>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(s->get_global_transform(), distanceScale);
-            ERROR_CHECK(instance->set3DAttributes(&attr));
-            return;
-        }
-    }
-}
-
 void FmodServer::shutdown() {
     isInitialized = false;
-    isNotinitPrinted = false;
+    isNotInitializedPrinted = false;
     ERROR_CHECK(system->unloadAll());
     ERROR_CHECK(system->release());
     system = nullptr;
@@ -441,9 +412,8 @@ void FmodServer::unload_bank(const String& pathToBank) {
 }
 
 bool FmodServer::banks_still_loading() {
-  cache->is_loading();
+    cache->is_loading();
 }
-
 
 bool FmodServer::check_vca_path(const String& vcaPath) {
     return cache->check_vca_path(vcaPath);
@@ -458,91 +428,97 @@ bool FmodServer::check_event_path(const String& eventPath) {
 }
 
 Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
-    FMOD::Studio::EventInstance* instance = _create_instance(eventPath, false, nullptr);
-    if (instance) {
-        Ref<FmodEvent> event = FmodEvent::create_ref(instance);
-        instance->setUserData(event.ptr());
-        return event;
-    }
-    return {};
+    return _create_instance(eventPath, false, nullptr);
 }
 
-FMOD::Studio::EventInstance* FmodServer::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
-    Array descriptions {cache->get_all_event_descriptions()};
-    if (!descriptions.has(eventName)) {
+Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneShot, Object* gameObject) {
+    bool found = cache->check_event_path(eventName);
+    if (!found) {
         GODOT_LOG(1, "Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
     }
-    Ref<FmodEventDescription> desc = cache->eventDescriptions[eventName];
+
+    Ref<FmodEventDescription> desc = cache->get_event(eventName);
     FMOD::Studio::EventInstance* eventInstance = nullptr;
-    ERROR_CHECK(desc->description->createInstance(&eventInstance));
-    if (eventInstance && (!isOneShot || gameObject)) {
-        auto* eventInfo = new EventInfo();
-        eventInfo->gameObj = gameObject;
-        eventInfo->isOneShot = isOneShot;
-        eventInstance->setUserData(eventInfo);
-        events.push_back(eventInstance);
+    ERROR_CHECK(desc->get_wrapped()->createInstance(&eventInstance));
+    Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
+    if(ref.is_valid()){
+        runningEvents.push_back(ref);
+        if (isOneShot || gameObject) {
+            auto* oneShot = new OneShot();
+            oneShot->gameObj = gameObject;
+            oneShots.push_back(oneShot);
+        }
     }
-    return eventInstance;
+
+
+    return ref;
 }
 
 void FmodServer::play_one_shot(const String& eventName, Object* gameObj) {
-    FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
-    if (instance) {
-        // set 3D attributes once
-        if (is_fmod_valid(gameObj)) {
-            _update_instance_3d_attributes(instance, gameObj);
-        }
-        ERROR_CHECK(instance->start());
-        ERROR_CHECK(instance->release());
+    Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
+    if (!ref.is_valid()) {
+        return;
     }
+
+    ref->set_3d_attributes(gameObj);
+    ref->start();
+    ref->release();
 }
 
 void FmodServer::play_one_shot_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
-    FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, nullptr);
-    if (instance) {
-        // set 3D attributes once
-        if (is_fmod_valid(gameObj)) {
-            _update_instance_3d_attributes(instance, gameObj);
-        }
-        // set the initial parameter values
-        auto keys = parameters.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            String k = keys[i];
-            float v = parameters[keys[i]];
-            ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
-        }
-        ERROR_CHECK(instance->start());
-        ERROR_CHECK(instance->release());
+    Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
+    if (!ref.is_valid()) {
+        return;
     }
+
+    ref->set_3d_attributes(gameObj);
+    // set the initial parameter values
+    auto keys = parameters.keys();
+    for (int i = 0; i < keys.size(); i++) {
+        String k = keys[i];
+        float v = parameters[keys[i]];
+        ref->set_parameter_by_name(k.utf8().get_data(), v);
+    }
+    ref->start();
+    ref->release();
 }
 
 void FmodServer::play_one_shot_attached(const String& eventName, Object* gameObj) {
-    if (is_fmod_valid(gameObj)) {
-        FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
-        if (instance) {
-            ERROR_CHECK(instance->start());
-        }
+    if (!is_fmod_valid(gameObj)) {
+        return;
     }
+
+    Ref<FmodEvent> ref = _create_instance(eventName, true, gameObj);
+    if (!ref.is_valid()) {
+        return;
+    }
+    ref->start();
+    ref->release();
 }
 
 void FmodServer::play_one_shot_attached_with_params(const String& eventName, Object* gameObj, const Dictionary& parameters) {
-    if (is_fmod_valid(gameObj)) {
-        FMOD::Studio::EventInstance* instance = _create_instance(eventName, true, gameObj);
-        if (instance) {
-            // set the initial parameter values
-            auto keys = parameters.keys();
-            for (int i = 0; i < keys.size(); i++) {
-                String k = keys[i];
-                float v = parameters[keys[i]];
-                ERROR_CHECK(instance->setParameterByName(k.utf8().get_data(), v));
-            }
-            ERROR_CHECK(instance->start());
-        }
+    if (!is_fmod_valid(gameObj)) {
+        return;
     }
+
+    Ref<FmodEvent> ref = _create_instance(eventName, true, gameObj);
+    if (!ref.is_valid()) {
+        return;
+    }
+
+    // set the initial parameter values
+    auto keys = parameters.keys();
+    for (int i = 0; i < keys.size(); i++) {
+        String k = keys[i];
+        float v = parameters[keys[i]];
+        ref->set_parameter_by_name(k.utf8().get_data(), v);
+    }
+    ref->start();
+    ref->release();
 }
 
-void FmodServer::set_system_dsp_buffer_size(unsigned int bufferlength, int numbuffers) {
-    if (bufferlength > 0 && numbuffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(bufferlength, numbuffers))) {
+void FmodServer::set_system_dsp_buffer_size(unsigned int bufferLength, int numBuffers) {
+    if (bufferLength > 0 && numBuffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(bufferLength, numBuffers))) {
         GODOT_LOG(0, "FMOD Sound System: Successfully set DSP buffer size")
     } else {
         GODOT_LOG(2, "FMOD Sound System: Failed to set DSP buffer size :|")
@@ -550,37 +526,37 @@ void FmodServer::set_system_dsp_buffer_size(unsigned int bufferlength, int numbu
 }
 
 Array FmodServer::get_system_dsp_buffer_size() {
-    unsigned int bufferlength;
-    int numbuffers;
+    unsigned int bufferLength;
+    int numBuffers;
     Array a;
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
-    a.append(bufferlength);
-    a.append(numbuffers);
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferLength, &numBuffers));
+    a.append(numBuffers);
+    a.append(numBuffers);
     return a;
 }
 
 unsigned int FmodServer::get_system_dsp_buffer_length() {
-    unsigned int bufferlength;
-    int numbuffers;
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
-    return bufferlength;
+    unsigned int bufferLength;
+    int numBuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferLength, &numBuffers));
+    return bufferLength;
 }
 
 int FmodServer::get_system_dsp_num_buffers() {
-    unsigned int bufferlength;
-    int numbuffers;
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferlength, &numbuffers));
-    return numbuffers;
+    unsigned int bufferLength;
+    int numBuffers;
+    ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferLength, &numBuffers));
+    return numBuffers;
 }
 
 void FmodServer::pause_all_events(const bool pause) {
-    for (auto eventInstance : events) {
-        ERROR_CHECK(eventInstance->setPaused(pause));
+    for (Ref<FmodEvent> eventInstance : runningEvents) {
+        eventInstance->set_paused(pause);
     }
 }
 
 void FmodServer::mute_all_events() {
-    if (cache->banks.size() > 1) {
+    if (cache->is_master_loaded()) {
         FMOD::Studio::Bus* masterBus = nullptr;
         if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(true);
@@ -589,7 +565,7 @@ void FmodServer::mute_all_events() {
 }
 
 void FmodServer::unmute_all_events() {
-    if (cache->banks.size() > 1) {
+    if (cache->is_master_loaded()) {
         FMOD::Studio::Bus* masterBus = nullptr;
         if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
             masterBus->setMute(false);
@@ -604,7 +580,7 @@ void FmodServer::load_file_as_sound(const String& path) {
         ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
         if (sound) {
             sounds[path] = sound;
-            GODOT_LOG(0,"FMOD Sound System: LOADING AS SOUND FILE" + String(path))
+            GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
         }
     }
 }
@@ -616,7 +592,7 @@ void FmodServer::load_file_as_music(const String& path) {
         ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
         if (sound) {
             sounds[path] = sound;
-            GODOT_LOG(0,"FMOD Sound System: LOADING AS MUSIC FILE" + String(path))
+            GODOT_LOG(0, "FMOD Sound System: LOADING AS MUSIC FILE" + String(path))
         }
     }
 }
@@ -630,7 +606,7 @@ void FmodServer::unload_file(const String& path) {
     FMOD::Sound* sound = sounds[path];
     ERROR_CHECK(sound->release());
     sounds.erase(path);
-    GODOT_LOG(0,"FMOD Sound System: UNLOADING FILE" + String(path))
+    GODOT_LOG(0, "FMOD Sound System: UNLOADING FILE" + String(path))
 }
 
 Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
@@ -644,7 +620,7 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     ERROR_CHECK(coreSystem->playSound(sound, nullptr, true, &channel));
     if (channel) {
         channels.push_back(channel);
-        Ref<FmodSound> ref = init_ref<FmodSound>();
+        Ref<FmodSound> ref = create_ref<FmodSound>();
         ref->sound = sound;
         return ref;
     }
@@ -834,28 +810,4 @@ Array FmodServer::get_global_parameter_desc_list() {
         a.append(paramDesc);
     }
     return a;
-}
-
-void FmodServer::attach_instance_to_node(Ref<FmodEvent> event, Object* gameObj) {
-    if (!is_fmod_valid(gameObj)) {
-        GODOT_LOG(1, "Trying to attach event instance to null game object or object is not Node3D or CanvasItem")
-        return;
-    }
-    _get_event_info(event->instance)->gameObj = gameObj;
-}
-
-void FmodServer::detach_instance_from_node(Ref<FmodEvent> event) {
-    _get_event_info(event->instance)->gameObj = nullptr;
-}
-
-Object* FmodServer::get_object_attached_to_instance(Ref<FmodEvent> event) {
-    Object* node = nullptr;
-    EventInfo* eventInfo = _get_event_info(event->instance);
-    if (eventInfo) {
-        node = eventInfo->gameObj;
-        if (!node) {
-            GODOT_LOG(1, "There is no node attached to event instance.")
-        }
-    }
-    return node;
 }

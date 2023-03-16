@@ -14,10 +14,10 @@ void FmodVCA::_bind_methods() {
 
 float FmodVCA::get_vca_volume(const String& VCAPath) {
     float volume = 0.0f;
-    ERROR_CHECK(wrapped->getVolume(&volume));
+    ERROR_CHECK(_wrapped->getVolume(&volume));
     return volume;
 }
 
 void FmodVCA::set_vca_volume(const String& VCAPath, float volume) {
-    ERROR_CHECK(wrapped->setVolume(volume));
+    ERROR_CHECK(_wrapped->setVolume(volume));
 }

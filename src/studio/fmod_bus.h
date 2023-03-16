@@ -6,7 +6,7 @@
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodBus : public FmodObject<FmodBus, FMOD::Studio::Bus> {
+    class FmodBus : public FmodObjectWithPath<FmodBus, FMOD::Studio::Bus> {
 
         bool get_mute() const;
         bool get_paused() const;
@@ -19,6 +19,9 @@ namespace godot {
     public:
         FmodBus() = default;
         ~FmodBus() = default;
+
+    protected:
+        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_BUS_H

@@ -7,13 +7,16 @@
 #include "helpers/fmod_object.h"
 
 namespace godot {
-    class FmodVCA : public FmodObject<FmodVCA, FMOD::Studio::VCA> {
+    class FmodVCA : public FmodObjectWithPath<FmodVCA, FMOD::Studio::VCA> {
         float get_vca_volume(const String& VCAPath);
         void set_vca_volume(const String& VCAPath, float volume);
 
     public:
         FmodVCA() = default;
         ~FmodVCA() = default;
+
+    protected:
+        static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_VCA_H

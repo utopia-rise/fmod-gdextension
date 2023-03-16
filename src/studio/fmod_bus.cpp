@@ -21,34 +21,34 @@ void FmodBus::_bind_methods() {
 
 bool FmodBus::get_mute() const {
     bool mute = false;
-    ERROR_CHECK(wrapped->getMute(&mute));
+    ERROR_CHECK(_wrapped->getMute(&mute));
     return mute;
 }
 
 bool FmodBus::get_paused() const {
     bool paused = false;
-    ERROR_CHECK(wrapped->getPaused(&paused));
+    ERROR_CHECK(_wrapped->getPaused(&paused));
     return paused;
 }
 
 float FmodBus::get_volume() const {
     float volume = 0.0f;
-    ERROR_CHECK(wrapped->getVolume(&volume));
+    ERROR_CHECK(_wrapped->getVolume(&volume));
     return volume;
 }
 
 void FmodBus::set_mute(bool mute) const {
-    ERROR_CHECK(wrapped->setMute(mute));
+    ERROR_CHECK(_wrapped->setMute(mute));
 }
 
 void FmodBus::set_paused(bool paused) const {
-    ERROR_CHECK(wrapped->setPaused(paused));
+    ERROR_CHECK(_wrapped->setPaused(paused));
 }
 
 void FmodBus::set_volume(float volume) const {
-    ERROR_CHECK(wrapped->setVolume(volume));
+    ERROR_CHECK(_wrapped->setVolume(volume));
 }
 
 void FmodBus::stop_all_events(int stopMode) {
-    ERROR_CHECK(wrapped->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
+    ERROR_CHECK(_wrapped->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
 }
