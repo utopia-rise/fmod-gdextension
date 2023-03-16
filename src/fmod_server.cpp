@@ -112,12 +112,10 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
         }
     }
 
-#ifdef CUSTOM_FILESYSTEM
     if (ERROR_CHECK(coreSystem->setFileSystem(
                 &Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1))) {
         GODOT_LOG(0, "Custom File System enabled.")
     }
-#endif
 }
 
 void FmodServer::update() {
@@ -386,7 +384,6 @@ void FmodServer::set_software_format(int sampleRate, const int speakerMode, int 
 }
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
-    DRIVE_PATH(pathToBank)
     if (cache->has_bank(pathToBank)) return {cache->get_bank(pathToBank)};// bank is already loaded
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
@@ -402,7 +399,6 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 }
 
 void FmodServer::unload_bank(const String& pathToBank) {
-    DRIVE_PATH(pathToBank)
     cache->remove_bank(pathToBank);
 }
 
@@ -574,7 +570,6 @@ void FmodServer::unmute_all_events() {
 }
 
 Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
-    DRIVE_PATH(path)
     if (!cache->has_file(path)) {
         GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
         return {};
@@ -591,7 +586,6 @@ Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
 }
 
 Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
-    DRIVE_PATH(path)
     if (!cache->has_file(path)) {
         GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
         return {};
@@ -607,7 +601,6 @@ Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
 }
 
 void FmodServer::unload_file(const String& path) {
-    DRIVE_PATH(path)
     if (!cache->has_file(path)) {
         GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
         return;
@@ -619,7 +612,6 @@ void FmodServer::unload_file(const String& path) {
 }
 
 Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
-    DRIVE_PATH(path)
     if (!cache->has_file(path)) {
         GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded.")
         return {};

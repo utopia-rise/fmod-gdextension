@@ -8,18 +8,6 @@
 #include <fmod_errors.h>
 #include <helpers/current_function.h>
 
-#define CUSTOM_FILESYSTEM
-
-#ifndef CUSTOM_FILESYSTEM
-    #ifdef __ANDROID__
-        #define DRIVE_PATH(path) path = path.replace("res://", "file:///android_asset/");
-    #else
-        #define DRIVE_PATH(path) path = path.replace("res://", "./");
-    #endif
-#else
-    #define DRIVE_PATH(path)
-#endif
-
 #define MAX_PATH_SIZE 512
 #define MAX_DRIVER_NAME_SIZE 256
 
