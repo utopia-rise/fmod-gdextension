@@ -12,13 +12,13 @@ namespace godot{
         T* wrapped = nullptr;
 
     public:
-        static Ref<Derived> wrap_ref(T* wrapped);
+        static Ref<Derived> create_ref(T* wrapped);
         T* get_wrapped();
         bool is_valid();
     };
 
     template<class Derived, class T>
-    Ref<Derived> FmodObject<Derived, T>::wrap_ref(T* wrapped) {
+    Ref<Derived> FmodObject<Derived, T>::create_ref(T* wrapped) {
         Ref<Derived> ref;
         ref.instantiate();
         ref->wrapped = wrapped;

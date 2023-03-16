@@ -28,6 +28,17 @@ namespace godot {
             List<String> eventDescriptionPaths;
             List<String> busesPaths;
             List<String> VCAsPaths;
+
+            void load_bank_data();
+            void unload_bank_data();
+
+            void load_all_vca();
+            void load_all_buses();
+            void load_all_event_descriptions();
+
+            void unload_all_vca();
+            void unload_all_buses();
+            void unload_all_event_descriptions();
         };
 
         List<LoadingBank*> loadingBanks;
@@ -37,25 +48,14 @@ namespace godot {
         HashMap<String, Ref<FmodBus>> buses;
         HashMap<String, Ref<FmodVCA>> VCAs;
 
-        void _load_bank_data(LoadingBank* loadingBank);
-        void _unload_bank_data(BankData* bank);
-
-        void _load_all_vca(BankData* bank);
-        void _load_all_buses(BankData* bank);
-        void _load_all_event_descriptions(BankData* bank);
-
-        void _unload_all_vca(BankData* bank);
-        void _unload_all_buses(BankData* bank);
-        void _unload_all_event_descriptions(BankData* bank);
-
     public:
         void add_bank(const String& bankPath, Ref<FmodBank> bank);
         bool has_bank(const String& bankPath);
         bool get_bank(const String& bankPath);
         void remove_bank(const String& bankPath);
-        void load_pending();
         void clear();
 
+        void update_pending();
         void force_loading();
         bool is_loading();
 

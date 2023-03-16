@@ -1,7 +1,7 @@
 #ifndef GODOTFMOD_FMOD_EVENT_EMITTER_H
 #define GODOTFMOD_FMOD_EVENT_EMITTER_H
 
-#include "studio/fmod_event.h"
+#include <fmod_server.h>
 
 namespace godot {
 

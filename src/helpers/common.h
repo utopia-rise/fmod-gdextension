@@ -79,6 +79,13 @@ namespace godot {
         return false;
     }
 
+    template<class T>
+    static inline Ref<T> create_ref() {
+        Ref<T> ref;
+        ref.instantiate();
+        return ref;
+    }
+
 }// namespace godot
 
 #endif// GODOTFMOD_COMMON_H

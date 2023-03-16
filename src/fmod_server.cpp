@@ -12,7 +12,7 @@ FmodServer* FmodServer::singleton = nullptr;
 FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotinitPrinted(false), distanceScale(1.0), cache(nullptr) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
-    performanceData = init_ref<FmodPerformanceData>();
+    performanceData = create_ref<FmodPerformanceData>();
     Callbacks::GodotFileRunner::get_singleton()->start();
 }
 
@@ -134,7 +134,7 @@ void FmodServer::update() {
     }
 
     // Check if bank are loaded, load buses, vca and event descriptions.
-    cache->load_pending();
+    cache->update_pending();
 
     for (FMOD::Studio::EventInstance* eventInstance : events) {
         if (eventInstance) {
@@ -664,7 +664,7 @@ void FmodServer::set_sound_3d_settings(float dopplerScale, float distanceFactor,
 
 void FmodServer::wait_for_all_loads() {
     ERROR_CHECK(system->flushSampleLoading());
-    cache->load_pending();
+    cache->update_pending();
 }
 
 Array FmodServer::get_available_drivers() {
