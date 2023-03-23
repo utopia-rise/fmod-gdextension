@@ -35,7 +35,10 @@ namespace Callbacks {
             }
             godot::Callable callback = event_instance->get_callback();
             if(callback.is_valid()){
-                callback.call(dictionary, type);
+                godot::Array args = godot::Array();
+                args.append(dictionary);
+                args.append(type);
+                callback.callv(args);
             }
         }
 

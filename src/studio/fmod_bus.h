@@ -3,7 +3,7 @@
 
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "helpers/fmod_object.h"
+#include "fmod_object.h"
 
 namespace godot {
     class FmodBus : public FmodObjectWithPath<FmodBus, FMOD::Studio::Bus> {

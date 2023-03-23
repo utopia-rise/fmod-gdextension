@@ -1,20 +1,20 @@
 #ifndef GODOTFMOD_FMOD_OBJECT_H
 #define GODOTFMOD_FMOD_OBJECT_H
 
-#include "classes/ref_counted.hpp"
-#include "common.h"
+#include <helpers/common.h>
+#include <classes/ref.hpp>
 
 namespace godot {
 
-    template<class Derived, class T>
+    template<class Derived, class Owned>
     class FmodObject : public RefCounted {
         GDCLASS(Derived, RefCounted);
 
     protected:
-        T* _wrapped = nullptr;
+        Owned* _wrapped = nullptr;
 
     public:
-        inline static Ref<Derived> create_ref(T* wrapped) {
+        inline static Ref<Derived> create_ref(Owned* wrapped) {
             Ref<Derived> ref;
             if (wrapped) {
                 ref.instantiate();
@@ -27,7 +27,7 @@ namespace godot {
             return _wrapped != nullptr && _wrapped->isValid();
         }
 
-        T* get_wrapped() const {
+        Owned* get_wrapped() const {
             return _wrapped;
         }
 
@@ -35,13 +35,13 @@ namespace godot {
         static void _bind_methods() {}
     };
 
-    template<class Derived, class T>
-    class FmodObjectWithPath : public FmodObject<Derived, T> {
+    template<class Derived, class Owned>
+    class FmodObjectWithPath : public FmodObject<Derived, Owned> {
     protected:
         String _path;
 
     public:
-        inline static Ref<Derived> create_ref(T* wrapped) {
+        inline static Ref<Derived> create_ref(Owned* wrapped) {
             Ref<Derived> ref;
             if (wrapped) {
                 ref.instantiate();

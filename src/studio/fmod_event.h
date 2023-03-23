@@ -1,7 +1,7 @@
 #ifndef GODOTFMOD_FMOD_EVENT_H
 #define GODOTFMOD_FMOD_EVENT_H
 
-#include "helpers/fmod_object.h"
+#include "fmod_object.h"
 
 namespace godot {
     class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {

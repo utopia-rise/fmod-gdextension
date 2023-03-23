@@ -7,7 +7,7 @@
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
-#include "helpers/fmod_object.h"
+#include "fmod_object.h"
 
 namespace godot {
     class FmodBank : public FmodObjectWithPath<FmodBank, FMOD::Studio::Bank>  {

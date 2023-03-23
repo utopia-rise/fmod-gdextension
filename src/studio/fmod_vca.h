@@ -4,7 +4,7 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "helpers/fmod_object.h"
+#include "fmod_object.h"
 
 namespace godot {
     class FmodVCA : public FmodObjectWithPath<FmodVCA, FMOD::Studio::VCA> {
