@@ -11,7 +11,7 @@ namespace godot {
 
     public:
         FmodEvent() = default;
-        ~FmodEvent() = default;
+        ~FmodEvent() override = default;
 
         float get_parameter_by_name(const String& parameterName) const;
         void set_parameter_by_name(const String& parameterName, float value) const;
@@ -44,7 +44,6 @@ namespace godot {
         void set_callback(Callable callback, int callbackMask);
         Callable get_callback() const;
 
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

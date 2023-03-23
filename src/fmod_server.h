@@ -2,6 +2,9 @@
 #define GODOTFMOD_FMOD_SERVER_H
 
 #include "fmod_cache.h"
+#include "core/fmod_file.h"
+#include "core/fmod_sound.h"
+#include "data/performance_data.h"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
 #include "studio/fmod_event.h"
@@ -87,14 +90,19 @@ namespace godot {
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
 
-        // INFORMATION
+        // OBJECTS
         bool check_vca_path(const String& vcaPath);
         bool check_bus_path(const String& busPath);
         bool check_event_path(const String& eventPath);
+        Ref<FmodVCA> get_vca(const String& vcaPath);
+        Ref<FmodBus> get_bus(const String& busPath);
+        Ref<FmodEventDescription> get_event(const String& eventPath);
         Array get_all_vca();
         Array get_all_buses();
         Array get_all_event_descriptions();
         Array get_all_banks();
+
+        //DEBUGGING
         Array get_available_drivers();
         int get_driver();
         void set_driver(int id);

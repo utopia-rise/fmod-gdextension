@@ -19,7 +19,6 @@ namespace godot {
             if (wrapped) {
                 ref.instantiate();
                 ref->_wrapped = wrapped;
-                wrapped->setUserData(ref.ptr());
             }
             return ref;
         }
@@ -33,9 +32,7 @@ namespace godot {
         }
 
     protected:
-        static void _bind_methods() {
-            Derived::_bind_methods();
-        }
+        static void _bind_methods() {}
     };
 
     template<class Derived, class T>
@@ -52,7 +49,6 @@ namespace godot {
                 char path[MAX_PATH_SIZE];
                 ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr));
                 ref->_path = String(path);
-                wrapped->setUserData(ref.ptr());
             }
             return ref;
         }

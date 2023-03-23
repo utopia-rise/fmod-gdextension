@@ -39,7 +39,7 @@
 #define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
 namespace godot {
-    bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
+    static bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
         if (result != FMOD_OK) {
             UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
             return false;
@@ -47,14 +47,14 @@ namespace godot {
         return true;
     }
 
-    bool is_dead(Object* node) {
+    static bool is_dead(Object* node) {
         if (!node) {
             return true;
         }
         return !UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
     }
 
-    bool is_fmod_valid(Object* node) {
+    static bool is_fmod_valid(Object* node) {
         if (node) {
             bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
             if (!ret) {

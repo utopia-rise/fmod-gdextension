@@ -6,19 +6,17 @@
 #include "fmod_event_emitter.h"
 
 namespace godot {
-    class FmodEventEmitter3D : public Node3D, public FmodEventEmitter {
-        GDCLASS(FmodEventEmitter3D, Node3D);
+    class FmodEventEmitter3D : public FmodEventEmitter<FmodEventEmitter3D, Node3D> {
 
     public:
-        FmodEventEmitter3D();
-        ~FmodEventEmitter3D();
+        FmodEventEmitter3D() = default;
+        ~FmodEventEmitter3D() override = default;
 
-        void _init();
         void _ready() override;
-        void _exit_tree() override;
+        void _process(double delta) override;
         void _notification(int p_what);
+        void _exit_tree() override;
 
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

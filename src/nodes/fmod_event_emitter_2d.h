@@ -6,20 +6,17 @@
 #include <classes/node2d.hpp>
 
 namespace godot {
-
-    class FmodEventEmitter2D : public Node2D, public FmodEventEmitter {
-        GDCLASS(FmodEventEmitter2D, Node2D);
+    class FmodEventEmitter2D : public FmodEventEmitter<FmodEventEmitter2D, Node2D>  {
 
     public:
-        FmodEventEmitter2D();
-        ~FmodEventEmitter2D();
+        FmodEventEmitter2D() = default;
+        ~FmodEventEmitter2D() override = default;
 
-        void _init();
         void _ready() override;
-        void _exit_tree() override;
+        void _process(double delta) override;
         void _notification(int p_what);
+        void _exit_tree() override;
 
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

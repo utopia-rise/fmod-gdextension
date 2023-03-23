@@ -8,6 +8,10 @@
 namespace godot {
     class FmodBus : public FmodObjectWithPath<FmodBus, FMOD::Studio::Bus> {
 
+    public:
+        FmodBus() = default;
+        ~FmodBus() override = default;
+
         bool get_mute() const;
         bool get_paused() const;
         float get_volume() const;
@@ -16,11 +20,6 @@ namespace godot {
         void set_volume(float volume) const;
         void stop_all_events(int stopMode);
 
-    public:
-        FmodBus() = default;
-        ~FmodBus() = default;
-
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

@@ -1,15 +1,19 @@
+#include "fmod_studio.hpp"
+#include "studio/fmod_event.h"
 #include <callback/event_callbacks.h>
-#include <fmod_server.h>
+#include <variant/dictionary.hpp>
+#include <variant/callable.hpp>
+#include <variant/variant.hpp>
 
 namespace Callbacks {
 
     FMOD_RESULT F_CALLBACK eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE* event, void* parameters) {
         auto* instance = reinterpret_cast<FMOD::Studio::EventInstance*>(event);
         godot::FmodEvent* event_instance;
-        instance->getUserData((void**) &instance);
+        instance->getUserData((void**) &event_instance);
 
         if (event_instance) {
-            godot::Dictionary dictionary {};
+            godot::Dictionary dictionary;
             if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
                 auto* props = (FMOD_STUDIO_TIMELINE_MARKER_PROPERTIES*) parameters;
                 dictionary["name"] = props->name;
@@ -30,7 +34,9 @@ namespace Callbacks {
                 dictionary["name"] = name;
             }
             godot::Callable callback = event_instance->get_callback();
-            callback.call(dictionary, type);
+            if(callback.is_valid()){
+                callback.call(dictionary, type);
+            }
         }
 
         return FMOD_OK;

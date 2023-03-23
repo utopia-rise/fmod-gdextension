@@ -3,7 +3,6 @@
 
 #include "classes/ref_counted.hpp"
 #include "fmod.hpp"
-#include "helpers/fmod_object.h"
 
 namespace godot {
     class FmodSound : public RefCounted {

@@ -12,7 +12,6 @@ namespace godot {
         String path;
 
     public:
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

@@ -1,4 +1,5 @@
 #include "fmod_event_description.h"
+#include "fmod_event.h"
 #include "helpers/common.h"
 
 using namespace godot;
@@ -35,6 +36,30 @@ int FmodEventDescription::get_length() {
     int length = -1;
     ERROR_CHECK(_wrapped->getLength(&length));
     return length;
+}
+
+Array FmodEventDescription::get_instance_list(){
+    Array array;
+    FMOD::Studio::EventInstance* instances[MAX_EVENT_INSTANCE_COUNT];
+    int count = 0;
+    ERROR_CHECK(_wrapped->getInstanceList(instances, MAX_EVENT_INSTANCE_COUNT, &count));
+    CHECK_SIZE(MAX_EVENT_INSTANCE_COUNT, count, events)
+    for (int i = 0; i < count; i++) {
+        godot::FmodEvent* event_instance;
+        instances[i]->getUserData((void**) &event_instance);
+        array.append(Ref(event_instance));
+    }
+    return array;
+}
+
+int FmodEventDescription::get_instance_count(){
+    int count = -1;
+    ERROR_CHECK(_wrapped->getInstanceCount(&count));
+    return count;
+}
+
+void FmodEventDescription::release_all_instances(){
+    ERROR_CHECK(_wrapped->releaseAllInstances());
 }
 
 void FmodEventDescription::load_sample_data() {

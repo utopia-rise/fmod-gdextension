@@ -2,20 +2,27 @@
 #define GODOTFMOD_FMOD_BANK_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_bus.h"
+#include "fmod_event_description.h"
 #include "fmod_studio.hpp"
+#include "fmod_vca.h"
 #include "helpers/common.h"
 #include "helpers/fmod_object.h"
 
 namespace godot {
     class FmodBank : public FmodObjectWithPath<FmodBank, FMOD::Studio::Bank>  {
 
-        List<String> eventDescriptionPaths;
-        List<String> busesPaths;
-        List<String> VCAsPaths;
+        List<Ref<FmodEventDescription>> eventDescriptions;
+        List<Ref<FmodBus>> buses;
+        List<Ref<FmodVCA>> VCAs;
+
+        void load_all_vca();
+        void load_all_buses();
+        void load_all_event_descriptions();
 
     public:
         FmodBank() = default;
-        ~FmodBank() = default;
+        ~FmodBank() override = default;
 
         int get_loading_state();
 
@@ -30,12 +37,10 @@ namespace godot {
 
         void update_bank_data();
 
-    private:
-        void load_all_vca();
-        void load_all_buses();
-        void load_all_event_descriptions();
+        const List<Ref<FmodEventDescription>>& getEventDescriptions() const;
+        const List<Ref<FmodBus>>& getBuses() const;
+        const List<Ref<FmodVCA>>& getVcAs() const;
 
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

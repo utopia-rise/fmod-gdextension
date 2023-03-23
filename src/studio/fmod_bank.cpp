@@ -22,15 +22,15 @@ int FmodBank::get_loading_state() {
 }
 
 int FmodBank::get_bus_count() {
-    int count = -1;
-    ERROR_CHECK(_wrapped->getBusCount(&count));
-    return count;
+    return buses.size();
 }
 
 int FmodBank::get_event_description_count() {
-    int count = -1;
-    ERROR_CHECK(_wrapped->getEventCount(&count));
-    return count;
+    return eventDescriptions.size();
+}
+
+int FmodBank::get_vca_count() const {
+    return VCAs.size();
 }
 
 int FmodBank::get_string_count() const {
@@ -39,32 +39,26 @@ int FmodBank::get_string_count() const {
     return count;
 }
 
-int FmodBank::get_vca_count() const {
-    int count = -1;
-    ERROR_CHECK(_wrapped->getVCACount(&count));
-    return count;
-}
-
 Array FmodBank::get_description_list() const {
     Array array;
-    for (const String& path : eventDescriptionPaths) {
-        array.append(path);
+    for (const Ref<FmodEventDescription>& ref : eventDescriptions) {
+        array.append(ref);
     }
     return array;
 }
 
 Array FmodBank::get_bus_list() const {
     Array array;
-    for (const String& path : busesPaths) {
-        array.append(path);
+    for (const Ref<FmodBus>& ref : buses) {
+        array.append(ref);
     }
     return array;
 }
 
 Array FmodBank::get_vca_list() const {
     Array array;
-    for (const String& path : VCAsPaths) {
-        array.append(path);
+    for (const Ref<FmodVCA>& ref : VCAs) {
+        array.append(ref);
     }
     return array;
 }
@@ -80,12 +74,10 @@ void FmodBank::load_all_vca() {
     int size = 0;
     if (ERROR_CHECK(_wrapped->getVCAList(array, MAX_VCA_COUNT, &size))) {
         CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
-        VCAsPaths.clear();
+        VCAs.clear();
         for (int i = 0; i < size; i++) {
-            auto vca = array[i];
-            char path[MAX_PATH_SIZE];
-            ERROR_CHECK(vca->getPath(path, MAX_PATH_SIZE, nullptr));
-            VCAsPaths.push_back(String(path));
+            Ref<FmodVCA> ref = FmodVCA::create_ref(array[i]);
+            VCAs.push_back(ref);
         }
     }
 }
@@ -95,12 +87,10 @@ void FmodBank::load_all_buses() {
     int size = 0;
     if (ERROR_CHECK(_wrapped->getBusList(array, MAX_BUS_COUNT, &size))) {
         CHECK_SIZE(MAX_BUS_COUNT, size, buses)
-        busesPaths.clear();
+        buses.clear();
         for (int i = 0; i < size; i++) {
-            auto bus = array[i];
-            char path[MAX_PATH_SIZE];
-            ERROR_CHECK(bus->getPath(path, MAX_PATH_SIZE, nullptr));
-            busesPaths.push_back(String(path));
+            Ref<FmodBus> ref = FmodBus::create_ref(array[i]);
+            buses.push_back(ref);
         }
     }
 }
@@ -110,12 +100,19 @@ void FmodBank::load_all_event_descriptions() {
     int size = 0;
     if (ERROR_CHECK(_wrapped->getEventList(array, MAX_EVENT_DESCRIPTION_COUNT, &size))) {
         CHECK_SIZE(MAX_EVENT_DESCRIPTION_COUNT, size, Events)
-        eventDescriptionPaths.clear();
+        eventDescriptions.clear();
         for (int i = 0; i < size; i++) {
-            auto eventDescription = array[i];
-            char path[MAX_PATH_SIZE];
-            ERROR_CHECK(eventDescription->getPath(path, MAX_PATH_SIZE, nullptr));
-            eventDescriptionPaths.push_back(String(path));
+            Ref<FmodEventDescription> ref = FmodEventDescription::create_ref(array[i]);
+            eventDescriptions.push_back(ref);
         }
     }
+}
+const List<Ref<FmodEventDescription>>& FmodBank::getEventDescriptions() const {
+    return eventDescriptions;
+}
+const List<Ref<FmodBus>>& FmodBank::getBuses() const {
+    return buses;
+}
+const List<Ref<FmodVCA>>& FmodBank::getVcAs() const {
+    return VCAs;
 }

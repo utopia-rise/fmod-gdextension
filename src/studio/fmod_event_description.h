@@ -9,6 +9,10 @@
 namespace godot {
     class FmodEventDescription : public FmodObjectWithPath<FmodEventDescription, FMOD::Studio::EventDescription> {
 
+    public:
+        FmodEventDescription() = default;
+        ~FmodEventDescription() override = default;
+
         int get_length();
         Array get_instance_list();
         int get_instance_count();
@@ -31,11 +35,6 @@ namespace godot {
         int get_user_property_count();
         Dictionary user_property_by_index(int index);
 
-    public:
-        FmodEventDescription() = default;
-        ~FmodEventDescription() = default;
-
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

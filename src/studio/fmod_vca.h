@@ -8,14 +8,13 @@
 
 namespace godot {
     class FmodVCA : public FmodObjectWithPath<FmodVCA, FMOD::Studio::VCA> {
+    public:
+        FmodVCA() = default;
+        ~FmodVCA() override = default;
+
         float get_vca_volume(const String& VCAPath);
         void set_vca_volume(const String& VCAPath, float volume);
 
-    public:
-        FmodVCA() = default;
-        ~FmodVCA() = default;
-
-    protected:
         static void _bind_methods();
     };
 }// namespace godot

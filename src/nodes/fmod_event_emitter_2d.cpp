@@ -12,9 +12,9 @@ void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_event_name"), &FmodEventEmitter2D::get_event_name);
     ClassDB::bind_method(D_METHOD("set_attached", "attached"), &FmodEventEmitter2D::set_attached);
     ClassDB::bind_method(D_METHOD("is_attached"), &FmodEventEmitter2D::is_attached);
-    ClassDB::bind_method(D_METHOD("set_autoplay", "autoplay"), &FmodEventEmitter2D::set_autoplay);
+    ClassDB::bind_method(D_METHOD("set_autoplay", "_autoplay"), &FmodEventEmitter2D::set_autoplay);
     ClassDB::bind_method(D_METHOD("is_autoplay"), &FmodEventEmitter2D::is_autoplay);
-    ClassDB::bind_method(D_METHOD("set_looped", "looped"), &FmodEventEmitter2D::set_looped);
+    ClassDB::bind_method(D_METHOD("set_looped", "_is_one_shot"), &FmodEventEmitter2D::set_looped);
     ClassDB::bind_method(D_METHOD("is_looped"), &FmodEventEmitter2D::is_looped);
     ClassDB::bind_method(D_METHOD("set_allow_fadeout", "allow_fadeout"), &FmodEventEmitter2D::set_allow_fadeout);
     ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &FmodEventEmitter2D::is_allow_fadeout);
@@ -23,8 +23,8 @@ void FmodEventEmitter2D::_bind_methods() {
 
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name"), "set_event_name", "get_event_name");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached"), "set_attached", "is_attached");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay"), "set_autoplay", "is_autoplay");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped"), "set_looped", "is_looped");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_autoplay"), "set_autoplay", "is_autoplay");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_is_one_shot"), "set_looped", "is_looped");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout"), "set_allow_fadeout", "is_allow_fadeout");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event"), "set_preload_event", "is_preload_event");
 
@@ -34,29 +34,37 @@ void FmodEventEmitter2D::_bind_methods() {
     ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
 }
 
-FmodEventEmitter2D::FmodEventEmitter2D() {
-    _init();
-}
-
-FmodEventEmitter2D::~FmodEventEmitter2D() {}
-
-void FmodEventEmitter2D::_init() {}
-
 void FmodEventEmitter2D::_ready() {
     // ensure we only run FMOD when the game is running!
     if (Engine::get_singleton()->is_editor_hint()) {
         return;
     }
-    for (int i = 0; i < params.keys().size(); i++) {
-        auto key = params.keys()[i];
-        _set_param_internally(key, params[key]);
+
+    if (_preload_event) {
+        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(_event_name);
+        desc->load_sample_data();
     }
-    if (preload_event) {
-        FmodServer::get_singleton()->desc(event_name);
-        FmodServer::get_singleton()->desc_load_sample_data(event_name);
+
+    _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+
+    for (int i = 0; i < _params.keys().size(); i++) {
+        auto key = _params.keys()[i];
+        _event->set_parameter_by_name(key, _params[key]);
     }
-    if (autoplay) {
+
+    _event->set_2d_attributes(get_transform());
+    if (_autoplay) {
         play();
+    }
+}
+
+void FmodEventEmitter2D::_process(double delta) {
+    if(!_event.is_valid() && !_is_one_shot && _autoplay){
+        _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+    }
+
+    if (_attached && _event.is_valid()) {
+        _event->set_2d_attributes(get_transform());
     }
 }
 
@@ -75,14 +83,13 @@ void FmodEventEmitter2D::_notification(int p_what) {
 }
 
 void FmodEventEmitter2D::_exit_tree() {
-    if (event != nullptr) {
-        if (attached) {
-            FmodServer::get_singleton()->detach_instance_from_node(event_id);
-        }
-        if (allow_fadeout) {
-            event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
-        } else {
-            event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
-        }
+    if (!_event.is_valid()) {
+        return;
+    }
+
+    if (_allow_fadeout) {
+        _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    } else {
+        _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
     }
 }

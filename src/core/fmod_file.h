@@ -1,8 +1,8 @@
 #ifndef GODOTFMOD_FMOD_FILE_H
 #define GODOTFMOD_FMOD_FILE_H
 
+#include "classes/ref_counted.hpp"
 #include "fmod.hpp"
-#include "helpers/fmod_object.h"
 
 namespace godot {
     class FmodFile : public RefCounted {

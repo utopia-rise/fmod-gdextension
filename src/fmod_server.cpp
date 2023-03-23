@@ -23,14 +23,25 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &FmodServer::get_system_dsp_buffer_length);
     ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &FmodServer::get_system_dsp_num_buffers);
 
-    // INFORMATION
+    // OBJECT
     ClassDB::bind_method(D_METHOD("check_VCA_path", "cvaPath"), &FmodServer::check_vca_path);
     ClassDB::bind_method(D_METHOD("check_bus_path", "busPath"), &FmodServer::check_bus_path);
     ClassDB::bind_method(D_METHOD("check_event_path", "eventPath"), &FmodServer::check_event_path);
+    ClassDB::bind_method(D_METHOD("get_vca", "cvaPath"), &FmodServer::get_vca);
+    ClassDB::bind_method(D_METHOD("get_bus", "busPath"), &FmodServer::get_bus);
+    ClassDB::bind_method(D_METHOD("get_event", "eventPath"), &FmodServer::get_event);
+    ClassDB::bind_method(D_METHOD("get_all_vca"), &FmodServer::get_all_vca);
+    ClassDB::bind_method(D_METHOD("get_all_buses"), &FmodServer::get_all_buses);
+    ClassDB::bind_method(D_METHOD("get_all_event_descriptions"), &FmodServer::get_all_event_descriptions);
+    ClassDB::bind_method(D_METHOD("get_all_banks"), &FmodServer::get_all_banks);
+
+    // DEBUGGING
     ClassDB::bind_method(D_METHOD("get_available_drivers"), &FmodServer::get_available_drivers);
     ClassDB::bind_method(D_METHOD("get_driver"), &FmodServer::get_driver);
     ClassDB::bind_method(D_METHOD("set_driver", "id"), &FmodServer::set_driver);
     ClassDB::bind_method(D_METHOD("get_performance_data"), &FmodServer::get_performance_data);
+
+    // GLOBAL PARAMETERS
     ClassDB::bind_method(D_METHOD("set_global_parameter_by_name", "parameterName", "value"), &FmodServer::set_global_parameter_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_by_name", "parameterName"), &FmodServer::get_global_parameter_by_name);
     ClassDB::bind_method(D_METHOD("set_global_parameter_by_id", "idPair", "value"), &FmodServer::set_global_parameter_by_id);
@@ -97,7 +108,6 @@ FmodServer* FmodServer::get_singleton() {
 }
 
 void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const unsigned int flag) {
-    cache = memnew(FmodCache);
     // initialize FMOD Studio and FMOD Core System with provided flags
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
@@ -116,6 +126,7 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
                 &Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1))) {
         GODOT_LOG(0, "Custom File System enabled.")
     }
+    cache = new FmodCache(system);
 }
 
 void FmodServer::update() {
@@ -207,7 +218,7 @@ void FmodServer::shutdown() {
     ERROR_CHECK(system->release());
     system = nullptr;
     coreSystem = nullptr;
-    memfree(cache);
+    delete cache;
     cache = nullptr;
     GODOT_LOG(0, "FMOD Sound System: System released")
 }
@@ -385,17 +396,7 @@ void FmodServer::set_software_format(int sampleRate, const int speakerMode, int 
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
     if (cache->has_bank(pathToBank)) return {cache->get_bank(pathToBank)};// bank is already loaded
-    FMOD::Studio::Bank* bank = nullptr;
-    ERROR_CHECK(system->loadBankFile(pathToBank.utf8().get_data(), flag, &bank));
-    Ref<FmodBank> ref = FmodBank::create_ref(bank);
-    if (bank) {
-        GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(pathToBank))
-        cache->add_bank(pathToBank, ref);
-        if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
-            cache->force_loading();
-        }
-    }
-    return ref;
+    return cache->add_bank(pathToBank, flag);
 }
 
 void FmodServer::unload_bank(const String& pathToBank) {
@@ -407,23 +408,69 @@ bool FmodServer::banks_still_loading() {
 }
 
 bool FmodServer::check_vca_path(const String& vcaPath) {
-    return cache->check_vca_path(vcaPath);
+    return cache->has_vca_path(vcaPath);
 }
 
 bool FmodServer::check_bus_path(const String& busPath) {
-    return cache->check_bus_path(busPath);
+    return cache->has_bus_path(busPath);
 }
 
 bool FmodServer::check_event_path(const String& eventPath) {
-    return cache->check_event_path(eventPath);
+    return cache->has_event_path(eventPath);
+}
+
+Ref<FmodVCA> FmodServer::get_vca(const String& vcaPath) {
+    return cache->get_vca(vcaPath);
+}
+
+Ref<FmodBus> FmodServer::get_bus(const String& busPath) {
+    return cache->get_bus(busPath);
+}
+
+Ref<FmodEventDescription> FmodServer::get_event(const String& eventPath) {
+    return cache->get_event(eventPath);
+}
+
+Array FmodServer::get_all_vca() {
+    Array array;
+    for (KeyValue<String, Ref<FmodVCA>>& entry : cache->vcas) {
+        array.append(entry.value);
+    }
+    return array;
+}
+
+Array FmodServer::get_all_buses() {
+    Array array;
+    for (KeyValue<String, Ref<FmodBus>>& entry : cache->buses) {
+        array.append(entry.value);
+    }
+    return array;
+}
+
+Array FmodServer::get_all_event_descriptions() {
+    Array array;
+    for (KeyValue<String, Ref<FmodEventDescription>>& entry : cache->eventDescriptions) {
+        array.append(entry.value);
+    }
+    return array;
+}
+
+Array FmodServer::get_all_banks() {
+    Array array;
+    for (KeyValue<String, Ref<FmodBank>>& entry : cache->banks) {
+        array.append(entry.value);
+    }
+    return array;
 }
 
 Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
-    return _create_instance(eventPath, false, nullptr);
+    Ref<FmodEvent> ref = _create_instance(eventPath, false, nullptr);
+    ref->get_wrapped()->setUserData(ref->_owner);
+    return ref;
 }
 
 Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneShot, Node* gameObject) {
-    bool found = cache->check_event_path(eventName);
+    bool found = cache->has_event_path(eventName);
     if (!found) {
         GODOT_LOG(1, "Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
     }
@@ -570,34 +617,19 @@ void FmodServer::unmute_all_events() {
 }
 
 Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
-    if (!cache->has_file(path)) {
-        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
-        return {};
+    if (cache->has_file(path)) {
+        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND" + String(path))
+        return cache->get_file(path);
     }
-
-    FMOD::Sound* sound = nullptr;
-    ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), FMOD_CREATESAMPLE, nullptr, &sound));
-    if (sound) {
-        Ref<FmodFile> ref = FmodFile::create_ref(sound);
-        cache->add_file(path, ref);
-        GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
-    }
-    return {};
+    return cache->add_file(path, FMOD_CREATESAMPLE);
 }
 
 Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
-    if (!cache->has_file(path)) {
-        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND " + String(path))
-        return {};
+    if (cache->has_file(path)) {
+        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS MUSIC" + String(path))
+        return cache->get_file(path);
     }
-    FMOD::Sound* sound = nullptr;
-    ERROR_CHECK(coreSystem->createSound(path.utf8().get_data(), (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL), nullptr, &sound));
-    if (sound) {
-        Ref<FmodFile> ref = FmodFile::create_ref(sound);
-        cache->add_file(path, ref);
-        GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(path))
-    }
-    return {};
+    return cache->add_file(path, (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL));
 }
 
 void FmodServer::unload_file(const String& path) {
@@ -605,8 +637,6 @@ void FmodServer::unload_file(const String& path) {
         GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
         return;
     }
-    Ref<FmodFile> ref = cache->get_file(path);
-    ERROR_CHECK(ref->get_wrapped()->release());
     cache->remove_file(path);
     GODOT_LOG(0, "FMOD Sound System: UNLOADING FILE" + String(path))
 }
@@ -810,20 +840,4 @@ Array FmodServer::get_global_parameter_desc_list() {
         a.append(paramDesc);
     }
     return a;
-}
-
-Array FmodServer::get_all_vca() {
-
-}
-
-Array FmodServer::get_all_buses() {
-
-}
-
-Array FmodServer::get_all_event_descriptions() {
-
-}
-
-Array FmodServer::get_all_banks() {
-
 }

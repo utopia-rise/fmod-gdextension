@@ -3,8 +3,6 @@
 
 #include <fmod_common.h>
 #include <fmod_studio_common.h>
-#include <mutex>
-#include <variant/dictionary.hpp>
 
 namespace Callbacks {
     FMOD_RESULT F_CALLBACK eventCallback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE* event, void* parameters);
