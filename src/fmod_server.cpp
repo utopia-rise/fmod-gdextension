@@ -2,8 +2,10 @@
 #include "data/performance_data.h"
 #include "helpers/common.h"
 #include "helpers/maths.h"
-#include <classes/node3d.hpp>
+
 #include <fmod_server.h>
+
+#include <classes/node3d.hpp>
 
 using namespace godot;
 
@@ -91,7 +93,13 @@ void FmodServer::_bind_methods() {
     REGISTER_ALL_CONSTANTS
 }
 
-FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isInitialized(false), isNotInitializedPrinted(false), distanceScale(1.0), cache(nullptr) {
+FmodServer::FmodServer() :
+  system(nullptr),
+  coreSystem(nullptr),
+  isInitialized(false),
+  isNotInitializedPrinted(false),
+  distanceScale(1.0),
+  cache(nullptr) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
     performanceData = create_ref<FmodPerformanceData>();
@@ -117,13 +125,12 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
     if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
         isInitialized = true;
         GODOT_LOG(0, "FMOD Sound System: Successfully initialized")
-        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) {
-            GODOT_LOG(0, "FMOD Sound System: Live update enabled!")
-        }
+        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) { GODOT_LOG(0, "FMOD Sound System: Live update enabled!") }
     }
 
-    if (ERROR_CHECK(coreSystem->setFileSystem(
-                &Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1))) {
+    if (ERROR_CHECK(
+          coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
+        )) {
         GODOT_LOG(0, "Custom File System enabled.")
     }
     cache = new FmodCache(system);
@@ -161,9 +168,7 @@ void FmodServer::update() {
     }
 
     for (Ref<FmodEvent> event : runningEvents) {
-        if (!event->is_valid()) {
-            runningEvents.erase(event);
-        }
+        if (!event->is_valid()) { runningEvents.erase(event); }
     }
 
     _set_listener_attributes();
@@ -183,9 +188,7 @@ void FmodServer::_set_listener_attributes() {
 
     for (int i = 0; i < systemListenerNumber; i++) {
         Listener* listener = &listeners[i];
-        if (listener->listenerLock) {
-            continue;
-        }
+        if (listener->listenerLock) { continue; }
         if (is_dead(listener->gameObj)) {
             listener->gameObj = nullptr;
             ERROR_CHECK(system->setListenerWeight(i, 0));
@@ -193,9 +196,7 @@ void FmodServer::_set_listener_attributes() {
         }
 
         Node* node {Object::cast_to<Node>(listener->gameObj)};
-        if (!node->is_inside_tree()) {
-            return;
-        }
+        if (!node->is_inside_tree()) { return; }
 
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
@@ -225,18 +226,14 @@ void FmodServer::shutdown() {
 
 void FmodServer::set_system_listener_number(int p_listenerNumber) {
     if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
-        if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) {
-            systemListenerNumber = p_listenerNumber;
-        }
+        if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) { systemListenerNumber = p_listenerNumber; }
     } else {
         GODOT_LOG(2, "Number of listeners must be set between 1 and 8")
     }
 }
 
 void FmodServer::add_listener(int index, Object* gameObj) {
-    if (!is_fmod_valid(gameObj)) {
-        return;
-    }
+    if (!is_fmod_valid(gameObj)) { return; }
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
         listener->gameObj = gameObj;
@@ -304,6 +301,7 @@ Transform3D FmodServer::get_listener_transform3d(int index) {
     }
     return transform;
 }
+
 Transform2D FmodServer::get_listener_transform2d(int index) {
     Transform2D transform;
     if (index >= 0 && index < systemListenerNumber) {
@@ -315,6 +313,7 @@ Transform2D FmodServer::get_listener_transform2d(int index) {
     }
     return transform;
 }
+
 Vector3 FmodServer::get_listener_3d_velocity(int index) {
     Vector3 velocity;
     if (index >= 0 && index < systemListenerNumber) {
@@ -326,6 +325,7 @@ Vector3 FmodServer::get_listener_3d_velocity(int index) {
     }
     return velocity;
 }
+
 Vector2 FmodServer::get_listener_2d_velocity(int index) {
     Vector2 velocity;
     if (index >= 0 && index < systemListenerNumber) {
@@ -379,9 +379,7 @@ Object* FmodServer::get_object_attached_to_listener(int index) {
         return nullptr;
     } else {
         Object* node = listeners[index].gameObj;
-        if (!node) {
-            GODOT_LOG(1, "No node was set on listener")
-        }
+        if (!node) { GODOT_LOG(1, "No node was set on listener") }
         return node;
     }
 }
@@ -493,9 +491,7 @@ Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneS
 
 void FmodServer::play_one_shot(const String& eventName, Node* gameObj) {
     Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
-    if (!ref.is_valid()) {
-        return;
-    }
+    if (!ref.is_valid()) { return; }
 
     ref->set_node_attributes(gameObj);
     ref->start();
@@ -504,9 +500,7 @@ void FmodServer::play_one_shot(const String& eventName, Node* gameObj) {
 
 void FmodServer::play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
     Ref<FmodEvent> ref = _create_instance(eventName, true, nullptr);
-    if (!ref.is_valid()) {
-        return;
-    }
+    if (!ref.is_valid()) { return; }
 
     ref->set_node_attributes(gameObj);
     // set the initial parameter values
@@ -521,27 +515,19 @@ void FmodServer::play_one_shot_with_params(const String& eventName, Node* gameOb
 }
 
 void FmodServer::play_one_shot_attached(const String& eventName, Node* gameObj) {
-    if (!is_fmod_valid(gameObj)) {
-        return;
-    }
+    if (!is_fmod_valid(gameObj)) { return; }
 
     Ref<FmodEvent> ref = _create_instance(eventName, true, gameObj);
-    if (!ref.is_valid()) {
-        return;
-    }
+    if (!ref.is_valid()) { return; }
     ref->start();
     ref->release();
 }
 
 void FmodServer::play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters) {
-    if (!is_fmod_valid(gameObj)) {
-        return;
-    }
+    if (!is_fmod_valid(gameObj)) { return; }
 
     Ref<FmodEvent> ref = _create_instance(eventName, true, gameObj);
-    if (!ref.is_valid()) {
-        return;
-    }
+    if (!ref.is_valid()) { return; }
 
     // set the initial parameter values
     auto keys = parameters.keys();
@@ -601,18 +587,14 @@ void FmodServer::unpause_all_events() {
 void FmodServer::mute_all_events() {
     if (cache->is_master_loaded()) {
         FMOD::Studio::Bus* masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
-            masterBus->setMute(true);
-        }
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) { masterBus->setMute(true); }
     }
 }
 
 void FmodServer::unmute_all_events() {
     if (cache->is_master_loaded()) {
         FMOD::Studio::Bus* masterBus = nullptr;
-        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) {
-            masterBus->setMute(false);
-        }
+        if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) { masterBus->setMute(false); }
     }
 }
 

@@ -1,4 +1,5 @@
 #include "fmod_event_description.h"
+
 #include "fmod_event.h"
 #include "helpers/common.h"
 
@@ -20,10 +21,14 @@ void FmodEventDescription::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_min_max_distance"), &FmodEventDescription::get_min_max_distance);
     ClassDB::bind_method(D_METHOD("get_sound_size"), &FmodEventDescription::get_sound_size);
     ClassDB::bind_method(D_METHOD("get_parameter_by_name", "name"), &FmodEventDescription::get_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_by_id",
-                                  "eventPath"
-                                  "idPair"),
-                         &FmodEventDescription::get_parameter_by_id);
+    ClassDB::bind_method(
+      D_METHOD(
+        "get_parameter_by_id",
+        "eventPath"
+        "idPair"
+      ),
+      &FmodEventDescription::get_parameter_by_id
+    );
     ClassDB::bind_method(D_METHOD("get_parameter_count"), &FmodEventDescription::get_parameter_count);
     ClassDB::bind_method(D_METHOD("get_parameter_by_index", "index"), &FmodEventDescription::get_parameter_by_index);
     ClassDB::bind_method(D_METHOD("get_user_property", "name"), &FmodEventDescription::get_user_property);
@@ -38,7 +43,7 @@ int FmodEventDescription::get_length() {
     return length;
 }
 
-Array FmodEventDescription::get_instance_list(){
+Array FmodEventDescription::get_instance_list() {
     Array array;
     FMOD::Studio::EventInstance* instances[MAX_EVENT_INSTANCE_COUNT];
     int count = 0;
@@ -52,13 +57,13 @@ Array FmodEventDescription::get_instance_list(){
     return array;
 }
 
-int FmodEventDescription::get_instance_count(){
+int FmodEventDescription::get_instance_count() {
     int count = -1;
     ERROR_CHECK(_wrapped->getInstanceCount(&count));
     return count;
 }
 
-void FmodEventDescription::release_all_instances(){
+void FmodEventDescription::release_all_instances() {
     ERROR_CHECK(_wrapped->releaseAllInstances());
 }
 

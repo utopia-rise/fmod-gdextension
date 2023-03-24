@@ -6,33 +6,33 @@
 using namespace godot;
 
 void FmodEvent::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("get_parameter_by_name",  "parameterName"), &FmodEvent::get_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_name",  "parameterName", "value"), &FmodEvent::set_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_by_id",  "idPair"), &FmodEvent::get_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_id",  "idPair", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameterName"), &FmodEvent::get_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameterName", "value"), &FmodEvent::set_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "idPair"), &FmodEvent::get_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "idPair", "value"), &FmodEvent::set_parameter_by_id);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
-    ClassDB::bind_method(D_METHOD("stop",  "stopMode"), &FmodEvent::stop);
+    ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
     ClassDB::bind_method(D_METHOD("get_playback_state"), &FmodEvent::get_playback_state);
     ClassDB::bind_method(D_METHOD("get_paused"), &FmodEvent::get_paused);
-    ClassDB::bind_method(D_METHOD("set_paused",  "paused"), &FmodEvent::set_paused);
+    ClassDB::bind_method(D_METHOD("set_paused", "paused"), &FmodEvent::set_paused);
     ClassDB::bind_method(D_METHOD("get_pitch"), &FmodEvent::get_pitch);
-    ClassDB::bind_method(D_METHOD("set_pitch",  "pitch"), &FmodEvent::set_pitch);
+    ClassDB::bind_method(D_METHOD("set_pitch", "pitch"), &FmodEvent::set_pitch);
     ClassDB::bind_method(D_METHOD("get_volume"), &FmodEvent::get_volume);
-    ClassDB::bind_method(D_METHOD("set_volume",  "volume"), &FmodEvent::set_volume);
+    ClassDB::bind_method(D_METHOD("set_volume", "volume"), &FmodEvent::set_volume);
     ClassDB::bind_method(D_METHOD("get_timeline_position"), &FmodEvent::get_timeline_position);
-    ClassDB::bind_method(D_METHOD("set_timeline_position",  "position"), &FmodEvent::set_timeline_position);
-    ClassDB::bind_method(D_METHOD("get_reverb_level",  "index"), &FmodEvent::get_reverb_level);
-    ClassDB::bind_method(D_METHOD("set_reverb_level",  "index", "level"), &FmodEvent::set_reverb_level);
+    ClassDB::bind_method(D_METHOD("set_timeline_position", "position"), &FmodEvent::set_timeline_position);
+    ClassDB::bind_method(D_METHOD("get_reverb_level", "index"), &FmodEvent::get_reverb_level);
+    ClassDB::bind_method(D_METHOD("set_reverb_level", "index", "level"), &FmodEvent::set_reverb_level);
     ClassDB::bind_method(D_METHOD("is_virtual"), &FmodEvent::is_virtual);
-    ClassDB::bind_method(D_METHOD("set_listener_mask",  "mask"), &FmodEvent::set_listener_mask);
+    ClassDB::bind_method(D_METHOD("set_listener_mask", "mask"), &FmodEvent::set_listener_mask);
     ClassDB::bind_method(D_METHOD("get_listener_mask"), &FmodEvent::get_listener_mask);
-    ClassDB::bind_method(D_METHOD("set_2d_attributes",  "position"), &FmodEvent::set_2d_attributes);
+    ClassDB::bind_method(D_METHOD("set_2d_attributes", "position"), &FmodEvent::set_2d_attributes);
     ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
-    ClassDB::bind_method(D_METHOD("set_3d_attributes",  "transform"), &FmodEvent::set_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_3d_attributes", "transform"), &FmodEvent::set_3d_attributes);
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
-    ClassDB::bind_method(D_METHOD("set_node_attributes",  "transform"), &FmodEvent::set_node_attributes);
+    ClassDB::bind_method(D_METHOD("set_node_attributes", "transform"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
@@ -44,7 +44,6 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask"), "set_listener_mask", "get_listener_mask");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d"), "set_2d_attributes", "get_2d_attributes");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d"), "set_node_attributes", "get_3d_attributes");
-
 }
 
 float FmodEvent::get_parameter_by_name(const String& parameterName) const {
@@ -208,6 +207,6 @@ void FmodEvent::set_callback(Callable callback, int callbackMask) {
     ERROR_CHECK(_wrapped->setCallback(Callbacks::eventCallback, callbackMask));
 }
 
-Callable FmodEvent::get_callback() const{
+Callable FmodEvent::get_callback() const {
     return eventCallback;
 }

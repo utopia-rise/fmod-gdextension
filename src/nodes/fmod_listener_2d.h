@@ -5,10 +5,12 @@
 #include "fmod_listener.h"
 
 namespace godot {
-    class FmodListener2D : public Node, public FmodListener {
+    class FmodListener2D : public Node,
+                           public FmodListener {
         GDCLASS(FmodListener2D, Node)
 
     public:
+
     protected:
         static void _bind_methods();
     };

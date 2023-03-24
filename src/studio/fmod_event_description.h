@@ -2,13 +2,12 @@
 #define GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_object.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "fmod_object.h"
 
 namespace godot {
     class FmodEventDescription : public FmodObjectWithPath<FmodEventDescription, FMOD::Studio::EventDescription> {
-
     public:
         FmodEventDescription() = default;
         ~FmodEventDescription() override = default;

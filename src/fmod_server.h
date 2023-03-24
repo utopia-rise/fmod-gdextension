@@ -1,10 +1,10 @@
 #ifndef GODOTFMOD_FMOD_SERVER_H
 #define GODOTFMOD_FMOD_SERVER_H
 
-#include "fmod_cache.h"
 #include "core/fmod_file.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
+#include "fmod_cache.h"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
 #include "studio/fmod_event.h"
@@ -12,8 +12,11 @@
 #include "studio/fmod_vca.h"
 #include "templates/hash_map.hpp"
 #include "variant/string.hpp"
+
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
+#include <helpers/constants.h>
+
 #include <classes/canvas_item.hpp>
 #include <classes/global_constants.hpp>
 #include <classes/mutex.hpp>
@@ -22,12 +25,11 @@
 #include <fmod.hpp>
 #include <fmod_studio.hpp>
 #include <godot.hpp>
-#include <helpers/constants.h>
 #include <variant/utility_functions.hpp>
 
 namespace godot {
 
-    struct OneShot{
+    struct OneShot {
         Node* gameObj = nullptr;
         Ref<FmodEvent> instance;
     };
@@ -77,7 +79,7 @@ namespace godot {
 
         static FmodServer* get_singleton();
 
-        //LIFECYCLE
+        // LIFECYCLE
         void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
         void update();
         void shutdown();
@@ -102,13 +104,13 @@ namespace godot {
         Array get_all_event_descriptions();
         Array get_all_banks();
 
-        //DEBUGGING
+        // DEBUGGING
         Array get_available_drivers();
         int get_driver();
         void set_driver(int id);
         Ref<FmodPerformanceData> get_performance_data();
 
-        //GLOBAL PARAMETERS
+        // GLOBAL PARAMETERS
         void set_global_parameter_by_name(const String& parameterName, float value);
         float get_global_parameter_by_name(const String& parameterName);
         void set_global_parameter_by_id(const Array& idPair, float value);

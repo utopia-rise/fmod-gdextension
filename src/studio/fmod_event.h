@@ -4,8 +4,7 @@
 #include "fmod_object.h"
 
 namespace godot {
-    class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance>  {
-
+    class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance> {
         float distanceScale = 0;
         Callable eventCallback;
 

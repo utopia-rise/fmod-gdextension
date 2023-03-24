@@ -4,14 +4,13 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_bus.h"
 #include "fmod_event_description.h"
+#include "fmod_object.h"
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
-#include "fmod_object.h"
 
 namespace godot {
-    class FmodBank : public FmodObjectWithPath<FmodBank, FMOD::Studio::Bank>  {
-
+    class FmodBank : public FmodObjectWithPath<FmodBank, FMOD::Studio::Bank> {
         List<Ref<FmodEventDescription>> eventDescriptions;
         List<Ref<FmodBus>> buses;
         List<Ref<FmodVCA>> VCAs;

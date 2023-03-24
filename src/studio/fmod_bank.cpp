@@ -1,4 +1,5 @@
 #include "fmod_bank.h"
+
 #include "helpers/common.h"
 
 using namespace godot;
@@ -107,12 +108,15 @@ void FmodBank::load_all_event_descriptions() {
         }
     }
 }
+
 const List<Ref<FmodEventDescription>>& FmodBank::getEventDescriptions() const {
     return eventDescriptions;
 }
+
 const List<Ref<FmodBus>>& FmodBank::getBuses() const {
     return buses;
 }
+
 const List<Ref<FmodVCA>>& FmodBank::getVcAs() const {
     return VCAs;
 }

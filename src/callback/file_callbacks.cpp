@@ -32,9 +32,7 @@ namespace Callbacks {
         // In this case, we wait until it's done.
         {
             std::unique_lock<std::mutex> lk(cancel_mut);
-            if (request == current_request) {
-                cancel_cv.wait(lk);
-            }
+            if (request == current_request) { cancel_cv.wait(lk); }
         }
     }
 

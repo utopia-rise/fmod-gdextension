@@ -1,8 +1,10 @@
 #include "fmod_studio.hpp"
 #include "studio/fmod_event.h"
+
 #include <callback/event_callbacks.h>
-#include <variant/dictionary.hpp>
+
 #include <variant/callable.hpp>
+#include <variant/dictionary.hpp>
 #include <variant/variant.hpp>
 
 namespace Callbacks {
@@ -34,7 +36,7 @@ namespace Callbacks {
                 dictionary["name"] = name;
             }
             godot::Callable callback = event_instance->get_callback();
-            if(callback.is_valid()){
+            if (callback.is_valid()) {
                 godot::Array args = godot::Array();
                 args.append(dictionary);
                 args.append(type);

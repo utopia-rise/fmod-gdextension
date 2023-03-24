@@ -1,13 +1,12 @@
 #ifndef GODOTFMOD_FMOD_BUS_H
 #define GODOTFMOD_FMOD_BUS_H
 
+#include "fmod_object.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "fmod_object.h"
 
 namespace godot {
     class FmodBus : public FmodObjectWithPath<FmodBus, FMOD::Studio::Bus> {
-
     public:
         FmodBus() = default;
         ~FmodBus() override = default;

@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_OBJECT_H
 
 #include <helpers/common.h>
+
 #include <classes/ref.hpp>
 
 namespace godot {
@@ -23,13 +24,9 @@ namespace godot {
             return ref;
         }
 
-        bool is_valid() const {
-            return _wrapped != nullptr && _wrapped->isValid();
-        }
+        bool is_valid() const { return _wrapped != nullptr && _wrapped->isValid(); }
 
-        Owned* get_wrapped() const {
-            return _wrapped;
-        }
+        Owned* get_wrapped() const { return _wrapped; }
 
     protected:
         static void _bind_methods() {}
@@ -53,9 +50,7 @@ namespace godot {
             return ref;
         }
 
-        String get_path() {
-            return _path;
-        }
+        String get_path() { return _path; }
     };
 
 }// namespace godot

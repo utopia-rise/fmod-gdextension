@@ -31,8 +31,7 @@ namespace godot {
         Vector3 pos = transform.get_origin() / distanceScale;
         Vector3 up = transform.get_basis().rows[1];
         Vector3 forward = transform.get_basis().rows[2];
-        return get_3d_attributes(
-                get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(velocity));
+        return get_3d_attributes(get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(velocity));
     }
 
     static inline FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform3d(const Transform3D& transform, const float distanceScale) {
@@ -40,8 +39,7 @@ namespace godot {
         Vector3 up = transform.get_basis().rows[1];
         Vector3 forward = transform.get_basis().rows[2];
         Vector3 vel(0, 0, 0);
-        return get_3d_attributes(
-                get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(vel));
+        return get_3d_attributes(get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(vel));
     }
 
     static inline FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform2d(const Transform2D& transform, const Vector2& velocity, const float distanceScale) {
@@ -85,7 +83,7 @@ namespace godot {
     }
 
     static inline Vector3 get_velocity3d_from_3d_attributes(FMOD_3D_ATTRIBUTES& attr, const float distanceScale) {
-        return  {attr.velocity.x, attr.velocity.y, attr.velocity.z};
+        return {attr.velocity.x, attr.velocity.y, attr.velocity.z};
     }
 
     static inline Vector2 get_velocity2d_from_3d_attributes(FMOD_3D_ATTRIBUTES& attr, const float distanceScale) {

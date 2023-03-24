@@ -40,7 +40,6 @@ namespace godot {
 
     protected:
         static void _bind_methods();
-
     };
 
 }// namespace godot

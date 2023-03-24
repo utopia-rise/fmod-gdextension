@@ -7,7 +7,6 @@
 
 namespace godot {
     class FmodEventEmitter3D : public FmodEventEmitter<FmodEventEmitter3D, Node3D> {
-
     public:
         FmodEventEmitter3D() = default;
         ~FmodEventEmitter3D() override = default;

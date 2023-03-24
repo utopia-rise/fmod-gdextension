@@ -21,10 +21,7 @@ namespace godot {
             return ref;
         }
 
-
-        FMOD::Sound* get_wrapped() const{
-            return _wrapped;
-        }
+        FMOD::Sound* get_wrapped() const { return _wrapped; }
 
     protected:
         static void _bind_methods();

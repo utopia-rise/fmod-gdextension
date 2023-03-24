@@ -36,21 +36,27 @@ void FmodPerformanceData::_bind_methods() {
 float FmodPerformanceData::get_dsp() const {
     return dsp;
 }
+
 float FmodPerformanceData::get_geometry() const {
     return geometry;
 }
+
 float FmodPerformanceData::get_stream() const {
     return stream;
 }
+
 float FmodPerformanceData::get_update() const {
     return update;
 }
+
 float FmodPerformanceData::get_convolution1() const {
     return convolution1;
 }
+
 float FmodPerformanceData::get_convolution2() const {
     return convolution2;
 }
+
 float FmodPerformanceData::get_studio() const {
     return studio;
 }
@@ -58,6 +64,7 @@ float FmodPerformanceData::get_studio() const {
 int FmodPerformanceData::get_currently_allocated() const {
     return currently_allocated;
 }
+
 int FmodPerformanceData::get_max_allocated() const {
     return max_allocated;
 }
@@ -65,9 +72,11 @@ int FmodPerformanceData::get_max_allocated() const {
 int FmodPerformanceData::get_sample_bytes_read() const {
     return sample_bytes_read;
 }
+
 int FmodPerformanceData::get_stream_bytes_read() const {
     return stream_bytes_read;
 }
+
 int FmodPerformanceData::get_other_bytes_read() const {
     return other_bytes_read;
 }

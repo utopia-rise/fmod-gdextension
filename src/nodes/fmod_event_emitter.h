@@ -1,14 +1,15 @@
 #ifndef GODOTFMOD_FMOD_EVENT_EMITTER_H
 #define GODOTFMOD_FMOD_EVENT_EMITTER_H
 
-#include <fmod_server.h>
 #include "classes/object.hpp"
+
+#include <fmod_server.h>
 
 namespace godot {
 
     template<class Derived, class Base>
     class FmodEventEmitter : public Base {
-      GDTEMPLATE(Derived, Base)
+        GDTEMPLATE(Derived, Base)
 
     protected:
         Ref<FmodEvent> _event;
@@ -25,30 +26,22 @@ namespace godot {
     public:
         void set_param(const String& key, const float value) {
             _params[key] = value;
-            if (!_event.is_valid()) {
-                return;
-            }
+            if (!_event.is_valid()) { return; }
             _event->set_parameter_by_name(key, _params[key]);
         }
-        
+
         bool is_paused() {
-            if (!_event.is_valid()) {
-                return false;
-            }
+            if (!_event.is_valid()) { return false; }
             return _event->get_paused();
         }
 
         void play() {
-            if (!_event.is_valid()) {
-                return;
-            }
+            if (!_event.is_valid()) { return; }
             _event->set_paused(false);
         }
 
         void pause() {
-            if (!_event.is_valid()) {
-                return;
-            }
+            if (!_event.is_valid()) { return; }
             _event->set_paused(true);
         }
 
@@ -60,49 +53,27 @@ namespace godot {
             }
         }
 
-        String get_event_name() {
-            return _event_name;
-        }
+        String get_event_name() { return _event_name; }
 
-        void set_attached(const bool attached) {
-            this->_attached = attached;
-        }
+        void set_attached(const bool attached) { this->_attached = attached; }
 
-        bool is_attached() const {
-            return _attached;
-        }
+        bool is_attached() const { return _attached; }
 
-        void set_autoplay(const bool autoplay) {
-            this->_autoplay = autoplay;
-        }
+        void set_autoplay(const bool autoplay) { this->_autoplay = autoplay; }
 
-        bool is_autoplay() const {
-            return _autoplay;
-        }
+        bool is_autoplay() const { return _autoplay; }
 
-        void set_looped(const bool looped) {
-            this->_is_one_shot = looped;
-        }
+        void set_looped(const bool looped) { this->_is_one_shot = looped; }
 
-        bool is_looped() const {
-            return _is_one_shot;
-        }
+        bool is_looped() const { return _is_one_shot; }
 
-        void set_allow_fadeout(const bool allow_fadeout) {
-            this->_allow_fadeout = allow_fadeout;
-        }
+        void set_allow_fadeout(const bool allow_fadeout) { this->_allow_fadeout = allow_fadeout; }
 
-        bool is_allow_fadeout() const {
-            return _allow_fadeout;
-        }
+        bool is_allow_fadeout() const { return _allow_fadeout; }
 
-        void set_preload_event(const bool preload_event) {
-            this->_preload_event = preload_event;
-        }
+        void set_preload_event(const bool preload_event) { this->_preload_event = preload_event; }
 
-        bool is_preload_event() const {
-            return _preload_event;
-        }
+        bool is_preload_event() const { return _preload_event; }
 
         static void _bind_methods() {}
     };

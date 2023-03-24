@@ -1,5 +1,6 @@
 
 #include "fmod_cache.h"
+
 #include "helpers/common.h"
 
 using namespace godot;
@@ -13,9 +14,7 @@ FmodCache::~FmodCache() {
 }
 
 void FmodCache::update_pending() {
-    if (loadingBanks.size() == 0) {
-        return;
-    }
+    if (loadingBanks.size() == 0) { return; }
     List<Ref<FmodBank>> toDelete;
     for (Ref<FmodBank> loadingBank : loadingBanks) {
         int loading_state = loadingBank->get_loading_state();
@@ -46,15 +45,11 @@ bool FmodCache::is_loading() {
 Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(bankPath.utf8().get_data(), flag, &bank));
-    if (!bank) {
-        return {};
-    }
+    if (!bank) { return {}; }
     Ref<FmodBank> ref = FmodBank::create_ref(bank);
     GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(bankPath))
     loadingBanks.push_back(ref);
-    if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) {
-        force_loading();
-    }
+    if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) { force_loading(); }
     return ref;
 }
 

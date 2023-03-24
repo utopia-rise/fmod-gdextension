@@ -1,6 +1,7 @@
-#include <classes/engine.hpp>
 #include <fmod_server.h>
 #include <nodes/fmod_event_emitter_3d.h>
+
+#include <classes/engine.hpp>
 
 using namespace godot;
 
@@ -37,9 +38,7 @@ void FmodEventEmitter3D::_bind_methods() {
 
 void FmodEventEmitter3D::_ready() {
     // ensure we only run FMOD when the game is running!
-    if (Engine::get_singleton()->is_editor_hint()) {
-        return;
-    }
+    if (Engine::get_singleton()->is_editor_hint()) { return; }
 
     if (_preload_event) {
         Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(_event_name);
@@ -54,39 +53,29 @@ void FmodEventEmitter3D::_ready() {
     }
 
     _event->set_3d_attributes(get_transform());
-    if (_autoplay) {
-        play();
-    }
+    if (_autoplay) { play(); }
 }
 
 void FmodEventEmitter3D::_process(double delta) {
-    if(!_event.is_valid() && !_is_one_shot && _autoplay){
+    if (!_event.is_valid() && !_is_one_shot && _autoplay) {
         _event = FmodServer::get_singleton()->create_event_instance(_event_name);
     }
 
-    if (_attached && _event.is_valid()) {
-        _event->set_3d_attributes(get_transform());
-    }
+    if (_attached && _event.is_valid()) { _event->set_3d_attributes(get_transform()); }
 }
 
 void FmodEventEmitter3D::_notification(int p_what) {
     // ensure we only run FMOD when the game is running!
-    if (Engine::get_singleton()->is_editor_hint()) {
-        return;
-    }
+    if (Engine::get_singleton()->is_editor_hint()) { return; }
     if (p_what == NOTIFICATION_PAUSED) {
         pause();
     } else if (p_what == NOTIFICATION_UNPAUSED) {
-        if (is_paused()) {
-            play();
-        }
+        if (is_paused()) { play(); }
     }
 }
 
 void FmodEventEmitter3D::_exit_tree() {
-    if (!_event.is_valid()) {
-        return;
-    }
+    if (!_event.is_valid()) { return; }
 
     if (_allow_fadeout) {
         _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);

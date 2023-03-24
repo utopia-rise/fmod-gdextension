@@ -3,11 +3,11 @@
 
 #include "fmod_event_emitter.h"
 #include "studio/fmod_event.h"
+
 #include <classes/node2d.hpp>
 
 namespace godot {
-    class FmodEventEmitter2D : public FmodEventEmitter<FmodEventEmitter2D, Node2D>  {
-
+    class FmodEventEmitter2D : public FmodEventEmitter<FmodEventEmitter2D, Node2D> {
     public:
         FmodEventEmitter2D() = default;
         ~FmodEventEmitter2D() override = default;
