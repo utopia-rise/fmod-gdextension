@@ -8,7 +8,7 @@ namespace godot {
 
     template<class Derived, class Base>
     class FmodEventEmitter : public Base {
-        GDCLASS(Derived, Base);
+      GDTEMPLATE(Derived, Base)
 
     protected:
         Ref<FmodEvent> _event;
