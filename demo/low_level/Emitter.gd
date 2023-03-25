@@ -5,11 +5,11 @@ var id: int = 0
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	id = Fmod.create_event_instance("event:/Vehicles/Car Engine")
-	Fmod.attach_instance_to_node(id, self)
-	Fmod.set_event_parameter_by_name(id, "RPM", 600)
-	Fmod.set_event_volume(id, 2)
-	Fmod.start_event(id)
+	id = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+	FmodServer.attach_instance_to_node(id, self)
+	FmodServer.set_event_parameter_by_name(id, "RPM", 600)
+	FmodServer.set_event_volume(id, 2)
+	FmodServer.start_event(id)
 	
 # warning-ignore:unused_argument
 func _process(delta):
@@ -17,9 +17,9 @@ func _process(delta):
 		isPlaying = !isPlaying
 		if(isPlaying):
 			print("Mower playing")
-			Fmod.set_event_paused(id, false)
+			FmodServer.set_event_paused(id, false)
 		else:
 			print("Mower paused")
-			Fmod.set_event_paused(id, true)
+			FmodServer.set_event_paused(id, true)
 	elif Input.is_action_just_pressed("kill_event"):
 		self.queue_free()

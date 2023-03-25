@@ -1,21 +1,40 @@
 [configuration]
-
 entry_symbol = "fmod_library_init"
 
 [libraries]
+windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_debug.x86_64.dll"
+windows.debug.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_debug.x86_64.dll"
+windows.release.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_release.x86_64.dll"
+macos.editor = "res://addons/fmod/libs/macos/libGodotFmod.macos.template_debug.framework"
+macos.debug  = "res://addons/fmod/libs/macos/libGodotFmod.macos.template_debug.framework"
+macos.release  = "res://addons/fmod/libs/macos/libGodotFmod.macos.template_release.framework"
+linux.editor.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_debug.x86_64.so"
+linux.debug.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_debug.x86_64.so"
+linux.release.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_release.x86_64.so"
 
-macos.editor = "res://addons/fmod/libs/macos/libGodotFmod.macos.editor.framework"
-windows.editor.x86_32 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_32.dll"
-windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"
-linux.editor.x86_64 = "res://addons/fmod/bin/linux/libGodotFmod.linux.editor.x86_64.so"
-linux.editor.arm64 = "res://addons/fmod/bin/linux/libGodotFmod.linux.editor.arm64.so"
-linux.editor.rv64 = "res://addons/fmod/bin/linux/libGodotFmod.linux.editor.rv64.so"
+
 
 [dependencies]
-
-macos.editor = {}
-windows.editor.x86_32 = {}
-windows.editor.x86_64 = {}
-linux.editor.x86_64 = {}
-linux.editor.arm64 = {}
-linux.editor.rv64 = {}
+windows.debug.x86_64 = {
+"libs/windows/fmodL.dll": "", 
+"libs/windows/fmodstudioL.dll": ""
+}
+windows.release .x86_64 = {
+"libs/windows/fmod.dll": "", 
+"libs/windows/fmodstudio.dll": ""
+}
+linux.debug.x86_64  = {
+"libs/linux/libfmodL.so": "",
+"libs/linux/libfmodL.so.13": "",
+"libs/linux/libfmodL.so.13.12": "",
+"libs/linux/libfmodstudioL.so": "",
+"libs/linux/libfmodstudioL.so.13": "",
+"libs/linux/libfmodstudioL.so.13.12": ""
+}
+linux.release.x86_64 = {
+"libs/linux/libfmod.so": "",
+"libs/linux/libfmod.so.13": "",
+"libs/linux/libfmod.so.13.12": "",
+"libs/linux/libfmodstudio.so": "",
+"libs/linux/libfmodstudio.so.13": "",
+"libs/linux/libfmodstudio.so.13.12": ""}

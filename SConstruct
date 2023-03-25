@@ -38,22 +38,38 @@ sources = [
     ]
 
 lfix = ""
-if env["target"] == "debug" or env["target"] == "editor":
+debug = False
+if env["target"] == "template_debug" or env["target"] == "editor":
     lfix = "L"
+    debug = True
 
 if env["platform"] == "macos":
     libfmod = 'libfmod%s.dylib' % lfix
     libfmodstudio = 'libfmodstudio%s.dylib' % lfix
+
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/'])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+
+    env.Append(
+        LINKFLAGS=[
+            "-framework",
+            "Cocoa",
+            "-Wl,-undefined,dynamic_lookup",
+        ]
+    )
 
 elif env["platform"] == "linux":
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
+
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"], env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+
+    env.Append(CCFLAGS=["-fPIC", "-Wwrite-strings"])
+    env.Append(LINKFLAGS=["-Wl,-R,'$$ORIGIN'"])
+    env.Append(LINKFLAGS=["-m64", "-fuse-ld=gold"])
 
 elif env["platform"] == "windows":
     libfmod = 'fmod%s_vc'% lfix
@@ -63,20 +79,26 @@ elif env["platform"] == "windows":
         "x86_32" : "x86",
     }
     arch_suffix_override = fmod_info_table[env["arch"]]
+
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'windows/core/inc/', env['fmod_lib_dir'] + 'windows/studio/inc/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override, env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+
+    env.Append(LINKFLAGS=["/WX"])
+    if debug:
+        env.Append(CCFLAGS=["/FS", "/Zi", "/Fd\"godot-cpp\\bin\\debug.pdb\""])
 
 elif env["platform"] == "ios":
+    libfmod = 'libfmod%s_iphoneos.a' % lfix
+    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
+
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+
     env.Append(LINKFLAGS=[
         '-Wl,-undefined,dynamic_lookup',
     ])
-
-    libfmod = 'libfmod%s_iphoneos.a' % lfix
-    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
 
 elif env["platform"] == "android":
     libfmod = 'libfmod%s.so' % lfix
@@ -88,10 +110,10 @@ elif env["platform"] == "android":
         "x86_64": "x86_64"
     }
     arch_dir = fmod_info_table[env["arch"]]
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
 
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'android/core/inc/', env['fmod_lib_dir'] + 'android/studio/inc/'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
+    env.Append(LIBS=[libfmod, libfmodstudio])
 
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(

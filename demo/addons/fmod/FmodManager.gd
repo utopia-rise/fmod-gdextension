@@ -1,7 +1,7 @@
 extends Node
 
 func _process(delta):
-	Fmod.update()
+	FmodServer.update()
 	
 func _notification(what):
-	Fmod.notification(what)
+	FmodServer.notification(what)

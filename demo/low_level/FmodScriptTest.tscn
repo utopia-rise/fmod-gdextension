@@ -1,12 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://bq8cp78n4pk7x"]
+[gd_scene load_steps=11 format=3 uid="uid://cs8nm6h12whh1"]
 
-[ext_resource type="Script" path="res://Script/FmodTest.gd" id="1"]
-[ext_resource type="Texture2D" uid="uid://ceqd5rtw6dup5" path="res://icon.png" id="2"]
-[ext_resource type="Script" path="res://Script/Emitter.gd" id="3"]
-[ext_resource type="Script" path="res://Script/Listener.gd" id="4"]
-[ext_resource type="Script" path="res://Script/EnterAndLeave.gd" id="5"]
-[ext_resource type="Script" path="res://Script/ChangeColor.gd" id="6"]
-[ext_resource type="Script" path="res://Script/EnterandLeave2.gd" id="7"]
+[ext_resource type="Script" path="res://low_level/FmodTest.gd" id="1_oc8v3"]
+[ext_resource type="Texture2D" uid="uid://bcee3p6b84etq" path="res://icon.png" id="2_mamb7"]
+[ext_resource type="Script" path="res://low_level/Emitter.gd" id="3_fx7d3"]
+[ext_resource type="Script" path="res://low_level/Listener.gd" id="4_448uv"]
+[ext_resource type="Script" path="res://low_level/EnterAndLeave.gd" id="5_85yno"]
+[ext_resource type="Script" path="res://low_level/ChangeColor.gd" id="6_fyoq1"]
+[ext_resource type="Script" path="res://low_level/EnterandLeave2.gd" id="7_6vajh"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(87.7038, 82.621)
@@ -20,7 +20,7 @@ size = Vector2(289.938, 284.96)
 
 [node name="FmodTest" type="Node2D"]
 position = Vector2(0, -3)
-script = ExtResource("1")
+script = ExtResource("1_oc8v3")
 
 [node name="Node2D" type="Node2D" parent="."]
 position = Vector2(500, 500)
@@ -28,8 +28,8 @@ position = Vector2(500, 500)
 [node name="Emitter" type="Sprite2D" parent="Node2D"]
 self_modulate = Color(0.988235, 0, 0, 1)
 position = Vector2(-3.05176e-05, 0)
-texture = ExtResource("2")
-script = ExtResource("3")
+texture = ExtResource("2_mamb7")
+script = ExtResource("3_fx7d3")
 
 [node name="Label" type="Label" parent="Node2D"]
 anchors_preset = 4
@@ -42,11 +42,11 @@ Come closer to hear it"
 
 [node name="Listener" type="CharacterBody2D" parent="."]
 position = Vector2(500, 150)
-script = ExtResource("4")
+script = ExtResource("4_448uv")
 
 [node name="icon" type="Sprite2D" parent="Listener"]
 position = Vector2(1.89996, 4.12415)
-texture = ExtResource("2")
+texture = ExtResource("2_mamb7")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Listener"]
 position = Vector2(0.440125, 0.440125)
@@ -63,7 +63,7 @@ Kill it with K key!"
 
 [node name="SoundArea1" type="Area2D" parent="."]
 position = Vector2(146.558, 148.68)
-script = ExtResource("5")
+script = ExtResource("5_85yno")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea1"]
 shape = SubResource("2")
@@ -72,7 +72,7 @@ shape = SubResource("2")
 self_modulate = Color(0.113725, 0.823529, 0.317647, 1)
 z_index = -1
 scale = Vector2(3, 3)
-texture = ExtResource("2")
+texture = ExtResource("2_mamb7")
 
 [node name="Label2" type="Label" parent="SoundArea1"]
 size_flags_stretch_ratio = 0.0
@@ -83,7 +83,7 @@ Several instances of the same sound can be played at the same time
 
 [node name="SoundArea2" type="Area2D" parent="."]
 position = Vector2(818.43, 97.5364)
-script = ExtResource("6")
+script = ExtResource("6_fyoq1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea2"]
 position = Vector2(52.8021, 45.8286)
@@ -94,7 +94,7 @@ self_modulate = Color(0.0117647, 0.956863, 0.0156863, 1)
 z_index = -1
 position = Vector2(52.3218, 46.0544)
 scale = Vector2(3, 3)
-texture = ExtResource("2")
+texture = ExtResource("2_mamb7")
 
 [node name="Label3" type="Label" parent="SoundArea2"]
 size_flags_stretch_ratio = 0.0
@@ -103,7 +103,7 @@ The color changes every beat"
 
 [node name="SoundArea3" type="Area2D" parent="."]
 position = Vector2(91.9974, 414.5)
-script = ExtResource("7")
+script = ExtResource("7_6vajh")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea3"]
 position = Vector2(52.8021, 45.8286)
@@ -114,7 +114,7 @@ self_modulate = Color(0.827451, 0.345098, 0.0941176, 1)
 z_index = -1
 position = Vector2(52.3218, 46.0544)
 scale = Vector2(3, 3)
-texture = ExtResource("2")
+texture = ExtResource("2_mamb7")
 
 [node name="Label3" type="Label" parent="SoundArea3"]
 size_flags_stretch_ratio = 0.0
@@ -122,9 +122,3 @@ text = "File loaded as Music
 Start when entering
 Stop when exiting
 Only one instance of that music can be played "
-
-[node name="FmodEventEmitter2d" type="FmodEventEmitter2D" parent="."]
-event_name = "event:/Vehicles/Car Engine"
-attached = false
-allow_fadeout = false
-preload_event = false
