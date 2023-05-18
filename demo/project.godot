@@ -21,7 +21,11 @@ config/icon="res://icon.png"
 
 [autoload]
 
-FmodManager="res://addons/fmod/FmodManager.gd"
+FmodManager="*res://addons/fmod/FmodManager.gd"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/fmod/plugin.cfg")
 
 [input]
 

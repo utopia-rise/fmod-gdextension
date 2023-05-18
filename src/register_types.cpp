@@ -45,7 +45,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         // Server
         ClassDB::register_class<FmodServer>();
         fmod_singleton = memnew(FmodServer);
-        Engine::get_singleton()->register_singleton("Fmod", FmodServer::get_singleton());
+        Engine::get_singleton()->register_singleton("FmodServer", FmodServer::get_singleton());
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
         // initialise filerunner singleton by calling it.
@@ -55,7 +55,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
-        Engine::get_singleton()->unregister_singleton("Fmod");
+        Engine::get_singleton()->unregister_singleton("FmodServer");
         memdelete(fmod_singleton);
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) { Callbacks::GodotFileRunner::get_singleton()->finish(); }

@@ -24,8 +24,8 @@ void FmodEventEmitter2D::_bind_methods() {
 
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name"), "set_event_name", "get_event_name");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached"), "set_attached", "is_attached");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_autoplay"), "set_autoplay", "is_autoplay");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_is_one_shot"), "set_looped", "is_looped");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay"), "set_autoplay", "is_autoplay");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped"), "set_looped", "is_looped");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout"), "set_allow_fadeout", "is_allow_fadeout");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event"), "set_preload_event", "is_preload_event");
 

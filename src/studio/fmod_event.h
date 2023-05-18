@@ -1,10 +1,14 @@
 #ifndef GODOTFMOD_FMOD_EVENT_H
 #define GODOTFMOD_FMOD_EVENT_H
 
-#include "fmod_object.h"
+#include "classes/ref_counted.hpp"
+#include "fmod_studio.hpp"
+#include "helpers/common.h"
 
 namespace godot {
-    class FmodEvent : public FmodObject<FmodEvent, FMOD::Studio::EventInstance> {
+    class FmodEvent : public RefCounted {
+        FMODCLASS(FmodEvent, RefCounted, FMOD::Studio::EventInstance);
+
         float distanceScale = 0;
         Callable eventCallback;
 
@@ -43,6 +47,7 @@ namespace godot {
         void set_callback(Callable callback, int callbackMask);
         Callable get_callback() const;
 
+    protected:
         static void _bind_methods();
     };
 }// namespace godot

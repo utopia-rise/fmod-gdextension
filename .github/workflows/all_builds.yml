@@ -118,7 +118,7 @@ jobs:
       - name: Compilation
         run: |
           cd ../${{env.PROJECT_FOLDER}}
-          scons platform=${{ matrix.artifact-name }} generate_bindings=yes target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j6 ${{ matrix.flags }}
+          scons platform=${{ matrix.artifact-name }} generate_bindings=yes target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j1 ${{ matrix.flags }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3

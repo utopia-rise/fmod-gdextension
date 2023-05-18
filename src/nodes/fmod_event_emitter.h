@@ -7,9 +7,8 @@
 
 namespace godot {
 
-    template<class Derived, class Base>
+    template<class Base>
     class FmodEventEmitter : public Base {
-        GDTEMPLATE(Derived, Base)
 
     protected:
         Ref<FmodEvent> _event;
@@ -74,8 +73,6 @@ namespace godot {
         void set_preload_event(const bool preload_event) { this->_preload_event = preload_event; }
 
         bool is_preload_event() const { return _preload_event; }
-
-        static void _bind_methods() {}
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_EMITTER_H

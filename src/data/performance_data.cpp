@@ -23,7 +23,6 @@ void FmodPerformanceData::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "update", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_update");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "convolution1", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_convolution1");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "convolution2", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_convolution2");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "studio", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_studio");
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "currently_allocated", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_currently_allocated");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "max_allocated", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_max_allocated");

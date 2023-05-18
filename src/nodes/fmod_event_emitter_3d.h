@@ -6,7 +6,9 @@
 #include "fmod_event_emitter.h"
 
 namespace godot {
-    class FmodEventEmitter3D : public FmodEventEmitter<FmodEventEmitter3D, Node3D> {
+    class FmodEventEmitter3D : public FmodEventEmitter<Node3D> {
+        GDCLASS(FmodEventEmitter3D, Node3D)
+
     public:
         FmodEventEmitter3D() = default;
         ~FmodEventEmitter3D() override = default;

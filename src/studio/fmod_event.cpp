@@ -10,7 +10,6 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameterName", "value"), &FmodEvent::set_parameter_by_name);
     ClassDB::bind_method(D_METHOD("get_parameter_by_id", "idPair"), &FmodEvent::get_parameter_by_id);
     ClassDB::bind_method(D_METHOD("set_parameter_by_id", "idPair", "value"), &FmodEvent::set_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
     ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);

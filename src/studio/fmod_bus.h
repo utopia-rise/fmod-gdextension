@@ -1,12 +1,13 @@
 #ifndef GODOTFMOD_FMOD_BUS_H
 #define GODOTFMOD_FMOD_BUS_H
 
-#include "fmod_object.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
 
 namespace godot {
-    class FmodBus : public FmodObjectWithPath<FmodBus, FMOD::Studio::Bus> {
+    class FmodBus : public RefCounted {
+        FMODCLASSWITHPATH(FmodBus, RefCounted, FMOD::Studio::Bus);
+
     public:
         FmodBus() = default;
         ~FmodBus() override = default;
@@ -19,7 +20,8 @@ namespace godot {
         void set_volume(float volume) const;
         void stop_all_events(int stopMode);
 
-        static void _bind_methods();
+        protected:
+            static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_BUS_H

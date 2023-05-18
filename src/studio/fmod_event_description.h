@@ -2,12 +2,13 @@
 #define GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
 
 #include "classes/ref_counted.hpp"
-#include "fmod_object.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
 
 namespace godot {
-    class FmodEventDescription : public FmodObjectWithPath<FmodEventDescription, FMOD::Studio::EventDescription> {
+    class FmodEventDescription  : public RefCounted {
+        FMODCLASSWITHPATH(FmodEventDescription, RefCounted, FMOD::Studio::EventDescription);
+
     public:
         FmodEventDescription() = default;
         ~FmodEventDescription() override = default;
@@ -34,7 +35,8 @@ namespace godot {
         int get_user_property_count();
         Dictionary user_property_by_index(int index);
 
-        static void _bind_methods();
+        protected:
+            static void _bind_methods();
     };
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
