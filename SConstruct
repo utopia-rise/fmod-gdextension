@@ -86,7 +86,7 @@ elif env["platform"] == "windows":
 
     env.Append(LINKFLAGS=["/WX"])
     if debug:
-        env.Append(CCFLAGS=["/FS", "/Zi", "/Fd\"godot-cpp\\bin\\debug.pdb\""])
+        env.Append(CCFLAGS=["/FS", "/Zi"])
 
 elif env["platform"] == "ios":
     libfmod = 'libfmod%s_iphoneos.a' % lfix

@@ -25,7 +25,7 @@ jobs:
       matrix:
         include:
           - name: Windows Compilation
-            os: "windows-latest"
+            os: "windows-2022"
             artifact-name: windows
             artifact-extension: dll
             additional-python-packages: pywin32
