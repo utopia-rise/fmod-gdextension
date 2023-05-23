@@ -14,9 +14,9 @@ void FmodBus::_bind_methods() {
     ClassDB::bind_method(D_METHOD("stop_all_events", "stopMode"), &FmodBus::stop_all_events);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodBus::is_valid);
 
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "mute"), "set_mute", "get_mute");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused"), "set_paused", "get_paused");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "mute",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_mute", "get_mute");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "get_paused");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
 }
 
 bool FmodBus::get_mute() const {

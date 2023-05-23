@@ -1,6 +1,8 @@
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
+#include "fmod_server.h"
 #include "nodes/fmod_bank_loader.h"
+#include "nodes/fmod_event_emitter_2d.h"
 #include "nodes/fmod_event_emitter_3d.h"
 #include "nodes/fmod_listener_2d.h"
 #include "nodes/fmod_listener_3d.h"
@@ -10,8 +12,6 @@
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 
-#include <fmod_server.h>
-#include <nodes/fmod_event_emitter_2d.h>
 #include <register_types.h>
 
 #include <classes/engine.hpp>
@@ -31,6 +31,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 
         // Core
         ClassDB::register_class<FmodSound>();
+        ClassDB::register_class<FmodFile>();
 
         // Studio
         ClassDB::register_class<FmodBank>();
@@ -41,11 +42,11 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodVCA>();
 
         // Nodes
-        ClassDB::register_class<FmodListener3D>();
-        ClassDB::register_class<FmodListener2D>();
-        ClassDB::register_class<FmodEventEmitter2D>();
-        ClassDB::register_class<FmodEventEmitter3D>();
-        ClassDB::register_class<FmodBankLoader>();
+        //ClassDB::register_class<FmodListener3D>();
+        //ClassDB::register_class<FmodListener2D>();
+        //ClassDB::register_class<FmodEventEmitter2D>();
+        //ClassDB::register_class<FmodEventEmitter3D>();
+        //ClassDB::register_class<FmodBankLoader>();
 
         // Server
         ClassDB::register_class<FmodServer>();

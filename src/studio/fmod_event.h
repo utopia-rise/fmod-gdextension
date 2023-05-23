@@ -9,7 +9,7 @@ namespace godot {
     class FmodEvent : public RefCounted {
         FMODCLASS(FmodEvent, RefCounted, FMOD::Studio::EventInstance);
 
-        float distanceScale = 0;
+        float distanceScale = 1.0f;
         Callable eventCallback;
 
     public:
@@ -40,12 +40,12 @@ namespace godot {
         uint32_t get_listener_mask() const;
         Transform3D get_3d_attributes() const;
         Transform2D get_2d_attributes() const;
-        void set_2d_attributes(Transform2D position) const;
+        void set_2d_attributes(const Transform2D& position) const;
         void set_3d_attributes(const Transform3D& transform) const;
         void set_node_attributes(Node* node) const;
-
-        void set_callback(Callable callback, int callbackMask);
-        Callable get_callback() const;
+        void set_callback(const Callable& callback, int callbackMask);
+        const Callable& get_callback() const;
+        void set_distance_scale(float scale);
 
     protected:
         static void _bind_methods();

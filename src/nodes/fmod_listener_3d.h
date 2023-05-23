@@ -2,12 +2,13 @@
 #define GODOTFMOD_FMOD_LISTENER_3D_H
 
 #include "classes/node.hpp"
+#include "classes/node3d.hpp"
 #include "fmod_listener.h"
 
 namespace godot {
-    class FmodListener3D : public Node,
+    class FmodListener3D : public Node3D,
                            public FmodListener {
-        GDCLASS(FmodListener3D, Node)
+        GDCLASS(FmodListener3D, Node3D)
 
     public:
 

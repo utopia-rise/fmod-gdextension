@@ -22,12 +22,12 @@ void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &FmodEventEmitter2D::set_preload_event);
     ClassDB::bind_method(D_METHOD("is_preload_event"), &FmodEventEmitter2D::is_preload_event);
 
-    ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name"), "set_event_name", "get_event_name");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached"), "set_attached", "is_attached");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay"), "set_autoplay", "is_autoplay");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped"), "set_looped", "is_looped");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout"), "set_allow_fadeout", "is_allow_fadeout");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event"), "set_preload_event", "is_preload_event");
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_event_name", "get_event_name");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_attached", "is_attached");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_autoplay", "is_autoplay");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_looped", "is_looped");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_allow_fadeout", "is_allow_fadeout");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_preload_event", "is_preload_event");
 
     ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
     ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));

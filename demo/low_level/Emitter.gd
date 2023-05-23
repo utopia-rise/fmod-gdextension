@@ -1,25 +1,26 @@
 extends Sprite2D
 
 var isPlaying: bool = true
-var id: int = 0
+var event: FmodEvent = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	id = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
-	FmodServer.attach_instance_to_node(id, self)
-	FmodServer.set_event_parameter_by_name(id, "RPM", 600)
-	FmodServer.set_event_volume(id, 2)
-	FmodServer.start_event(id)
+	event = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+	event.set_2d_attributes(self.global_transform)
+	event.set_parameter_by_name("RPM", 600)
+	event.set_volume( 2)
+	event.start()
 	
 # warning-ignore:unused_argument
-func _process(delta):
+func _process(_delta):
 	if Input.is_action_just_pressed("space"):
 		isPlaying = !isPlaying
 		if(isPlaying):
 			print("Mower playing")
-			FmodServer.set_event_paused(id, false)
+			event.set_paused(false)
 		else:
 			print("Mower paused")
-			FmodServer.set_event_paused(id, true)
+			event.set_paused(true)
 	elif Input.is_action_just_pressed("kill_event"):
 		self.queue_free()
+

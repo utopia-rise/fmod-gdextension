@@ -463,7 +463,8 @@ Array FmodServer::get_all_banks() {
 
 Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
     Ref<FmodEvent> ref = _create_instance(eventPath, false, nullptr);
-    ref->get_wrapped()->setUserData(ref->_owner);
+    ref->get_wrapped()->setUserData(ref.ptr());
+    ref->set_distance_scale(distanceScale);
     return ref;
 }
 

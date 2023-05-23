@@ -2,8 +2,8 @@ extends Area2D
 
 # Declare member variables here. Examples:
 # var a = 2
-var open_sound: int = 0
-var close_sound: int = 0
+var open_sound: FmodSound = null
+var close_sound: FmodSound = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -15,18 +15,18 @@ func _ready():
 	body_exited.connect(leave)
 
 # warning-ignore:unused_argument
-func enter(area):
+func enter(_area):
 	print("enter")
-	open_sound = Fmod.create_sound_instance("res://assets/Sounds/doorOpen_1.ogg")
-	FmodServer.set_sound_pitch(open_sound, randf_range(0.75,1.25))
-	FmFmodServerod.play_sound(open_sound)
+	open_sound = FmodServer.create_sound_instance("res://assets/Sounds/doorOpen_1.ogg")
+	open_sound.set_pitch(randf_range(0.75,1.25))
+	open_sound.play()
 	
 # warning-ignore:unused_argument
-func leave(area):
+func leave(_area):
 	print("leave")
-	close_sound = Fmod.create_sound_instance("res://assets/Sounds/doorClose_1.ogg")
-	FmodServer.set_sound_pitch(close_sound, randf_range(0.75,1.5))
-	FmodServer.play_sound(close_sound)
+	close_sound = FmodServer.create_sound_instance("res://assets/Sounds/doorClose_1.ogg")
+	close_sound.set_pitch(randf_range(0.75,1.5))
+	close_sound.play()
 	
 
 func _exit_tree():

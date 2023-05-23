@@ -3,7 +3,7 @@ extends CharacterBody2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# register listener
-	Fmod.add_listener(0, self)
+	FmodServer.add_listener(0, self)
 	print("Listener set.")
 	return
 	
@@ -28,6 +28,7 @@ func _process(delta):
 	self.position += direction
 	self.rotate(rotation_dir * delta * 5)
 	if Input.is_action_pressed("lock_listener"):
-		Fmod.set_listener_lock(0, !Fmod.get_listener_lock(0))
+		FmodServer.set_listener_lock(0, !FmodServer.get_listener_lock(0))
 	elif Input.is_action_pressed("kill"):
 		self.queue_free()
+

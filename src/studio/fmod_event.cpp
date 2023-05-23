@@ -36,13 +36,13 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
 
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused"), "set_paused", "get_paused");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch"), "set_pitch", "get_pitch");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "position"), "set_timeline_position", "get_timeline_position");
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask"), "set_listener_mask", "get_listener_mask");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d"), "set_2d_attributes", "get_2d_attributes");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d"), "set_node_attributes", "get_3d_attributes");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "get_paused");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_pitch", "get_pitch");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "position",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_timeline_position", "get_timeline_position");
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_listener_mask", "get_listener_mask");
+    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
+    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_node_attributes", "get_3d_attributes");
 }
 
 float FmodEvent::get_parameter_by_name(const String& parameterName) const {
@@ -160,7 +160,7 @@ uint32_t FmodEvent::get_listener_mask() const {
     return mask;
 }
 
-void FmodEvent::set_2d_attributes(Transform2D position) const {
+void FmodEvent::set_2d_attributes(const Transform2D& position) const {
     FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(position, distanceScale);
     ERROR_CHECK(_wrapped->set3DAttributes(&attr));
 }
@@ -201,11 +201,15 @@ void FmodEvent::set_node_attributes(Node* node) const {
     }
 }
 
-void FmodEvent::set_callback(Callable callback, int callbackMask) {
+void FmodEvent::set_callback(const Callable& callback, int callbackMask) {
     eventCallback = callback;
     ERROR_CHECK(_wrapped->setCallback(Callbacks::eventCallback, callbackMask));
 }
 
-Callable FmodEvent::get_callback() const {
+const Callable& FmodEvent::get_callback() const {
     return eventCallback;
+}
+
+void FmodEvent::set_distance_scale(float scale){
+    distanceScale = scale;
 }

@@ -9,7 +9,7 @@ void FmodVCA::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_volume", "volume"), &FmodVCA::set_volume);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodVCA::is_valid);
 
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
 }
 
 float FmodVCA::get_volume() {

@@ -9,6 +9,9 @@
 #include <fmod_errors.h>
 #include <helpers/current_function.h>
 
+#include <godot.hpp>
+#include <variant/utility_functions.hpp>
+
 #define MAX_PATH_SIZE 512
 #define MAX_DRIVER_NAME_SIZE 256
 

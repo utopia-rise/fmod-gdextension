@@ -1,4 +1,5 @@
 #include "fmod_studio.hpp"
+#include "helpers/common.h"
 #include "studio/fmod_event.h"
 
 #include <callback/event_callbacks.h>
@@ -13,7 +14,6 @@ namespace Callbacks {
         auto* instance = reinterpret_cast<FMOD::Studio::EventInstance*>(event);
         godot::FmodEvent* event_instance;
         instance->getUserData((void**) &event_instance);
-
         if (event_instance) {
             godot::Dictionary dictionary;
             if (type == FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER) {
@@ -36,7 +36,7 @@ namespace Callbacks {
                 dictionary["name"] = name;
             }
             godot::Callable callback = event_instance->get_callback();
-            if (callback.is_valid()) {
+            if (!callback.is_null() && callback.is_valid()) {
                 godot::Array args = godot::Array();
                 args.append(dictionary);
                 args.append(type);

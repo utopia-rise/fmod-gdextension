@@ -1,30 +1,27 @@
 extends Area2D
 
-var id: int = 0
+var event: FmodEvent = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-# warning-ignore:return_value_discarded
-	FmodServer.timeline_beat.connect(change_color)
-# warning-ignore:return_value_discarded
+	event = FmodServer.create_event_instance("event:/Music/Level 02")
+	event.set_callback(change_color, FmodServer.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	body_entered.connect(enter)
-# warning-ignore:return_value_discarded
 	body_exited.connect(leave)
-	id = FmodServer.create_event_instance("event:/Music/Level 02")
-	FmodServer.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
-	FmodServer.start_event(id)
-	FmodServer.set_event_paused(id, true)
+	event.start()
+	event.set_paused(true)
 
 # warning-ignore:unused_argument
-func enter(area):
+func enter(_area):
 	print("enter")
-	FmodServer.set_event_paused(id, false)
+	event.set_paused(false)
 	
 # warning-ignore:unused_argument
-func leave(area):
+func leave(_area):
 	print("leave")
-	FmodServer.set_event_paused(id, true)
+	event.set_paused(true)
 
 # warning-ignore:unused_argument
-func change_color(dict: Dictionary):
-	$icon.self_modulate = Color(randf_range(0,1), randf_range(0,1), randf_range(0,1), 1)
+func change_color(dict: Dictionary, type: int):
+	if type == FmodServer.FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT:
+		$icon.self_modulate = Color(randf_range(0,1), randf_range(0,1), randf_range(0,1), 1)

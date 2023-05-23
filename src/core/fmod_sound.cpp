@@ -16,8 +16,8 @@ void FmodSound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_pitch", "pitch"), &FmodSound::set_pitch);
     ClassDB::bind_method(D_METHOD("get_pitch"), &FmodSound::get_pitch);
 
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch"), "set_pitch", "get_pitch");
-    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume"), "set_volume", "get_volume");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_pitch", "get_pitch");
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
 }
 
 void FmodSound::release() const {
