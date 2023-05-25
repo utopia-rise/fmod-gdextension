@@ -42,11 +42,11 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodVCA>();
 
         // Nodes
-        //ClassDB::register_class<FmodListener3D>();
-        //ClassDB::register_class<FmodListener2D>();
-        //ClassDB::register_class<FmodEventEmitter2D>();
-        //ClassDB::register_class<FmodEventEmitter3D>();
-        //ClassDB::register_class<FmodBankLoader>();
+        ClassDB::register_class<FmodListener3D>();
+        ClassDB::register_class<FmodListener2D>();
+        ClassDB::register_class<FmodEventEmitter2D>();
+        ClassDB::register_class<FmodEventEmitter3D>();
+        ClassDB::register_class<FmodBankLoader>();
 
         // Server
         ClassDB::register_class<FmodServer>();

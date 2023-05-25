@@ -2,7 +2,7 @@
 #define GODOTFMOD_FMOD_LISTENER_H
 
 namespace godot {
-    class FmodListener {};
+    struct FmodListener {};
 }// namespace godot
 
 #endif// GODOTFMOD_FMOD_LISTENER_H

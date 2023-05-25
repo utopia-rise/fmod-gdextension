@@ -21,6 +21,7 @@ void FmodEventEmitter2D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &FmodEventEmitter2D::is_allow_fadeout);
     ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &FmodEventEmitter2D::set_preload_event);
     ClassDB::bind_method(D_METHOD("is_preload_event"), &FmodEventEmitter2D::is_preload_event);
+    ClassDB::bind_method(D_METHOD("_notification", "p_what"), &FmodEventEmitter2D::_notification);
 
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_event_name", "get_event_name");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_attached", "is_attached");
@@ -39,28 +40,28 @@ void FmodEventEmitter2D::_ready() {
     // ensure we only run FMOD when the game is running!
     if (Engine::get_singleton()->is_editor_hint()) { return; }
 
-    if (_preload_event) {
-        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(_event_name);
+    if (internal_emitter._preload_event) {
+        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(internal_emitter._event_name);
         desc->load_sample_data();
     }
 
-    _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+    internal_emitter._event = FmodServer::get_singleton()->create_event_instance(internal_emitter._event_name);
 
-    for (int i = 0; i < _params.keys().size(); i++) {
-        auto key = _params.keys()[i];
-        _event->set_parameter_by_name(key, _params[key]);
+    for (int i = 0; i < internal_emitter._params.keys().size(); i++) {
+        auto key = internal_emitter._params.keys()[i];
+        internal_emitter._event->set_parameter_by_name(key, internal_emitter._params[key]);
     }
 
-    _event->set_2d_attributes(get_transform());
-    if (_autoplay) { play(); }
+    internal_emitter._event->set_2d_attributes(get_transform());
+    if (internal_emitter._autoplay) { play(); }
 }
 
 void FmodEventEmitter2D::_process(double delta) {
-    if (!_event.is_valid() && !_is_one_shot && _autoplay) {
-        _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+    if (!internal_emitter._event.is_valid() && !internal_emitter._is_one_shot && internal_emitter._autoplay) {
+        internal_emitter._event = FmodServer::get_singleton()->create_event_instance(internal_emitter._event_name);
     }
 
-    if (_attached && _event.is_valid()) { _event->set_2d_attributes(get_transform()); }
+    if (internal_emitter._attached && internal_emitter._event.is_valid()) { internal_emitter._event->set_2d_attributes(get_transform()); }
 }
 
 void FmodEventEmitter2D::_notification(int p_what) {
@@ -74,11 +75,53 @@ void FmodEventEmitter2D::_notification(int p_what) {
 }
 
 void FmodEventEmitter2D::_exit_tree() {
-    if (!_event.is_valid()) { return; }
+    if (!internal_emitter._event.is_valid()) { return; }
 
-    if (_allow_fadeout) {
-        _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    if (internal_emitter._allow_fadeout) {
+        internal_emitter._event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
     } else {
-        _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        internal_emitter._event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
     }
 }
+
+void FmodEventEmitter2D::set_param(const String& key, const float value) {
+    internal_emitter.set_param(key, value);
+}
+
+bool FmodEventEmitter2D::is_paused() {
+    return internal_emitter.is_paused();
+}
+
+void FmodEventEmitter2D::play() {
+    internal_emitter.play();
+}
+
+void FmodEventEmitter2D::pause() {
+    internal_emitter.pause();
+}
+
+void FmodEventEmitter2D::set_event_name(const String& name) {
+    internal_emitter.set_event_name(name);
+}
+
+String FmodEventEmitter2D::get_event_name() { return internal_emitter._event_name; }
+
+void FmodEventEmitter2D::set_attached(const bool attached) { internal_emitter._attached = attached; }
+
+bool FmodEventEmitter2D::is_attached() const { return internal_emitter._attached; }
+
+void FmodEventEmitter2D::set_autoplay(const bool autoplay) { internal_emitter._autoplay = autoplay; }
+
+bool FmodEventEmitter2D::is_autoplay() const { return internal_emitter._autoplay; }
+
+void FmodEventEmitter2D::set_looped(const bool looped) { internal_emitter._is_one_shot = !looped; }
+
+bool FmodEventEmitter2D::is_looped() const { return !internal_emitter._is_one_shot; }
+
+void FmodEventEmitter2D::set_allow_fadeout(const bool allow_fadeout) { internal_emitter._allow_fadeout = allow_fadeout; }
+
+bool FmodEventEmitter2D::is_allow_fadeout() const { return internal_emitter._allow_fadeout; }
+
+void FmodEventEmitter2D::set_preload_event(const bool preload_event) { internal_emitter._preload_event = preload_event; }
+
+bool FmodEventEmitter2D::is_preload_event() const { return internal_emitter._preload_event; }

@@ -7,10 +7,8 @@
 
 namespace godot {
 
-    template<class Base>
-    class FmodEventEmitter : public Base {
+    struct FmodEventEmitter {
 
-    protected:
         Ref<FmodEvent> _event;
 
         String _event_name;
@@ -22,7 +20,6 @@ namespace godot {
 
         Dictionary _params;
 
-    public:
         void set_param(const String& key, const float value) {
             _params[key] = value;
             if (!_event.is_valid()) { return; }

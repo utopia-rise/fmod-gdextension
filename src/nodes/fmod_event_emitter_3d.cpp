@@ -1,4 +1,3 @@
-#include <fmod_server.h>
 #include <nodes/fmod_event_emitter_3d.h>
 
 #include <classes/engine.hpp>
@@ -22,11 +21,12 @@ void FmodEventEmitter3D::_bind_methods() {
     ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &FmodEventEmitter3D::is_allow_fadeout);
     ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &FmodEventEmitter3D::set_preload_event);
     ClassDB::bind_method(D_METHOD("is_preload_event"), &FmodEventEmitter3D::is_preload_event);
+    ClassDB::bind_method(D_METHOD("_notification", "p_what"), &FmodEventEmitter3D::_notification);
 
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_event_name", "get_event_name");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_attached", "is_attached");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_autoplay", "is_autoplay");
-    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "_is_one_shot",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_looped", "is_looped");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_autoplay", "is_autoplay");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "looped",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_looped", "is_looped");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_allow_fadeout", "is_allow_fadeout");
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_preload_event", "is_preload_event");
 
@@ -40,28 +40,28 @@ void FmodEventEmitter3D::_ready() {
     // ensure we only run FMOD when the game is running!
     if (Engine::get_singleton()->is_editor_hint()) { return; }
 
-    if (_preload_event) {
-        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(_event_name);
+    if (internal_emitter._preload_event) {
+        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(internal_emitter._event_name);
         desc->load_sample_data();
     }
 
-    _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+    internal_emitter._event = FmodServer::get_singleton()->create_event_instance(internal_emitter._event_name);
 
-    for (int i = 0; i < _params.keys().size(); i++) {
-        auto key = _params.keys()[i];
-        _event->set_parameter_by_name(key, _params[key]);
+    for (int i = 0; i < internal_emitter._params.keys().size(); i++) {
+        auto key = internal_emitter._params.keys()[i];
+        internal_emitter._event->set_parameter_by_name(key, internal_emitter._params[key]);
     }
 
-    _event->set_3d_attributes(get_transform());
-    if (_autoplay) { play(); }
+    internal_emitter._event->set_3d_attributes(get_transform());
+    if (internal_emitter._autoplay) { play(); }
 }
 
 void FmodEventEmitter3D::_process(double delta) {
-    if (!_event.is_valid() && !_is_one_shot && _autoplay) {
-        _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+    if (!internal_emitter._event.is_valid() && !internal_emitter._is_one_shot && internal_emitter._autoplay) {
+        internal_emitter._event = FmodServer::get_singleton()->create_event_instance(internal_emitter._event_name);
     }
 
-    if (_attached && _event.is_valid()) { _event->set_3d_attributes(get_transform()); }
+    if (internal_emitter._attached && internal_emitter._event.is_valid()) { internal_emitter._event->set_3d_attributes(get_transform()); }
 }
 
 void FmodEventEmitter3D::_notification(int p_what) {
@@ -75,11 +75,53 @@ void FmodEventEmitter3D::_notification(int p_what) {
 }
 
 void FmodEventEmitter3D::_exit_tree() {
-    if (!_event.is_valid()) { return; }
+    if (!internal_emitter._event.is_valid()) { return; }
 
-    if (_allow_fadeout) {
-        _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+    if (internal_emitter._allow_fadeout) {
+        internal_emitter._event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
     } else {
-        _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        internal_emitter._event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
     }
 }
+
+void FmodEventEmitter3D::set_param(const String& key, const float value) {
+    internal_emitter.set_param(key, value);
+}
+
+bool FmodEventEmitter3D::is_paused() {
+    return internal_emitter.is_paused();
+}
+
+void FmodEventEmitter3D::play() {
+    internal_emitter.play();
+}
+
+void FmodEventEmitter3D::pause() {
+    internal_emitter.pause();
+}
+
+void FmodEventEmitter3D::set_event_name(const String& name) {
+    internal_emitter.set_event_name(name);
+}
+
+String FmodEventEmitter3D::get_event_name() { return internal_emitter._event_name; }
+
+void FmodEventEmitter3D::set_attached(const bool attached) { internal_emitter._attached = attached; }
+
+bool FmodEventEmitter3D::is_attached() const { return internal_emitter._attached; }
+
+void FmodEventEmitter3D::set_autoplay(const bool autoplay) { internal_emitter._autoplay = autoplay; }
+
+bool FmodEventEmitter3D::is_autoplay() const { return internal_emitter._autoplay; }
+
+void FmodEventEmitter3D::set_looped(const bool looped) { internal_emitter._is_one_shot = !looped; }
+
+bool FmodEventEmitter3D::is_looped() const { return !internal_emitter._is_one_shot; }
+
+void FmodEventEmitter3D::set_allow_fadeout(const bool allow_fadeout) { internal_emitter._allow_fadeout = allow_fadeout; }
+
+bool FmodEventEmitter3D::is_allow_fadeout() const { return internal_emitter._allow_fadeout; }
+
+void FmodEventEmitter3D::set_preload_event(const bool preload_event) { internal_emitter._preload_event = preload_event; }
+
+bool FmodEventEmitter3D::is_preload_event() const { return internal_emitter._preload_event; }

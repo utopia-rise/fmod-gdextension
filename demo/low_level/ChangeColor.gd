@@ -22,6 +22,6 @@ func leave(_area):
 	event.set_paused(true)
 
 # warning-ignore:unused_argument
-func change_color(dict: Dictionary, type: int):
+func change_color(_dict: Dictionary, type: int):
 	if type == FmodServer.FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT:
 		$icon.self_modulate = Color(randf_range(0,1), randf_range(0,1), randf_range(0,1), 1)
