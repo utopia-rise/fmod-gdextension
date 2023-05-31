@@ -15,13 +15,12 @@ modules="org/godotengine/godot/FmodSingleton"
 [application]
 
 config/name="Fmod Demo"
-run/main_scene="res://Scenes/FmodScriptTest.tscn"
+run/main_scene="res://low_level/FmodScriptTest.tscn"
 config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
 [autoload]
 
-FmodAutoloader="*res://addons/fmod/FmodManager.gd"
 FmodManager="*res://addons/fmod/FmodManager.gd"
 
 [editor_plugins]

@@ -1,20 +1,19 @@
-#ifndef FMOD_EVENT_EMITTER_2D_GODOT_FMOD_H
-#define FMOD_EVENT_EMITTER_2D_GODOT_FMOD_H
+#ifndef GODOTFMOD_FMOD_EVENT_EMITTER_3D_H
+#define GODOTFMOD_FMOD_EVENT_EMITTER_3D_H
 
+#include "classes/node.hpp"
+#include "classes/node3d.hpp"
 #include "fmod_event_emitter.h"
-#include "studio/fmod_event.h"
-
-#include <classes/node2d.hpp>
 
 namespace godot {
-    class FmodEventEmitter2D : public Node2D {
-        GDCLASS(FmodEventEmitter2D, Node2D)
+    class FmodEventEmitter3D : public Node3D {
+        GDCLASS(FmodEventEmitter3D, Node3D)
 
         FmodEventEmitter internal_emitter;
 
     public:
-        FmodEventEmitter2D() = default;
-        ~FmodEventEmitter2D() override = default;
+        FmodEventEmitter3D() = default;
+        ~FmodEventEmitter3D() override = default;
 
         virtual void _ready() override;
         virtual  void _process(double delta) override;
@@ -42,4 +41,4 @@ namespace godot {
     };
 }// namespace godot
 
-#endif// FMOD_EVENT_EMITTER_2D_GODOT_FMOD_H
+#endif// GODOTFMOD_FMOD_EVENT_EMITTER_3D_H
