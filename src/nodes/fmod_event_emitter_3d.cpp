@@ -47,7 +47,7 @@ void FmodEventEmitter3D::_ready() {
 
     internal_emitter._event = FmodServer::get_singleton()->create_event_instance(internal_emitter._event_name);
 
-    for (int i = 0; i < internal_emitter._params.keys().size(); i++) {
+    for (int i = 0; i < internal_emitter._params.keys().size(); ++i) {
         auto key = internal_emitter._params.keys()[i];
         internal_emitter._event->set_parameter_by_name(key, internal_emitter._params[key]);
     }

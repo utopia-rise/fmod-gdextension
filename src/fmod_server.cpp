@@ -186,7 +186,7 @@ void FmodServer::_set_listener_attributes() {
         return;
     }
 
-    for (int i = 0; i < systemListenerNumber; i++) {
+    for (int i = 0; i < systemListenerNumber; ++i) {
         Listener* listener = &listeners[i];
         if (listener->listenerLock) { continue; }
         if (is_dead(listener->gameObj)) {
@@ -239,7 +239,7 @@ void FmodServer::add_listener(int index, Object* gameObj) {
         listener->gameObj = gameObj;
         ERROR_CHECK(system->setListenerWeight(index, listener->weight));
         int count = 0;
-        for (int i = 0; i < systemListenerNumber; i++) {
+        for (int i = 0; i < systemListenerNumber; ++i) {
             if ((&listeners[i])->gameObj != nullptr) count++;
         }
         actualListenerNumber = count;
@@ -255,7 +255,7 @@ void FmodServer::remove_listener(int index) {
         listener->gameObj = nullptr;
         ERROR_CHECK(system->setListenerWeight(index, 0));
         int count = 0;
-        for (int i = 0; i < systemListenerNumber; i++) {
+        for (int i = 0; i < systemListenerNumber; ++i) {
             if ((&listeners[i])->gameObj != nullptr) count++;
         }
         actualListenerNumber = count;
@@ -506,7 +506,7 @@ void FmodServer::play_one_shot_with_params(const String& eventName, Node* gameOb
     ref->set_node_attributes(gameObj);
     // set the initial parameter values
     auto keys = parameters.keys();
-    for (int i = 0; i < keys.size(); i++) {
+    for (int i = 0; i < keys.size(); ++i) {
         String k = keys[i];
         float v = parameters[keys[i]];
         ref->set_parameter_by_name(k.utf8().get_data(), v);
@@ -532,7 +532,7 @@ void FmodServer::play_one_shot_attached_with_params(const String& eventName, Nod
 
     // set the initial parameter values
     auto keys = parameters.keys();
-    for (int i = 0; i < keys.size(); i++) {
+    for (int i = 0; i < keys.size(); ++i) {
         String k = keys[i];
         float v = parameters[keys[i]];
         ref->set_parameter_by_name(k.utf8().get_data(), v);
@@ -662,7 +662,7 @@ Array FmodServer::get_available_drivers() {
 
     ERROR_CHECK(coreSystem->getNumDrivers(&numDrivers));
 
-    for (int i = 0; i < numDrivers; i++) {
+    for (int i = 0; i < numDrivers; ++i) {
         char name[MAX_DRIVER_NAME_SIZE];
         int sampleRate;
         FMOD_SPEAKERMODE speakerMode;
@@ -811,7 +811,7 @@ Array FmodServer::get_global_parameter_desc_list() {
     descList[256];
     int count = 0;
     ERROR_CHECK(system->getParameterDescriptionList(descList, 256, &count));
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         auto pDesc = descList[i];
         Dictionary paramDesc;
         paramDesc["name"] = String(pDesc.name);

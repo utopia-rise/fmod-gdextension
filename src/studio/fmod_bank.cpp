@@ -76,7 +76,7 @@ void FmodBank::load_all_vca() {
     if (ERROR_CHECK(_wrapped->getVCAList(array, MAX_VCA_COUNT, &size))) {
         CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
         VCAs.clear();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             Ref<FmodVCA> ref = FmodVCA::create_ref(array[i]);
             VCAs.push_back(ref);
         }
@@ -89,7 +89,7 @@ void FmodBank::load_all_buses() {
     if (ERROR_CHECK(_wrapped->getBusList(array, MAX_BUS_COUNT, &size))) {
         CHECK_SIZE(MAX_BUS_COUNT, size, buses)
         buses.clear();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             Ref<FmodBus> ref = FmodBus::create_ref(array[i]);
             buses.push_back(ref);
         }
@@ -102,7 +102,7 @@ void FmodBank::load_all_event_descriptions() {
     if (ERROR_CHECK(_wrapped->getEventList(array, MAX_EVENT_DESCRIPTION_COUNT, &size))) {
         CHECK_SIZE(MAX_EVENT_DESCRIPTION_COUNT, size, Events)
         eventDescriptions.clear();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             Ref<FmodEventDescription> ref = FmodEventDescription::create_ref(array[i]);
             eventDescriptions.push_back(ref);
         }

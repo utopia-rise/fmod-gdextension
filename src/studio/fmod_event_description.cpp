@@ -49,7 +49,7 @@ Array FmodEventDescription::get_instance_list() {
     int count = 0;
     ERROR_CHECK(_wrapped->getInstanceList(instances, MAX_EVENT_INSTANCE_COUNT, &count));
     CHECK_SIZE(MAX_EVENT_INSTANCE_COUNT, count, events)
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; ++i) {
         godot::FmodEvent* event_instance;
         instances[i]->getUserData((void**) &event_instance);
         array.append(Ref(event_instance));
