@@ -68,8 +68,8 @@ extern "C" {
 // Initialization.
 
 GDExtensionBool GDE_EXPORT
-fmod_library_init(const GDExtensionInterface* p_interface, const GDExtensionClassLibraryPtr p_library, GDExtensionInitialization* r_initialization) {
-    GDExtensionBinding::InitObject init_obj(p_interface, p_library, r_initialization);
+summator_library_init(GDExtensionInterfaceGetProcAddress p_get_proc_address, GDExtensionClassLibraryPtr p_library, GDExtensionInitialization *r_initialization) {
+    GDExtensionBinding::InitObject init_obj(p_get_proc_address, p_library, r_initialization);
 
     init_obj.register_initializer(initialize_fmod_module);
     init_obj.register_terminator(uninitialize_fmod_module);
