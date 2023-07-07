@@ -42,9 +42,6 @@ extends Node
 var _utils = load('res://addons/gut/utils.gd').get_instance()
 var _compare = _utils.Comparator.new()
 
-# constant for signal when calling yield_for
-const YIELD = 'timeout'
-signal timeout
 
 # Need a reference to the instance that is running the tests.  This
 # is set by the gut class when it runs the tests.  This gets you
@@ -72,7 +69,7 @@ var _summary = {
 var _signal_watcher = load('res://addons/gut/signal_watcher.gd').new()
 
 # Convenience copy of _utils.DOUBLE_STRATEGY
-var DOUBLE_STRATEGY = _utils.DOUBLE_STRATEGY
+var DOUBLE_STRATEGY = GutUtils.DOUBLE_STRATEGY
 
 var _lgr = _utils.get_logger()
 var _strutils = _utils.Strutils.new()
@@ -98,8 +95,9 @@ func _fail(text):
 	_summary.failed += 1
 	_fail_pass_text.append('failed:  ' + text)
 	if(gut):
-		_lgr.failed(text)
+		_lgr.failed(gut.get_call_count_text() + text)
 		gut._fail(text)
+
 
 # ------------------------------------------------------------------------------
 # Pass an assertion.
@@ -245,13 +243,11 @@ func assert_eq(got, expected, text=""):
 		var disp = "[" + _str(got) + "] expected to equal [" + _str(expected) + "]:  " + text
 		var result = null
 
-		if(typeof(got) == TYPE_ARRAY):
-			result = _compare.shallow(got, expected)
-		else:
-			result = _compare.simple(got, expected)
+		result = _compare.simple(got, expected)
 
 		if(typeof(got) in [TYPE_ARRAY, TYPE_DICTIONARY]):
 			disp = str(result.summary, '  ', text)
+			_lgr.info('Array/Dictionary compared by value.  Use assert_same to compare references.  Use assert_eq_deep to see diff when failing.')
 
 		if(result.are_equal):
 			_pass(disp)
@@ -267,13 +263,11 @@ func assert_ne(got, not_expected, text=""):
 		var disp = "[" + _str(got) + "] expected to not equal [" + _str(not_expected) + "]:  " + text
 		var result = null
 
-		if(typeof(got) == TYPE_ARRAY):
-			result = _compare.shallow(got, not_expected)
-		else:
-			result = _compare.simple(got, not_expected)
+		result = _compare.simple(got, not_expected)
 
 		if(typeof(got) in [TYPE_ARRAY, TYPE_DICTIONARY]):
 			disp = str(result.summary, '  ', text)
+			_lgr.info('Array/Dictionary compared by value.  Use assert_not_same to compare references.  Use assert_ne_deep to see diff.')
 
 		if(result.are_equal):
 			_fail(disp)
@@ -681,6 +675,7 @@ func assert_has_signal(object, signal_name, text=""):
 	else:
 		_fail(disp)
 
+
 # ------------------------------------------------------------------------------
 # Returns the number of times a signal was emitted.  -1 returned if the object
 # is not being watched.
@@ -742,7 +737,7 @@ func assert_is(object, a_class, text=''):
 		if(!_utils.is_native_class(a_class) and !_utils.is_gdscript(a_class)):
 			_fail(str(bad_param_2, a_str))
 		else:
-			if(object is a_class):
+			if(is_instance_of(object, a_class)):
 				_pass(disp)
 			else:
 				_fail(disp)
@@ -1043,7 +1038,7 @@ func _warn_for_public_accessors(obj, property_name):
 func assert_property_with_backing_variable(obj, property_name, default_value, new_value, backed_by_name=null):
 	var setter_name = str('@', property_name, '_setter')
 	var getter_name = str('@', property_name, '_getter')
-	var backing_name = _utils.nvl(backed_by_name, str('_', property_name))
+	var backing_name = GutUtils.nvl(backed_by_name, str('_', property_name))
 	var pre_fail_count = get_fail_count()
 
 	var props = obj.get_property_list()
@@ -1110,60 +1105,54 @@ func pending(text=""):
 		_lgr.pending(text)
 		gut._pending(text)
 
-# ------------------------------------------------------------------------------
-# Returns the number of times a signal was emitted.  -1 returned if the object
-# is not being watched.
-# ------------------------------------------------------------------------------
-
 
 # ------------------------------------------------------------------------------
 # Yield for the time sent in.  The optional message will be printed when
-# Gut detects the yield.  When the time expires the YIELD signal will be
-# emitted.
+# Gut detects the yield.
 # ------------------------------------------------------------------------------
 func wait_seconds(time, msg=''):
-	return gut.set_yield_time(time, msg).timeout
+	var to_return = gut.set_wait_time(time, msg)
+	return to_return
 
 func yield_for(time, msg=''):
 	_lgr.deprecated('yield_for', 'wait_seconds')
-	return gut.set_yield_time(time, msg).timeout
+	var to_return = gut.set_wait_time(time, msg)
+	return to_return
 
 
 # ------------------------------------------------------------------------------
-# Yield to a signal or a maximum amount of time, whichever comes first.  When
-# the conditions are met the YIELD signal will be emitted.
+# Yield to a signal or a maximum amount of time, whichever comes first.
 # ------------------------------------------------------------------------------
 func wait_for_signal(sig, max_wait, msg=''):
 	watch_signals(sig.get_object())
-	gut.set_yield_signal_or_time(sig.get_object(), sig.get_name(), max_wait, msg)
-	return gut.timeout
+	var to_return = gut.set_wait_for_signal_or_time(sig.get_object(), sig.get_name(), max_wait, msg)
+	return to_return
 
 
 func yield_to(obj, signal_name, max_wait, msg=''):
 	_lgr.deprecated('yield_to', 'wait_for_signal')
 	watch_signals(obj)
-	gut.set_yield_signal_or_time(obj, signal_name, max_wait, msg)
-	return gut.timeout
+	var to_return = gut.set_wait_for_signal_or_time(obj, signal_name, max_wait, msg)
+	return to_return
 
 # ------------------------------------------------------------------------------
 # Yield for a number of frames.  The optional message will be printed. when
-# Gut detects a yield.  When the number of frames have elapsed (counted in gut's
-# _process function) the YIELD signal will be emitted.
+# Gut detects a yield.
 # ------------------------------------------------------------------------------
 func wait_frames(frames, msg=''):
 	if(frames <= 0):
 		var text = str('yeild_frames:  frames must be > 0, you passed  ', frames, '.  0 frames waited.')
 		_lgr.error(text)
-		frames = 0
-	gut.set_yield_frames(frames, msg)
+		frames = 1
 
-	return gut.timeout
+	var to_return = gut.set_wait_frames(frames, msg)
+	return to_return
 
 
 func yield_frames(frames, msg=''):
 	_lgr.deprecated("yield_frames", "wait_frames")
-	wait_frames(frames, msg)
-	return gut.timeout
+	var to_return = wait_frames(frames, msg)
+	return to_return
 
 func get_summary():
 	return _summary
@@ -1213,7 +1202,7 @@ func get_summary_text():
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 func _smart_double(thing, double_strat, partial):
-	var override_strat = _utils.nvl(double_strat, gut.get_doubler().get_strategy())
+	var override_strat = GutUtils.nvl(double_strat, gut.get_doubler().get_strategy())
 	var to_return = null
 
 	if(thing is PackedScene):
@@ -1301,7 +1290,7 @@ func double_scene(path, strategy=null):
 	_lgr.deprecated('test.double_scene has been removed.', 'double')
 	return null
 
-	# var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
+	# var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
 	# return gut.get_doubler().double_scene(path, override_strat)
 
 # ------------------------------------------------------------------------------
@@ -1311,7 +1300,7 @@ func double_script(path, strategy=null):
 	_lgr.deprecated('test.double_script has been removed.', 'double')
 	return null
 
-	# var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
+	# var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
 	# return gut.get_doubler().double(path, override_strat)
 
 # ------------------------------------------------------------------------------
@@ -1321,7 +1310,7 @@ func double_inner(path, subpath, strategy=null):
 	_lgr.deprecated('double_inner should not be used.  Use register_inner_classes and double instead.', 'double')
 	return null
 
-	var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
+	var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
 	return gut.get_doubler().double_inner(path, subpath, override_strat)
 
 
@@ -1335,11 +1324,8 @@ func ignore_method_when_doubling(thing, method_name):
 		return
 
 	var r = thing
-
 	if(thing is PackedScene):
-		var inst = thing.instantiate()
-		if(inst.get_script()):
-			r = inst.get_script()
+		r = _utils.get_scene_script_object(thing)
 
 	gut.get_doubler().add_ignored_method(r, method_name)
 
@@ -1428,9 +1414,12 @@ func use_parameters(params):
 		ph = _utils.ParameterHandler.new(params)
 		gut.parameter_handler = ph
 
-	var output = str('(call #', ph.get_call_count() + 1, ') with parameters:  ', ph.get_current_parameters())
-	_lgr.log(output)
-	_lgr.inc_indent()
+	# DO NOT use gut.gd's get_call_count_text here since it decrements the
+	# get_call_count value.  This method increments the call count in its
+	# return statement.
+	var output = str('- params[', ph.get_call_count(), ']','(', ph.get_current_parameters(), ')')
+	gut.p(output, gut.LOG_LEVEL_TEST_AND_FAILURES)
+
 	return ph.next_parameters()
 
 # ------------------------------------------------------------------------------
@@ -1477,7 +1466,7 @@ func add_child_autoqfree(node, legible_unique_name=false):
 func is_passing():
 	if(gut.get_current_test_object() != null and
 		!['before_all', 'after_all'].has(gut.get_current_test_object().name)):
-		return gut.get_current_test_object().passed and \
+		return gut.get_current_test_object().is_passing() and \
 			gut.get_current_test_object().assert_count > 0
 	else:
 		_lgr.error('No current test object found.  is_passing must be called inside a test.')
@@ -1489,7 +1478,8 @@ func is_passing():
 func is_failing():
 	if(gut.get_current_test_object() != null and
 		!['before_all', 'after_all'].has(gut.get_current_test_object().name)):
-		return !gut.get_current_test_object().passed
+
+		return gut.get_current_test_object().is_failing()
 	else:
 		_lgr.error('No current test object found.  is_failing must be called inside a test.')
 		return null
@@ -1518,14 +1508,13 @@ func compare_deep(v1, v2, max_differences=null):
 	return result
 
 # ------------------------------------------------------------------------------
-# Peforms a shallow compare on both values, a CompareResult instnace is returned.
-# The optional max_differences paramter sets the max_differences to be displayed.
+# REMOVED
 # ------------------------------------------------------------------------------
 func compare_shallow(v1, v2, max_differences=null):
-	var result = _compare.shallow(v1, v2)
-	if(max_differences != null):
-		result.max_differences = max_differences
-	return result
+	_fail('compare_shallow has been removed.  Use compare_deep or just compare using == instead.')
+	_lgr.error('compare_shallow has been removed.  Use compare_deep or just compare using == instead.')
+	return null
+
 
 # ------------------------------------------------------------------------------
 # Performs a deep compare and asserts the  values are equal
@@ -1548,25 +1537,34 @@ func assert_ne_deep(v1, v2):
 		_fail(result.get_short_summary())
 
 # ------------------------------------------------------------------------------
-# Performs a shallow compare and asserts the values are equal
+# REMOVED
 # ------------------------------------------------------------------------------
 func assert_eq_shallow(v1, v2):
-	var result = compare_shallow(v1, v2)
-	if(result.are_equal):
-		_pass(result.get_short_summary())
-	else:
-		_fail(result.summary)
+	_fail('assert_eq_shallow has been removed.  Use assert_eq/assert_same/assert_eq_deep')
 
 # ------------------------------------------------------------------------------
-# Performs a shallow compare and asserts the values are not equal
+# REMOVED
 # ------------------------------------------------------------------------------
 func assert_ne_shallow(v1, v2):
-	var result = compare_shallow(v1, v2)
-	if(!result.are_equal):
-		_pass(result.get_short_summary())
-	else:
-		_fail(result.get_short_summary())
+	_fail('assert_eq_shallow has been removed.  Use assert_eq/assert_same/assert_eq_deep')
 
+
+# ------------------------------------------------------------------------------
+# Assert wrapper for is_same
+# ------------------------------------------------------------------------------
+func assert_same(v1, v2, text=''):
+	var disp = "[" + _str(v1) + "] expected to be same as  [" + _str(v2) + "]:  " + text
+	if(is_same(v1, v2)):
+		_pass(disp)
+	else:
+		_fail(disp)
+
+func assert_not_same(v1, v2, text=''):
+	var disp = "[" + _str(v1) + "] expected to not be same as  [" + _str(v2) + "]:  " + text
+	if(is_same(v1, v2)):
+		_fail(disp)
+	else:
+		_pass(disp)
 
 # ------------------------------------------------------------------------------
 # Checks the passed in version string (x.x.x) against the engine version to see
@@ -1600,6 +1598,7 @@ func skip_if_godot_version_ne(expected):
 	if(should_skip):
 		_pass(str('Skipping ', _utils.godot_version(), ' is not ', expected))
 	return should_skip
+
 
 # ------------------------------------------------------------------------------
 # Registers all the inner classes in a script with the doubler.  This is required

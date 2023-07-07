@@ -27,6 +27,10 @@ FmodManager="*res://addons/fmod/FmodManager.gd"
 
 enabled=PackedStringArray("res://addons/fmod/plugin.cfg")
 
+[filesystem]
+
+import/blender/enabled=false
+
 [input]
 
 ui_accept={
