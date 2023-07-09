@@ -1,3 +1,5 @@
+class_name GutUtils
+extends Node
 # ##############################################################################
 #(G)odot (U)nit (T)est class
 #
@@ -31,13 +33,37 @@
 # This class is a PSUEDO SINGLETON.  You should not make instances of it but use
 # the get_instance static method.
 # ##############################################################################
-extends Node
+const GUT_METADATA = '__gutdbl'
 
+# Note, these cannot change since places are checking for TYPE_INT to determine
+# how to process parameters.
+enum DOUBLE_STRATEGY{
+	INCLUDE_NATIVE,
+	SCRIPT_ONLY,
+}
+
+
+enum DIFF {
+	DEEP,
+	SIMPLE
+}
+
+const TEST_STATUSES = {
+	NO_ASSERTS = 'no asserts',
+	SKIPPED = 'skipped',
+	NOT_RUN = 'not run',
+	PENDING = 'pending',
+	# These two got the "ed" b/c pass is a reserved word and I could not
+	# think of better words.
+	FAILED = 'fail',
+	PASSED = 'pass'
+}
 # ------------------------------------------------------------------------------
 # The instance name as a function since you can't have static variables.
 # ------------------------------------------------------------------------------
 static func INSTANCE_NAME():
 	return '__GutUtilsInstName__'
+
 
 # ------------------------------------------------------------------------------
 # Gets the root node without having to be in the tree and pushing out an error
@@ -50,6 +76,7 @@ static func get_root_node():
 	else:
 		push_error('No Main Loop Yet')
 		return null
+
 
 # ------------------------------------------------------------------------------
 # Get the ONE instance of utils
@@ -68,6 +95,62 @@ static func get_instance():
 		the_root.add_child(inst)
 	return inst
 
+
+# ------------------------------------------------------------------------------
+# Gets the value from an enum.  If passed an int it will return it if the enum
+# contains it.  If passed a string it will convert it to upper case and replace
+# spaces with underscores.  If the enum contains the key, it will return the
+# value for they key.  When keys or ints are not found, the default is returned.
+# ------------------------------------------------------------------------------
+static func get_enum_value(thing, e, default=null):
+	var to_return = default
+
+	if(typeof(thing) == TYPE_STRING):
+		var converted = thing.to_upper().replace(' ', '_')
+		if(e.keys().has(converted)):
+			to_return = e[converted]
+	else:
+		if(e.values().has(thing)):
+			to_return = thing
+
+	return to_return
+
+
+# ------------------------------------------------------------------------------
+# return if_null if value is null otherwise return value
+# ------------------------------------------------------------------------------
+static func nvl(value, if_null):
+	if(value == null):
+		return if_null
+	else:
+		return value
+
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+static func pretty_print(dict):
+	print(JSON.stringify(dict, ' '))
+
+
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+static func print_properties(props, thing, print_all_meta=false):
+	for i in range(props.size()):
+		var prop_name = props[i].name
+		var prop_value = thing.get(props[i].name)
+		var print_value = str(prop_value)
+		if(print_value.length() > 100):
+			print_value = print_value.substr(0, 97) + '...'
+		elif(print_value == ''):
+			print_value = 'EMPTY'
+
+		print(prop_name, ' = ', print_value)
+		if(print_all_meta):
+			print('  ', props[i])
+
+# ##############################################################################
+# Start Class
+# ##############################################################################
 var Logger = load('res://addons/gut/logger.gd') # everything should use get_logger
 var _lgr = null
 var json = JSON.new()
@@ -75,11 +158,13 @@ var json = JSON.new()
 var _test_mode = false
 
 var AutoFree = load('res://addons/gut/autofree.gd')
+var Awaiter = load('res://addons/gut/awaiter.gd')
 var Comparator = load('res://addons/gut/comparator.gd')
 var CompareResult = load('res://addons/gut/compare_result.gd')
 var DiffTool = load('res://addons/gut/diff_tool.gd')
 var Doubler = load('res://addons/gut/doubler.gd')
 var Gut = load('res://addons/gut/gut.gd')
+var GutConfig = load('res://addons/gut/gut_config.gd')
 var HookScript = load('res://addons/gut/hook_script.gd')
 var InnerClassRegistry = load('res://addons/gut/inner_class_registry.gd')
 var InputFactory = load("res://addons/gut/input_factory.gd")
@@ -101,16 +186,15 @@ var Summary = load('res://addons/gut/summary.gd')
 var Test = load('res://addons/gut/test.gd')
 var TestCollector = load('res://addons/gut/test_collector.gd')
 var ThingCounter = load('res://addons/gut/thing_counter.gd')
+var CollectedTest = load('res://addons/gut/collected_test.gd')
+var CollectedScript = load('res://addons/gut/collected_test.gd')
 
+var GutScene = load('res://addons/gut/GutScene.tscn')
 
 # Source of truth for the GUT version
-var version = '7.4.1'
+var version = '9.0.1'
 # The required Godot version as an array.
-var req_godot = [3, 2, 0]
-
-# Online fetch of the latest version available on github
-var latest_version = null
-var should_display_latest_version = false
+var req_godot = [4, 0, 0]
 
 # These methods all call super implicitly.  Stubbing them to call super causes
 # super to be called twice.
@@ -126,49 +210,6 @@ var non_super_methods = [
 	"_gui_input	",
 ]
 
-
-func _ready() -> void:
-	_http_request_latest_version()
-
-func _http_request_latest_version() -> void:
-	return
-	var http_request = HTTPRequest.new()
-	http_request.name = "http_request"
-	add_child(http_request)
-	http_request.connect("request_completed",Callable(self,"_on_http_request_latest_version_completed"))
-	# Perform a GET request. The URL below returns JSON as of writing.
-	var __error = http_request.request("https://api.github.com/repos/bitwes/Gut/releases/latest")
-
-func _on_http_request_latest_version_completed(result, response_code, headers, body):
-	if not result == HTTPRequest.RESULT_SUCCESS:
-		return
-
-	var test_json_conv = JSON.new()
-	test_json_conv.parse(body.get_string_from_utf8())
-	var response = test_json_conv.get_data()
-	# Will print the user agent string used by the HTTPRequest node (as recognized by httpbin.org).
-	if response:
-		if response.get("html_url"):
-			latest_version = Array(response.html_url.split("/")).pop_back().right(1)
-			if latest_version != version:
-				should_display_latest_version = true
-
-
-
-const GUT_METADATA = '__gutdbl'
-
-# Note, these cannot change since places are checking for TYPE_INT to determine
-# how to process parameters.
-enum DOUBLE_STRATEGY{
-	SCRIPT_ONLY,
-	INCLUDE_SUPER
-}
-
-enum DIFF {
-	DEEP,
-	SHALLOW,
-	SIMPLE
-}
 
 # ------------------------------------------------------------------------------
 # Blurb of text with GUT and Godot versions.
@@ -251,17 +292,6 @@ func get_logger():
 		return _lgr
 
 
-
-# ------------------------------------------------------------------------------
-# return if_null if value is null otherwise return value
-# ------------------------------------------------------------------------------
-func nvl(value, if_null):
-	if(value == null):
-		return if_null
-	else:
-		return value
-
-
 # ------------------------------------------------------------------------------
 # returns true if the object has been freed, false if not
 #
@@ -287,7 +317,7 @@ func is_not_freed(obj):
 func is_double(obj):
 	var to_return = false
 	if(typeof(obj) == TYPE_OBJECT and is_instance_valid(obj)):
-		to_return = obj.has_method('__gutbl_check_method__')
+		to_return = obj.has_method('__gutdbl_check_method__')
 	return to_return
 
 
@@ -430,10 +460,6 @@ func are_datatypes_same(got, expected):
 	return !(typeof(got) != typeof(expected) and got != null and expected != null)
 
 
-func pretty_print(dict):
-	print(json.stringify(dict, ' '))
-
-
 func get_script_text(obj):
 	return obj.get_script().get_source_code()
 
@@ -483,7 +509,7 @@ func pp(dict, indent=''):
 var _created_script_count = 0
 func create_script_from_source(source, override_path=null):
 	_created_script_count += 1
-	var r_path = str('workaround for godot issue #65263 (', _created_script_count, ')')
+	var r_path = ''#str('workaround for godot issue #65263 (', _created_script_count, ')')
 	if(override_path != null):
 		r_path = override_path
 
@@ -515,3 +541,7 @@ func get_scene_script_object(scene):
 		node_idx += 1
 
 	return to_return
+
+
+func get_display_size():
+	return get_viewport().get_visible_rect()
