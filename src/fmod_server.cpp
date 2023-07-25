@@ -554,7 +554,7 @@ Array FmodServer::get_system_dsp_buffer_size() {
     int numBuffers;
     Array a;
     ERROR_CHECK(coreSystem->getDSPBufferSize(&bufferLength, &numBuffers));
-    a.append(numBuffers);
+    a.append(bufferLength);
     a.append(numBuffers);
     return a;
 }

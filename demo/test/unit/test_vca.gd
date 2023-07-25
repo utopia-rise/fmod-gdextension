@@ -8,37 +8,38 @@ class TestVCA:
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-		Fmod.set_listener_number(1)
+		FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.set_listener_number(1)
 		get_tree().get_root().add_child(sprite)
-		Fmod.add_listener(0, sprite)
+		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		Fmod.remove_listener(0)
-		Fmod.unload_bank("res://assets/Banks/Master.strings.bank")
-		Fmod.unload_bank("res://assets/Banks/Master.bank")
-		Fmod.unload_bank("res://assets/Banks/Music.bank")
-		Fmod.unload_bank("res://assets/Banks/Vehicles.bank")
+		FmodServer.remove_listener(0)
+		FmodServer.unload_bank("res://assets/Banks/Master.strings.bank")
+		FmodServer.unload_bank("res://assets/Banks/Master.bank")
+		FmodServer.unload_bank("res://assets/Banks/Music.bank")
+		FmodServer.unload_bank("res://assets/Banks/Vehicles.bank")
 	
 	func test_assert_valid_paths():
-		assert_true(Fmod.check_VCA_path("vca:/Environment"), "vca:/Environment should be present")
-		assert_true(Fmod.check_VCA_path("vca:/Player"), "vca:/Player should be present")
-		assert_true(Fmod.check_VCA_path("vca:/Equipment"), "vca:/Equipment should be present")
+		assert_true(FmodServer.check_VCA_path("vca:/Environment"), "vca:/Environment should be present")
+		assert_true(FmodServer.check_VCA_path("vca:/Player"), "vca:/Player should be present")
+		assert_true(FmodServer.check_VCA_path("vca:/Equipment"), "vca:/Equipment should be present")
 	
 	func test_assert_invalid_path():
-		assert_false(Fmod.check_VCA_path("vca:/undefined"), "Invalid vca should not be present")
+		assert_false(FmodServer.check_VCA_path("vca:/undefined"), "Invalid vca should not be present")
 	
 	func test_assert_volume():
 		var desired_value: float = 1.0
-		assert_eq(Fmod.get_VCA_volume("vca:/Environment"), desired_value, "VCA volume should be " + str(desired_value))
+		var environment_vca = FmodServer.get_vca("vca:/Environment")
+		assert_eq(environment_vca.volume, desired_value, "VCA volume should be " + str(desired_value))
 		desired_value = 0.5
-		Fmod.set_VCA_volume("vca:/Environment", desired_value)
-		assert_eq(Fmod.get_VCA_volume("vca:/Environment"), desired_value, "VCA volume should be " + str(desired_value))
+		environment_vca.volume = desired_value
+		assert_eq(environment_vca.volume, desired_value, "VCA volume should be " + str(desired_value))
 		desired_value = 1.0
-		Fmod.set_VCA_volume("vca:/Environment", desired_value)
+		environment_vca.volume = desired_value

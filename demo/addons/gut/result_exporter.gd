@@ -7,38 +7,36 @@
 var _utils = load('res://addons/gut/utils.gd').get_instance()
 var json = JSON.new()
 
-func _export_tests(collected_script):
+func _export_tests(summary_script):
 	var to_return = {}
-	var tests = collected_script.tests
-	for test in tests:
-		if(test.get_status_text() != GutUtils.TEST_STATUSES.NOT_RUN):
-			to_return[test.name] = {
-				"status":test.get_status_text(),
-				"passing":test.pass_texts,
-				"failing":test.fail_texts,
-				"pending":test.pending_texts,
-				"orphans":test.orphans
-			}
+	var tests = summary_script.get_tests()
+	for key in tests.keys():
+		to_return[key] = {
+			"status":tests[key].get_status(),
+			"passing":tests[key].pass_texts,
+			"failing":tests[key].fail_texts,
+			"pending":tests[key].pending_texts,
+			"orphans":tests[key].orphans
+		}
 
 	return to_return
 
 # TODO
 #	errors
-func _export_scripts(collector):
-	if(collector == null):
+func _export_scripts(summary):
+	if(summary == null):
 		return {}
 
 	var scripts = {}
 
-	for s in collector.scripts:
-		var test_data = _export_tests(s)
-		scripts[s.get_full_name()] = {
+	for s in summary.get_scripts():
+		scripts[s.name] = {
 			'props':{
-				"tests":test_data.keys().size(),
+				"tests":s._tests.size(),
 				"pending":s.get_pending_count(),
 				"failures":s.get_fail_count(),
 			},
-			"tests":test_data
+			"tests":_export_tests(s)
 		}
 	return scripts
 
@@ -65,25 +63,26 @@ func _make_results_dict():
 #	time
 #	errors
 func get_results_dictionary(gut, include_scripts=true):
+	var summary = gut.get_summary()
 	var scripts = []
 
 	if(include_scripts):
-		scripts = _export_scripts(gut.get_test_collector())
+		scripts = _export_scripts(summary)
 
 	var result =  _make_results_dict()
+	if(summary != null):
+		var totals = summary.get_totals()
 
-	var totals = gut.get_summary().get_totals()
-
-	var props = result.test_scripts.props
-	props.pending = totals.pending
-	props.failures = totals.failing
-	props.passing = totals.passing_tests
-	props.tests = totals.tests
-	props.errors = gut.logger.get_errors().size()
-	props.warnings = gut.logger.get_warnings().size()
-	props.time =  gut.get_elapsed_time()
-	props.orphans = gut.get_orphan_counter().get_counter('total')
-	result.test_scripts.scripts = scripts
+		var props = result.test_scripts.props
+		props.pending = totals.pending
+		props.failures = totals.failing
+		props.passing = totals.passing_tests
+		props.tests = totals.tests
+		props.errors = gut.logger.get_errors().size()
+		props.warnings = gut.logger.get_warnings().size()
+		props.time =  gut.get_elapsed_time()
+		props.orphans = gut.get_orphan_counter().get_counter('total')
+		result.test_scripts.scripts = scripts
 
 	return result
 

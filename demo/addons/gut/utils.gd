@@ -1,5 +1,3 @@
-class_name GutUtils
-extends Node
 # ##############################################################################
 #(G)odot (U)nit (T)est class
 #
@@ -33,37 +31,13 @@ extends Node
 # This class is a PSUEDO SINGLETON.  You should not make instances of it but use
 # the get_instance static method.
 # ##############################################################################
-const GUT_METADATA = '__gutdbl'
+extends Node
 
-# Note, these cannot change since places are checking for TYPE_INT to determine
-# how to process parameters.
-enum DOUBLE_STRATEGY{
-	INCLUDE_NATIVE,
-	SCRIPT_ONLY,
-}
-
-
-enum DIFF {
-	DEEP,
-	SIMPLE
-}
-
-const TEST_STATUSES = {
-	NO_ASSERTS = 'no asserts',
-	SKIPPED = 'skipped',
-	NOT_RUN = 'not run',
-	PENDING = 'pending',
-	# These two got the "ed" b/c pass is a reserved word and I could not
-	# think of better words.
-	FAILED = 'fail',
-	PASSED = 'pass'
-}
 # ------------------------------------------------------------------------------
 # The instance name as a function since you can't have static variables.
 # ------------------------------------------------------------------------------
 static func INSTANCE_NAME():
 	return '__GutUtilsInstName__'
-
 
 # ------------------------------------------------------------------------------
 # Gets the root node without having to be in the tree and pushing out an error
@@ -76,7 +50,6 @@ static func get_root_node():
 	else:
 		push_error('No Main Loop Yet')
 		return null
-
 
 # ------------------------------------------------------------------------------
 # Get the ONE instance of utils
@@ -95,62 +68,6 @@ static func get_instance():
 		the_root.add_child(inst)
 	return inst
 
-
-# ------------------------------------------------------------------------------
-# Gets the value from an enum.  If passed an int it will return it if the enum
-# contains it.  If passed a string it will convert it to upper case and replace
-# spaces with underscores.  If the enum contains the key, it will return the
-# value for they key.  When keys or ints are not found, the default is returned.
-# ------------------------------------------------------------------------------
-static func get_enum_value(thing, e, default=null):
-	var to_return = default
-
-	if(typeof(thing) == TYPE_STRING):
-		var converted = thing.to_upper().replace(' ', '_')
-		if(e.keys().has(converted)):
-			to_return = e[converted]
-	else:
-		if(e.values().has(thing)):
-			to_return = thing
-
-	return to_return
-
-
-# ------------------------------------------------------------------------------
-# return if_null if value is null otherwise return value
-# ------------------------------------------------------------------------------
-static func nvl(value, if_null):
-	if(value == null):
-		return if_null
-	else:
-		return value
-
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-static func pretty_print(dict):
-	print(JSON.stringify(dict, ' '))
-
-
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-static func print_properties(props, thing, print_all_meta=false):
-	for i in range(props.size()):
-		var prop_name = props[i].name
-		var prop_value = thing.get(props[i].name)
-		var print_value = str(prop_value)
-		if(print_value.length() > 100):
-			print_value = print_value.substr(0, 97) + '...'
-		elif(print_value == ''):
-			print_value = 'EMPTY'
-
-		print(prop_name, ' = ', print_value)
-		if(print_all_meta):
-			print('  ', props[i])
-
-# ##############################################################################
-# Start Class
-# ##############################################################################
 var Logger = load('res://addons/gut/logger.gd') # everything should use get_logger
 var _lgr = null
 var json = JSON.new()
@@ -164,7 +81,6 @@ var CompareResult = load('res://addons/gut/compare_result.gd')
 var DiffTool = load('res://addons/gut/diff_tool.gd')
 var Doubler = load('res://addons/gut/doubler.gd')
 var Gut = load('res://addons/gut/gut.gd')
-var GutConfig = load('res://addons/gut/gut_config.gd')
 var HookScript = load('res://addons/gut/hook_script.gd')
 var InnerClassRegistry = load('res://addons/gut/inner_class_registry.gd')
 var InputFactory = load("res://addons/gut/input_factory.gd")
@@ -186,8 +102,6 @@ var Summary = load('res://addons/gut/summary.gd')
 var Test = load('res://addons/gut/test.gd')
 var TestCollector = load('res://addons/gut/test_collector.gd')
 var ThingCounter = load('res://addons/gut/thing_counter.gd')
-var CollectedTest = load('res://addons/gut/collected_test.gd')
-var CollectedScript = load('res://addons/gut/collected_test.gd')
 
 var GutScene = load('res://addons/gut/GutScene.tscn')
 
@@ -210,6 +124,19 @@ var non_super_methods = [
 	"_gui_input	",
 ]
 
+const GUT_METADATA = '__gutdbl'
+
+# Note, these cannot change since places are checking for TYPE_INT to determine
+# how to process parameters.
+enum DOUBLE_STRATEGY{
+	SCRIPT_ONLY,
+	INCLUDE_SUPER
+}
+
+enum DIFF {
+	DEEP,
+	SIMPLE
+}
 
 # ------------------------------------------------------------------------------
 # Blurb of text with GUT and Godot versions.
@@ -290,6 +217,17 @@ func get_logger():
 		if(_lgr == null):
 			_lgr = Logger.new()
 		return _lgr
+
+
+
+# ------------------------------------------------------------------------------
+# return if_null if value is null otherwise return value
+# ------------------------------------------------------------------------------
+func nvl(value, if_null):
+	if(value == null):
+		return if_null
+	else:
+		return value
 
 
 # ------------------------------------------------------------------------------
@@ -460,6 +398,10 @@ func are_datatypes_same(got, expected):
 	return !(typeof(got) != typeof(expected) and got != null and expected != null)
 
 
+func pretty_print(dict):
+	print(json.stringify(dict, ' '))
+
+
 func get_script_text(obj):
 	return obj.get_script().get_source_code()
 
@@ -541,7 +483,3 @@ func get_scene_script_object(scene):
 		node_idx += 1
 
 	return to_return
-
-
-func get_display_size():
-	return get_viewport().get_visible_rect()
