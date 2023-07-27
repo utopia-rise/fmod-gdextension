@@ -15,6 +15,7 @@ namespace godot {
         List<Ref<FmodEventDescription>> eventDescriptions;
         List<Ref<FmodBus>> buses;
         List<Ref<FmodVCA>> VCAs;
+        String _godot_res_path;
 
         void load_all_vca();
         void load_all_buses();
@@ -41,7 +42,15 @@ namespace godot {
         const List<Ref<FmodBus>>& getBuses() const;
         const List<Ref<FmodVCA>>& getVcAs() const;
 
-        protected:
+        const String& get_godot_res_path() const;
+
+        inline static Ref<FmodBank> create_ref(FMOD::Studio::Bank* wrapped, const String& p_godot_res_path) {
+            Ref<FmodBank> ref { create_ref(wrapped) };
+            ref->_godot_res_path = p_godot_res_path;
+            return ref;
+        }
+
+    protected:
             static void _bind_methods();
     };
 }// namespace godot

@@ -120,3 +120,7 @@ const List<Ref<FmodBus>>& FmodBank::getBuses() const {
 const List<Ref<FmodVCA>>& FmodBank::getVcAs() const {
     return VCAs;
 }
+
+const String& FmodBank::get_godot_res_path() const {
+    return _godot_res_path;
+}

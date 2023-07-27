@@ -113,8 +113,10 @@ namespace godot {
     }
 
     static bool is_dead(Object* node) {
-        if (!node) { return true; }
-        return !UtilityFunctions::is_instance_valid(Object::cast_to<Node>(node)->get_owner());
+        if (!node || !UtilityFunctions::is_instance_valid(node)) {
+            return true;
+        }
+        return !Object::cast_to<Node>(node)->is_inside_tree();
     }
 
     static bool is_fmod_valid(Object* node) {

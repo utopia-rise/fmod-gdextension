@@ -102,11 +102,14 @@ FmodServer::FmodServer() :
   cache(nullptr) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
+    callback_mutex.instantiate();
     performanceData = create_ref<FmodPerformanceData>();
     Callbacks::GodotFileRunner::get_singleton()->start();
 }
 
 FmodServer::~FmodServer() {
+    callbacks_to_process.clear();
+
     ERR_FAIL_COND(singleton != this);
     singleton = nullptr;
 }
@@ -147,6 +150,19 @@ void FmodServer::update() {
 
     // Check if bank are loaded, load buses, vca and event descriptions.
     cache->update_pending();
+
+    callback_mutex->lock();
+
+    for (const Callback& callback : callbacks_to_process) {
+        godot::Array args = godot::Array();
+        args.append(callback.fmod_callback_properties);
+        args.append(callback.type);
+        callback.callable.callv(args);
+    }
+
+    callbacks_to_process.clear();
+
+    callback_mutex->unlock();
 
     for (OneShot* oneShot : oneShots) {
         if (!oneShot->instance.is_valid()) {
@@ -823,4 +839,10 @@ Array FmodServer::get_global_parameter_desc_list() {
         a.append(paramDesc);
     }
     return a;
+}
+
+void FmodServer::add_callback(const Callback& callback) {
+    callback_mutex->lock();
+    callbacks_to_process.push_back(callback);
+    callback_mutex->unlock();
 }
