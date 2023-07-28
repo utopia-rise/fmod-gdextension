@@ -40,6 +40,12 @@ namespace godot {
         float weight = 1.0;
     };
 
+    struct Callback {
+        FMOD_STUDIO_EVENT_CALLBACK_TYPE type;
+        godot::Callable callable;
+        Dictionary fmod_callback_properties;
+    };
+
     class FmodServer : public Object {
         GDCLASS(FmodServer, Object);
 
@@ -58,13 +64,22 @@ namespace godot {
 
         int systemListenerNumber = 1;
         int actualListenerNumber = 0;
-        Listener listeners[FMOD_MAX_LISTENERS];
         bool listenerWarning = true;
+        Listener listeners[FMOD_MAX_LISTENERS];
 
         List<OneShot*> oneShots;
         List<Ref<FmodEvent>> runningEvents;
 
         Ref<FmodPerformanceData> performanceData;
+
+        // Direct call from fmod thread cannot be made as we cannot interact with scene tree from another thread (thread
+        // guard).
+        // call_deferred is not implemented in godot-cpp.
+        // Would have prefered a SpinLock but does not seems to exist in godot-cpp.
+        // TODO: Change when https://github.com/godotengine/godot-cpp/pull/1091 is merged.
+        Ref<Mutex> callback_mutex;
+        List<Callback> callbacks_to_process;
+
 
         void _set_listener_attributes();
 
@@ -148,6 +163,9 @@ namespace godot {
         Ref<FmodFile> load_file_as_music(const String& path);
         void unload_file(const String& path);
         Ref<FmodSound> create_sound_instance(const String& path);
+
+        //CALLBACKS
+        void add_callback(const Callback& callback);
 
         /* Helper methods */
         void play_one_shot(const String& eventName, Node* gameObj);

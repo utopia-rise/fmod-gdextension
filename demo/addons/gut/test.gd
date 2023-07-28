@@ -69,7 +69,7 @@ var _summary = {
 var _signal_watcher = load('res://addons/gut/signal_watcher.gd').new()
 
 # Convenience copy of _utils.DOUBLE_STRATEGY
-var DOUBLE_STRATEGY = GutUtils.DOUBLE_STRATEGY
+var DOUBLE_STRATEGY = _utils.DOUBLE_STRATEGY
 
 var _lgr = _utils.get_logger()
 var _strutils = _utils.Strutils.new()
@@ -95,9 +95,8 @@ func _fail(text):
 	_summary.failed += 1
 	_fail_pass_text.append('failed:  ' + text)
 	if(gut):
-		_lgr.failed(gut.get_call_count_text() + text)
+		_lgr.failed(text)
 		gut._fail(text)
-
 
 # ------------------------------------------------------------------------------
 # Pass an assertion.
@@ -1038,7 +1037,7 @@ func _warn_for_public_accessors(obj, property_name):
 func assert_property_with_backing_variable(obj, property_name, default_value, new_value, backed_by_name=null):
 	var setter_name = str('@', property_name, '_setter')
 	var getter_name = str('@', property_name, '_getter')
-	var backing_name = GutUtils.nvl(backed_by_name, str('_', property_name))
+	var backing_name = _utils.nvl(backed_by_name, str('_', property_name))
 	var pre_fail_count = get_fail_count()
 
 	var props = obj.get_property_list()
@@ -1202,7 +1201,7 @@ func get_summary_text():
 # ------------------------------------------------------------------------------
 # ------------------------------------------------------------------------------
 func _smart_double(thing, double_strat, partial):
-	var override_strat = GutUtils.nvl(double_strat, gut.get_doubler().get_strategy())
+	var override_strat = _utils.nvl(double_strat, gut.get_doubler().get_strategy())
 	var to_return = null
 
 	if(thing is PackedScene):
@@ -1290,7 +1289,7 @@ func double_scene(path, strategy=null):
 	_lgr.deprecated('test.double_scene has been removed.', 'double')
 	return null
 
-	# var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
+	# var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
 	# return gut.get_doubler().double_scene(path, override_strat)
 
 # ------------------------------------------------------------------------------
@@ -1300,7 +1299,7 @@ func double_script(path, strategy=null):
 	_lgr.deprecated('test.double_script has been removed.', 'double')
 	return null
 
-	# var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
+	# var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
 	# return gut.get_doubler().double(path, override_strat)
 
 # ------------------------------------------------------------------------------
@@ -1310,7 +1309,7 @@ func double_inner(path, subpath, strategy=null):
 	_lgr.deprecated('double_inner should not be used.  Use register_inner_classes and double instead.', 'double')
 	return null
 
-	var override_strat = GutUtils.nvl(strategy, gut.get_doubler().get_strategy())
+	var override_strat = _utils.nvl(strategy, gut.get_doubler().get_strategy())
 	return gut.get_doubler().double_inner(path, subpath, override_strat)
 
 
@@ -1414,12 +1413,9 @@ func use_parameters(params):
 		ph = _utils.ParameterHandler.new(params)
 		gut.parameter_handler = ph
 
-	# DO NOT use gut.gd's get_call_count_text here since it decrements the
-	# get_call_count value.  This method increments the call count in its
-	# return statement.
-	var output = str('- params[', ph.get_call_count(), ']','(', ph.get_current_parameters(), ')')
-	gut.p(output, gut.LOG_LEVEL_TEST_AND_FAILURES)
-
+	var output = str('(call #', ph.get_call_count() + 1, ') with parameters:  ', ph.get_current_parameters())
+	_lgr.log(output)
+	_lgr.inc_indent()
 	return ph.next_parameters()
 
 # ------------------------------------------------------------------------------
@@ -1466,7 +1462,7 @@ func add_child_autoqfree(node, legible_unique_name=false):
 func is_passing():
 	if(gut.get_current_test_object() != null and
 		!['before_all', 'after_all'].has(gut.get_current_test_object().name)):
-		return gut.get_current_test_object().is_passing() and \
+		return gut.get_current_test_object().passed and \
 			gut.get_current_test_object().assert_count > 0
 	else:
 		_lgr.error('No current test object found.  is_passing must be called inside a test.')
@@ -1478,8 +1474,7 @@ func is_passing():
 func is_failing():
 	if(gut.get_current_test_object() != null and
 		!['before_all', 'after_all'].has(gut.get_current_test_object().name)):
-
-		return gut.get_current_test_object().is_failing()
+		return !gut.get_current_test_object().passed
 	else:
 		_lgr.error('No current test object found.  is_failing must be called inside a test.')
 		return null

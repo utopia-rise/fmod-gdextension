@@ -20,7 +20,7 @@ void FmodCache::update_pending() {
         int loading_state = loadingBank->get_loading_state();
         if (loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
             _get_bank_data(loadingBank);
-            banks[loadingBank->get_path()] = loadingBank;
+            banks[loadingBank->get_godot_res_path()] = loadingBank;
             toDelete.push_back(loadingBank);
         } else if (loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             toDelete.push_back(loadingBank);
@@ -46,7 +46,7 @@ Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
     FMOD::Studio::Bank* bank = nullptr;
     ERROR_CHECK(system->loadBankFile(bankPath.utf8().get_data(), flag, &bank));
     if (!bank) { return {}; }
-    Ref<FmodBank> ref = FmodBank::create_ref(bank);
+    Ref<FmodBank> ref = FmodBank::create_ref(bank, bankPath);
     GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(bankPath))
     loadingBanks.push_back(ref);
     if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) { force_loading(); }
@@ -54,12 +54,14 @@ Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
 }
 
 void FmodCache::remove_bank(const String& bankPath) {
-    if (banks.has(bankPath)) {
-        Ref<FmodBank> bank = banks[bankPath];
-        _remove_bank_data(bank);
-        ERROR_CHECK(bank->get_wrapped()->unload());
-        banks.erase(bankPath);
+    if (!banks.has(bankPath)) {
+        GODOT_LOG(2, vformat("Cannot unload bank with path %s, not in cache.", bankPath));
+        return;
     }
+    Ref<FmodBank> bank = banks[bankPath];
+    _remove_bank_data(bank);
+    ERROR_CHECK(bank->get_wrapped()->unload());
+    banks.erase(bankPath);
 }
 
 bool FmodCache::has_bank(const String& bankPath) {

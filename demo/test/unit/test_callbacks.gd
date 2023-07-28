@@ -1,47 +1,48 @@
 extends "res://addons/gut/test.gd"
 
-class TestCallbacks:
-	extends "res://addons/gut/test.gd"
-	
-	var sprite: Sprite2D = Sprite2D.new()
-	
-	func before_all():
-		# load banks
-		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master.strings.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Master.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Music.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-		# warning-ignore:return_value_discarded
-		Fmod.load_bank("res://assets/Banks/Vehicles.bank", Fmod.FMOD_STUDIO_LOAD_BANK_NORMAL)
-		Fmod.set_listener_number(1)
-		get_tree().get_root().add_child(sprite)
-		Fmod.add_listener(0, sprite)
-	
-	func after_all():
-		Fmod.remove_listener(0)
-		Fmod.unload_bank("res://assets/Banks/Master.strings.bank")
-		Fmod.unload_bank("res://assets/Banks/Master.bank")
-		Fmod.unload_bank("res://assets/Banks/Music.bank")
-		Fmod.unload_bank("res://assets/Banks/Vehicles.bank")
-	
-	func test_assert_has_signals():
-		assert_has_signal(Fmod, "timeline_beat")
-		assert_has_signal(Fmod, "timeline_marker")
-		assert_has_signal(Fmod, "sound_played")
-		assert_has_signal(Fmod, "sound_stopped")
-	
-	func test_assert_set_callback():
-		watch_signals(Fmod)
-		var id: int = Fmod.create_event_instance("event:/Music/Level 02")
-		Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED)
-		Fmod.set_event_volume(id, 0)
-		Fmod.start_event(id)
-		await yield_for(2)
-		assert_signal_not_emitted(Fmod, "timeline_beat", "Fmod should not have emitted timeline_beat signal")
-		Fmod.set_callback(id, Fmod.FMOD_STUDIO_EVENT_CALLBACK_ALL)
-		await yield_to(Fmod, "timeline_beat", 3)
-		assert_signal_emitted(Fmod, "timeline_beat", "Fmod should have emitted timeline_beat signal")
-		Fmod.stop_event(id, Fmod.FMOD_STUDIO_STOP_IMMEDIATE)
-		Fmod.release_event(id)
+var sprite: Sprite2D = Sprite2D.new()
+
+func before_all():
+	# load banks
+	# warning-ignore:return_value_discarded
+	FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	# warning-ignore:return_value_discarded
+	FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	# warning-ignore:return_value_discarded
+	FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	# warning-ignore:return_value_discarded
+	FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	FmodServer.set_listener_number(1)
+	get_tree().get_root().add_child(sprite)
+	FmodServer.add_listener(0, sprite)
+
+func after_all():
+	FmodServer.remove_listener(0)
+	FmodServer.unload_bank("res://assets/Banks/Master.strings.bank")
+	FmodServer.unload_bank("res://assets/Banks/Master.bank")
+	FmodServer.unload_bank("res://assets/Banks/Music.bank")
+	FmodServer.unload_bank("res://assets/Banks/Vehicles.bank")
+
+func test_assert_has_signals():
+	var emitter: FmodEventEmitter2D = FmodEventEmitter2D.new()
+	assert_has_signal(emitter, "timeline_beat")
+	assert_has_signal(emitter, "timeline_marker")
+	assert_has_signal(emitter, "sound_played")
+	assert_has_signal(emitter, "sound_stopped")
+	emitter.free()
+
+var callback_called = false
+
+func on_callback(_dict: Dictionary, type: int):
+	callback_called = true
+
+func test_assert_set_callback():
+	watch_signals(FmodServer)
+	var fmod_event: FmodEvent = FmodServer.create_event_instance("event:/Music/Level 02")
+	fmod_event.volume = 0
+	fmod_event.start()
+	fmod_event.set_callback(on_callback, FmodServer.FMOD_STUDIO_EVENT_CALLBACK_ALL)
+	await wait_seconds(2)
+	assert_true(callback_called)
+	fmod_event.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmod_event.release()

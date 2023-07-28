@@ -1,6 +1,6 @@
 #include "fmod_studio.hpp"
-#include "helpers/common.h"
 #include "studio/fmod_event.h"
+#include "fmod_server.h"
 
 #include <callback/event_callbacks.h>
 
@@ -35,12 +35,15 @@ namespace Callbacks {
                 godot::String name(n);
                 dictionary["name"] = name;
             }
-            godot::Callable callback = event_instance->get_callback();
+            const godot::Callable& callback {event_instance->get_callback()};
             if (!callback.is_null() && callback.is_valid()) {
-                godot::Array args = godot::Array();
-                args.append(dictionary);
-                args.append(type);
-                callback.callv(args);
+                godot::FmodServer::get_singleton()->add_callback(
+                        {
+                            type,
+                            callback,
+                            dictionary
+                        }
+                );
             }
         }
 
