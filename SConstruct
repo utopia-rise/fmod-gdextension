@@ -118,6 +118,8 @@ elif env["platform"] == "android":
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
     target_path, env["platform"], target_name, env["platform"], env["target"]
+) if env["platform"] != "android" else "{}{}/{}/{}.{}.{}".format(
+    target_path, env["platform"], env["arch"], target_name, env["platform"], env["target"]
 )
 
 if env["platform"] == "macos":
