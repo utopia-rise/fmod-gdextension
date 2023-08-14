@@ -17,6 +17,8 @@ else()
     message(FATAL_ERROR "Not implemented support for ${CMAKE_SYSTEM_NAME}")
 endif()
 
+add_compile_definitions(TOOLS_ENABLED)
+
 # Change the output directory to the bin directory
 set(BUILD_PATH ${CMAKE_SOURCE_DIR}/bin/${TARGET_PATH})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${BUILD_PATH}")
@@ -96,8 +98,8 @@ else()
 endif()
 
 # Get Sources
-file(GLOB_RECURSE SOURCES src/*.c**)
-file(GLOB_RECURSE HEADERS src/*.h**)
+file(GLOB_RECURSE SOURCES src/*.c** src/**/*.c**)
+file(GLOB_RECURSE HEADERS src/*.h** src/**/*.h**)
 
 # Define our godot-cpp library
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})

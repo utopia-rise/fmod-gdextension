@@ -127,14 +127,14 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
 
     if (ERROR_CHECK(system->initialize(numOfChannels, studioFlag, flag, nullptr))) {
         isInitialized = true;
-        GODOT_LOG(0, "FMOD Sound System: Successfully initialized")
-        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) { GODOT_LOG(0, "FMOD Sound System: Live update enabled!") }
+        GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
+        if (studioFlag == FMOD_STUDIO_INIT_LIVEUPDATE) { GODOT_LOG_INFO("FMOD Sound System: Live update enabled!") }
     }
 
     if (ERROR_CHECK(
           coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
         )) {
-        GODOT_LOG(0, "Custom File System enabled.")
+        GODOT_LOG_INFO("Custom File System enabled.")
     }
     cache = new FmodCache(system);
 }
@@ -142,7 +142,7 @@ void FmodServer::init(int numOfChannels, const unsigned int studioFlag, const un
 void FmodServer::update() {
     if (!isInitialized) {
         if (!isNotInitializedPrinted) {
-            GODOT_LOG(2, "FMOD Sound System: Fmod should be initialized before calling update")
+            GODOT_LOG_ERROR("FMOD Sound System: Fmod should be initialized before calling update")
             isNotInitializedPrinted = true;
         }
         return;
@@ -196,7 +196,7 @@ void FmodServer::update() {
 void FmodServer::_set_listener_attributes() {
     if (actualListenerNumber == 0) {
         if (listenerWarning) {
-            GODOT_LOG(1, "FMOD Sound System: No listeners are set!")
+            GODOT_LOG_WARNING("FMOD Sound System: No listeners are set!")
             listenerWarning = false;
         }
         return;
@@ -237,14 +237,14 @@ void FmodServer::shutdown() {
     coreSystem = nullptr;
     delete cache;
     cache = nullptr;
-    GODOT_LOG(0, "FMOD Sound System: System released")
+    GODOT_LOG_INFO("FMOD Sound System: System released")
 }
 
 void FmodServer::set_system_listener_number(int p_listenerNumber) {
     if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
         if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) { systemListenerNumber = p_listenerNumber; }
     } else {
-        GODOT_LOG(2, "Number of listeners must be set between 1 and 8")
+        GODOT_LOG_ERROR("Number of listeners must be set between 1 and 8")
     }
 }
 
@@ -261,7 +261,7 @@ void FmodServer::add_listener(int index, Object* gameObj) {
         actualListenerNumber = count;
         if (actualListenerNumber > 0) listenerWarning = true;
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -277,7 +277,7 @@ void FmodServer::remove_listener(int index) {
         actualListenerNumber = count;
         if (actualListenerNumber > 0) listenerWarning = true;
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -292,7 +292,7 @@ float FmodServer::get_system_listener_weight(const int index) {
         listeners[index].weight = weight;
         return weight;
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return 0;
     }
 }
@@ -302,7 +302,7 @@ void FmodServer::set_system_listener_weight(const int index, float weight) {
         listeners[index].weight = weight;
         ERROR_CHECK(system->setListenerWeight(index, weight));
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -313,7 +313,7 @@ Transform3D FmodServer::get_listener_transform3d(int index) {
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         transform = get_transform3d_from_3d_attributes(attr, distanceScale);
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return transform;
 }
@@ -325,7 +325,7 @@ Transform2D FmodServer::get_listener_transform2d(int index) {
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         transform = get_transform2d_from_3d_attributes(attr, distanceScale);
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return transform;
 }
@@ -337,7 +337,7 @@ Vector3 FmodServer::get_listener_3d_velocity(int index) {
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         velocity = get_velocity3d_from_3d_attributes(attr, distanceScale);
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return velocity;
 }
@@ -349,7 +349,7 @@ Vector2 FmodServer::get_listener_2d_velocity(int index) {
         ERROR_CHECK(system->getListenerAttributes(index, &attr));
         velocity = get_velocity2d_from_3d_attributes(attr, distanceScale);
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return velocity;
 }
@@ -359,7 +359,7 @@ void FmodServer::set_listener_transform3d(int index, const Transform3D& transfor
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -368,7 +368,7 @@ void FmodServer::set_listener_transform2d(int index, const Transform2D& transfor
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(transform, distanceScale);
         ERROR_CHECK(system->setListenerAttributes(index, &attr));
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -376,7 +376,7 @@ void FmodServer::set_listener_lock(int index, bool isLocked) {
     if (index >= 0 && index < systemListenerNumber) {
         listeners[index].listenerLock = isLocked;
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
@@ -384,18 +384,18 @@ bool FmodServer::get_listener_lock(int index) {
     if (index >= 0 && index < systemListenerNumber) {
         return listeners[index].listenerLock;
     } else {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return false;
     }
 }
 
 Object* FmodServer::get_object_attached_to_listener(int index) {
     if (index < 0 || index >= systemListenerNumber) {
-        GODOT_LOG(2, "index of listeners must be set between 0 and the number of listeners set")
+        GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
     } else {
         Object* node = listeners[index].gameObj;
-        if (!node) { GODOT_LOG(1, "No node was set on listener") }
+        if (!node) { GODOT_LOG_WARNING("No node was set on listener") }
         return node;
     }
 }
@@ -487,7 +487,7 @@ Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
 Ref<FmodEvent> FmodServer::_create_instance(const String& eventName, bool isOneShot, Node* gameObject) {
     bool found = cache->has_event_path(eventName);
     if (!found) {
-        GODOT_LOG(1, "Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
+        GODOT_LOG_WARNING("Event " + eventName + " can't be found. Check if the path is correct or the bank properly loaded.")
     }
 
     Ref<FmodEventDescription> desc = cache->get_event(eventName);
@@ -559,9 +559,9 @@ void FmodServer::play_one_shot_attached_with_params(const String& eventName, Nod
 
 void FmodServer::set_system_dsp_buffer_size(unsigned int bufferLength, int numBuffers) {
     if (bufferLength > 0 && numBuffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(bufferLength, numBuffers))) {
-        GODOT_LOG(0, "FMOD Sound System: Successfully set DSP buffer size")
+        GODOT_LOG_INFO("FMOD Sound System: Successfully set DSP buffer size")
     } else {
-        GODOT_LOG(2, "FMOD Sound System: Failed to set DSP buffer size :|")
+        GODOT_LOG_ERROR("FMOD Sound System: Failed to set DSP buffer size :|")
     }
 }
 
@@ -617,7 +617,7 @@ void FmodServer::unmute_all_events() {
 
 Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
     if (cache->has_file(path)) {
-        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS SOUND" + String(path))
+        GODOT_LOG_WARNING("FMOD Sound System: FILE ALREADY LOADED AS SOUND" + String(path))
         return cache->get_file(path);
     }
     return cache->add_file(path, FMOD_CREATESAMPLE);
@@ -625,7 +625,7 @@ Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
 
 Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
     if (cache->has_file(path)) {
-        GODOT_LOG(1, "FMOD Sound System: FILE ALREADY LOADED AS MUSIC" + String(path))
+        GODOT_LOG_WARNING("FMOD Sound System: FILE ALREADY LOADED AS MUSIC" + String(path))
         return cache->get_file(path);
     }
     return cache->add_file(path, (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL));
@@ -633,16 +633,16 @@ Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
 
 void FmodServer::unload_file(const String& path) {
     if (!cache->has_file(path)) {
-        GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
+        GODOT_LOG_WARNING("File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
         return;
     }
     cache->remove_file(path);
-    GODOT_LOG(0, "FMOD Sound System: UNLOADING FILE" + String(path))
+    GODOT_LOG_INFO("FMOD Sound System: UNLOADING FILE" + String(path))
 }
 
 Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     if (!cache->has_file(path)) {
-        GODOT_LOG(1, "File " + path + " can't be found. Check if it was properly loaded.")
+        GODOT_LOG_WARNING("File " + path + " can't be found. Check if it was properly loaded.")
         return {};
     }
 
@@ -658,12 +658,12 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
 
 void FmodServer::set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale) {
     if (distanceFactor <= 0) {
-        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
+        GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
     } else if (ERROR_CHECK(coreSystem->set3DSettings(dopplerScale, distanceFactor, rollOffScale))) {
         distanceScale = distanceFactor;
-        GODOT_LOG(0, "FMOD Sound System: Successfully set global 3D settings")
+        GODOT_LOG_INFO("FMOD Sound System: Successfully set global 3D settings")
     } else {
-        GODOT_LOG(2, "FMOD Sound System: Failed to set 3D settings")
+        GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings")
     }
 }
 
@@ -754,7 +754,7 @@ float FmodServer::get_global_parameter_by_name(const String& parameterName) {
 
 void FmodServer::set_global_parameter_by_id(const Array& idPair, const float value) {
     if (idPair.size() != 2) {
-        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        GODOT_LOG_ERROR("FMOD Sound System: Invalid parameter ID")
         return;
     }
     FMOD_STUDIO_PARAMETER_ID id;
@@ -765,7 +765,7 @@ void FmodServer::set_global_parameter_by_id(const Array& idPair, const float val
 
 float FmodServer::get_global_parameter_by_id(const Array& idPair) {
     if (idPair.size() != 2) {
-        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        GODOT_LOG_ERROR("FMOD Sound System: Invalid parameter ID")
         return -1.f;
     }
     FMOD_STUDIO_PARAMETER_ID id;
@@ -794,7 +794,7 @@ Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameter
 
 Dictionary FmodServer::get_global_parameter_desc_by_id(const Array& idPair) {
     if (idPair.size() != 2) {
-        GODOT_LOG(2, "FMOD Sound System: Invalid parameter ID")
+        GODOT_LOG_ERROR("FMOD Sound System: Invalid parameter ID")
         return {};
     }
     Dictionary paramDesc;

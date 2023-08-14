@@ -20,24 +20,15 @@
 #define MAX_EVENT_DESCRIPTION_COUNT 256
 #define MAX_EVENT_INSTANCE_COUNT 128
 
-#define GODOT_LOG(level, message)                                                                \
-    switch (level) {                                                                             \
-        case 0:                                                                                  \
-            UtilityFunctions::print(message);                                                    \
-            break;                                                                               \
-        case 1:                                                                                  \
-            UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__); \
-            break;                                                                               \
-        case 2:                                                                                  \
-            UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);   \
-            break;                                                                               \
-    }
+#define GODOT_LOG_INFO(message) UtilityFunctions::print(message);
+#define GODOT_LOG_WARNING(message) UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
+#define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 
 #define CHECK_SIZE(maxSize, actualSize, type)                                                                          \
     if ((actualSize) > (maxSize)) {                                                                                    \
         String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " \
                        + String::num(actualSize) + " entries";                                                         \
-        GODOT_LOG(2, message)                                                                                          \
+        GODOT_LOG_ERROR(message)                                                                                          \
         (actualSize) = maxSize;                                                                                        \
     }
 
@@ -122,10 +113,10 @@ namespace godot {
     static bool is_fmod_valid(Object* node) {
         if (node) {
             bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
-            if (!ret) { GODOT_LOG(2, "Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
+            if (!ret) { GODOT_LOG_ERROR("Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
             return ret;
         }
-        GODOT_LOG(2, "Object is null")
+        GODOT_LOG_ERROR("Object is null")
         return false;
     }
 

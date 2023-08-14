@@ -12,6 +12,10 @@
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 
+#ifdef TOOLS_ENABLED
+#include <tools//fmod_editor_export_plugin.h>
+#endif
+
 #include <register_types.h>
 
 #include <classes/engine.hpp>
@@ -53,6 +57,9 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         fmod_singleton = memnew(FmodServer);
         Engine::get_singleton()->register_singleton("FmodServer", FmodServer::get_singleton());
     }
+#ifdef TOOLS_ENABLED
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) { ClassDB::register_class<FmodEditorExportPlugin>(); }
+#endif
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
