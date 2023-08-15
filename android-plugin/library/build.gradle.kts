@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.incremental.createDirectory
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -27,9 +29,13 @@ android {
 }
 
 val copyAarFiles = tasks.create("copyAarFiles") {
-    val aarFiles = project
+    val aarOutputDir = project
         .buildDir
         .resolve("outputs/aar/")
+
+    aarOutputDir.createDirectory()
+    
+    val aarFiles = aarOutputDir
         .listFiles()
         .filter { it.extension == "aar" }
     for (aarFile in aarFiles) {

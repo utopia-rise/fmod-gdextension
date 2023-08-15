@@ -13,4 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
-library/libraries/fmod.jar
+library/libraries/

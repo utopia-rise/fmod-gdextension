@@ -13,7 +13,7 @@ env:
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
   TARGET: editor
-  GODOT_VERSION: 4.0
+  GODOT_VERSION: 4.1.1
   FMOD_VERSION: 20212
 
 jobs:
@@ -115,14 +115,44 @@ jobs:
           [[ ${{matrix.artifact-name}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
           cd ../../
 
+      - name: Get number of CPU cores
+        id: cpu-cores
+        uses: SimenB/github-actions-cpu-cores@v1
+
       - name: Compilation
         run: |
           cd ../${{env.PROJECT_FOLDER}}
-          scons platform=${{ matrix.artifact-name }} generate_bindings=yes target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j1 ${{ matrix.flags }}
+          scons platform=${{ matrix.artifact-name }} generate_bindings=yes target=${{ env.TARGET }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j${{ steps.cpu-cores.outputs.count }} ${{ matrix.flags }}
+
+      - name: Set up JDK 17
+        if: matrix.artifact-name == 'android'
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: Copy android fmod jar
+        if: matrix.artifact-name == 'android'
+        run: |
+          mkdir -p android-plugin/library/libraries/android/aar/
+          cp ../libs/fmod/android/core/lib/fmod.jar android-plugin/library/libraries/fmod.jar
+
+      - name: Download godot android aar
+        if: matrix.artifact-name == 'android'
+        run : |
+          cd android-plugin/library/libraries/
+          wget https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/godot-lib.${{ env.GODOT_VERSION }}.stable.template_release.aar
+
+      - name: Build android plugin
+        if: matrix.artifact-name == 'android'
+        uses: eskatos/gradle-command-action@v1
+        with:
+          wrapper-directory: android-plugin/
+          build-root-directory: android-plugin/
+          arguments: :library:build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.artifact-name }}
-          path: ${{ env.TARGET_PATH }}${{ matrix.artifact-name }}/*.${{ matrix.artifact-extension }}
+          path: ${{ env.TARGET_PATH }}${{ matrix.artifact-name }}/**/*.${{ matrix.artifact-extension }}
           if-no-files-found: error
