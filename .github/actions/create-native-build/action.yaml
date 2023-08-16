@@ -1,0 +1,100 @@
+name: Create Fmod native build
+description: Creates fmod native build for a specific platform
+env:
+  TARGET_PATH: demo/addons/fmod/libs/
+  TARGET_NAME: libGodotFmod
+  GODOT_VERSION: 4.1.1
+  FMOD_VERSION: 20212
+inputs:
+  platform:
+    description: The platform to build for.
+  target:
+    description: The target to build.
+  artifact-extension:
+    description: Extension of the compiled artifact
+  additional-python-packages:
+    description: Additional python package to install.
+  flags:
+    description: Additional compilation scons flags.
+  fmod-executable-suffix:
+    description: The suffix of fmod executable to install fmod libraries.
+  fmod-user:
+    description: The FMOD user used to download fmod binaries
+  fmod-password:
+    description: The password for fmod account used to download fmod binaries.
+  shell:
+    description: The shell used by the runner.
+runs:
+  using: composite
+  steps:
+    # Use python 3.x release (works cross platform; best to keep self contained in it's own step)
+    - name: Set up Python 3.x
+      uses: actions/setup-python@v4
+      with:
+        # Semantic version range syntax or exact version of a Python version
+        python-version: '3.x'
+        # Optional - x64 or x86 architecture, defaults to x64
+        architecture: 'x64'
+
+    # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+    - name: Configuring Python packages
+      shell: ${{ inputs.shell }}
+      run: |
+        python -c "import sys; print(sys.version)"
+        python -m pip install scons requests ${{ inputs.additional-python-packages }}
+        python --version
+        scons --version
+
+    - name: Installing FMOD on Windows
+      shell: ${{ inputs.shell }}
+      if: runner.os == 'Windows'
+      run: |
+        cd ..
+        New-Item -ItemType directory -Path libs; cd libs
+        New-Item -ItemType directory -Path fmod; cd fmod
+        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        7z x fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        mv api/ windows
+        cd ../../
+
+    - name: Installing FMOD on Linux & Android
+      if: runner.os == 'Linux'
+      shell: ${{ inputs.shell }}
+      run: |
+        cd ..
+        mkdir libs && cd libs
+        mkdir fmod && cd fmod
+        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        tar -xvf fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        mv fmodstudioapi${{env.FMOD_VERSION}}${{inputs.platform}}/api ${{inputs.platform}}
+        cd ../../
+
+    - name: Installing FMOD on MacOS & iOS
+      if: runner.os == 'MacOS'
+      shell: ${{ inputs.shell }}
+      run: |
+        cd ..
+        mkdir libs && cd libs
+        mkdir fmod && cd fmod
+        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        hdiutil attach fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        [[ ${{inputs.platform}} = "macos" ]] && cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
+        [[ ${{inputs.platform}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
+        cd ../../
+
+    - name: Get number of CPU cores
+      id: cpu-cores
+      uses: SimenB/github-actions-cpu-cores@v1
+
+    - name: Compilation
+      shell: ${{ inputs.shell }}
+      run: |
+        cd ../fmod-gdnative
+        scons platform=${{ inputs.platform }} generate_bindings=yes target=${{ inputs.target }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j${{ steps.cpu-cores.outputs.count }} ${{ inputs.flags }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.platform }}
+        path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.${{ inputs.artifact-extension }}
+        if-no-files-found: error
