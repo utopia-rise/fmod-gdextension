@@ -12,7 +12,6 @@ env:
   PROJECT_FOLDER: fmod-gdnative
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  TARGET: editor
   GODOT_VERSION: 4.1.1
   FMOD_VERSION: 20212
 
@@ -24,39 +23,121 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Windows Compilation
+          - name: Windows Editor Compilation
             os: "windows-2022"
             platform: windows
+            target: editor
             artifact-extension: dll
             additional-python-packages: pywin32
             fmod-executable-suffix: win-installer.exe
             shell: pwsh
 
-          - name: Ubuntu Compilation
+          - name: Windows Debug Compilation
+            os: "windows-2022"
+            platform: windows
+            target: template_debug
+            artifact-extension: dll
+            additional-python-packages: pywin32
+            fmod-executable-suffix: win-installer.exe
+            shell: pwsh
+
+          - name: Windows Release Compilation
+            os: "windows-2022"
+            platform: windows
+            target: template_release
+            artifact-extension: dll
+            additional-python-packages: pywin32
+            fmod-executable-suffix: win-installer.exe
+            shell: pwsh
+
+          - name: Ubuntu Editor Compilation
             os: "ubuntu-20.04"
             platform: linux
+            target: editor
             artifact-extension: so
             fmod-executable-suffix: linux.tar.gz
             shell: bash
 
-          - name: MacOS Compilation
+          - name: Ubuntu Debug Compilation
+            os: "ubuntu-20.04"
+            platform: linux
+            target: template_debug
+            artifact-extension: so
+            fmod-executable-suffix: linux.tar.gz
+            shell: bash
+
+          - name: Ubuntu Release Compilation
+            os: "ubuntu-20.04"
+            platform: linux
+            target: template_release
+            artifact-extension: so
+            fmod-executable-suffix: linux.tar.gz
+            shell: bash
+
+          - name: MacOS Editor Compilation
             os: "macos-11"
             platform: macos
+            target: editor
             artifact-extension: framework
             fmod-executable-suffix: osx.dmg
             shell: bash
 
-          - name: Android Compilation
+          - name: MacOS Debug Compilation
+            os: "macos-11"
+            platform: macos
+            target: template_debug
+            artifact-extension: framework
+            fmod-executable-suffix: osx.dmg
+            shell: bash
+
+          - name: MacOS Release Compilation
+            os: "macos-11"
+            platform: macos
+            target: template_release
+            artifact-extension: framework
+            fmod-executable-suffix: osx.dmg
+            shell: bash
+
+          - name: Android Editor Compilation
             os: "ubuntu-20.04"
             platform: android
+            target: editor
             artifact-extension: so
             fmod-executable-suffix: android.tar.gz
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
             shell: bash
 
-          - name: iOS Compilation
+          - name: Android Debug Compilation
+            os: "ubuntu-20.04"
+            platform: android
+            target: template_debug
+            artifact-extension: so
+            fmod-executable-suffix: android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            shell: bash
+
+          - name: Android Release Compilation
+            os: "ubuntu-20.04"
+            platform: android
+            target: template_release
+            artifact-extension: so
+            fmod-executable-suffix: android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            shell: bash
+
+          - name: iOS Debug Compilation
             os: "macos-11"
             platform: ios
+            target: template_debug
+            artifact-extension: dylib
+            fmod-executable-suffix: ios.dmg
+            flags: arch=arm64
+            shell: bash
+
+          - name: iOS Release Compilation
+            os: "macos-11"
+            platform: ios
+            target: template_release
             artifact-extension: dylib
             fmod-executable-suffix: ios.dmg
             flags: arch=arm64
@@ -73,7 +154,7 @@ jobs:
         uses: ./.github/actions/create-native-build
         with:
           platform: ${{ matrix.platform }}
-          target: ${{ env.TARGET }}
+          target: ${{ matrix.target }}
           artifact-extension: ${{ matrix.artifact-extension }}
           additional-python-packages: ${{ matrix.additional-python-packages }}
           flags: ${{ matrix.flags }}
@@ -81,27 +162,30 @@ jobs:
           fmod-user: ${{ secrets.FMODUSER }}
           fmod-password: ${{ secrets.FMODPASS }}
           shell: ${{ matrix.shell }}
-
+  package-addon:
+    needs: [ build ]
+    strategy:
+      matrix:
+        include:
+          - os: "ubuntu-20.04"
+    runs-on: ${{ matrix.os }}
+    steps:
       - name: Set up JDK 17
-        if: matrix.platform == 'android'
         uses: actions/setup-java@v1
         with:
           java-version: 17
 
       - name: Copy android fmod jar
-        if: matrix.platform == 'android'
         run: |
           mkdir -p android-plugin/library/libraries/android/aar/
           cp ../libs/fmod/android/core/lib/fmod.jar android-plugin/library/libraries/fmod.jar
 
       - name: Download godot android aar
-        if: matrix.platform == 'android'
-        run : |
+        run: |
           cd android-plugin/library/libraries/
           wget https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/godot-lib.${{ env.GODOT_VERSION }}.stable.template_release.aar
 
       - name: Build android plugin
-        if: matrix.platform == 'android'
         uses: eskatos/gradle-command-action@v1
         with:
           wrapper-directory: android-plugin/
