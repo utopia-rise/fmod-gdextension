@@ -56,6 +56,11 @@ jobs:
             target: editor
             artifact-extension: so
             fmod-executable-suffix: linux.tar.gz
+            fmod-core-platform-folder: linux/core/lib/x86_64
+            fmod-studio-platform-folder: linux/studio/lib/x86_64
+            fmod-library-suffix: so
+            godot-executable-download-suffix: linux.x86_64.zip
+            godot-executable: Godot_v4.1.1-stable_linux.x86_64
             shell: bash
 
           - name: Ubuntu Debug Compilation
@@ -80,6 +85,11 @@ jobs:
             target: editor
             artifact-extension: framework
             fmod-executable-suffix: osx.dmg
+            fmod-core-platform-folder: osx/core/lib
+            fmod-studio-platform-folder: osx/studio/lib
+            fmod-library-suffix: dylib
+            godot-executable-download-suffix: macos.universal.zip
+            godot-executable: Godot.app/Contents/MacOs/Godot
             shell: bash
 
           - name: MacOS Debug Compilation
@@ -162,7 +172,25 @@ jobs:
           fmod-user: ${{ secrets.FMODUSER }}
           fmod-password: ${{ secrets.FMODPASS }}
           shell: ${{ matrix.shell }}
-  package-addon:
+
+      - name: Download godot engine
+        if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
+        run: |
+          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
+          unzip Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
+          rm Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
+
+      - name: Run tests
+        if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
+        run: |
+          cp ../libs/fmod/${{ matrix.fmod-core-platform-folder }}/libfmodL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
+          cp ../libs/fmod/${{ matrix.fmod-studio-platform-folder }}/libfmodstudioL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
+          cd demo
+          chmod +x run_tests.sh
+          chmod +x ../${{ matrix.godot-executable }}
+          ./run_tests.sh ../${{ matrix.godot-executable }}
+
+  package-godot-addon:
     needs: [ build ]
     strategy:
       matrix:
@@ -170,15 +198,22 @@ jobs:
           - os: "ubuntu-20.04"
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: recursive
+
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
           java-version: 17
 
-      - name: Copy android fmod jar
-        run: |
-          mkdir -p android-plugin/library/libraries/android/aar/
-          cp ../libs/fmod/android/core/lib/fmod.jar android-plugin/library/libraries/fmod.jar
+      - name: Download fmod jar
+        uses: actions/download-artifact@v3
+        with:
+          name: fmod-jar
+          path: android-plugin/library/libraries/
 
       - name: Download godot android aar
         run: |
@@ -191,3 +226,47 @@ jobs:
           wrapper-directory: android-plugin/
           build-root-directory: android-plugin/
           arguments: :library:build
+
+      - name: Copy aar plugin files
+        uses: eskatos/gradle-command-action@v1
+        with:
+          wrapper-directory: android-plugin/
+          build-root-directory: android-plugin/
+          arguments: :library:copyAarFiles
+
+      - name: Download linux libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download windows libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: windows
+          path: demo/addons/fmod/libs/windows/
+
+      - name: Download macos libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: macos
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download iOS libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: ios
+          path: demo/addons/fmod/libs/iOS/
+
+      - name: Download android libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: android
+          path: demo/addons/fmod/libs/android/
+
+      - name: Upload addon artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: fmod-addon
+          path: demo/addons/fmod
+          if-no-files-found: error

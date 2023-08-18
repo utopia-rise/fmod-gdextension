@@ -3,13 +3,13 @@ entry_symbol = "fmod_library_init"
 compatibility_minimum = 4.1
 
 [libraries]
-windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_debug.x86_64.dll"
+windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"
 windows.debug.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_debug.x86_64.dll"
 windows.release.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.template_release.x86_64.dll"
 macos.editor = "res://addons/fmod/libs/macos/libGodotFmod.macos.editor.framework"
 macos.debug  = "res://addons/fmod/libs/macos/libGodotFmod.macos.template_debug.framework"
 macos.release  = "res://addons/fmod/libs/macos/libGodotFmod.macos.template_release.framework"
-linux.editor.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_debug.x86_64.so"
+linux.editor.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.editor.x86_64.so"
 linux.debug.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_debug.x86_64.so"
 linux.release.x86_64 = "res://addons/fmod/libs/linux/libGodotFmod.linux.template_release.x86_64.so"
 android.debug.x86_64 = "res://addons/fmod/libs/android/x86_64/libGodotFmod.android.template_debug.x86_64.so"
@@ -22,6 +22,10 @@ ios.release  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_release.uni
 
 
 [dependencies]
+windows.editor.x86_64 = {
+"libs/windows/fmodL.dll": "",
+"libs/windows/fmodstudioL.dll": ""
+}
 windows.debug.x86_64 = {
 "libs/windows/fmodL.dll": "", 
 "libs/windows/fmodstudioL.dll": ""
@@ -29,6 +33,14 @@ windows.debug.x86_64 = {
 windows.release.x86_64 = {
 "libs/windows/fmod.dll": "", 
 "libs/windows/fmodstudio.dll": ""
+}
+linux.editor.x86_64  = {
+"libs/linux/libfmodL.so": "",
+"libs/linux/libfmodL.so.13": "",
+"libs/linux/libfmodL.so.13.12": "",
+"libs/linux/libfmodstudioL.so": "",
+"libs/linux/libfmodstudioL.so.13": "",
+"libs/linux/libfmodstudioL.so.13.12": ""
 }
 linux.debug.x86_64  = {
 "libs/linux/libfmodL.so": "",

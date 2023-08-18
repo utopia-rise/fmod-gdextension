@@ -82,6 +82,22 @@ runs:
         [[ ${{inputs.platform}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
         cd ../../
 
+    - name: create android fmod artifact
+      if: inputs.platform == 'android'
+      shell: ${{ inputs.shell }}
+      run: |
+        mkdir android-fmod-artifact
+        cp ../libs/fmod/android/core/lib/fmod.jar android-fmod-artifact/
+        cp android-plugin/library/src/main/resources/fmod-android-license.txt android-fmod-artifact/
+
+    - name: Upload fmod jar
+      if: inputs.platform == 'android'
+      uses: actions/upload-artifact@v3
+      with:
+        name: fmod-jar
+        path: android-fmod-artifact
+        if-no-files-found: error
+
     - name: Get number of CPU cores
       id: cpu-cores
       uses: SimenB/github-actions-cpu-cores@v1

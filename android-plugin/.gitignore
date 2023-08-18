@@ -9,4 +9,3 @@
 .cxx
 local.properties
 library/libraries/
-gradle/wrapper/*.jar
