@@ -19,7 +19,7 @@ namespace godot {
         ~FmodEditorExportPlugin() = default;
 
     private:
-        PackedStringArray _list_files_in_folder(const String& folder, const String& extension = "");
+        void _list_files_in_folder(PackedStringArray& result, const String& folder, const String& extension = "");
     };
 }
 
