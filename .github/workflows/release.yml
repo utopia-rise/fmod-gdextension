@@ -1,11 +1,8 @@
-name: 🌈 All Builds
+name: 🌈 Release
 on:
   push:
-    branches: [ godot-4.x ]
     tags:
-      - "v2*"
-  pull_request:
-    branches: "*"
+      - '\d+.\d+.\d+'
 
 # Global Settings
 env:
@@ -173,23 +170,6 @@ jobs:
           fmod-password: ${{ secrets.FMODPASS }}
           shell: ${{ matrix.shell }}
 
-      - name: Download godot engine
-        if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
-        run: |
-          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
-          unzip Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
-          rm Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
-
-      - name: Run tests
-        if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
-        run: |
-          cp ../libs/fmod/${{ matrix.fmod-core-platform-folder }}/libfmodL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
-          cp ../libs/fmod/${{ matrix.fmod-studio-platform-folder }}/libfmodstudioL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
-          cd demo
-          chmod +x run_tests.sh
-          chmod +x ../${{ matrix.godot-executable }}
-          ./run_tests.sh ../${{ matrix.godot-executable }}
-
   package-godot-addon:
     needs: [ build ]
     strategy:
@@ -204,35 +184,8 @@ jobs:
           lfs: true
           submodules: recursive
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v1
-        with:
-          java-version: 17
-
-      - name: Download fmod jar
-        uses: actions/download-artifact@v3
-        with:
-          name: fmod-jar
-          path: android-plugin/library/libraries/
-
-      - name: Download godot android aar
-        run: |
-          cd android-plugin/library/libraries/
-          wget https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/godot-lib.${{ env.GODOT_VERSION }}.stable.template_release.aar
-
-      - name: Build android plugin
-        uses: eskatos/gradle-command-action@v1
-        with:
-          wrapper-directory: android-plugin/
-          build-root-directory: android-plugin/
-          arguments: :library:build
-
-      - name: Copy aar plugin files
-        uses: eskatos/gradle-command-action@v1
-        with:
-          wrapper-directory: android-plugin/
-          build-root-directory: android-plugin/
-          arguments: :library:copyAarFiles
+      - name: Create android plugin
+        uses: ./.github/actions/create-android-plugin
 
       - name: Download linux libraries
         uses: actions/download-artifact@v3
@@ -264,9 +217,29 @@ jobs:
           name: android
           path: demo/addons/fmod/libs/android/
 
-      - name: Upload addon artifact
-        uses: actions/upload-artifact@v3
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: fmod-addon
-          path: demo/addons/fmod
-          if-no-files-found: error
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Zip fmod addon
+        run: |
+          cd demo/addons/
+          zip -r addon.zip fmod
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./demo/addons/addon.zip
+          asset_name: addon.zip
+          asset_content_type: application/zip

@@ -132,3 +132,5 @@ config.log
 # uncomment when https://github.com/godotengine/godot/issues/71521 fix is in release.
 #demo/.godot
 **/*.editor
+
+demo/addons/fmod/libs/android/aar/
