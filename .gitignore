@@ -129,5 +129,8 @@ config.log
 
 # End of https://www.gitignore.io/api/clion,cmake,scons
 
-demo/.godot
+# uncomment when https://github.com/godotengine/godot/issues/71521 fix is in release.
+#demo/.godot
 **/*.editor
+
+demo/addons/fmod/libs/android/aar/

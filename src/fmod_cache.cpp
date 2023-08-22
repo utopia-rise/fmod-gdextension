@@ -24,7 +24,7 @@ void FmodCache::update_pending() {
             toDelete.push_back(loadingBank);
         } else if (loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
             toDelete.push_back(loadingBank);
-            GODOT_LOG(2, "Fmod Sound System: Error loading bank.")
+            GODOT_LOG_ERROR("Fmod Sound System: Error loading bank.")
         }
     }
     for (const Ref<FmodBank>& element : toDelete) {
@@ -47,7 +47,7 @@ Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
     ERROR_CHECK(system->loadBankFile(bankPath.utf8().get_data(), flag, &bank));
     if (!bank) { return {}; }
     Ref<FmodBank> ref = FmodBank::create_ref(bank, bankPath);
-    GODOT_LOG(0, "FMOD Sound System: LOADING BANK " + String(bankPath))
+    GODOT_LOG_INFO("FMOD Sound System: LOADING BANK " + String(bankPath))
     loadingBanks.push_back(ref);
     if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) { force_loading(); }
     return ref;
@@ -55,7 +55,7 @@ Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
 
 void FmodCache::remove_bank(const String& bankPath) {
     if (!banks.has(bankPath)) {
-        GODOT_LOG(2, vformat("Cannot unload bank with path %s, not in cache.", bankPath));
+        GODOT_LOG_ERROR(vformat("Cannot unload bank with path %s, not in cache.", bankPath));
         return;
     }
     Ref<FmodBank> bank = banks[bankPath];
@@ -81,7 +81,7 @@ Ref<FmodFile> FmodCache::add_file(const String& filePath, unsigned int flag) {
     if (sound) {
         Ref<FmodFile> ref = FmodFile::create_ref(sound);
         files[filePath] = ref;
-        GODOT_LOG(0, "FMOD Sound System: LOADING AS SOUND FILE" + String(filePath))
+        GODOT_LOG_INFO("FMOD Sound System: LOADING AS SOUND FILE" + String(filePath))
         return ref;
     }
     return {};

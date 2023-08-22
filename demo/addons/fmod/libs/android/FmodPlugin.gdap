@@ -1,0 +1,5 @@
+[config]
+
+name="FmodPlugin"
+binary_type="local"
+binary="aar/library-release.aar"

@@ -1,0 +1,245 @@
+name: 🌈 Release
+on:
+  push:
+    tags:
+      - '\d+.\d+.\d+'
+
+# Global Settings
+env:
+  PROJECT_FOLDER: fmod-gdnative
+  TARGET_PATH: demo/addons/fmod/libs/
+  TARGET_NAME: libGodotFmod
+  GODOT_VERSION: 4.1.1
+  FMOD_VERSION: 20212
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows Editor Compilation
+            os: "windows-2022"
+            platform: windows
+            target: editor
+            artifact-extension: dll
+            additional-python-packages: pywin32
+            fmod-executable-suffix: win-installer.exe
+            shell: pwsh
+
+          - name: Windows Debug Compilation
+            os: "windows-2022"
+            platform: windows
+            target: template_debug
+            artifact-extension: dll
+            additional-python-packages: pywin32
+            fmod-executable-suffix: win-installer.exe
+            shell: pwsh
+
+          - name: Windows Release Compilation
+            os: "windows-2022"
+            platform: windows
+            target: template_release
+            artifact-extension: dll
+            additional-python-packages: pywin32
+            fmod-executable-suffix: win-installer.exe
+            shell: pwsh
+
+          - name: Ubuntu Editor Compilation
+            os: "ubuntu-20.04"
+            platform: linux
+            target: editor
+            artifact-extension: so
+            fmod-executable-suffix: linux.tar.gz
+            fmod-core-platform-folder: linux/core/lib/x86_64
+            fmod-studio-platform-folder: linux/studio/lib/x86_64
+            fmod-library-suffix: so
+            godot-executable-download-suffix: linux.x86_64.zip
+            godot-executable: Godot_v4.1.1-stable_linux.x86_64
+            shell: bash
+
+          - name: Ubuntu Debug Compilation
+            os: "ubuntu-20.04"
+            platform: linux
+            target: template_debug
+            artifact-extension: so
+            fmod-executable-suffix: linux.tar.gz
+            shell: bash
+
+          - name: Ubuntu Release Compilation
+            os: "ubuntu-20.04"
+            platform: linux
+            target: template_release
+            artifact-extension: so
+            fmod-executable-suffix: linux.tar.gz
+            shell: bash
+
+          - name: MacOS Editor Compilation
+            os: "macos-11"
+            platform: macos
+            target: editor
+            artifact-extension: framework
+            fmod-executable-suffix: osx.dmg
+            fmod-core-platform-folder: osx/core/lib
+            fmod-studio-platform-folder: osx/studio/lib
+            fmod-library-suffix: dylib
+            godot-executable-download-suffix: macos.universal.zip
+            godot-executable: Godot.app/Contents/MacOs/Godot
+            shell: bash
+
+          - name: MacOS Debug Compilation
+            os: "macos-11"
+            platform: macos
+            target: template_debug
+            artifact-extension: framework
+            fmod-executable-suffix: osx.dmg
+            shell: bash
+
+          - name: MacOS Release Compilation
+            os: "macos-11"
+            platform: macos
+            target: template_release
+            artifact-extension: framework
+            fmod-executable-suffix: osx.dmg
+            shell: bash
+
+          - name: Android Editor Compilation
+            os: "ubuntu-20.04"
+            platform: android
+            target: editor
+            artifact-extension: so
+            fmod-executable-suffix: android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            shell: bash
+
+          - name: Android Debug Compilation
+            os: "ubuntu-20.04"
+            platform: android
+            target: template_debug
+            artifact-extension: so
+            fmod-executable-suffix: android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            shell: bash
+
+          - name: Android Release Compilation
+            os: "ubuntu-20.04"
+            platform: android
+            target: template_release
+            artifact-extension: so
+            fmod-executable-suffix: android.tar.gz
+            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            shell: bash
+
+          - name: iOS Debug Compilation
+            os: "macos-11"
+            platform: ios
+            target: template_debug
+            artifact-extension: dylib
+            fmod-executable-suffix: ios.dmg
+            flags: arch=arm64
+            shell: bash
+
+          - name: iOS Release Compilation
+            os: "macos-11"
+            platform: ios
+            target: template_release
+            artifact-extension: dylib
+            fmod-executable-suffix: ios.dmg
+            flags: arch=arm64
+            shell: bash
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Compile native plugin
+        uses: ./.github/actions/create-native-build
+        with:
+          platform: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          artifact-extension: ${{ matrix.artifact-extension }}
+          additional-python-packages: ${{ matrix.additional-python-packages }}
+          flags: ${{ matrix.flags }}
+          fmod-executable-suffix: ${{ matrix.fmod-executable-suffix }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+          shell: ${{ matrix.shell }}
+
+  package-godot-addon:
+    needs: [ build ]
+    strategy:
+      matrix:
+        include:
+          - os: "ubuntu-20.04"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Create android plugin
+        uses: ./.github/actions/create-android-plugin
+
+      - name: Download linux libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: linux
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download windows libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: windows
+          path: demo/addons/fmod/libs/windows/
+
+      - name: Download macos libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: macos
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download iOS libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: ios
+          path: demo/addons/fmod/libs/iOS/
+
+      - name: Download android libraries
+        uses: actions/download-artifact@v3
+        with:
+          name: android
+          path: demo/addons/fmod/libs/android/
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Zip fmod addon
+        run: |
+          cd demo/addons/
+          zip -r addon.zip fmod
+
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./demo/addons/addon.zip
+          asset_name: addon.zip
+          asset_content_type: application/zip
