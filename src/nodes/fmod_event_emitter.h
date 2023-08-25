@@ -7,6 +7,9 @@
 
 #include <classes/engine.hpp>
 
+static constexpr const char* BEAT_SIGNAL_STRING = "timeline_beat";
+static constexpr const char* MARKER_SIGNAL_STRING = "timeline_marker";
+
 namespace godot {
 
     template<class Derived, class NodeType>
@@ -29,10 +32,9 @@ namespace godot {
         void _notification(int p_what);
         virtual void _exit_tree() override;
         
-        void start();
-        void stop();
         void play();
-        void pause();
+        void stop();
+        void set_paused(bool p_is_paused);
         const Ref<FmodEvent>& get_event() const;
         bool is_paused();
         void set_event_name(const String& name);
@@ -56,6 +58,7 @@ namespace godot {
         static StringName& get_class_static();
 
     protected:
+        void _emit_callbacks(const Dictionary& dict, const int type) const;
         static void _bind_methods();
 
     private:
@@ -63,6 +66,7 @@ namespace godot {
         void apply_parameters();
         void preload_event() const;
         void load_event();
+
     };
 
     template<class Derived, class NodeType>
@@ -88,7 +92,10 @@ namespace godot {
             set_space_attribute();
         }
 
-        if (_autoplay) { play(); }
+        if (_autoplay) {
+            set_paused(false);
+            play();
+        }
     }
     
     template<class Derived, class NodeType>
@@ -110,6 +117,7 @@ namespace godot {
         }
 
         if (should_restart) {
+            set_paused(false);
             play();
         }
     }
@@ -122,9 +130,9 @@ namespace godot {
 #endif
 
         if (p_what == Node::NOTIFICATION_PAUSED) {
-            pause();
+            set_paused(true);
         } else if (p_what == Node::NOTIFICATION_UNPAUSED) {
-            if (is_paused()) { play(); }
+            if (is_paused()) { set_paused(false); }
         }
     }
     
@@ -162,29 +170,12 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::start() {
-        if (!_event.is_valid()) { return; }
-        _event->start();
-    }
-
-    template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::stop() {
-        if (!_event.is_valid()) { return; }
-        if (_allow_fadeout) {
-            _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
-        } else {
-            _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
-        }
-    }
-
-    template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play() {
         if (!_event.is_valid()) { return; }
-        _event->set_paused(false);
 
         if (!_is_one_shot) {
             if (_attached) { set_space_attribute(); }
-            start();
+            _event->start();
             return;
         }
 
@@ -216,9 +207,19 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::pause() {
+    void FmodEventEmitter<Derived, NodeType>::stop() {
         if (!_event.is_valid()) { return; }
-        _event->set_paused(true);
+        if (_allow_fadeout && !_is_one_shot) {
+            _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+        } else {
+            _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        }
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_paused(bool p_is_paused) {
+        if (!_event.is_valid()) { return; }
+        _event->set_paused(p_is_paused);
     }
 
     template<class Derived, class NodeType>
@@ -230,6 +231,7 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
         _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+        _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
     }
 
     template<class Derived, class NodeType>
@@ -322,6 +324,18 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_emit_callbacks(const Dictionary& dict, const int type) const {
+        switch (type) {
+            case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(BEAT_SIGNAL_STRING, dict);
+                break;
+            case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(MARKER_SIGNAL_STRING, dict);
+                break;
+        }
+    }
+
+    template<class Derived, class NodeType>
     StringName& FmodEventEmitter<Derived, NodeType>::get_class_static() {
         return Derived::get_class_static();
     }
@@ -329,9 +343,10 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_bind_methods() {
         ClassDB::bind_method(D_METHOD("set_parameter", "key", "value"), &Derived::set_parameter);
-        ClassDB::bind_method(D_METHOD("is_paused"), &Derived::is_paused);
         ClassDB::bind_method(D_METHOD("play"), &Derived::play);
-        ClassDB::bind_method(D_METHOD("pause"), &Derived::pause);
+        ClassDB::bind_method(D_METHOD("stop"), &Derived::stop);
+        ClassDB::bind_method(D_METHOD("is_paused"), &Derived::is_paused);
+        ClassDB::bind_method(D_METHOD("set_paused", "p_is_paused"), &Derived::set_paused);
         ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &Derived::set_event_name);
         ClassDB::bind_method(D_METHOD("get_event_name"), &Derived::get_event_name);
         ClassDB::bind_method(D_METHOD("set_attached", "attached"), &Derived::set_attached);
@@ -349,6 +364,7 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("set_parameters", "p_parameters"), &Derived::set_parameters);
         ClassDB::bind_method(D_METHOD("get_volume"), &Derived::get_volume);
         ClassDB::bind_method(D_METHOD("set_volume", "p_volume"), &Derived::set_volume);
+        ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);
 
         ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_name", "get_event_name");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_attached", "is_attached");
@@ -358,9 +374,10 @@ namespace godot {
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_preload_event", "is_preload_event");
         ADD_PROPERTY(PropertyInfo(Variant::DICTIONARY, "parameters",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_parameters", "get_parameters");
         ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_volume", "get_volume");
+        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "is_paused");
 
-        ADD_SIGNAL(MethodInfo("timeline_beat", PropertyInfo(Variant::DICTIONARY, "params")));
-        ADD_SIGNAL(MethodInfo("timeline_marker", PropertyInfo(Variant::DICTIONARY, "params")));
+        ADD_SIGNAL(MethodInfo(BEAT_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
+        ADD_SIGNAL(MethodInfo(MARKER_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
         ADD_SIGNAL(MethodInfo("sound_played", PropertyInfo(Variant::DICTIONARY, "params")));
         ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
     }

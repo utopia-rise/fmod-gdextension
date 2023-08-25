@@ -88,21 +88,3 @@ class TestEvent:
 		assert_true(bus.mute, "Master bus should be muted")
 		FmodServer.unmute_all_events()
 		assert_false(bus.mute, "Master bus should not be muted")
-
-#TODO: reimplement when emitters are ok.
-#	func test_assert_attached_to_node():
-#		FmodServer.attach_instance_to_node(id, sprite)
-#		var node_instance: Object = FmodServer.get_object_attached_to_instance(id)
-#		var node_instance_id: int = node_instance.get_instance_id()
-#		assert_false(node_instance == null, "Instance " + str(id) + " should be attached to Node")
-#		var id2: int = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
-#		var object: Object = FmodServer.get_object_attached_to_instance(id2)
-#		assert_true(object == null, "Instance " + str(id2) + " should not be attached to any Node")
-#		FmodServer.attach_instance_to_node(id2, sprite)
-#		var object_instance_id = FmodServer.get_object_attached_to_instance(id2).get_instance_id()
-#		assert_true(node_instance_id == object_instance_id, "Both instances should be attached to same Node")
-#		FmodServer.detach_instance_from_node(id2)
-#		object = FmodServer.get_object_attached_to_instance(id2)
-#		assert_true(object == null, "Instance " + str(id2) + " should be detached")
-#		FmodServer.release_event(id2)
-#		FmodServer.detach_instance_from_node(id)
