@@ -53,8 +53,10 @@ namespace godot {
         const Dictionary& get_parameters() const;
         void set_parameters(const Dictionary& p_params);
 
-        static void _bind_methods();
         static StringName& get_class_static();
+
+    protected:
+        static void _bind_methods();
 
     private:
         void set_space_attribute() const;
