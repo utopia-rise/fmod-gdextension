@@ -8,8 +8,15 @@ namespace godot {
     class FmodBankLoader : public Node {
         GDCLASS(FmodBankLoader, Node)
 
-        Ref<FmodBank> bank;
-        String path;
+    public:
+        virtual void _enter_tree() override;
+
+        void set_bank_paths(const Array& p_paths);
+        const Array& get_bank_paths() const;
+
+    private:
+        Array bank;
+        Array bank_paths;
 
     public:
         static void _bind_methods();

@@ -6,13 +6,15 @@
 #include "fmod_listener.h"
 
 namespace godot {
-    class FmodListener2D : public Node2D {
+    class FmodListener2D : public FmodListener<FmodListener2D, Node2D> {
         GDCLASS(FmodListener2D, Node2D)
 
-        FmodListener internal_emitter;
     public:
+        virtual void _ready() override;
+        virtual void _exit_tree() override;
 
     protected:
+
         static void _bind_methods();
     };
 }// namespace godot
