@@ -1,0 +1,45 @@
+site_name: Isometric Map Module
+docs_dir: src/doc
+
+repo_name: 'utopia-rise/fmod-gdextension'
+repo_url: 'https://github.com/utopia-rise/fmod-gdextension'
+
+theme:
+  name: material
+  favicon: assets/img/favicon.ico
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+  logo: assets/img/logo.png
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+
+
+extra:
+  social:
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/utopia-rise
+
+markdown_extensions:
+  - pymdownx.highlight:
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - admonition
+  - meta
+
+extra_javascript:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js
+  - js/init.js
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css

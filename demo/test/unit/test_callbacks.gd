@@ -27,8 +27,10 @@ func test_assert_has_signals():
 	var emitter: FmodEventEmitter2D = FmodEventEmitter2D.new()
 	assert_has_signal(emitter, "timeline_beat")
 	assert_has_signal(emitter, "timeline_marker")
-	assert_has_signal(emitter, "sound_played")
-	assert_has_signal(emitter, "sound_stopped")
+	assert_has_signal(emitter, "start_failed")
+	assert_has_signal(emitter, "started")
+	assert_has_signal(emitter, "restarted")
+	assert_has_signal(emitter, "stopped")
 	emitter.free()
 
 var callback_called = false

@@ -52,7 +52,7 @@ runs:
         cd ..
         New-Item -ItemType directory -Path libs; cd libs
         New-Item -ItemType directory -Path fmod; cd fmod
-        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
         7z x fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
         mv api/ windows
         cd ../../
@@ -64,7 +64,7 @@ runs:
         cd ..
         mkdir libs && cd libs
         mkdir fmod && cd fmod
-        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
         tar -xvf fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
         mv fmodstudioapi${{env.FMOD_VERSION}}${{inputs.platform}}/api ${{inputs.platform}}
         cd ../../
@@ -76,7 +76,7 @@ runs:
         cd ..
         mkdir libs && cd libs
         mkdir fmod && cd fmod
-        python ../../fmod-gdnative/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
+        python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
         hdiutil attach fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
         [[ ${{inputs.platform}} = "macos" ]] && cp -r "/Volumes/FMOD Programmers API Mac/FMOD Programmers API/api" osx
         [[ ${{inputs.platform}} = "ios" ]] && cp -r "/Volumes/FMOD Programmers API iOS/FMOD Programmers API/api" ios
@@ -105,7 +105,7 @@ runs:
     - name: Compilation
       shell: ${{ inputs.shell }}
       run: |
-        cd ../fmod-gdnative
+        cd ../fmod-gdextension
         scons platform=${{ inputs.platform }} generate_bindings=yes target=${{ inputs.target }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j${{ steps.cpu-cores.outputs.count }} ${{ inputs.flags }}
 
     - name: Upload Artifact

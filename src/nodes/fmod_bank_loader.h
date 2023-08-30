@@ -10,6 +10,7 @@ namespace godot {
 
     public:
         virtual void _enter_tree() override;
+        void _exit_tree() override;
 
         void set_bank_paths(const Array& p_paths);
         const Array& get_bank_paths() const;
