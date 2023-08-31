@@ -1,6 +1,5 @@
-[gd_scene load_steps=11 format=3 uid="uid://dl6g18ybwc83t"]
+[gd_scene load_steps=10 format=3 uid="uid://dl6g18ybwc83t"]
 
-[ext_resource type="Script" path="res://high_level/FmodNodesTest.gd" id="1_apdyc"]
 [ext_resource type="Script" path="res://high_level/Emitter.gd" id="2_5cntr"]
 [ext_resource type="Texture2D" uid="uid://dichdnwxg2opa" path="res://icon.png" id="2_llv2n"]
 [ext_resource type="Script" path="res://high_level/Kinematic.gd" id="3_dlbku"]
@@ -19,7 +18,6 @@ size = Vector2(288.124, 291.966)
 size = Vector2(289.938, 284.96)
 
 [node name="FmodNodesTest" type="Node"]
-script = ExtResource("1_apdyc")
 
 [node name="FmodBankLoader" type="FmodBankLoader" parent="."]
 bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank"]
