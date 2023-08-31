@@ -28,12 +28,6 @@ namespace Callbacks {
                 dictionary["time_signature_upper"] = props->timesignatureupper;
                 dictionary["time_signature_lower"] = props->timesignaturelower;
                 dictionary["position"] = props->position;
-            } else if (type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED || type == FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED) {
-                auto* sound = (FMOD::Sound*) parameters;
-                char n[256];
-                sound->getName(n, 256);
-                godot::String name(n);
-                dictionary["name"] = name;
             }
             const godot::Callable& callback {event_instance->get_callback()};
             if (!callback.is_null() && callback.is_valid()) {

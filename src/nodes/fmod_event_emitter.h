@@ -9,6 +9,10 @@
 
 static constexpr const char* BEAT_SIGNAL_STRING = "timeline_beat";
 static constexpr const char* MARKER_SIGNAL_STRING = "timeline_marker";
+static constexpr const char* START_FAILED_SIGNAL_STRING = "start_failed";
+static constexpr const char* STARTED_SIGNAL_STRING = "started";
+static constexpr const char* RESTARTED_SIGNAL_STRING = "restarted";
+static constexpr const char* STOPPED_SIGNAL_STRING = "stopped";
 
 namespace godot {
 
@@ -332,6 +336,18 @@ namespace godot {
             case FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER:
                 const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(MARKER_SIGNAL_STRING, dict);
                 break;
+            case FMOD_STUDIO_EVENT_CALLBACK_START_FAILED:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(START_FAILED_SIGNAL_STRING);
+                break;
+            case FMOD_STUDIO_EVENT_CALLBACK_STARTED:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(STARTED_SIGNAL_STRING);
+                break;
+            case FMOD_STUDIO_EVENT_CALLBACK_RESTARTED:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(RESTARTED_SIGNAL_STRING);
+                break;
+            case FMOD_STUDIO_EVENT_CALLBACK_STOPPED:
+                const_cast<Derived*>(static_cast<const Derived*>(this))->emit_signal(STOPPED_SIGNAL_STRING);
+                break;
         }
     }
 
@@ -378,8 +394,10 @@ namespace godot {
 
         ADD_SIGNAL(MethodInfo(BEAT_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
         ADD_SIGNAL(MethodInfo(MARKER_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
-        ADD_SIGNAL(MethodInfo("sound_played", PropertyInfo(Variant::DICTIONARY, "params")));
-        ADD_SIGNAL(MethodInfo("sound_stopped", PropertyInfo(Variant::DICTIONARY, "params")));
+        ADD_SIGNAL(MethodInfo(START_FAILED_SIGNAL_STRING));
+        ADD_SIGNAL(MethodInfo(STARTED_SIGNAL_STRING));
+        ADD_SIGNAL(MethodInfo(RESTARTED_SIGNAL_STRING));
+        ADD_SIGNAL(MethodInfo(STOPPED_SIGNAL_STRING));
     }
 }// namespace godot
 #endif// GODOTFMOD_FMOD_EVENT_EMITTER_H

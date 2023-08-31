@@ -6,7 +6,7 @@ on:
 
 # Global Settings
 env:
-  PROJECT_FOLDER: fmod-gdnative
+  PROJECT_FOLDER: fmod-gdextension
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
   GODOT_VERSION: 4.1.1
