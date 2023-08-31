@@ -1,4 +1,4 @@
-![logo](.README/fmod-gdextension-logo.png)
+![logo](docs/src/doc/assets/fmod-gdextension-logo.png)
 
 Godot C++ GDExtension for Godot 4 that provides an integration for the FMOD Studio API.
 
