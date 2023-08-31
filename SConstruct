@@ -35,6 +35,7 @@ sources = [
     Glob('src/tools/*.cpp'),
     Glob('src/helpers/*.cpp'),
     Glob('src/nodes/*.cpp'),
+    Glob('src/resources/*.cpp'),
     Glob('src/studio/*.cpp')
     ]
 

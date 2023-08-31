@@ -1,3 +1,4 @@
+#include "constants.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "fmod_server.h"
@@ -17,12 +18,47 @@
 #endif
 
 #include <register_types.h>
+#include <resources/fmod_dsp_settings.h>
+#include <resources/fmod_software_format_settings.h>
+#include <tools/fmod_editor_plugin.h>
 
 #include <classes/engine.hpp>
+#include <classes/project_settings.hpp>
 
 using namespace godot;
 
 static FmodServer* fmod_singleton;
+
+void initialize_fmod_with_settings() {
+    Ref<FmodGeneralSettings> general_settings = FmodGeneralSettings::get_from_project_settings();
+    Ref<FmodSoftwareFormatSettings> software_format_settings = FmodSoftwareFormatSettings::get_from_project_settings();
+    Ref<FmodDspSettings> dsp_settings = FmodDspSettings::get_from_project_settings();
+    Ref<FmodSound3DSettings> three_d_settings = FmodSound3DSettings::get_from_project_settings();
+
+    FmodServer::get_singleton()->set_software_format(software_format_settings);
+    FmodServer::get_singleton()->set_system_dsp_buffer_size(dsp_settings);
+    FmodServer::get_singleton()->init(general_settings);
+    FmodServer::get_singleton()->set_sound_3d_settings(three_d_settings);
+    FmodServer::get_singleton()->set_system_listener_number(general_settings->get_default_listener_count());
+}
+
+void initialize_fmod() {
+#ifdef TOOLS_ENABLED
+    if (Engine::get_singleton()->is_editor_hint()) {
+        initialize_fmod_with_settings();
+        return;
+    }
+#endif
+
+    bool auto_initialize = ProjectSettings::get_singleton()->get_setting(
+      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FMOD_SETTING_AUTO_INITIALIZE),
+      DEFAULT_AUTO_INITIALIZE
+    );
+
+    if (auto_initialize) {
+        initialize_fmod_with_settings();
+    }
+}
 
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
@@ -52,19 +88,32 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodEventEmitter3D>();
         ClassDB::register_class<FmodBankLoader>();
 
+        // Resources
+        ClassDB::register_class<FmodGeneralSettings>();
+        ClassDB::register_class<FmodSoftwareFormatSettings>();
+        ClassDB::register_class<FmodDspSettings>();
+        ClassDB::register_class<FmodSound3DSettings>();
+
         // Server
         ClassDB::register_class<FmodServer>();
         fmod_singleton = memnew(FmodServer);
         Engine::get_singleton()->register_singleton("FmodServer", FmodServer::get_singleton());
+        initialize_fmod();
     }
 #ifdef TOOLS_ENABLED
-    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) { ClassDB::register_class<FmodEditorExportPlugin>(); }
+    if (p_level == MODULE_INITIALIZATION_LEVEL_EDITOR) {
+        ClassDB::register_class<FmodEditorExportPlugin>();
+        ClassDB::register_class<FmodEditorPlugin>();
+        EditorPlugins::add_by_type<FmodEditorPlugin>();
+    }
 #endif
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) { Callbacks::GodotFileRunner::get_singleton()->finish(); }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
+        fmod_singleton->shutdown();
+
         Engine::get_singleton()->unregister_singleton("FmodServer");
         memdelete(fmod_singleton);
     }

@@ -16,6 +16,10 @@
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
 #include <helpers/constants.h>
+#include <resources/fmod_dsp_settings.h>
+#include <resources/fmod_settings.h>
+#include <resources/fmod_software_format_settings.h>
+#include <resources/fmod_sound_3d_settings.h>
 
 #include <classes/canvas_item.hpp>
 #include <classes/global_constants.hpp>
@@ -95,15 +99,15 @@ namespace godot {
         static FmodServer* get_singleton();
 
         // LIFECYCLE
-        void init(int numOfChannels, unsigned int studioFlag, unsigned int flag);
+        void init(const Ref<FmodGeneralSettings>& p_settings);
         void update();
         void shutdown();
 
         // SETTINGS
-        void set_software_format(int sampleRate, int speakerMode, int numRawSpeakers);
-        void set_sound_3d_settings(float dopplerScale, float distanceFactor, float rollOffScale);
-        void set_system_dsp_buffer_size(unsigned int bufferLength, int numBuffers);
-        Array get_system_dsp_buffer_size();
+        void set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings);
+        void set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_settings);
+        void set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings);
+        Ref<FmodDspSettings> get_system_dsp_buffer_size();
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
 
