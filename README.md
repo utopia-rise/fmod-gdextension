@@ -13,8 +13,6 @@ work in progress and some API functions are not yet exposed._ Feel free to tweak
 same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
 as C# support is required and performance might not be on the same level as a C++ integration.
 
-![wowmeme]
-
 ### Getting started
 
 in order to get started, take a look at [documentation](./docs/src/doc/user-guide)
@@ -38,6 +36,5 @@ work to GDNative.
 Feel free to propose any modification using github's *pull request*. We hope you'll enjoy this driver.
 
 
-[wowmeme]: .README/wowmeme.png
 [fmodsingleton]: .README/fmodsingleton.png
 [usecustombuild]: .README/usecustombuild.png
