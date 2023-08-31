@@ -11,15 +11,7 @@ work in progress and some API functions are not yet exposed._ Feel free to tweak
 
 **Note:** FMOD also provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
 same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
-as C# support is required and performance might not be on the same level as a C++ integration. 
-
-**Note:** This project is a fork of [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
-which uses godot module to integrate fmod in the engine. We thank [alexfonseka](https://github.com/alexfonseka) for the work he did.
-This fork was designed to be able to use Fmod without building Godot Engine !
-
-**Note:** The video tutorial below will guide you through the integration on Windows, including the basics of FMOD Studio and basic Godot usage. The tutorial uses driver 3.1.1, is for Godot 3.3.4 and 3.4.4, and uses FMOD 2.02.07.
-
-[![Integration Tutorial Video Thumbnail](https://img.youtube.com/vi/Zhh7B2Ggr_g/0.jpg)](https://www.youtube.com/watch?v=Zhh7B2Ggr_g)
+as C# support is required and performance might not be on the same level as a C++ integration.
 
 ![wowmeme]
 

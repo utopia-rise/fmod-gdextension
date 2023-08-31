@@ -3,16 +3,6 @@
 We provide nodes to easily create your game using fmod.  
 Those nodes are gdextension, so you can extends them using scripts like any other godot node.
 
-## Initialize fmod
-
-You first need to initialize Fmod.  
-Here is a sample to initialize it:  
-```gdscript
-FmodServer.set_software_format(0, FmodServer.FMOD_SPEAKERMODE_STEREO, 0)
-FmodServer.init(1024, FmodServer.FMOD_STUDIO_INIT_LIVEUPDATE, FmodServer.FMOD_INIT_NORMAL)
-FmodServer.set_sound_3D_settings(1.0, 32.0, 1.0)
-```
-
 ## Fmod Bank loader
 
 `FmodBankLoader` is in charge of loading banks when entering the scene. You should place it, in the scene hierarchy,

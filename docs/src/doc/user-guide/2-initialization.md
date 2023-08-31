@@ -2,10 +2,10 @@
 
 When you first add fmod addon to your godot project, you need to setup fmod options within projects parameters.  
 Parameters are split in several categories:
-- General
-- Software Format
-- Dsp
-- 3d Settings
+- General  
+- Software Format  
+- Dsp  
+- 3d Settings  
 
 ## General
 
