@@ -2,4 +2,4 @@
 
 name="FmodPlugin"
 binary_type="local"
-binary="aar/library-release.aar"
+binary="library-release.aar"

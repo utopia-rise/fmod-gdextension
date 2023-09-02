@@ -41,7 +41,7 @@ val copyAarFiles = tasks.create("copyAarFiles") {
     for (aarFile in aarFiles) {
         aarFile
             .copyTo(
-                project.projectDir.resolve("../../demo/addons/fmod/libs/android/aar/${aarFile.name}"),
+                project.projectDir.resolve("../../demo/android/plugins/${aarFile.name}"),
                 overwrite = true
             )
     }
