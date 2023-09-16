@@ -65,6 +65,7 @@ private:
                                                                          \
 private:                                                                 \
     m_owned* _wrapped = nullptr;                                         \
+    FMOD_GUID guid;                                                      \
     String _path;                                                        \
                                                                          \
 public:                                                                  \
@@ -75,6 +76,7 @@ public:                                                                  \
             ref->_wrapped = wrapped;                                     \
             char path[MAX_PATH_SIZE];                                    \
             ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr)); \
+            ERROR_CHECK(wrapped->getID(&ref->guid));                     \
             ref->_path = String(path);                                   \
         }                                                                \
         return ref;                                                      \
