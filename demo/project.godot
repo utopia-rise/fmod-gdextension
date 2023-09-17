@@ -23,6 +23,7 @@ DSP/dsp_buffer_count=4
 "3D Settings/doppler_scale"=1.0
 "3D Settings/distance_factor"=32.0
 "3D Settings/rolloff_scale"=1.0
+General/banks_path="res://assets/Banks"
 
 [android]
 
