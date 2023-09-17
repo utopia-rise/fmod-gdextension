@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 21" width="18" height="21">
+	<title>c_parameter_icon</title>
+	<defs>
+		<image  width="18" height="21" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAVCAMAAAB8FU7dAAAAAXNSR0IB2cksfwAAALdQTFRFAAAAAAAAAAAAAAAAAAAAHx8fTExMSEhIMTExAAAAAAAAOzs7jo6OiIiIj4+PXFxcAAAAODg4h4eHgICAb29vV1dXAAAAMDAwc3NzEBAQAAAAKCgoe3t7AAAACgoKNDQ0AAAAbW1tY2NjBAQEX19fMjIyQ0NDGRkZAAAAa2trDAwMDw8PPz8/U1NTICAgR0dHGxsbLCwsS0tLAAAAAAAAf39/enp6GBgYT09PPDw8fn5+AAAAFBQUHGvHAgAAAD10Uk5Ti+ztr93/////6NX//////+H//////9b////////7///+/////////9z/////////////5/P////////8/yfQ/xAAAADPSURBVHicbdDXEoIwEAXQ2BVUhIjlgjX2horY//+73CUyg2UfMpMzyezuFSKT/aycyBeKpVQVyxVhmNVaqupWQxi2I5NqSum4DdFqJ9TpwvOZev2EPAADpiFGWsZQE4URURZTTW3YcoY50QKqw+IrLKW/wow6rrFh2mJHZ4A9kYeVT5cDjtxVIaS55gjif/F/Eycii58FKEQR0RlDnv5CvS64skhnDyaayKaXmsyY5I3mPkb3mNyHXvv2tN9bOW74kYTUSRhm/TuvP6n+Zv8CeG0dU9iBm/oAAAAASUVORK5CYII="/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+</svg>

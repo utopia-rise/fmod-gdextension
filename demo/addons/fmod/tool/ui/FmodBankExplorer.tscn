@@ -1,0 +1,32 @@
+[gd_scene load_steps=2 format=3 uid="uid://nr38urn226al"]
+
+[ext_resource type="Script" path="res://addons/fmod/tool/ui/FmodBankExplorer.gd" id="1_ekqus"]
+
+[node name="FmodBankExplorer" type="Window"]
+title = "Fmod banks explorer"
+initial_position = 2
+size = Vector2i(1440, 790)
+script = ExtResource("1_ekqus")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Tree" type="Tree" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 3
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Ok"
