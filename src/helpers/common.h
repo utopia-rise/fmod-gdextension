@@ -98,6 +98,10 @@ public:                                                                  \
         return _guid;                                                    \
     }                                                                    \
                                                                          \
+    String get_guid_as_string() const {                                  \
+        return fmod_guid_to_string(_guid);                               \
+    }                                                                    \
+                                                                         \
 private:
 
 namespace godot {

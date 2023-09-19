@@ -14,6 +14,7 @@ void FmodBank::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_bus_list"), &FmodBank::get_bus_list);
     ClassDB::bind_method(D_METHOD("get_vca_list"), &FmodBank::get_vca_list);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodBank::is_valid);
+    ClassDB::bind_method(D_METHOD("get_godot_res_path"), &FmodBank::get_godot_res_path);
 }
 
 int FmodBank::get_loading_state() {

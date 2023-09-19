@@ -1,6 +1,4 @@
-@tool extends Window
-
-var tree: Tree
+@tool class_name FmodBankExplorer extends Window
 
 static var _fmod_icon = load("res://addons/fmod/icons/fmod_icon.svg")
 static var _vca_icon = load("res://addons/fmod/icons/vca_icon.svg")
@@ -9,46 +7,61 @@ static var _event_icon = load("res://addons/fmod/icons/event_icon.svg")
 static var _bus_icon = load("res://addons/fmod/icons/bus_icon.svg")
 static var _snapshot_icon = load("res://addons/fmod/icons/snapshot_icon.svg")
 
+var tree: Tree
+var copy_path_button := Button.new()
+var copy_guid_button := Button.new()
+
 func _ready():
 	var main_window_size = get_parent().get_window().size
 	size = main_window_size * 0.5
 	
-	tree = $VBoxContainer/ScrollContainer/Tree
+	copy_path_button.text = "Copy"
+	copy_guid_button.text = "Copy"
+	copy_path_button.visible = false
+	copy_guid_button.visible = false
+	copy_path_button.pressed.connect(_on_copy_path_button)
+	copy_guid_button.pressed.connect(_on_copy_guid_button)
 	
-	tree.columns = 3
+	%ButtonsContainer.add_child(copy_path_button)
+	%ButtonsContainer.add_child(copy_guid_button)
 	
-	var root_item: TreeItem = tree.create_item()
+	tree = %Tree
+	tree.item_selected.connect(_on_item_selected)
+	
+	tree.columns = 1
+	
+	var root_item := tree.create_item()
 	root_item.set_text(0, "Fmod objects")
 	root_item.set_icon(0, _fmod_icon)
 	
 	for bank in FmodServer.get_all_banks():
-		var fmod_bank: FmodBank = bank as FmodBank
+		var fmod_bank := bank as FmodBank
 		
-		var bank_item: TreeItem = tree.create_item(root_item)
+		var bank_item := tree.create_item(root_item)
 		bank_item.set_text(0, fmod_bank.get_godot_res_path())
 		bank_item.set_icon(0, _bank_icon)
 		
-		var buses_item: TreeItem = tree.create_item(bank_item)
+		var buses_item := tree.create_item(bank_item)
 		buses_item.set_text(0, "Buses")
 		buses_item.set_icon(0, _bus_icon)
 		
-		var buses: Array = fmod_bank.get_bus_list()
+		var buses := fmod_bank.get_bus_list()
 		buses.sort_custom(sort_by_path)
 		_add_elements_as_tree(buses, buses_item)
 		
-		var vca_item: TreeItem = tree.create_item(bank_item)
+		var vca_item := tree.create_item(bank_item)
 		vca_item.set_text(0, "VCAs")
 		vca_item.set_icon(0, _vca_icon)
 		
-		var vcas: Array = fmod_bank.get_vca_list()
+		var vcas := fmod_bank.get_vca_list()
 		vcas.sort_custom(sort_by_path)
 		_add_elements_as_tree(vcas, vca_item)
 		
-		var events_item: TreeItem = tree.create_item(bank_item)
+		var events_item := tree.create_item(bank_item)
 		events_item.set_text(0, "Events")
 		events_item.set_icon(0, _event_icon)
 		
-		var events: Array = fmod_bank.get_description_list()
+		var events := fmod_bank.get_description_list()
 		events.sort_custom(sort_by_path)
 		_add_elements_as_tree(events, events_item)
 
@@ -59,7 +72,7 @@ func _add_elements_as_tree(elements: Array, parent: TreeItem):
 
 func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
 	var fmod_path: String = path_element.get_path()
-	var path_parts: PackedStringArray = fmod_path.split("/")
+	var path_parts := fmod_path.split("/")
 	if path_parts[path_parts.size() - 1] == "":
 		path_parts.remove_at(path_parts.size() - 1)
 	
@@ -72,8 +85,7 @@ func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
 			var tree_item = tree.create_item(parent_item)
 			tree_item.set_text(0, path_part)
 			if i == path_parts.size() - 1:
-				tree_item.set_text(1, fmod_path)
-				tree_item.set_text(2, path_element.get_guid())
+				tree_item.set_metadata(0, path_element)
 				tree_item.set_icon(0, _get_icon_for_fmod_path(fmod_path))
 			stack.append(tree_item)
 			continue
@@ -86,10 +98,28 @@ func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
 			var tree_item = tree.create_item(parent_item)
 			tree_item.set_text(0, path_part)
 			if i == path_parts.size() - 1:
-				tree_item.set_text(1, fmod_path)
-				tree_item.set_text(2, path_element.get_guid())
+				tree_item.set_metadata(0, path_element)
 				tree_item.set_icon(0, _get_icon_for_fmod_path(fmod_path))
 			stack.append(tree_item)
+
+func _on_item_selected():
+	var metadata = tree.get_selected().get_metadata(0)
+	if metadata == null:
+		%GuidLabel.set_text("")
+		%PathLabel.set_text("")
+		copy_path_button.visible = false
+		copy_guid_button.visible = false
+		return
+	%GuidLabel.set_text(metadata.get_guid())
+	%PathLabel.set_text(metadata.get_path())
+	copy_path_button.visible = true
+	copy_guid_button.visible = true
+
+func _on_copy_path_button():
+	DisplayServer.clipboard_set(%PathLabel.text)
+
+func _on_copy_guid_button():
+	DisplayServer.clipboard_set(%GuidLabel.text)
 
 static func _get_icon_for_fmod_path(fmod_path: String) -> Texture2D:
 	var icon: Texture2D = null
