@@ -87,14 +87,19 @@ void FmodServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("create_event_instance_with_guid", "guid"), &FmodServer::create_event_instance_with_guid);
     ClassDB::bind_method(D_METHOD("create_event_instance", "eventPath"), &FmodServer::create_event_instance);
+    ClassDB::bind_method(D_METHOD("create_event_instance_from_description", "eventPath"), &FmodServer::create_event_instance_from_description);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid", "guid", "game_obj"), &FmodServer::play_one_shot_using_guid);
     ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "game_obj"), &FmodServer::play_one_shot);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description", "event_description", "game_obj"), &FmodServer::play_one_shot_using_event_description);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_with_params", "guid", "game_obj", "parameters"), &FmodServer::play_one_shot_using_guid_with_params);
     ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "event_name", "game_obj", "parameters"), &FmodServer::play_one_shot_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_with_params", "event_description", "game_obj", "parameters"), &FmodServer::play_one_shot_using_event_description_with_params);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_attached", "guid", "game_obj"), &FmodServer::play_one_shot_using_guid_attached);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "game_obj"), &FmodServer::play_one_shot_attached);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_attached", "event_description", "game_obj"), &FmodServer::play_one_shot_using_event_description_attached);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_attached_with_params", "guid", "game_obj", "parameters"), &FmodServer::play_one_shot_using_guid_attached_with_params);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "event_name", "game_obj", "parameters"), &FmodServer::play_one_shot_attached_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_attached_with_params", "event_description", "game_obj", "parameters"), &FmodServer::play_one_shot_using_event_description_attached_with_params);
     ClassDB::bind_method(D_METHOD("pause_all_events"), &FmodServer::pause_all_events);
     ClassDB::bind_method(D_METHOD("unpause_all_events"), &FmodServer::unpause_all_events);
     ClassDB::bind_method(D_METHOD("mute_all_events"), &FmodServer::mute_all_events);
@@ -465,7 +470,7 @@ bool FmodServer::banks_still_loading() {
 }
 
 bool FmodServer::check_vca_guid(const String& guid) {
-    return cache->has_vca_guid(string_to_fmod_guid(guid));
+    return cache->has_vca_guid(string_to_fmod_guid(guid.utf8().get_data()));
 }
 
 bool FmodServer::check_vca_path(const String& vcaPath) {
@@ -473,7 +478,7 @@ bool FmodServer::check_vca_path(const String& vcaPath) {
 }
 
 bool FmodServer::check_bus_guid(const String& guid) {
-    return cache->has_bus_guid(string_to_fmod_guid(guid));
+    return cache->has_bus_guid(string_to_fmod_guid(guid.utf8().get_data()));
 }
 
 bool FmodServer::check_bus_path(const String& busPath) {
@@ -481,7 +486,11 @@ bool FmodServer::check_bus_path(const String& busPath) {
 }
 
 bool FmodServer::check_event_guid(const String& guid) {
-    return cache->has_event_guid(string_to_fmod_guid(guid));
+    return cache->has_event_guid(string_to_fmod_guid(guid.utf8().get_data()));
+}
+
+bool FmodServer::check_event_guid_internal(const FMOD_GUID& guid) {
+    return cache->has_event_guid(guid);
 }
 
 bool FmodServer::check_event_path(const String& eventPath) {
@@ -489,7 +498,7 @@ bool FmodServer::check_event_path(const String& eventPath) {
 }
 
 Ref<FmodVCA> FmodServer::get_vca_from_guid(const String& guid) {
-    return cache->get_vca(string_to_fmod_guid(guid));
+    return cache->get_vca(string_to_fmod_guid(guid.utf8().get_data()));
 }
 
 Ref<FmodVCA> FmodServer::get_vca(const String& vcaPath) {
@@ -497,7 +506,7 @@ Ref<FmodVCA> FmodServer::get_vca(const String& vcaPath) {
 }
 
 Ref<FmodBus> FmodServer::get_bus_from_guid(const String& guid) {
-    return cache->get_bus(string_to_fmod_guid(guid));
+    return cache->get_bus(string_to_fmod_guid(guid.utf8().get_data()));
 }
 
 Ref<FmodBus> FmodServer::get_bus(const String& busPath) {
@@ -505,7 +514,11 @@ Ref<FmodBus> FmodServer::get_bus(const String& busPath) {
 }
 
 Ref<FmodEventDescription> FmodServer::get_event_from_guid(const String& guid) {
-    return cache->get_event(string_to_fmod_guid(guid));
+    return cache->get_event(string_to_fmod_guid(guid.utf8().get_data()));
+}
+
+Ref<FmodEventDescription> FmodServer::get_event_from_guid_internal(const FMOD_GUID& guid) {
+    return cache->get_event(guid);
 }
 
 Ref<FmodEventDescription> FmodServer::get_event(const String& eventPath) {
@@ -545,11 +558,23 @@ Array FmodServer::get_all_banks() {
 }
 
 Ref<FmodEvent> FmodServer::create_event_instance_with_guid(const String& guid) {
-    return _create_event_instance<true>(guid);
+    return create_event_instance_with_guid_internal(string_to_fmod_guid(guid.utf8().get_data()));
+}
+
+Ref<FmodEvent> FmodServer::create_event_instance_with_guid_internal(const FMOD_GUID& guid) {
+    IdentifierParameter parameters {};
+    parameters.guid = guid;
+    return _create_event_instance<IdentifierParameterType::GUID>(parameters);
 }
 
 Ref<FmodEvent> FmodServer::create_event_instance(const String& eventPath) {
-    return _create_event_instance(eventPath);
+    return _create_event_instance<IdentifierParameterType::PATH>({eventPath.utf8().get_data()});
+}
+
+Ref<FmodEvent> FmodServer::create_event_instance_from_description(const Ref<FmodEventDescription>& event_description) {
+    IdentifierParameter parameter {};
+    parameter.event_description = event_description.ptr();
+    return _create_event_instance<IdentifierParameterType::EVENT_DESCRIPTION>(parameter);
 }
 
 Ref<FmodEventDescription> FmodServer::_get_event_description(const String& event_name) {
@@ -572,35 +597,87 @@ Ref<FmodEventDescription> FmodServer::_get_event_description(const FMOD_GUID& gu
 }
 
 void FmodServer::play_one_shot_using_guid(const String& guid, Node* game_obj) {
-    return _play_one_shot<true, false, false>(guid, game_obj);
+    return play_one_shot_using_guid_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj);
+}
+
+void FmodServer::play_one_shot_using_guid_internal(const FMOD_GUID& guid, godot::Node* game_obj) {
+    IdentifierParameter parameter {};
+    parameter.guid = guid;
+    return _play_one_shot<IdentifierParameterType::GUID, false, false>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot(const String& event_name, Node* game_obj) {
-    return _play_one_shot<false, false, false>(event_name, game_obj);
+    return _play_one_shot<IdentifierParameterType::PATH, false, false>({event_name.utf8().get_data()}, game_obj);
+}
+
+void FmodServer::play_one_shot_using_event_description(const Ref<FmodEventDescription>& event_description, Node* game_obj) {
+    IdentifierParameter parameter {};
+    parameter.event_description = event_description.ptr();
+    return _play_one_shot<IdentifierParameterType::EVENT_DESCRIPTION, false, false>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot_using_guid_with_params(const String& guid, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<true, true, false>(guid, game_obj, parameters);
+    return play_one_shot_using_guid_with_params_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj, parameters);
+}
+
+void FmodServer::play_one_shot_using_guid_with_params_internal(const FMOD_GUID& guid, godot::Node* game_obj, const godot::Dictionary& parameters) {
+    IdentifierParameter parameter {};
+    parameter.guid = guid;
+    return _play_one_shot<IdentifierParameterType::GUID, true, false>(parameter, game_obj, parameters);
 }
 
 void FmodServer::play_one_shot_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<false, true, false>(event_name, game_obj, parameters);
+    return _play_one_shot<IdentifierParameterType::PATH, true, false>({event_name.utf8().get_data()}, game_obj, parameters);
+}
+
+void FmodServer::play_one_shot_using_event_description_with_params(const Ref<FmodEventDescription>& event_description, Node* game_obj, const Dictionary& parameters) {
+    IdentifierParameter parameter {};
+    parameter.event_description = event_description.ptr();
+    return _play_one_shot<IdentifierParameterType::EVENT_DESCRIPTION, true, false>(parameter, game_obj, parameters);
 }
 
 void FmodServer::play_one_shot_using_guid_attached(const String& guid, Node* game_obj) {
-    return _play_one_shot<true, false, true>(guid, game_obj);
+    return play_one_shot_using_guid_attached_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj);
+}
+
+void FmodServer::play_one_shot_using_guid_attached_internal(const FMOD_GUID& guid, Node* game_obj) {
+    IdentifierParameter parameter {};
+    parameter.guid = guid;
+    return _play_one_shot<IdentifierParameterType::GUID, false, true>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot_attached(const String& event_name, Node* game_obj) {
-    return _play_one_shot<false, false, true>(event_name, game_obj);
+    return _play_one_shot<IdentifierParameterType::PATH, false, true>({event_name.utf8().get_data()}, game_obj);
+}
+
+void FmodServer::play_one_shot_using_event_description_attached(const Ref<FmodEventDescription>& event_description, Node* game_obj) {
+    IdentifierParameter parameter {};
+    parameter.event_description = event_description.ptr();
+    return _play_one_shot<IdentifierParameterType::EVENT_DESCRIPTION, false, true>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot_using_guid_attached_with_params(const String& guid, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<true, true, true>(guid, game_obj, parameters);
+    return play_one_shot_using_guid_attached_with_params_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj, parameters);
+}
+
+void FmodServer::play_one_shot_using_guid_attached_with_params_internal(const FMOD_GUID& guid, Node* game_obj, const Dictionary& parameters) {
+    IdentifierParameter parameter {};
+    parameter.guid = guid;
+    return _play_one_shot<IdentifierParameterType::GUID, true, true>(parameter, game_obj, parameters);
 }
 
 void FmodServer::play_one_shot_attached_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<false, true, true>(event_name, game_obj, parameters);
+    return _play_one_shot<IdentifierParameterType::PATH, true, true>({event_name.utf8().get_data()}, game_obj, parameters);
+}
+
+void FmodServer::play_one_shot_using_event_description_attached_with_params(
+  const Ref<FmodEventDescription>& event_description,
+  Node* game_obj,
+  const Dictionary& parameters
+) {
+    IdentifierParameter parameter {};
+    parameter.event_description = event_description.ptr();
+    return _play_one_shot<IdentifierParameterType::EVENT_DESCRIPTION, true, true>(parameter, game_obj, parameters);
 }
 
 void FmodServer::set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings) {
@@ -757,6 +834,22 @@ int FmodServer::get_driver() {
 
 void FmodServer::set_driver(const int id) {
     ERROR_CHECK(coreSystem->setDriver(id));
+}
+
+Ref<FmodEvent> FmodServer::_create_instance(const Ref<FmodEventDescription>& description, bool is_one_shot, Node* game_object) {
+    FMOD::Studio::EventInstance* eventInstance = nullptr;
+    ERROR_CHECK(description->get_wrapped()->createInstance(&eventInstance));
+    Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
+    if (ref.is_valid()) {
+        runningEvents.push_back(ref);
+        if (is_one_shot || game_object) {
+            auto* oneShot = new OneShot();
+            oneShot->gameObj = game_object;
+            oneShots.push_back(oneShot);
+        }
+    }
+
+    return ref;
 }
 
 void FmodServer::_update_performance_data() {

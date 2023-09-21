@@ -1,5 +1,5 @@
 @tool
-extends EditorPlugin
+class_name FmodPlugin extends EditorPlugin
 
 const ADDON_PATH = "res://addons/fmod"
 
@@ -11,9 +11,7 @@ var fmod_button: Button
 
 var export_plugin = FmodEditorExportPluginProxy.new()
 
-#func _ready() -> void:
-	# configure icons
-	#theme.set_icon("FmodEventEmitter2D", "EditorIcons", iconFmodEventEmitter)
+var emitter_inspector_plugin = FmodEmitterPropertyInspectorPlugin.new(self)
 
 func _init():
 	add_autoload_singleton("FmodManager", "res://addons/fmod/FmodManager.gd")
@@ -30,16 +28,30 @@ func _init():
 	bank_explorer.visible = false
 	add_child(bank_explorer)
 
+	add_inspector_plugin(emitter_inspector_plugin)
+
 func _on_project_explorer_button_clicked():
+	bank_explorer.should_display_copy_buttons = true
+	bank_explorer.should_display_select_button = false
+	_popup_project_explorer(FmodBankExplorer.ToDisplayFlags.BANKS | FmodBankExplorer.ToDisplayFlags.BUSES | FmodBankExplorer.ToDisplayFlags.VCA | FmodBankExplorer.ToDisplayFlags.EVENTS)
+
+func open_project_explorer_events(on_select_callable: Callable):
+	bank_explorer.should_display_copy_buttons = false
+	bank_explorer.should_display_select_button = true
+	_popup_project_explorer(FmodBankExplorer.ToDisplayFlags.BANKS | FmodBankExplorer.ToDisplayFlags.EVENTS, on_select_callable)
+
+func _popup_project_explorer(to_display: int, callable: Callable = Callable()):
 	if bank_explorer.visible == true:
-		bank_explorer.visible = false
+		bank_explorer.close_window()
 		return
+	bank_explorer.regenerate_tree(to_display, callable)
 	bank_explorer.popup_centered()
 
 func _enter_tree():
 	add_export_plugin(export_plugin)
 
 func _exit_tree():
+	remove_inspector_plugin(emitter_inspector_plugin)
 	remove_control_from_container(EditorPlugin.CONTAINER_TOOLBAR, fmod_button)
 	fmod_button.queue_free()
 	remove_export_plugin(export_plugin)

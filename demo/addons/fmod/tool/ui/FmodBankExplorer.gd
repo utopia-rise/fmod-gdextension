@@ -1,5 +1,12 @@
 @tool class_name FmodBankExplorer extends Window
 
+enum ToDisplayFlags {
+	BANKS = 1,
+	BUSES = 2,
+	VCA = 4,
+	EVENTS = 8
+}
+
 static var _fmod_icon = load("res://addons/fmod/icons/fmod_icon.svg")
 static var _vca_icon = load("res://addons/fmod/icons/vca_icon.svg")
 static var _bank_icon = load("res://addons/fmod/icons/bank_icon.svg")
@@ -7,9 +14,16 @@ static var _event_icon = load("res://addons/fmod/icons/event_icon.svg")
 static var _bus_icon = load("res://addons/fmod/icons/bus_icon.svg")
 static var _snapshot_icon = load("res://addons/fmod/icons/snapshot_icon.svg")
 
+signal emit_path_and_guid(path: String, guid: String)
+
 var tree: Tree
 var copy_path_button := Button.new()
 var copy_guid_button := Button.new()
+
+var should_display_copy_buttons = true
+var should_display_select_button = false
+
+var _current_select_callable: Callable
 
 func _ready():
 	var main_window_size = get_parent().get_window().size
@@ -22,6 +36,12 @@ func _ready():
 	copy_path_button.pressed.connect(_on_copy_path_button)
 	copy_guid_button.pressed.connect(_on_copy_guid_button)
 	
+	var emit_path_and_guid_callable = func emit_path_and_guid_callable():
+		emit_path_and_guid.emit(%PathLabel.text, %GuidLabel.text)
+	%SelectButton.pressed.connect(emit_path_and_guid_callable)
+	%SelectButton.pressed.connect(close_window)
+	%CloseButton.pressed.connect(close_window)
+	
 	%ButtonsContainer.add_child(copy_path_button)
 	%ButtonsContainer.add_child(copy_guid_button)
 	
@@ -29,7 +49,15 @@ func _ready():
 	tree.item_selected.connect(_on_item_selected)
 	
 	tree.columns = 1
+	regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+
+func regenerate_tree(to_display: int, callable: Callable = Callable()):
+	%SelectButton.visible = should_display_select_button
+	if _current_select_callable != Callable() && _current_select_callable.get_object() != null:
+		emit_path_and_guid.disconnect(_current_select_callable)
+	_current_select_callable = callable
 	
+	tree.clear()
 	var root_item := tree.create_item()
 	root_item.set_text(0, "Fmod objects")
 	root_item.set_icon(0, _fmod_icon)
@@ -41,29 +69,44 @@ func _ready():
 		bank_item.set_text(0, fmod_bank.get_godot_res_path())
 		bank_item.set_icon(0, _bank_icon)
 		
-		var buses_item := tree.create_item(bank_item)
-		buses_item.set_text(0, "Buses")
-		buses_item.set_icon(0, _bus_icon)
+		if to_display & ToDisplayFlags.BUSES:
+			var buses_item := tree.create_item(bank_item)
+			buses_item.set_text(0, "Buses")
+			buses_item.set_icon(0, _bus_icon)
+			
+			var buses := fmod_bank.get_bus_list()
+			buses.sort_custom(sort_by_path)
+			_add_elements_as_tree(buses, buses_item)
 		
-		var buses := fmod_bank.get_bus_list()
-		buses.sort_custom(sort_by_path)
-		_add_elements_as_tree(buses, buses_item)
+		if to_display & ToDisplayFlags.VCA:
+			var vca_item := tree.create_item(bank_item)
+			vca_item.set_text(0, "VCAs")
+			vca_item.set_icon(0, _vca_icon)
+			
+			var vcas := fmod_bank.get_vca_list()
+			vcas.sort_custom(sort_by_path)
+			_add_elements_as_tree(vcas, vca_item)
 		
-		var vca_item := tree.create_item(bank_item)
-		vca_item.set_text(0, "VCAs")
-		vca_item.set_icon(0, _vca_icon)
-		
-		var vcas := fmod_bank.get_vca_list()
-		vcas.sort_custom(sort_by_path)
-		_add_elements_as_tree(vcas, vca_item)
-		
-		var events_item := tree.create_item(bank_item)
-		events_item.set_text(0, "Events")
-		events_item.set_icon(0, _event_icon)
-		
-		var events := fmod_bank.get_description_list()
-		events.sort_custom(sort_by_path)
-		_add_elements_as_tree(events, events_item)
+		if to_display & ToDisplayFlags.EVENTS:
+			var events_item := tree.create_item(bank_item)
+			events_item.set_text(0, "Events")
+			events_item.set_icon(0, _event_icon)
+			
+			var events := fmod_bank.get_description_list()
+			events.sort_custom(sort_by_path)
+			_add_elements_as_tree(events, events_item)
+	
+	if copy_path_button.visible:
+		copy_path_button.visible = should_display_copy_buttons
+	
+	if copy_guid_button.visible:
+		copy_guid_button.visible = should_display_copy_buttons
+	
+	if _current_select_callable != Callable():
+		print(_current_select_callable)
+		emit_path_and_guid.connect(_current_select_callable)
+	
+	%SelectButton.visible = should_display_select_button and %GuidLabel.text != ""
 
 func _add_elements_as_tree(elements: Array, parent: TreeItem):
 	var stack = Array()
@@ -109,17 +152,24 @@ func _on_item_selected():
 		%PathLabel.set_text("")
 		copy_path_button.visible = false
 		copy_guid_button.visible = false
+		%SelectButton.visible = false
 		return
 	%GuidLabel.set_text(metadata.get_guid())
 	%PathLabel.set_text(metadata.get_path())
-	copy_path_button.visible = true
-	copy_guid_button.visible = true
+	if should_display_copy_buttons:
+		copy_path_button.visible = true
+		copy_guid_button.visible = true
+	if should_display_select_button:
+		%SelectButton.visible = true
 
 func _on_copy_path_button():
 	DisplayServer.clipboard_set(%PathLabel.text)
 
 func _on_copy_guid_button():
 	DisplayServer.clipboard_set(%GuidLabel.text)
+
+func close_window():
+	visible = false
 
 static func _get_icon_for_fmod_path(fmod_path: String) -> Texture2D:
 	var icon: Texture2D = null

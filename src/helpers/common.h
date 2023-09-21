@@ -137,9 +137,9 @@ namespace godot {
         return ref;
     }
 
-    static inline FMOD_GUID string_to_fmod_guid(const String& guid) {
+    static inline FMOD_GUID string_to_fmod_guid(const char* guid) {
         FMOD_GUID result;
-        sscanf(guid.utf8().get_data(),
+        sscanf(guid,
                "{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
                &result.Data1, &result.Data2, &result.Data3,
                &result.Data4[0], &result.Data4[1], &result.Data4[2], &result.Data4[3],

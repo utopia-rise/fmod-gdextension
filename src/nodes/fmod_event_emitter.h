@@ -21,6 +21,8 @@ namespace godot {
         Ref<FmodEvent> _event;
 
         String _event_name;
+        FMOD_GUID _event_guid;
+        bool _load_by_event_name;
         bool _attached = true;
         bool _autoplay = false;
         bool _is_one_shot = false;
@@ -43,6 +45,10 @@ namespace godot {
         bool is_paused();
         void set_event_name(const String& name);
         String get_event_name() const;
+        void set_event_guid(const String& guid);
+        String get_event_guid() const;
+        void set_load_by_event_name(const bool p_load_by_event_name);
+        bool get_load_by_event_name() const;
         void set_attached(const bool attached);
         bool is_attached() const;
         void set_autoplay(const bool autoplay);
@@ -68,6 +74,7 @@ namespace godot {
     private:
         void set_space_attribute() const;
         void apply_parameters();
+        Ref<FmodEventDescription> _load_event_description() const;
         void preload_event() const;
         void load_event();
 
@@ -183,30 +190,32 @@ namespace godot {
             return;
         }
 
+        Ref<FmodEventDescription> event_description {_load_event_description()};
+
         if (_attached) {
             if (!_params.is_empty()) {
-                FmodServer::get_singleton()->play_one_shot_attached_with_params(
-                  _event_name,
+                FmodServer::get_singleton()->play_one_shot_using_event_description_attached_with_params(
+                  event_description,
                   this,
                   _params
                 );
                 return;
             }
 
-            FmodServer::get_singleton()->play_one_shot_attached(_event_name, this);
+            FmodServer::get_singleton()->play_one_shot_using_event_description(event_description, this);
             return;
         }
 
         if (!_params.is_empty()) {
-            FmodServer::get_singleton()->play_one_shot_with_params(
-              _event_name,
+            FmodServer::get_singleton()->play_one_shot_using_event_description_with_params(
+              event_description,
               this,
               _params
             );
             return;
         }
 
-        FmodServer::get_singleton()->play_one_shot(_event_name, this);
+        FmodServer::get_singleton()->play_one_shot_using_event_description(event_description, this);
         return;
     }
 
@@ -227,14 +236,58 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
+    Ref<FmodEventDescription> FmodEventEmitter<Derived, NodeType>::_load_event_description() const {
+        Ref<FmodEventDescription> ret;
+        if (_load_by_event_name) {
+#ifdef DEBUG_ENABLED
+            if (FmodServer::get_singleton()->check_event_path(_event_name)) {
+#endif
+                ret = FmodServer::get_singleton()->get_event(_event_name);
+#ifdef DEBUG_ENABLED
+            } else {
+                GODOT_LOG_ERROR(vformat("Cannot find event with path %s, will try with guid", _event_name));
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
+                    ret = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
+                } else {
+                    GODOT_LOG_ERROR(vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name));
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                    return ret;
+                }
+            }
+#endif
+        } else {
+#ifdef DEBUG_ENABLED
+            if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
+#endif
+                ret = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
+#ifdef DEBUG_ENABLED
+            } else {
+                GODOT_LOG_ERROR(vformat("Cannot find event with guid %s, will try with guid", get_event_guid()));
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                if (FmodServer::get_singleton()->check_event_path(_event_name)) {
+                    ret = FmodServer::get_singleton()->get_event(_event_name);
+                } else {
+                    GODOT_LOG_ERROR(vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name));
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                    return ret;
+                }
+            }
+#endif
+        }
+
+        return ret;
+    }
+
+    template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::preload_event() const {
-        Ref<FmodEventDescription> desc = FmodServer::get_singleton()->get_event(_event_name);
+        Ref<FmodEventDescription> desc = _load_event_description();
         desc->load_sample_data();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
-        _event = FmodServer::get_singleton()->create_event_instance(_event_name);
+        _event = FmodServer::get_singleton()->create_event_instance_from_description(_load_event_description());
         _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
     }
 
@@ -260,6 +313,26 @@ namespace godot {
     template<class Derived, class NodeType>
     String FmodEventEmitter<Derived, NodeType>::get_event_name() const {
         return _event_name;
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_event_guid(const String& guid) {
+        _event_guid = string_to_fmod_guid(guid.utf8().get_data());
+    }
+
+    template<class Derived, class NodeType>
+    String FmodEventEmitter<Derived, NodeType>::get_event_guid() const {
+        return fmod_guid_to_string(_event_guid);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_load_by_event_name(const bool p_load_by_event_name) {
+        _load_by_event_name = p_load_by_event_name;
+    }
+
+    template<class Derived, class NodeType>
+    bool FmodEventEmitter<Derived, NodeType>::get_load_by_event_name() const {
+        return _load_by_event_name;
     }
 
     template<class Derived, class NodeType>
@@ -365,6 +438,10 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("set_paused", "p_is_paused"), &Derived::set_paused);
         ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &Derived::set_event_name);
         ClassDB::bind_method(D_METHOD("get_event_name"), &Derived::get_event_name);
+        ClassDB::bind_method(D_METHOD("set_event_guid", "event_guid"), &Derived::set_event_guid);
+        ClassDB::bind_method(D_METHOD("get_event_guid"), &Derived::get_event_guid);
+        ClassDB::bind_method(D_METHOD("set_load_by_event_name", "p_load_by_event_name"), &Derived::set_load_by_event_name);
+        ClassDB::bind_method(D_METHOD("get_load_by_event_name"), &Derived::get_load_by_event_name);
         ClassDB::bind_method(D_METHOD("set_attached", "attached"), &Derived::set_attached);
         ClassDB::bind_method(D_METHOD("is_attached"), &Derived::is_attached);
         ClassDB::bind_method(D_METHOD("set_autoplay", "_autoplay"), &Derived::set_autoplay);
@@ -383,6 +460,8 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);
 
         ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_name", "get_event_name");
+        ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_guid",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_guid", "get_event_guid");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "load_by_event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_load_by_event_name", "get_load_by_event_name");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_attached", "is_attached");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_autoplay", "is_autoplay");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "one_shot",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_one_shot", "is_one_shot");
