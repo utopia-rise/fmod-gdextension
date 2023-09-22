@@ -22,14 +22,15 @@ automatically.
 
 ### Properties
 
-You first should set event name that emitter will play.  
+You first should set event that emitter will play. You can set name or guid manually or using event selection button.  
 You can setup parameters using a `Dictionary` with keys representing parameter name as `String` and values as `Float`.
 Then you have few toogle options:  
-- *attached*: if `true`, Fmod event position will be updated alongside node's position.
-- *autoplay*: if `true`, it will autoplay event, without need to call `play` method.
-- *one_shot*: if `true`, event will be played only once.
-- *allow_fadeout*: if `true`, event will be stop with fadeout mode.
-- *preload_event*: if `true`, event will be preloaded when node is ready.
+- *load_by_event_name*: if `true` will use event_name to load event, otherwise it uses GUID.  
+- *attached*: if `true`, Fmod event position will be updated alongside node's position.  
+- *autoplay*: if `true`, it will autoplay event, without need to call `play` method.  
+- *one_shot*: if `true`, event will be played only once.  
+- *allow_fadeout*: if `true`, event will be stop with fadeout mode.  
+- *preload_event*: if `true`, event will be preloaded when node is ready.  
 
 ### Signals
 
