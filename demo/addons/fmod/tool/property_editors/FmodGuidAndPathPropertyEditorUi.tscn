@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://hy04frgfhtgu"]
+
+[ext_resource type="Texture2D" uid="uid://dca7c6jnnpl0f" path="res://addons/fmod/icons/event_icon.svg" id="1_kuu6i"]
+
+[node name="HBoxContainer" type="HBoxContainer"]
+offset_right = 1152.0
+offset_bottom = 66.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="FmodGuidAndPathPropertyEditorUi" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PathLineEdit" type="LineEdit" parent="FmodGuidAndPathPropertyEditorUi"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="GuidLineEdit" type="LineEdit" parent="FmodGuidAndPathPropertyEditorUi"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EventExplorerButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+icon = ExtResource("1_kuu6i")

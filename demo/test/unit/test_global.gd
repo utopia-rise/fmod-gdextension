@@ -39,7 +39,6 @@ class TestGlobal:
 		assert_eq(num_buffers, 4)
 
 	func test_assert_should_have_dsp_buffer_size():
-		var buffer_size = FmodServer.get_system_dsp_buffer_size()
-		assert_eq(buffer_size.size(), 2)
-		assert_eq(buffer_size[0], 512)
-		assert_eq(buffer_size[1], 4)
+		var buffer_size: FmodDspSettings = FmodServer.get_system_dsp_buffer_settings()
+		assert_eq(buffer_size.dsp_buffer_size, 512)
+		assert_eq(buffer_size.dsp_buffer_count, 4)

@@ -17,9 +17,6 @@ namespace godot {
 
         FmodEditorExportPlugin() = default;
         ~FmodEditorExportPlugin() = default;
-
-    private:
-        void _list_files_in_folder(PackedStringArray& result, const String& folder, const String& extension = "");
     };
 }
 

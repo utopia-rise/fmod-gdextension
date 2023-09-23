@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 23 18" width="23" height="18">
+	<title>snapshot_icon</title>
+	<defs>
+		<image  width="23" height="18" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAASCAMAAACHObUhAAAAAXNSR0IB2cksfwAAAPxQTFRFAAAAAAAAAAAAAQEBAQEBAAAAAQEBAAAAAQEBFBQUMjIyMzMzFBQUAQEBAAAAOTk5ZmZmfHx8gICAfn5+ODg4AAAAAQEBExMTHx8fGhoaVVVVf39/R0dHFBQUdnZ2UlJSa2trAQEBAAAALy8vHh4eAQEBEBAQZGRkPDw8dHR0SUlJZ2dnMTExAwMDKioqcHBwBQUFCAgIBAQEFxcXQ0NDYmJiDAwMGxsbWVlZBgYGc3NzKCgoFhYWISEhJiYmbGxsWFhYeHh4VFRUCwsLbW1tRkZGAAAAEhISAQEBAAAANzc3AAAAAQEBExMTAAAAAAAAAQEBAQEBAQEBAAAAvMGz4gAAAFR0Uk5TAAFn1/r/1max/v///bBu////////a9r+////////////2fz///////////////////////////////////////////////v+2Gz/aq/9rmXV+dRjwdo0YQAAAN1JREFUeJxtkX1XAWEQxeeJGy3RznorlrClImUpL6GEUIny/b9L9gXPOu5fc35zzszcO0TiyOeHLP9xQBCJIE6UkCwljFNBEUTPVPZIiyFOiaSWOr9I2yCjZ5lz+qWWzFOhyMbVdapk8RvcMt+hzMUCocIGcK9XHxxeekSNK3A5YNYbNn9a12mJPzdbB3i73lCdOZ0XRDdzzK6S9ex1eK//ap/5ZkKX+cD18w4MZc6H+NrXRqMexq6vDyuHbWObw2RKM8R2DTe3T3yR+MZ8L+c5fqwHLJbev/z+rQT9A5sFJPmrtG2HAAAAAElFTkSuQmCC"/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+</svg>

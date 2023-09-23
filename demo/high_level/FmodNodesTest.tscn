@@ -27,6 +27,7 @@ position = Vector2(500, 500)
 
 [node name="Emitter" type="FmodEventEmitter2D" parent="FmodBankLoader/Node2D"]
 event_name = "event:/Vehicles/Car Engine"
+event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
 autoplay = true
 parameters = {
 "RPM": 600.0
@@ -99,6 +100,7 @@ script = ExtResource("5_5p5kb")
 
 [node name="FmodEventEmitter2D" type="FmodEventEmitter2D" parent="FmodBankLoader/SoundArea2"]
 event_name = "event:/Music/Level 02"
+event_guid = "{c7f946fd-d695-499b-a820-752799c4921d}"
 autoplay = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FmodBankLoader/SoundArea2"]

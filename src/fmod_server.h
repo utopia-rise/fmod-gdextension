@@ -55,6 +55,18 @@ namespace godot {
 
         static FmodServer* singleton;
 
+        union IdentifierParameter {
+            const char* string_identifier;
+            FMOD_GUID guid;
+            FmodEventDescription* event_description;
+        };
+
+        enum IdentifierParameterType {
+            PATH,
+            GUID,
+            EVENT_DESCRIPTION
+        };
+
     private:
         FMOD::Studio::System* system;
         FMOD::System* coreSystem;
@@ -87,7 +99,12 @@ namespace godot {
 
         void _set_listener_attributes();
 
-        Ref<FmodEvent> _create_instance(const String& eventName, bool isOneShot, Node* gameObject);
+        Ref<FmodEventDescription> _get_event_description(const String& event_name);
+        Ref<FmodEventDescription> _get_event_description(const FMOD_GUID& guid);
+
+        template<IdentifierParameterType parameter_type>
+        Ref<FmodEvent> _create_instance(const IdentifierParameter& identifier, bool isOneShot, Node* gameObject);
+        Ref<FmodEvent> _create_instance(const Ref<FmodEventDescription>& description, bool is_one_shot, Node* game_object);
 
         void _update_performance_data();
 
@@ -107,16 +124,24 @@ namespace godot {
         void set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings);
         void set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_settings);
         void set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings);
-        Ref<FmodDspSettings> get_system_dsp_buffer_size();
+        Ref<FmodDspSettings> get_system_dsp_buffer_settings();
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
 
         // OBJECTS
+        bool check_vca_guid(const String& guid);
         bool check_vca_path(const String& vcaPath);
+        bool check_bus_guid(const String& guid);
         bool check_bus_path(const String& busPath);
+        bool check_event_guid(const String& guid);
+        bool check_event_guid_internal(const FMOD_GUID& guid);
         bool check_event_path(const String& eventPath);
+        Ref<FmodVCA> get_vca_from_guid(const String& guid);
         Ref<FmodVCA> get_vca(const String& vcaPath);
+        Ref<FmodBus> get_bus_from_guid(const String& guid);
         Ref<FmodBus> get_bus(const String& busPath);
+        Ref<FmodEventDescription> get_event_from_guid(const String& guid);
+        Ref<FmodEventDescription> get_event_from_guid_internal(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
         Array get_all_vca();
         Array get_all_buses();
@@ -160,7 +185,16 @@ namespace godot {
         Ref<FmodBank> load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
+
+        // EVENTS
+    private:
+        template<IdentifierParameterType parameter_type>
+        Ref<FmodEvent> _create_event_instance(const IdentifierParameter& identifier);
+    public:
+        Ref<FmodEvent> create_event_instance_with_guid(const String& guid);
+        Ref<FmodEvent> create_event_instance_with_guid_internal(const FMOD_GUID& guid);
         Ref<FmodEvent> create_event_instance(const String& eventPath);
+        Ref<FmodEvent> create_event_instance_from_description(const Ref<FmodEventDescription>& event_description);
 
         // SOUNDS
         Ref<FmodFile> load_file_as_sound(const String& path);
@@ -172,10 +206,26 @@ namespace godot {
         void add_callback(const Callback& callback);
 
         /* Helper methods */
-        void play_one_shot(const String& eventName, Node* gameObj);
-        void play_one_shot_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
-        void play_one_shot_attached(const String& eventName, Node* gameObj);
-        void play_one_shot_attached_with_params(const String& eventName, Node* gameObj, const Dictionary& parameters);
+    private:
+        template<IdentifierParameterType parameter_type, bool with_params, bool is_attached>
+        void _play_one_shot(const IdentifierParameter& identifier, Node* game_obj, const Dictionary& parameters = Dictionary());
+    public:
+        void play_one_shot_using_guid(const String& guid, Node* game_obj);
+        void play_one_shot_using_guid_internal(const FMOD_GUID& guid, Node* game_obj);
+        void play_one_shot(const String& event_name, Node* game_obj);
+        void play_one_shot_using_event_description(const Ref<FmodEventDescription>& event_description, Node* game_obj);
+        void play_one_shot_using_guid_with_params_internal(const FMOD_GUID& guid, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_using_guid_with_params(const String& guid, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_using_event_description_with_params(const Ref<FmodEventDescription>& event_description, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_using_guid_attached(const String& guid, Node* game_obj);
+        void play_one_shot_using_guid_attached_internal(const FMOD_GUID& guid, Node* game_obj);
+        void play_one_shot_attached(const String& event_name, Node* game_obj);
+        void play_one_shot_using_event_description_attached(const Ref<FmodEventDescription>& event_description, Node* game_obj);
+        void play_one_shot_using_guid_attached_with_params(const String& guid, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_using_guid_attached_with_params_internal(const FMOD_GUID& guid, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_attached_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters);
+        void play_one_shot_using_event_description_attached_with_params(const Ref<FmodEventDescription>& event_description, Node* game_obj, const Dictionary& parameters);
         void pause_all_events();
         void unpause_all_events();
         void mute_all_events();
@@ -185,6 +235,59 @@ namespace godot {
     protected:
         static void _bind_methods();
     };
+
+    template<FmodServer::IdentifierParameterType parameter_type>
+    Ref<FmodEvent> FmodServer::_create_instance(const IdentifierParameter& identifier, bool isOneShot, Node* gameObject) {
+        Ref<FmodEventDescription> desc;
+        switch (parameter_type) {
+            case PATH:
+                desc = _get_event_description(identifier.string_identifier);
+                break;
+            case GUID:
+                desc = _get_event_description(identifier.guid);
+                break;
+            case EVENT_DESCRIPTION:
+                desc = Ref<FmodEventDescription>(identifier.event_description);
+                break;
+        }
+
+        return _create_instance(desc, isOneShot, gameObject);
+    }
+
+    template<FmodServer::IdentifierParameterType parameter_type>
+    Ref<FmodEvent> FmodServer::_create_event_instance(const IdentifierParameter& identifier) {
+        Ref<FmodEvent> ref = _create_instance<parameter_type>(identifier, false, nullptr);
+        ref->get_wrapped()->setUserData(ref.ptr());
+        ref->set_distance_scale(distanceScale);
+        return ref;
+    }
+
+    template<FmodServer::IdentifierParameterType parameter_type, bool with_params, bool is_attached>
+    void FmodServer::_play_one_shot(const IdentifierParameter& identifier, Node* game_obj, const Dictionary& parameters) {
+        if (is_attached && !is_fmod_valid(game_obj)) { return; }
+
+        Ref<FmodEvent> ref = _create_instance<parameter_type>(
+          identifier,
+          true,
+          is_attached ? game_obj : nullptr
+        );
+        if (!ref.is_valid()) { return; }
+
+        if (!is_attached) { ref->set_node_attributes(game_obj); }
+
+        if (with_params) {
+            // set the initial parameter values
+            Array keys = parameters.keys();
+            for (int i = 0; i < keys.size(); ++i) {
+                String k = keys[i];
+                float v = parameters[keys[i]];
+                ref->set_parameter_by_name(k.utf8().get_data(), v);
+            }
+        }
+
+        ref->start();
+        ref->release();
+    }
 }// namespace godot
 
 #endif// GODOTFMOD_FMOD_SERVER_H

@@ -50,8 +50,14 @@ roll-off scale.
 
 ![3d-tab]
 
+## Fmod explorer
+
+When all is setup you can explore your project's banks using `Fmod Explorer`.  
+![fmod-explorer]
+
 
 [general-tab]: ./assets/parameter-general.png
 [software-format-tab]: ./assets/parameters-software-format.png
 [dsp-tab]: ./assets/parameters-dsp.png
 [3d-tab]: ./assets/parameters-3d.png
+[fmod-explorer]: ./assets/fmod-explorer.png

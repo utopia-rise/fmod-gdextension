@@ -1,0 +1,9 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 21" width="18" height="21">
+	<title>d_parameter_icon</title>
+	<defs>
+		<image  width="18" height="21" id="img1" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAAVCAMAAAB8FU7dAAAAAXNSR0IB2cksfwAAAGxQTFRFAAAAAAAAAAAAAAAAAAAAHx8fTExMSEhIMTExAAAAAAAAOzs7jo6OiIiIj4+PXFxcAAAAODg4h4eHgICAV1dXPz8/Q0NDKysrAAAAX19fAAAANzc3NjY2VlZWf39/AAAAGxsbAwMDTk5OR0dHZLhzlQAAACR0Uk5Ti+ztr93/////6NX//////+H/////////8P///////+r/////RH/TkgAAAHVJREFUeJx1kNsSgjAMRAPSIlQrFsKlykX4/3/U6YwlbeA8ntnZSRYgSUMukAmZE+S1gFLd7gT9qKB8mppgGqLQ0Xa9V4P94xVaEafQou96cfXmSnEVdY2Bmk5SPzUvrTtb7Mof/VnjFG78bbKE0vFeB6vy7b+Cnhf2Pv5vKwAAAABJRU5ErkJggg=="/>
+	</defs>
+	<style>
+	</style>
+	<use id="Background" href="#img1" x="0" y="0"/>
+</svg>

@@ -48,8 +48,32 @@ class TestEventDescription:
 		assert_eq(FmodServer.get_event("event:/Vehicles/Car Engine").get_instance_count(), desired_value, "Event description list size should be " + str(desired_value))
 		fmodEvent = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
 	
+	func test_assert_should_create_and_release_using_guid():
+		var desired_value: int = 2
+		var fmodEvent2: FmodEvent = FmodServer.create_event_instance_with_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}")
+		var instance_list: Array = FmodServer.get_event_from_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}").get_instance_list()
+		assert_eq(instance_list.size(), desired_value, "Event description list size should be " + str(desired_value))
+		fmodEvent2.release()
+		desired_value = 1
+		await wait_seconds(2)
+		assert_eq(FmodServer.get_event("event:/Vehicles/Car Engine").get_instance_list().size(), desired_value, "Event description list size should be " + str(desired_value))
+		fmodEvent2 = FmodServer.create_event_instance_with_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}")
+		var fmodEvent3: FmodEvent = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+		desired_value = 3
+		assert_eq(FmodServer.get_event_from_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}").get_instance_list().size(), desired_value, "Event description list size should be " + str(desired_value))
+		FmodServer.get_event_from_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}").release_all_instances()
+		desired_value = 0
+		await wait_seconds(2)
+		assert_eq(FmodServer.get_event_from_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}").get_instance_count(), desired_value, "Event description list size should be " + str(desired_value))
+		fmodEvent = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+	
 	func test_assert_should_be_3d():
-		assert_true(FmodServer.get_event("event:/Vehicles/Car Engine").is_3d(), "Event description should be 3D")
+		_test_assert_should_be_3d(false)
+		_test_assert_should_be_3d(true)
+	
+	func _test_assert_should_be_3d(is_guid: bool):
+		var event: FmodEventDescription = FmodServer.get_event_from_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}") if is_guid else FmodServer.get_event("event:/Vehicles/Car Engine")
+		assert_true(event.is_3d(), "Event description should be 3D")
 	
 	func test_assert_should_not_be_oneshot():
 		assert_false(FmodServer.get_event("event:/Vehicles/Car Engine").is_one_shot(), "Event description should not be oneshot")

@@ -36,9 +36,17 @@ class TestEvent:
 		var wanted: String = "event:/Vehicles/Car Engine"
 		assert_true(FmodServer.check_event_path(wanted), wanted + " should be present")
 	
+	func test_should_has_event_guid():
+		var wanted: String = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
+		assert_true(FmodServer.check_event_guid(wanted), wanted + " should be present")
+	
 	func test_should_not_has_event():
 		var wanted: String = "undefined"
 		assert_false(FmodServer.check_event_path(wanted), wanted + " should not be present")
+	
+	func test_should_not_has_event_guid():
+		var wanted: String = "{29583fe9-eee9-4c67-94e1-57d5f6c552af}"
+		assert_false(FmodServer.check_event_guid(wanted), wanted + " should not be present")
 	
 	func test_assert_set_volume():
 		var desired_value: float = 4.0
@@ -72,7 +80,7 @@ class TestEvent:
 	
 	func test_assert_should_pause_all():
 		fmodEvent.paused = false
-		var fmodEvent2 = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+		var fmodEvent2 = FmodServer.create_event_instance_with_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}")
 		fmodEvent2.start()
 		FmodServer.pause_all_events()
 		assert_true(fmodEvent.paused, "Event " + str(fmodEvent) + " should be paused")

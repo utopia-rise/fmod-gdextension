@@ -65,6 +65,7 @@ private:
                                                                          \
 private:                                                                 \
     m_owned* _wrapped = nullptr;                                         \
+    FMOD_GUID _guid;                                                     \
     String _path;                                                        \
                                                                          \
 public:                                                                  \
@@ -75,6 +76,7 @@ public:                                                                  \
             ref->_wrapped = wrapped;                                     \
             char path[MAX_PATH_SIZE];                                    \
             ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr)); \
+            ERROR_CHECK(wrapped->getID(&ref->_guid));                    \
             ref->_path = String(path);                                   \
         }                                                                \
         return ref;                                                      \
@@ -90,6 +92,14 @@ public:                                                                  \
                                                                          \
     String get_path() const {                                            \
         return _path;                                                    \
+    }                                                                    \
+                                                                         \
+    FMOD_GUID get_guid() const {                                         \
+        return _guid;                                                    \
+    }                                                                    \
+                                                                         \
+    String get_guid_as_string() const {                                  \
+        return fmod_guid_to_string(_guid);                               \
     }                                                                    \
                                                                          \
 private:
@@ -127,6 +137,24 @@ namespace godot {
         return ref;
     }
 
+    static inline FMOD_GUID string_to_fmod_guid(const char* guid) {
+        FMOD_GUID result;
+        sscanf(guid,
+               "{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
+               &result.Data1, &result.Data2, &result.Data3,
+               &result.Data4[0], &result.Data4[1], &result.Data4[2], &result.Data4[3],
+               &result.Data4[4], &result.Data4[5], &result.Data4[6], &result.Data4[7]);
+        return result;
+    }
+
+    static inline String fmod_guid_to_string(const FMOD_GUID& guid) {
+        char result[39];
+        snprintf(result, sizeof(result), "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+                 guid.Data1, guid.Data2, guid.Data3,
+                 guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+                 guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+        return result;
+    }
 }// namespace godot
 
 #endif// GODOTFMOD_COMMON_H

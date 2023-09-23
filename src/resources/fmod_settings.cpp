@@ -38,6 +38,14 @@ int FmodGeneralSettings::get_default_listener_count() const {
     return _default_listener_count;
 }
 
+void FmodGeneralSettings::set_banks_path(const String& p_paths) {
+    _banks_path = p_paths;
+}
+
+const String& FmodGeneralSettings::get_banks_path() const {
+    return _banks_path;
+}
+
 Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     Ref<FmodGeneralSettings> settings;
     settings.instantiate();
@@ -56,6 +64,9 @@ Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     String default_listener_count_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, DEFAULT_LISTENER_COUNT_OPTION);
     settings->set_default_listener_count(project_settings->get_setting(default_listener_count_setting_path, DEFAULT_DEFAULT_LISTENER_COUNT));
 
+    String banks_paths_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, BANKS_PATH_OPTION);
+    settings->set_banks_path(project_settings->get_setting(banks_paths_setting_path, DEFAULT_BANKS_PATH));
+
     return settings;
 }
 
@@ -71,6 +82,9 @@ void FmodGeneralSettings::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_default_listener_count", "p_listener_count"), &FmodGeneralSettings::set_default_listener_count);
     ClassDB::bind_method(D_METHOD("get_default_listener_count"), &FmodGeneralSettings::get_default_listener_count);
+
+    ClassDB::bind_method(D_METHOD("set_banks_path", "p_paths"), &FmodGeneralSettings::set_banks_path);
+    ClassDB::bind_method(D_METHOD("get_banks_path"), &FmodGeneralSettings::get_banks_path);
 
     ADD_PROPERTY(
       PropertyInfo(
@@ -118,5 +132,17 @@ void FmodGeneralSettings::_bind_methods() {
       ),
       "set_default_listener_count",
       "get_default_listener_count"
+    );
+
+    ADD_PROPERTY(
+      PropertyInfo(
+        Variant::STRING,
+        "banks_path",
+        PROPERTY_HINT_NONE,
+        "",
+        PROPERTY_USAGE_DEFAULT
+      ),
+      "set_banks_path",
+      "get_banks_path"
     );
 }

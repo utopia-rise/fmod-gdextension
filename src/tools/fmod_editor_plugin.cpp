@@ -5,7 +5,9 @@
 #include "fmod_editor_export_plugin.h"
 
 #include <constants.h>
+#include <fmod_server.h>
 #include <helpers/common.h>
+#include <helpers/files.h>
 #include <resources/fmod_dsp_settings.h>
 #include <resources/fmod_settings.h>
 #include <resources/fmod_software_format_settings.h>
@@ -14,6 +16,9 @@
 #include <classes/project_settings.hpp>
 
 using namespace godot;
+
+static constexpr const char* MASTER_BANK_NAME = "Master.bank";
+static constexpr const char* MASTER_STRINGS_BANK_NAME = "Master.strings.bank";
 
 void FmodEditorPlugin::_ready() {
     add_setting(
@@ -59,6 +64,14 @@ void FmodEditorPlugin::_ready() {
       Variant::Type::INT
     );
 
+    const String& bank_path_option_name =
+      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::BANKS_PATH_OPTION);
+    add_setting(bank_path_option_name,
+      FmodGeneralSettings::DEFAULT_BANKS_PATH,
+      Variant::Type::STRING,
+      PROPERTY_HINT_DIR
+    );
+
     add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodDspSettings::DSP_SETTINGS_BASE_PATH, FmodDspSettings::DSP_BUFFER_SIZE_OPTION),
       FmodDspSettings::DEFAULT_DSP_BUFFER_SIZE,
@@ -85,6 +98,33 @@ void FmodEditorPlugin::_ready() {
       FmodSound3DSettings::DEFAULT_ROLLOFF_SCALE,
       Variant::Type::FLOAT
     );
+
+    String banks_root = ProjectSettings::get_singleton()->get_setting(bank_path_option_name);
+
+    const String master_strings_bank_path {vformat("%s/%s", banks_root, MASTER_STRINGS_BANK_NAME)};
+    if (!FileAccess::file_exists(master_strings_bank_path)) {
+        GODOT_LOG_WARNING(vformat("Cannot find master strings bank at %s", master_strings_bank_path));
+        return;
+    }
+
+    FmodServer::get_singleton()->load_bank(master_strings_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+
+    const String master_bank_path {vformat("%s/%s", banks_root, MASTER_BANK_NAME)};
+    if (!FileAccess::file_exists(master_bank_path)) {
+        GODOT_LOG_WARNING(vformat("Cannot find master bank at %s", master_bank_path));
+        return;
+    }
+
+    FmodServer::get_singleton()->load_bank(master_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+
+    PackedStringArray banks_path;
+    list_files_in_folder(banks_path, banks_root, ".bank");
+    for (const String& bank_path : banks_path) {
+        if (bank_path.ends_with(MASTER_BANK_NAME) || bank_path.ends_with(MASTER_STRINGS_BANK_NAME)) {
+            continue;
+        }
+        FmodServer::get_singleton()->load_bank(bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+    }
 }
 
 void FmodEditorPlugin::add_setting(
