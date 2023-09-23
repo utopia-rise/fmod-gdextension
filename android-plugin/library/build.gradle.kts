@@ -14,9 +14,18 @@ android {
         targetSdk = 33
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            buildConfigField("boolean", "DEBUG", "false")
+        }
+
+        debug {
+            buildConfigField("boolean", "DEBUG", "true")
         }
     }
     compileOptions {

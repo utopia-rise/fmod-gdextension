@@ -20,8 +20,13 @@ class FmodPlugin(godot: Godot) : GodotPlugin(godot) {
 
     companion object {
         init {
-            System.loadLibrary("fmod")
-            System.loadLibrary("fmodstudio")
+            if (BuildConfig.DEBUG) {
+                System.loadLibrary("fmodL")
+                System.loadLibrary("fmodstudioL")
+            } else {
+                System.loadLibrary("fmod")
+                System.loadLibrary("fmodstudio")
+            }
         }
     }
 }
