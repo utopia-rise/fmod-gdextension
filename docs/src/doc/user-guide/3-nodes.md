@@ -7,7 +7,9 @@ Those nodes are gdextension, so you can extends them using scripts like any othe
 
 `FmodBankLoader` is in charge of loading banks when entering the scene. You should place it, in the scene hierarchy,
 before all other fmod nodes using this bank. Banks are unloaded on exit tree.  
-You simply have to specify bank paths as `String` in inspector:  
+If you want to load your bank when starting game and keep them loaded, use this node and add it as autoload node.  
+You can add banks with fmod project explorer, using the `+` button with bank icon, or manually add a bank using bottom
+line edit. You can also remove and re-order banks:  
 ![fmod-bank-image]
 
 !!! warning

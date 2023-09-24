@@ -37,7 +37,15 @@ func _ready():
 	copy_guid_button.pressed.connect(_on_copy_guid_button)
 	
 	var emit_path_and_guid_callable = func emit_path_and_guid_callable():
-		emit_path_and_guid.emit(%PathLabel.text, %GuidLabel.text)
+		var selected_item = tree.get_selected()
+		if selected_item == null:
+			return
+		var selected_fmod_element = selected_item.get_metadata(0)
+		if selected_fmod_element == null:
+			return
+		
+		var path = selected_fmod_element.get_godot_res_path() if selected_fmod_element is FmodBank else selected_fmod_element.get_path()
+		emit_path_and_guid.emit(path, selected_fmod_element.get_guid())
 	%SelectButton.pressed.connect(emit_path_and_guid_callable)
 	%SelectButton.pressed.connect(close_window)
 	%CloseButton.pressed.connect(close_window)
@@ -68,6 +76,7 @@ func regenerate_tree(to_display: int, callable: Callable = Callable()):
 		var bank_item := tree.create_item(root_item)
 		bank_item.set_text(0, fmod_bank.get_godot_res_path())
 		bank_item.set_icon(0, _bank_icon)
+		bank_item.set_metadata(0, bank)
 		
 		if to_display & ToDisplayFlags.BUSES:
 			var buses_item := tree.create_item(bank_item)
