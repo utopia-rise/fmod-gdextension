@@ -2,14 +2,15 @@
 #include "fmod_server.h"
 #include "helpers/common.h"
 #include "helpers/maths.h"
+#include "fmod_event.h"
 
 using namespace godot;
 
 void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameterName"), &FmodEvent::get_parameter_by_name);
     ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameterName", "value"), &FmodEvent::set_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "idPair"), &FmodEvent::get_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "idPair", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "long_id"), &FmodEvent::get_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "long_id", "value"), &FmodEvent::set_parameter_by_id);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
     ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
@@ -55,20 +56,22 @@ void FmodEvent::set_parameter_by_name(const String& parameterName, float value) 
     ERROR_CHECK(_wrapped->setParameterByName(parameterName.utf8().get_data(), value));
 }
 
-float FmodEvent::get_parameter_by_id(const Array& idPair) const {
+float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
+    return get_parameter_by_fmod_id(ulong_to_fmod_parameter_id(long_id));
+}
+
+float FmodEvent::get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const {
     float value = -1.0f;
-    FMOD_STUDIO_PARAMETER_ID id;
-    id.data1 = idPair[0];
-    id.data2 = idPair[1];
-    ERROR_CHECK(_wrapped->getParameterByID(id, &value));
+    ERROR_CHECK(_wrapped->getParameterByID(parameter_id, &value));
     return value;
 }
 
-void FmodEvent::set_parameter_by_id(const Array& idPair, float value) const {
-    FMOD_STUDIO_PARAMETER_ID id;
-    id.data1 = idPair[0];
-    id.data2 = idPair[1];
-    ERROR_CHECK(_wrapped->setParameterByID(id, value));
+void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {
+    set_parameter_by_fmod_id(ulong_to_fmod_parameter_id(long_id), value);
+}
+
+void FmodEvent::set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const {
+    ERROR_CHECK(_wrapped->setParameterByID(parameter_id, value));
 }
 
 void FmodEvent::release() const {
