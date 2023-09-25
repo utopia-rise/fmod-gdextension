@@ -89,7 +89,7 @@ namespace godot {
     void FmodEventEmitter<Derived, NodeType>::_ready() {
 
         // ensure sound can be played even if game is paused.
-        set_process_mode(ProcessMode.PROCESS_MODE_PAUSABLE);
+        set_process_mode(PROCESS_MODE_ALWAYS);
 
 
 #ifdef TOOLS_ENABLED
@@ -97,18 +97,18 @@ namespace godot {
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
         
-        if (is_preload_event() && _event_name != "") {
+        if (is_preload_event()) {
             preload_event();
         }
 
-        if (!_is_one_shot && _event_name != "") {
+        if (!_is_one_shot) {
             load_event();
             _event->set_volume(_volume);
             apply_parameters();
             set_space_attribute();
         }
 
-        if (_autoplay && _event_name != "") {
+        if (_autoplay) {
             set_paused(false);
             play();
         }

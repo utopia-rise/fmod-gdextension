@@ -1,7 +1,7 @@
 extends Node
 
 func _ready() -> void:
-	process = PROCESS_MODE_PAUSABLE
+	process = PROCESS_MODE_ALWAYS
 
 func _process(delta):
 	FmodServer.update()
