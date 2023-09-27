@@ -18,6 +18,7 @@ else()
 endif()
 
 add_compile_definitions(TOOLS_ENABLED)
+add_compile_definitions(DEBUG_ENABLED)
 
 # Change the output directory to the bin directory
 set(BUILD_PATH ${CMAKE_SOURCE_DIR}/bin/${TARGET_PATH})

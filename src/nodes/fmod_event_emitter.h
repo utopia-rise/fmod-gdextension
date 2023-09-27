@@ -4,6 +4,7 @@
 #include "classes/object.hpp"
 
 #include <fmod_server.h>
+#include <resources/fmod_parameter_identifier.h>
 
 #include <classes/engine.hpp>
 
@@ -62,6 +63,8 @@ namespace godot {
         void set_volume(const float volume);
         float get_volume() const;
         void set_parameter(const String& key, const float value);
+        void set_parameter_by_id(const uint64_t id, const float value);
+        void set_parameter_by_full_identifier(const Ref<FmodParameterIdentifier>& identifier, const float value);
         const Dictionary& get_parameters() const;
         void set_parameters(const Dictionary& p_params);
 
@@ -161,6 +164,19 @@ namespace godot {
         _params[key] = value;
         if (!_event.is_valid()) { return; }
         _event->set_parameter_by_name(key, _params[key]);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_parameter_by_id(const uint64_t id, const float value) {
+        //TODO
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_parameter_by_full_identifier(
+      const Ref<FmodParameterIdentifier>& identifier,
+      const float value
+    ) {
+        //TODO
     }
 
     template<class Derived, class NodeType>

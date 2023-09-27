@@ -20,6 +20,7 @@
 #include <register_types.h>
 #include <resources/fmod_dsp_settings.h>
 #include <resources/fmod_software_format_settings.h>
+#include <studio/fmod_parameter_description.h>
 #include <tools/fmod_editor_plugin.h>
 
 #include <classes/engine.hpp>
@@ -76,6 +77,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         // Studio
         ClassDB::register_class<FmodBank>();
         ClassDB::register_class<FmodEventDescription>();
+        ClassDB::register_class<FmodParameterDescription>();
 
         ClassDB::register_class<FmodEvent>();
         ClassDB::register_class<FmodBus>();

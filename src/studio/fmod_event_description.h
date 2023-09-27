@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_parameter_description.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
 
@@ -27,10 +28,11 @@ namespace godot {
         bool has_sustain_point();
         Array get_min_max_distance();
         float get_sound_size();
-        Dictionary get_parameter_by_name(const String& name);
-        Dictionary get_parameter_by_id(const Array& idPair);
+        Ref<FmodParameterDescription> get_parameter_by_name(const String& name);
+        Ref<FmodParameterDescription> get_parameter_by_id(uint64_t id);
         int get_parameter_count();
-        Dictionary get_parameter_by_index(int index);
+        Ref<FmodParameterDescription> get_parameter_by_index(int index);
+        Array get_parameters();
         Dictionary get_user_property(const String& name);
         int get_user_property_count();
         Dictionary user_property_by_index(int index);

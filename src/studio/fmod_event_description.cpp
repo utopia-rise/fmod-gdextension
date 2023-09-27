@@ -1,6 +1,7 @@
 #include "fmod_event_description.h"
 
 #include "fmod_event.h"
+#include "fmod_parameter_description.h"
 #include "helpers/common.h"
 
 using namespace godot;
@@ -31,6 +32,7 @@ void FmodEventDescription::_bind_methods() {
     );
     ClassDB::bind_method(D_METHOD("get_parameter_count"), &FmodEventDescription::get_parameter_count);
     ClassDB::bind_method(D_METHOD("get_parameter_by_index", "index"), &FmodEventDescription::get_parameter_by_index);
+    ClassDB::bind_method(D_METHOD("get_parameters"), &FmodEventDescription::get_parameters);
     ClassDB::bind_method(D_METHOD("get_user_property", "name"), &FmodEventDescription::get_user_property);
     ClassDB::bind_method(D_METHOD("get_user_property_count"), &FmodEventDescription::get_user_property_count);
     ClassDB::bind_method(D_METHOD("user_property_by_index", "index"), &FmodEventDescription::user_property_by_index);
@@ -130,37 +132,23 @@ float FmodEventDescription::get_sound_size() {
     return soundSize;
 }
 
-Dictionary FmodEventDescription::get_parameter_by_name(const String& name) {
-    Dictionary paramDesc;
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
-    if (ERROR_CHECK(_wrapped->getParameterDescriptionByName(name.utf8().get_data(), &pDesc))) {
-        paramDesc["name"] = String(pDesc.name);
-        paramDesc["id_first"] = pDesc.id.data1;
-        paramDesc["id_second"] = pDesc.id.data2;
-        paramDesc["minimum"] = pDesc.minimum;
-        paramDesc["maximum"] = pDesc.maximum;
-        paramDesc["default_value"] = pDesc.defaultvalue;
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const String& name) {
+    Ref<FmodParameterDescription> param_desc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByName(name.utf8().get_data(), &fmod_desc))) {
+        param_desc = FmodParameterDescription::create_ref(fmod_desc);
     }
-    return paramDesc;
+    return param_desc;
 }
 
-Dictionary FmodEventDescription::get_parameter_by_id(const Array& idPair) {
-    Dictionary paramDesc;
-    FMOD_STUDIO_PARAMETER_ID paramId;
-    paramId.data1 = (unsigned int) idPair[0];
-    paramId.data2 = (unsigned int) idPair[1];
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
-    if (ERROR_CHECK(_wrapped->getParameterDescriptionByID(paramId, &pDesc))) {
-        paramDesc["name"] = String(pDesc.name);
-        paramDesc["id_first"] = pDesc.id.data1;
-        paramDesc["id_second"] = pDesc.id.data2;
-        paramDesc["minimum"] = pDesc.minimum;
-        paramDesc["maximum"] = pDesc.maximum;
-        paramDesc["default_value"] = pDesc.defaultvalue;
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t id) {
+    Ref<FmodParameterDescription> param_desc;
+    FMOD_STUDIO_PARAMETER_ID param_id { ulong_to_fmod_parameter_id(id) };
+    FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByID(param_id, &fmod_desc))) {
+        param_desc = FmodParameterDescription::create_ref(fmod_desc);
     }
-    return paramDesc;
+    return param_desc;
 }
 
 int FmodEventDescription::get_parameter_count() {
@@ -169,19 +157,21 @@ int FmodEventDescription::get_parameter_count() {
     return count;
 }
 
-Dictionary FmodEventDescription::get_parameter_by_index(int index) {
-    Dictionary paramDesc;
-    FMOD_STUDIO_PARAMETER_DESCRIPTION
-    pDesc;
-    if (ERROR_CHECK(_wrapped->getParameterDescriptionByIndex(index, &pDesc))) {
-        paramDesc["name"] = String(pDesc.name);
-        paramDesc["id_first"] = pDesc.id.data1;
-        paramDesc["id_second"] = pDesc.id.data2;
-        paramDesc["minimum"] = pDesc.minimum;
-        paramDesc["maximum"] = pDesc.maximum;
-        paramDesc["default_value"] = pDesc.defaultvalue;
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_index(int index) {
+    Ref<FmodParameterDescription> param_desc;
+    FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
+    if (ERROR_CHECK(_wrapped->getParameterDescriptionByIndex(index, &fmod_desc))) {
+        param_desc = FmodParameterDescription::create_ref(fmod_desc);
     }
-    return paramDesc;
+    return param_desc;
+}
+
+Array FmodEventDescription::get_parameters() {
+    Array parameters;
+    for (int i = 0; i < get_parameter_count(); ++i) {
+        parameters.append(get_parameter_by_index(i));
+    }
+    return parameters;
 }
 
 Dictionary FmodEventDescription::get_user_property(const String& name) {
