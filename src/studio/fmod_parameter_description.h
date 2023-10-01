@@ -26,7 +26,7 @@ namespace godot {
             return ref;
         }
 
-        protected:
+    protected:
         static void _bind_methods();
     };
 }

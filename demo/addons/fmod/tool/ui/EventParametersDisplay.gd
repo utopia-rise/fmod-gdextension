@@ -8,7 +8,6 @@ func set_fmod_event(event: FmodEventDescription):
 		child.queue_free()
 	
 	var event_parameters: Array = event.get_parameters()
-	print("trololo")
 	for parameter in event_parameters:
 		var event_parameter := parameter as FmodParameterDescription
 		print(event_parameter.get_name())
