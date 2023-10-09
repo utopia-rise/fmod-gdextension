@@ -5,11 +5,3 @@
 
 [node name="FmodEventEditorProperty" instance=ExtResource("1_xvpec")]
 script = ExtResource("2_nkhkm")
-
-[node name="ParametersTitle" type="Label" parent="VBoxContainer" index="1"]
-layout_mode = 2
-text = "Parameters:"
-
-[node name="ParametersContainer" type="VBoxContainer" parent="VBoxContainer" index="2"]
-unique_name_in_owner = true
-layout_mode = 2
