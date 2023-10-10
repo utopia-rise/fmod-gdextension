@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://skp8awewyl85"]
+
+[ext_resource type="PackedScene" uid="uid://cppeyr1ke5wre" path="res://addons/fmod/tool/ui/EventParametersDisplay.tscn" id="1_clkxg"]
+
+[node name="EventParametersWindow" type="Window"]
+
+[node name="EventParametersDisplay" parent="." instance=ExtResource("1_clkxg")]

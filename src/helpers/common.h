@@ -4,6 +4,7 @@
 #include "classes/canvas_item.hpp"
 #include "classes/node3d.hpp"
 #include "fmod_common.h"
+#include <fmod_studio_common.h>
 #include "variant/utility_functions.hpp"
 
 #include <fmod_errors.h>
@@ -154,6 +155,18 @@ namespace godot {
                  guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
                  guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
         return result;
+    }
+
+    static inline uint64_t fmod_parameter_id_to_ulong(const FMOD_STUDIO_PARAMETER_ID& parameter_id) {
+        const unsigned int first_id_part {parameter_id.data1};
+        return (static_cast<uint64_t>(first_id_part) << 32) | static_cast<uint64_t>(parameter_id.data2);
+    }
+
+    static inline FMOD_STUDIO_PARAMETER_ID ulong_to_fmod_parameter_id(uint64_t converted) {
+        FMOD_STUDIO_PARAMETER_ID paramId;
+        paramId.data2 = static_cast<unsigned int>(converted & 0xFFFFFFFF);
+        paramId.data1 = static_cast<unsigned int>((converted >> 32) & 0xFFFFFFFF);
+        return paramId;
     }
 }// namespace godot
 

@@ -18,8 +18,10 @@ namespace godot {
 
         float get_parameter_by_name(const String& parameterName) const;
         void set_parameter_by_name(const String& parameterName, float value) const;
-        float get_parameter_by_id(const Array& idPair) const;
-        void set_parameter_by_id(const Array& idPair, float value) const;
+        float get_parameter_by_id(uint64_t long_id) const;
+        float get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const;
+        void set_parameter_by_id(uint64_t long_id, float value) const;
+        void set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const;
         void release() const;
         void start() const;
         void stop(int stopMode) const;

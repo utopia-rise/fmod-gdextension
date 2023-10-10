@@ -162,6 +162,9 @@ func _on_item_selected():
 		copy_path_button.visible = false
 		copy_guid_button.visible = false
 		%SelectButton.visible = false
+		%ParameterSectionSeparator.visible = false
+		%ParametersLabel.visible = false
+		%EventParametersDisplay.visible = false
 		return
 	%GuidLabel.set_text(metadata.get_guid())
 	%PathLabel.set_text(metadata.get_path())
@@ -170,6 +173,16 @@ func _on_item_selected():
 		copy_guid_button.visible = true
 	if should_display_select_button:
 		%SelectButton.visible = true
+	
+	if metadata is FmodEventDescription:
+		%EventParametersDisplay.set_fmod_event(metadata)
+		%ParameterSectionSeparator.visible = true
+		%ParametersLabel.visible = true
+		%EventParametersDisplay.visible = true
+		return
+	%ParameterSectionSeparator.visible = false
+	%ParametersLabel.visible = false
+	%EventParametersDisplay.visible = false
 
 func _on_copy_path_button():
 	DisplayServer.clipboard_set(%PathLabel.text)

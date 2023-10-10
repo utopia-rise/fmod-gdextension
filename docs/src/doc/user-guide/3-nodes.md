@@ -34,6 +34,24 @@ Then you have few toogle options:
 - *allow_fadeout*: if `true`, event will be stop with fadeout mode.  
 - *preload_event*: if `true`, event will be preloaded when node is ready.  
 
+#### Fmod parameters
+
+Event emitters have dynamics properties corresponding to fmod parameters associated with the current event.  
+You can set their values like any other godot float property.  
+By default those are loaded using their FMOD id. You can load them using their names by unchecking `Should Load by ID`.  
+From scripts, you can change them using `get` and `set` object's operators.  
+Example:
+```gdscript
+extends FmodEventEmitter2D
+
+func _process(_delta):
+	if Input.is_action_pressed("engine_power_up"):
+		self["event_parameter/RPM/value"] = self["event_parameter/RPM/value"] + 10
+	if Input.is_action_pressed("engine_power_down"):
+		self["event_parameter/RPM/value"] = self["event_parameter/RPM/value"] - 10
+```  
+To easily retrieve fmod parameters properties path, you can use godot's `Copy Property Path` functionality.
+
 ### Signals
 
 `FmodEventEmitter2D` and `FmodEventEmitter3D` emits signals:

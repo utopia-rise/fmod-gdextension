@@ -1,0 +1,7 @@
+[gd_scene load_steps=3 format=3 uid="uid://cowfthogh1n7i"]
+
+[ext_resource type="PackedScene" uid="uid://cujo3xq0erren" path="res://addons/fmod/tool/property_editors/FmodPathEditorProperty.tscn" id="1_xvpec"]
+[ext_resource type="Script" path="res://addons/fmod/tool/property_editors/FmodEventEditorProperty.gd" id="2_nkhkm"]
+
+[node name="FmodEventEditorProperty" instance=ExtResource("1_xvpec")]
+script = ExtResource("2_nkhkm")

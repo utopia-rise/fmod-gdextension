@@ -23,6 +23,7 @@ namespace godot {
         void _notification(int p_what);
         virtual void _exit_tree() override;
 
+    protected:
         static void _bind_methods();
     };
 }// namespace godot
