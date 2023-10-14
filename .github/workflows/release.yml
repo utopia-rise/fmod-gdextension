@@ -2,7 +2,7 @@ name: 🌈 Release
 on:
   push:
     tags:
-      - '\d+.\d+.\d+'
+      - '\d+.\d+.\d+-\d+.\d+.\d+'
 
 # Global Settings
 env:
