@@ -434,7 +434,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     typename FmodEventEmitter<Derived, NodeType>::Parameter* FmodEventEmitter<Derived, NodeType>::find_parameter_by_name(const String& p_name) const {
-        Parameter* parameter;
+        Parameter* parameter {nullptr};
         for (const Parameter& item : _parameters) {
             if (item.name != p_name) {
                 continue;
