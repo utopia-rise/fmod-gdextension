@@ -48,7 +48,6 @@ func _update_parameters():
 	for param in event_description.get_parameters():
 		var parameter_name = param.get_name()
 		var parameter_id_param = "%s/%s/id" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
-		var parameter_should_load_by_id_param = "%s/%s/should_load_by_id" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_value_param = "%s/%s/value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_min_value_param = "%s/%s/min_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_max_value_param = "%s/%s/max_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
@@ -64,8 +63,6 @@ func _update_parameters():
 		
 		if not are_properties_already_in_node or get_edited_object()[parameter_id_param] == null:
 			get_edited_object()[parameter_id_param] = parameter_id
-		if not are_properties_already_in_node or get_edited_object()[parameter_should_load_by_id_param] == null:
-			get_edited_object()[parameter_should_load_by_id_param] = true
 		if not are_properties_already_in_node or get_edited_object()[parameter_value_param] == null:
 			get_edited_object()[parameter_value_param] = param.get_default_value()
 		if not are_properties_already_in_node or get_edited_object()[parameter_min_value_param] == null:

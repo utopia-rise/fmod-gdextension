@@ -3,9 +3,11 @@
 
 #include "classes/object.hpp"
 
+#include <constants.h>
 #include <fmod_server.h>
 
 #include <classes/engine.hpp>
+#include <classes/project_settings.hpp>
 
 static constexpr const char* BEAT_SIGNAL_STRING = "timeline_beat";
 static constexpr const char* MARKER_SIGNAL_STRING = "timeline_marker";
@@ -36,7 +38,6 @@ namespace godot {
 
         String _event_name;
         FMOD_GUID _event_guid;
-        bool _load_by_event_name;
         bool _attached = true;
         bool _autoplay = false;
         bool _is_one_shot = false;
@@ -61,8 +62,6 @@ namespace godot {
         String get_event_name() const;
         void set_event_guid(const String& guid);
         String get_event_guid() const;
-        void set_load_by_event_name(const bool p_load_by_event_name);
-        bool get_load_by_event_name() const;
         void set_attached(const bool attached);
         bool is_attached() const;
         void set_autoplay(const bool autoplay);
@@ -100,6 +99,7 @@ namespace godot {
         void load_event();
         Parameter* find_parameter_by_name(const String& p_name) const;
 
+        static bool _should_load_by_event_name();
     };
 
     template<class Derived, class NodeType>
@@ -242,7 +242,7 @@ namespace godot {
     template<class Derived, class NodeType>
     Ref<FmodEventDescription> FmodEventEmitter<Derived, NodeType>::_load_event_description() const {
         Ref<FmodEventDescription> ret;
-        if (_load_by_event_name) {
+        if (_should_load_by_event_name()) {
 #ifdef DEBUG_ENABLED
             if (FmodServer::get_singleton()->check_event_path(_event_name)) {
 #endif
@@ -298,14 +298,7 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::apply_parameters() {
         if (!_event.is_valid()) { return; }
-        for (const Parameter& parameter : _parameters) {
-            if (parameter.should_load_by_id) {
-                _event->set_parameter_by_id(parameter.id, parameter.value);
-                continue;
-            }
-
-            _event->set_parameter_by_name(parameter.name, parameter.value);
-        }
+        FmodServer::get_singleton()->apply_parameter_list_to_event(_event, _parameters);
     }
 
     template<class Derived, class NodeType>
@@ -331,16 +324,6 @@ namespace godot {
     template<class Derived, class NodeType>
     String FmodEventEmitter<Derived, NodeType>::get_event_guid() const {
         return fmod_guid_to_string(_event_guid);
-    }
-
-    template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::set_load_by_event_name(const bool p_load_by_event_name) {
-        _load_by_event_name = p_load_by_event_name;
-    }
-
-    template<class Derived, class NodeType>
-    bool FmodEventEmitter<Derived, NodeType>::get_load_by_event_name() const {
-        return _load_by_event_name;
     }
 
     template<class Derived, class NodeType>
@@ -446,6 +429,19 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
+    bool FmodEventEmitter<Derived, NodeType>::_should_load_by_event_name() {
+#ifndef TOOLS_ENABLED
+        static
+#endif
+        bool should_load_by_name {
+            ProjectSettings::get_singleton()->get_setting(
+              vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME)
+            )
+        };
+        return should_load_by_name;
+    }
+
+    template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_set(const StringName& p_name, const Variant& p_property) {
         if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) {
             return false;
@@ -464,25 +460,24 @@ namespace godot {
         if (!parameter) {
             Parameter param;
             param.name = parameter_name;
+            param.should_load_by_id = !_should_load_by_event_name();
+
             _parameters.push_back(param);
             parameter = &_parameters[_parameters.size() - 1];
         }
 
         const String& parameter_end = parts[1];
         if (parameter_end == "id") {
-            parameter->id = p_property.operator uint64_t();
-            return true;
-        }
+            uint64_t parameter_id = p_property.operator uint64_t();
 
-        if (parameter_end == "should_load_by_id") {
-            parameter->should_load_by_id = p_property;
+            parameter->id = parameter_id;
 
-            if (p_property) {
-                parameter->identifier.id = parameter->id;
+            if (parameter->should_load_by_id) {
+                parameter->identifier.id = parameter_id;
                 return true;
             }
 
-            parameter->identifier.name = parameter->name.utf8().get_data();
+            parameter->identifier.name = &parameter->name;
             return true;
         }
 
@@ -542,11 +537,6 @@ namespace godot {
             return true;
         }
 
-        if (parameter_end == "should_load_by_id") {
-            r_property = parameter->should_load_by_id;
-            return true;
-        }
-
         if (parameter_end == "value") {
             r_property = parameter->value;
             return true;
@@ -582,13 +572,7 @@ namespace godot {
             .split("/")
         };
 
-        const String& parameter_end = parts[1];
-
-        if (parameter_end == "should_load_by_id") {
-            return true;
-        }
-
-        if (parameter_end == "value") {
+        if (parts[1] == "value") {
             return true;
         }
 
@@ -613,14 +597,7 @@ namespace godot {
             return false;
         }
 
-        const String& parameter_end = parts[1];
-
-        if (parameter_end == "should_load_by_id") {
-            r_property = parameter->should_load_by_id;
-            return true;
-        }
-
-        if (parameter_end == "value") {
+        if (parts[1] == "value") {
             r_property = parameter->default_value;
             return true;
         }
@@ -643,13 +620,6 @@ namespace godot {
                 PROPERTY_HINT_NONE,
                 "",
                 PROPERTY_USAGE_NO_EDITOR
-              )
-            );
-
-            p_list->push_back(
-              PropertyInfo(
-                Variant::Type::BOOL,
-                vformat("%s/%s/should_load_by_id", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name)
               )
             );
 
@@ -732,8 +702,6 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("get_event_name"), &Derived::get_event_name);
         ClassDB::bind_method(D_METHOD("set_event_guid", "event_guid"), &Derived::set_event_guid);
         ClassDB::bind_method(D_METHOD("get_event_guid"), &Derived::get_event_guid);
-        ClassDB::bind_method(D_METHOD("set_load_by_event_name", "p_load_by_event_name"), &Derived::set_load_by_event_name);
-        ClassDB::bind_method(D_METHOD("get_load_by_event_name"), &Derived::get_load_by_event_name);
         ClassDB::bind_method(D_METHOD("set_attached", "attached"), &Derived::set_attached);
         ClassDB::bind_method(D_METHOD("is_attached"), &Derived::is_attached);
         ClassDB::bind_method(D_METHOD("set_autoplay", "_autoplay"), &Derived::set_autoplay);
@@ -756,7 +724,6 @@ namespace godot {
 
         ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_name", "get_event_name");
         ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_guid",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_guid", "get_event_guid");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "load_by_event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_load_by_event_name", "get_load_by_event_name");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_attached", "is_attached");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_autoplay", "is_autoplay");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "one_shot",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_one_shot", "is_one_shot");

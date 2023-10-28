@@ -1077,6 +1077,6 @@ void FmodServer::_apply_parameter_dict_to_event(const Ref<FmodEvent>& p_event, c
             p_event->set_parameter_by_id(key_variant, value);
             continue;
         }
-        p_event->set_parameter_by_name(key_variant.operator String().utf8().get_data(), value);
+        p_event->set_parameter_by_name(key_variant.operator String(), value);
     }
 }

@@ -20,7 +20,7 @@ size = Vector2(289.938, 284.96)
 [node name="FmodNodesTest" type="Node"]
 
 [node name="FmodBankLoader" type="FmodBankLoader" parent="."]
-bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank"]
+bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank", "res://assets/Banks/SFX.bank"]
 
 [node name="Node2D" type="Node2D" parent="FmodBankLoader"]
 position = Vector2(500, 500)
@@ -31,17 +31,15 @@ event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
 autoplay = true
 volume = 2.0
 event_parameter/RPM/id = 5864137074015534804
-event_parameter/RPM/should_load_by_id = true
 event_parameter/RPM/value = 600.0
 event_parameter/RPM/min_value = 0.0
 event_parameter/RPM/max_value = 10000.0
 event_parameter/RPM/default_value = 0.0
 event_parameter/Load/id = -1795603775021193717
-event_parameter/Load/should_load_by_id = true
-event_parameter/Load/value = 0.0
+event_parameter/Load/value = -1.0
 event_parameter/Load/min_value = -1.0
 event_parameter/Load/max_value = 1.0
-event_parameter/Load/default_value = 0.0
+event_parameter/Load/default_value = -1.0
 self_modulate = Color(0.988235, 0, 0, 1)
 position = Vector2(-3.05176e-05, 0)
 script = ExtResource("2_5cntr")
