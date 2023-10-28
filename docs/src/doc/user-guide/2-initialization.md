@@ -17,7 +17,8 @@ and audibility. See the Virtual Voices guide for more information.
 - "Memory Tracking": Enables detailed memory usage statistics. Increases memory footprint and impacts performance.
 See Studio::Bus::getMemoryUsage and Studio::EventInstance::getMemoryUsage for more information.
 Implies FMOD_INIT_MEMORY_TRACKING.
-- Default Listener count: set max listener count (should be between 1 and 8).
+- Default Listener count: set max listener count (should be between 1 and 8).  
+- Should Load by Name: If true will load events and parameters by name instead of id when using fmod nodes.
 
 ![general-tab]
 

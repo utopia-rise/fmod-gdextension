@@ -68,7 +68,7 @@ namespace godot {
         };
 
         union ParameterIdentifier {
-            const char* name;
+            String* name;
             uint64_t id;
         };
 
@@ -223,8 +223,6 @@ namespace godot {
 
         static void _apply_parameter_dict_to_event(const Ref<FmodEvent>& p_event, const Dictionary& parameters);
 
-        template<class TParameter>
-        static void _apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters);
     public:
         void play_one_shot_using_guid(const String& guid, Node* game_obj);
         void play_one_shot_using_guid_internal(const FMOD_GUID& guid, Node* game_obj);
@@ -251,6 +249,9 @@ namespace godot {
         void mute_all_events();
         void unmute_all_events();
         void wait_for_all_loads();
+
+        template<class TParameter>
+        static void apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters);
 
     protected:
         static void _bind_methods();
@@ -306,14 +307,14 @@ namespace godot {
     }
 
     template<class TParameter>
-    void FmodServer::_apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters) {
+    void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters) {
         for (const TParameter& parameter : parameters) {
             if (parameter.should_load_by_id) {
                 p_event->set_parameter_by_id(parameter.identifier.id, parameter.value);
                 continue;
             }
 
-            p_event->set_parameter_by_name(parameter.identifier.name, parameter.value);
+            p_event->set_parameter_by_name(*parameter.identifier.name, parameter.value);
         }
     }
 
@@ -326,9 +327,7 @@ namespace godot {
           EventIdentifierType::EVENT_DESCRIPTION,
           true,
           false,
-          List<TParameter>,
-          &FmodServer::_apply_parameter_list_to_event
-        >(parameter, game_obj, parameters);
+          List<TParameter>, &FmodServer::apply_parameter_list_to_event>(parameter, game_obj, parameters);
     }
 
     template<class TParameter>
@@ -344,9 +343,7 @@ namespace godot {
           EventIdentifierType::EVENT_DESCRIPTION,
           true,
           true,
-          List<TParameter>,
-          &FmodServer::_apply_parameter_list_to_event
-        >(parameter, game_obj, parameters);
+          List<TParameter>, &FmodServer::apply_parameter_list_to_event>(parameter, game_obj, parameters);
     }
 }// namespace godot
 

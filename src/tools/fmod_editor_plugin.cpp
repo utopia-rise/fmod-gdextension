@@ -73,6 +73,12 @@ void FmodEditorPlugin::_ready() {
     );
 
     add_setting(
+      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME),
+      FmodGeneralSettings::DEFAULT_SHOULD_LOAD_BY_NAME,
+      Variant::Type::BOOL
+    );
+
+    add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodDspSettings::DSP_SETTINGS_BASE_PATH, FmodDspSettings::DSP_BUFFER_SIZE_OPTION),
       FmodDspSettings::DEFAULT_DSP_BUFFER_SIZE,
       Variant::Type::INT
