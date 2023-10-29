@@ -179,8 +179,6 @@ jobs:
       - name: Run tests
         if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
         run: |
-          cp ../libs/fmod/${{ matrix.fmod-core-platform-folder }}/libfmodL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
-          cp ../libs/fmod/${{ matrix.fmod-studio-platform-folder }}/libfmodstudioL.${{ matrix.fmod-library-suffix }}* demo/addons/fmod/libs/${{ matrix.platform }}/
           cd demo
           chmod +x run_tests.sh
           chmod +x ../${{ matrix.godot-executable }}

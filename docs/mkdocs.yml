@@ -1,4 +1,4 @@
-site_name: Isometric Map Module
+site_name: Godot Fmod GdExtension
 docs_dir: src/doc
 
 repo_name: 'utopia-rise/fmod-gdextension'
@@ -6,7 +6,7 @@ repo_url: 'https://github.com/utopia-rise/fmod-gdextension'
 
 theme:
   name: material
-  favicon: assets/img/favicon.ico
+  favicon: assets/favicon.ico
   palette:
     - scheme: default
       toggle:
@@ -16,7 +16,7 @@ theme:
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
-  logo: assets/img/logo.png
+  logo: assets/fmod-gdextension-logo.png
   features:
     - navigation.tabs
     - navigation.sections

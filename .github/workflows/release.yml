@@ -2,7 +2,7 @@ name: 🌈 Release
 on:
   push:
     tags:
-      - '\d+.\d+.\d+'
+      - '\d+.\d+.\d+-\d+.\d+.\d+'
 
 # Global Settings
 env:
@@ -231,15 +231,29 @@ jobs:
       - name: Zip fmod addon
         run: |
           cd demo/addons/
-          zip -r addon.zip fmod
+          zip -r addons.zip fmod
 
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Zip android fmod plugin
+        run: |
+          cd demo/
+          zip -r android.zip android
+
+      - name: Upload Addon Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./demo/addons/addon.zip
-          asset_name: addon.zip
+          asset_path: ./demo/addons/addons.zip
+          asset_name: addons.zip
+          asset_content_type: application/zip
+
+      - name: Upload Android Plugin Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+          asset_path: ./demo/android.zip
+          asset_name: android.zip
           asset_content_type: application/zip

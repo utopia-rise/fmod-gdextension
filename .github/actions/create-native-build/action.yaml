@@ -112,5 +112,5 @@ runs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.platform }}
-        path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.${{ inputs.artifact-extension }}
+        path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.*
         if-no-files-found: error

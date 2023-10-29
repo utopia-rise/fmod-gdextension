@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 import os
+import shutil
 import subprocess
+
+from SCons.Script import SConscript, ARGUMENTS, Action, Copy
 
 target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
@@ -162,5 +165,39 @@ if env["platform"] == "macos":
     change_id_action = Action('', change_id)
 
     AddPostAction(library, change_id_action)
+
+
+def copy_fmod_libraries(self, arg, env, executor = None):
+    fmod_core_lib_dir = ""
+    fmod_studio_lib_dir = ""
+
+    addon_fmod_libs_output = "{}{}/".format(
+        target_path, env["platform"]
+    ) if env["platform"] != "android" else "{}{}/{}/".format(
+        target_path, env["platform"], env["arch"]
+    )
+
+    if env["platform"] == "macos":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'osx/core/lib/'
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'osx/studio/lib/'
+    elif env["platform"] == "linux":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"]
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]
+    elif env["platform"] == "windows":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override + '/'
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override + '/'
+    elif env["platform"] == "ios":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'ios/core/lib/'
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'ios/studio/lib/'
+    elif env["platform"] == "android":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir
+
+    source_files = [env.Glob(os.path.join(source_dir, '*.*')) for source_dir in [fmod_core_lib_dir, fmod_studio_lib_dir]]
+    [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
+
+
+copy_fmod_libraries_action = Action('', copy_fmod_libraries)
+AddPostAction(library, copy_fmod_libraries_action)
 
 Default(library)

@@ -15,7 +15,7 @@ as C# support is required and performance might not be on the same level as a C+
 
 ### Getting started
 
-in order to get started, take a look at [documentation](./docs/src/doc/user-guide)
+in order to get started, take a look at [documentation](https://fmod-gdextension.readthedocs.io/en/latest/)
 
 ### Continuous delivery
 
