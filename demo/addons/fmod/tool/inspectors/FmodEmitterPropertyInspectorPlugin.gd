@@ -14,7 +14,7 @@ func _parse_property(object: Object, type: Variant.Type, name: String, hint_type
 	return name == "event_name" || name == "event_guid"
 
 func _parse_category(object: Object, category: String):
-	if category != "FmodEventEmitter2D":
+	if category != "FmodEventEmitter2D" and category != "FmodEventEmitter3D":
 		return
 	var editor_property := _event_editor_property_scene.instantiate()
 	editor_property.initialize(_open_project_explorer_callable, "event_name", "event_guid")
