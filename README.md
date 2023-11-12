@@ -1,39 +1,61 @@
 ![logo](docs/src/doc/assets/fmod-gdextension-logo.png)
 
-Godot C++ GDExtension for Godot 4 that provides an integration for the FMOD Studio API.
+[![🌈 Build](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/release.yml/badge.svg)](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/release.yml) 
+[![](https://img.shields.io/discord/1012326818365325352.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.com/invite/u2NM2vTGMn)
+---
 
-FMOD is an audio engine and middleware solution for interactive audio in games. It has been the audio engine behind many
-titles such as Transistor, Into the Breach and Celeste. [More on FMOD's website](https://www.fmod.com/).
+**Godot 4 GDExtension that integrates with the FMOD Studio API.** [FMOD is an audio engine and middleware solution](https://www.fmod.com/) for interactive audio in games. It has been the audio engine behind many
+titles such as **Transistor**, **Into the Breach** and **Celeste**. This Godot extension is used by games such as [Koira](https://dont-nod.com/en/games/koira/).
 
-This GDExtension exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
-common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. _It is still very much a
-work in progress and some API functions are not yet exposed._ Feel free to tweak/extend it based on your project's needs.
+# Installation
 
-**Note:** FMOD also provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
-same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
-as C# support is required and performance might not be on the same level as a C++ integration.
+1. [Download Latest Release](https://github.com/bitbrain/beehave/releases/latest)
+    - (optional) access latest build for [Godot 3.x](https://github.com/bitbrain/beehave/archive/refs/heads/godot-3.x.zip), [Godot 4.x](https://github.com/bitbrain/beehave/archive/refs/heads/master.zip)
+2. Unpack the `addons/fmod` folder into your `/addons` folder within the Godot project
+3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
 
-### Getting started
+#### Read the [official docs](https://fmod-gdextension.readthedocs.io/en/latest/) to get started with this addon.
 
-in order to get started, take a look at [documentation](https://fmod-gdextension.readthedocs.io/en/latest/)
+# Features
 
-### Continuous delivery
+## 🔉 Seamless integration with FMOD
 
-This project uses github actions to continuously deploy released drivers. If you do not want to use those releases, you
-can compile from sources by looking to [compile from sources section](./docs/src/doc/advanced/1-compiling.md).  
-This project uses [SEMVER](https://semver.org/).
+Use FMOD Studio to create bank files this addon will auto-load all events for you inside Godot Engine. Live updating works out of the box.
 
-## Contributing
+![fmod-events](docs/src/doc/assets/screenshot-01.png)
+
+## 🔉 Dedicated Godot nodes
+
+This GDExtension provides nodes such as `FmodEventEmitter2D`, `FmodEventEmitter3D`, `FmodEventListener2D` and `FmodEventListener3D` that can be used in any Godot scene or code (both GDScript and C#).
+
+![fmod-nodes](docs/src/doc/assets/screenshot-02.png)
+
+# Contributing
 
 In order to be able to PR this repo from a fork, you need to add `FMODUSER` and `FMODPASS` secrets to your fork repo.  
 This enables CI to download FMOD api.
 
-## Thanks
+Feel free to raise pull requests. We hope you'll enjoy this addon!
+
+## How this extension works
+
+This GDExtension exposes most of the Studio API functions to Godot's GDScript and also provides helpers for performing
+common functions like attaching Studio events to Godot nodes and playing 3D/positional audio.
+
+> **Note:** FMOD also provides a C# wrapper for their API which is used in the Unity integration and it is possible to use the
+same wrapper to build an integration for Godot in C#. However do note that this would only work on a Mono build of Godot
+as C# support is required and performance might not be on the same level as a C++ integration.
+
+## Continuous Delivery
+
+This project uses [Github Actions](https://github.com/features/actions) to continuously deploy released drivers. If you do not want to use those releases, you
+can compile from sources by looking to [compile from sources section](./docs/src/doc/advanced/1-compiling.md). This project uses [SEMVER](https://semver.org/).
+
+# Special Thanks
 
 This project is a forked from [godot-fmod-integration](https://github.com/alexfonseka/godot-fmod-integration)
 from [alexfonseka](https://github.com/alexfonseka). We'd like to thank him for the work he did, we simply adapted his
-work to GDNative.  
-Feel free to propose any modification using github's *pull request*. We hope you'll enjoy this driver.
+work to GDNative.
 
 
 [fmodsingleton]: .README/fmodsingleton.png
