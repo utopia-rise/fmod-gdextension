@@ -9,8 +9,8 @@ titles such as **Transistor**, **Into the Breach** and **Celeste**. This Godot e
 
 # Installation
 
-1. [Download Latest Release](https://github.com/bitbrain/beehave/releases/latest)
-    - (optional) access latest build for [Godot 3.x](https://github.com/bitbrain/beehave/archive/refs/heads/godot-3.x.zip), [Godot 4.x](https://github.com/bitbrain/beehave/archive/refs/heads/master.zip)
+1. [Download Latest Release](https://github.com/utopia-rise/fmod-gdextension/releases/latest)
+    - (optional) access latest build for [Godot 3.x](https://github.com/utopia-rise/fmod-gdextension/archive/refs/heads/godot-3.x.zip), [Godot 4.x](https://github.com/utopia-rise/fmod-gdextension/archive/refs/heads/master.zip)
 2. Unpack the `addons/fmod` folder into your `/addons` folder within the Godot project
 3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
 
