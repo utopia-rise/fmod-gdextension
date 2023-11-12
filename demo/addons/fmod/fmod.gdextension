@@ -19,7 +19,11 @@ android.release.arm64 = "res://addons/fmod/libs/android/arm64/libGodotFmod.andro
 ios.debug  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_debug.universal.dylib"
 ios.release  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_release.universal.dylib"
 
-
+[icons]
+FmodEventEmitter2D = "res://addons/fmod/icons/fmod_icon.svg"
+FmodEventEmitter3D = "res://addons/fmod/icons/fmod_icon.svg"
+FmodListener2D = "res://addons/fmod/icons/fmod_icon.svg"
+FmodListener3D = "res://addons/fmod/icons/fmod_icon.svg"
 
 [dependencies]
 windows.editor.x86_64 = {
