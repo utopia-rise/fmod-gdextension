@@ -24,6 +24,7 @@ FmodEventEmitter2D = "res://addons/fmod/icons/fmod_icon.svg"
 FmodEventEmitter3D = "res://addons/fmod/icons/fmod_icon.svg"
 FmodListener2D = "res://addons/fmod/icons/fmod_icon.svg"
 FmodListener3D = "res://addons/fmod/icons/fmod_icon.svg"
+FmodBankLoader = "res://addons/fmod/icons/fmod_icon.svg"
 
 [dependencies]
 windows.editor.x86_64 = {
