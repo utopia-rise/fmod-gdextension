@@ -157,6 +157,13 @@ jobs:
           lfs: true
           submodules: recursive
 
+      - name: Android dependencies
+        if: ${{ matrix.platform == 'android' }}
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: r23c
+          link-to-sdk: true
+
       - name: Compile native plugin
         uses: ./.github/actions/create-native-build
         with:
