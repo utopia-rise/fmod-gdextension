@@ -56,7 +56,7 @@ jobs:
             fmod-studio-platform-folder: linux/studio/lib/x86_64
             fmod-library-suffix: so
             godot-executable-download-suffix: linux.x86_64.zip
-            godot-executable: Godot_v4.1.2-stable_linux.x86_64
+            godot-executable: Godot_v$GODOT_VERSION-stable_linux.x86_64
             shell: bash
 
           - name: Ubuntu Debug Compilation
