@@ -55,6 +55,7 @@ namespace godot {
 
         static FmodServer* singleton;
 
+    public:
         union EventIdentifier {
             const char* string_identifier;
             FMOD_GUID guid;
@@ -120,6 +121,7 @@ namespace godot {
         void _update_performance_data();
 
     public:
+
         FmodServer();
 
         ~FmodServer() override;
