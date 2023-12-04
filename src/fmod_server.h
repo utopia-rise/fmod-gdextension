@@ -121,7 +121,6 @@ namespace godot {
         void _update_performance_data();
 
     public:
-
         FmodServer();
 
         ~FmodServer() override;
