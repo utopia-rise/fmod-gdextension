@@ -1,16 +1,20 @@
 {
-  "dirs":["res://test/unit/","res://test/integration/"],
-  "double_strategy":"partial",
-  "ignore_pause":false,
-  "include_subdirs":true,
-  "inner_class":"",
-  "log_level":3,
-  "opacity":100,
+  "include_subdirs": true,
+  "dirs": [
+    "res://test/unit/",
+    "res://test/integration/"
+  ],
+  "should_maximize": false,
+  "hide_orphans": true,
+  "should_exit": true,
+  "ignore_pause": true,
   "prefix":"test_",
-  "selected":"",
-  "should_exit":true,
-  "should_maximize":true,
   "suffix":".gd",
-  "tests":[],
-  "unit_test_name":""
+  "log_level": 3,
+  "opacity":100,
+  "double_strategy": "script_only",
+  "inner_class": "",
+  "disable_colors": false,
+  "compact_mode": true,
+  "gut_on_top": true
 }
