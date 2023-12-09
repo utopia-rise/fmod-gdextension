@@ -55,6 +55,8 @@ namespace godot {
         
         void play();
         void stop();
+        Variant get_parameter(const String& p_name) const;
+        void set_parameter(const String& p_name, const Variant& p_property);
         void set_paused(bool p_is_paused);
         const Ref<FmodEvent>& get_event() const;
         bool is_paused();
@@ -231,6 +233,36 @@ namespace godot {
         } else {
             _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
         }
+    }
+
+    template<class Derived, class NodeType>
+    Variant FmodEventEmitter<Derived, NodeType>::get_parameter(const String& p_name) const {
+        if (!_event.is_valid()) { return nullptr; }
+
+        Parameter* parameter {find_parameter_by_name(p_name)};
+
+        if (!parameter) { return nullptr; }
+
+        return parameter->value;
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_parameter(const String& p_name, const Variant& p_property) {
+        if (!_event.is_valid()) { return; }
+
+        Parameter* parameter {find_parameter_by_name(p_name)};
+
+        if (!parameter) { return; }
+
+        parameter->value = p_property;
+
+        #ifdef TOOLS_ENABLED
+        if (!Engine::get_singleton()->is_editor_hint()) {
+        #endif
+           apply_parameters();
+        #ifdef TOOLS_ENABLED
+        }
+        #endif
     }
 
     template<class Derived, class NodeType>
@@ -696,6 +728,8 @@ namespace godot {
     void FmodEventEmitter<Derived, NodeType>::_bind_methods() {
         ClassDB::bind_method(D_METHOD("play"), &Derived::play);
         ClassDB::bind_method(D_METHOD("stop"), &Derived::stop);
+        ClassDB::bind_method(D_METHOD("set_parameter", "name", "value"), &Derived::set_parameter);
+        ClassDB::bind_method(D_METHOD("get_parameter", "name"), &Derived::get_parameter);
         ClassDB::bind_method(D_METHOD("is_paused"), &Derived::is_paused);
         ClassDB::bind_method(D_METHOD("set_paused", "p_is_paused"), &Derived::set_paused);
         ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &Derived::set_event_name);
