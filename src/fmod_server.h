@@ -55,6 +55,7 @@ namespace godot {
 
         static FmodServer* singleton;
 
+    public:
         union EventIdentifier {
             const char* string_identifier;
             FMOD_GUID guid;

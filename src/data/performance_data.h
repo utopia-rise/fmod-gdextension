@@ -7,6 +7,7 @@ namespace godot {
     class FmodPerformanceData : public RefCounted {
         GDCLASS(FmodPerformanceData, RefCounted);
 
+    public:
         float dsp = 0;
         float geometry = 0;
         float stream = 0;
@@ -22,7 +23,6 @@ namespace godot {
         int stream_bytes_read = 0;
         int other_bytes_read = 0;
 
-    public:
         float get_geometry() const;
         float get_stream() const;
         float get_update() const;
