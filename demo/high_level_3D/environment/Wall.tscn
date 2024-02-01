@@ -1,0 +1,54 @@
+[gd_scene load_steps=8 format=3 uid="uid://c7isdpd8ykjep"]
+
+[ext_resource type="Material" path="res://high_level_3D/environment/wall_material.tres" id="2"]
+
+
+[sub_resource type="BoxMesh" id="9"]
+material = ExtResource("2")
+size = Vector3(20, 5, 5)
+
+[sub_resource type="PrismMesh" id="12"]
+material = ExtResource("2")
+left_to_right = 0.0
+size = Vector3(10, 5, 5)
+
+[sub_resource type="ConcavePolygonShape3D" id="15"]
+data = PackedVector3Array(-5, 2.5, 2.5, 5, -2.5, 2.5, -5, -2.5, 2.5, -5, 2.5, -2.5, -5, -2.5, -2.5, 5, -2.5, -2.5, -5, 2.5, 2.5, -5, 2.5, -2.5, 5, -2.5, 2.5, -5, 2.5, -2.5, 5, -2.5, -2.5, 5, -2.5, 2.5, -5, 2.5, -2.5, -5, 2.5, 2.5, -5, -2.5, -2.5, -5, 2.5, 2.5, -5, -2.5, 2.5, -5, -2.5, -2.5, -5, -2.5, 2.5, 5, -2.5, 2.5, -5, -2.5, -2.5, 5, -2.5, 2.5, 5, -2.5, -2.5, -5, -2.5, -2.5)
+
+[sub_resource type="PrismMesh" id="14"]
+material = ExtResource("2")
+left_to_right = 1.0
+size = Vector3(10, 5, 5)
+
+[sub_resource type="ConcavePolygonShape3D" id="16"]
+data = PackedVector3Array(5, 2.5, 2.5, 5, -2.5, 2.5, -5, -2.5, 2.5, 5, 2.5, -2.5, -5, -2.5, -2.5, 5, -2.5, -2.5, 5, 2.5, 2.5, 5, 2.5, -2.5, 5, -2.5, 2.5, 5, 2.5, -2.5, 5, -2.5, -2.5, 5, -2.5, 2.5, 5, 2.5, -2.5, 5, 2.5, 2.5, -5, -2.5, -2.5, 5, 2.5, 2.5, -5, -2.5, 2.5, -5, -2.5, -2.5, -5, -2.5, 2.5, 5, -2.5, 2.5, -5, -2.5, -2.5, 5, -2.5, 2.5, 5, -2.5, -2.5, -5, -2.5, -2.5)
+
+[sub_resource type="ConcavePolygonShape3D" id="17"]
+data = PackedVector3Array(-10, 2.5, 2.5, 10, 2.5, 2.5, -10, -2.5, 2.5, 10, 2.5, 2.5, 10, -2.5, 2.5, -10, -2.5, 2.5, 10, 2.5, -2.5, -10, 2.5, -2.5, 10, -2.5, -2.5, -10, 2.5, -2.5, -10, -2.5, -2.5, 10, -2.5, -2.5, 10, 2.5, 2.5, 10, 2.5, -2.5, 10, -2.5, 2.5, 10, 2.5, -2.5, 10, -2.5, -2.5, 10, -2.5, 2.5, -10, 2.5, -2.5, -10, 2.5, 2.5, -10, -2.5, -2.5, -10, 2.5, 2.5, -10, -2.5, 2.5, -10, -2.5, -2.5, 10, 2.5, 2.5, -10, 2.5, 2.5, 10, 2.5, -2.5, -10, 2.5, 2.5, -10, 2.5, -2.5, 10, 2.5, -2.5, -10, -2.5, 2.5, 10, -2.5, 2.5, -10, -2.5, -2.5, 10, -2.5, 2.5, 10, -2.5, -2.5, -10, -2.5, -2.5)
+
+[node name="Wall" type="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35862, -5.6476)
+mesh = SubResource("9")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+mesh = SubResource("12")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+shape = SubResource("15")
+
+[node name="MeshInstance2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
+mesh = SubResource("14")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance2/StaticBody3D"]
+shape = SubResource("16")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+shape = SubResource("17")

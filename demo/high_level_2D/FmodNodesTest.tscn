@@ -1,11 +1,12 @@
-[gd_scene load_steps=10 format=3 uid="uid://dl6g18ybwc83t"]
+[gd_scene load_steps=11 format=3 uid="uid://dl6g18ybwc83t"]
 
-[ext_resource type="Script" path="res://high_level/Emitter.gd" id="2_5cntr"]
-[ext_resource type="Texture2D" uid="uid://dichdnwxg2opa" path="res://icon.png" id="2_llv2n"]
-[ext_resource type="Script" path="res://high_level/Kinematic.gd" id="3_dlbku"]
-[ext_resource type="Script" path="res://high_level/ChangeColor.gd" id="5_5p5kb"]
-[ext_resource type="Script" path="res://low_level/EnterAndLeave.gd" id="5_jxvuy"]
-[ext_resource type="Script" path="res://low_level/EnterandLeave2.gd" id="7_c28gt"]
+[ext_resource type="Script" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
+[ext_resource type="Script" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
+[ext_resource type="Texture2D" uid="uid://d4blkybu5ojj6" path="res://icon.png" id="2_llv2n"]
+[ext_resource type="Script" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
+[ext_resource type="Script" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
+[ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
+[ext_resource type="Script" path="res://low_level_2D/EnterandLeave2.gd" id="7_c28gt"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(87.7038, 82.621)
@@ -23,7 +24,8 @@ size = Vector2(289.938, 284.96)
 bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank", "res://assets/Banks/SFX.bank"]
 
 [node name="Node2D" type="Node2D" parent="FmodBankLoader"]
-position = Vector2(500, 500)
+position = Vector2(703, 486)
+script = ExtResource("1_2lkrj")
 
 [node name="Emitter" type="FmodEventEmitter2D" parent="FmodBankLoader/Node2D"]
 event_name = "event:/Vehicles/Car Engine"

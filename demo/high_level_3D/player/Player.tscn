@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3 uid="uid://bsguup0m8xqxp"]
+
+[ext_resource type="Script" path="res://high_level_3D/player/Player.gd" id="1"]
+[ext_resource type="Script" path="res://high_level_3D/player/Camera.gd" id="2_fstpc"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_di3pi"]
+
+[node name="Player" type="CharacterBody3D"]
+platform_on_leave = 2
+script = ExtResource("1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 9.09495e-15, 0, -9.09495e-15, 1, 0, 0, 0, 1, -9.31323e-10, 1.67742, 0.13534)
+cull_mask = 524287
+current = true
+fov = 50.0
+far = 200.0
+script = ExtResource("2_fstpc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0151734, 1.01978, 0.234704)
+shape = SubResource("CapsuleShape3D_di3pi")

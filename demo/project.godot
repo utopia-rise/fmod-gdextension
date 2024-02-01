@@ -21,7 +21,7 @@ General/default_listener_count=1
 DSP/dsp_buffer_size=512
 DSP/dsp_buffer_count=4
 "3D Settings/doppler_scale"=1.0
-"3D Settings/distance_factor"=32.0
+"3D Settings/distance_factor"=64.0
 "3D Settings/rolloff_scale"=1.0
 General/banks_path="res://assets/Banks"
 General/should_load_by_name=false
@@ -33,7 +33,7 @@ modules="org/godotengine/godot/FmodSingleton"
 [application]
 
 config/name="Fmod Demo"
-run/main_scene="res://low_level/FmodScriptTest.tscn"
+run/main_scene="res://low_level_2D/FmodScriptTest.tscn"
 config/features=PackedStringArray("4.2")
 config/icon="res://icon.png"
 
@@ -163,6 +163,10 @@ engine_power_down={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":4194322,"key_label":0,"unicode":0,"echo":false,"script":null)
 ]
 }
+
+[physics]
+
+3d/default_gravity=98.0
 
 [rendering]
 

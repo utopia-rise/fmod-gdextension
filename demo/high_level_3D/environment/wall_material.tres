@@ -1,0 +1,11 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3]
+
+[ext_resource type="Texture2D" uid="uid://b8p3qvgwqt8dd" path="res://high_level_3D/environment/1x1.png" id="1"]
+
+
+[resource]
+detail_enabled = true
+detail_blend_mode = 0
+detail_uv_layer = 0
+detail_albedo = ExtResource( 1 )
+uv1_scale = Vector3( 20, 15, 0 )

@@ -1,0 +1,117 @@
+[gd_scene load_steps=13 format=3 uid="uid://dk02rm1jcir6t"]
+
+[ext_resource type="Script" path="res://high_level_3D/FPSCounter.gd" id="1_sjwuc"]
+[ext_resource type="PackedScene" uid="uid://bhw2o0powjnsp" path="res://high_level_3D/environment/Floor.tscn" id="2_kesb6"]
+[ext_resource type="PackedScene" uid="uid://dl8xj04oxmnsb" path="res://high_level_3D/environment/Ball.tscn" id="3_bkia1"]
+[ext_resource type="Script" path="res://high_level_3D/environment/sin_move.gd" id="4_ewod2"]
+[ext_resource type="PackedScene" uid="uid://c7isdpd8ykjep" path="res://high_level_3D/environment/Wall.tscn" id="4_jv1x4"]
+[ext_resource type="Script" path="res://high_level_3D/environment/soundcollider.gd" id="4_mxf3j"]
+[ext_resource type="Script" path="res://high_level_3D/selfdestroy.gd" id="4_vlj6k"]
+[ext_resource type="Script" path="res://high_level_3D/rollingball.gd" id="5_d681a"]
+[ext_resource type="PackedScene" uid="uid://bsguup0m8xqxp" path="res://high_level_3D/player/Player.tscn" id="5_i7hmm"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_y252g"]
+
+[sub_resource type="Sky" id="8"]
+sky_material = SubResource("ProceduralSkyMaterial_y252g")
+
+[sub_resource type="Environment" id="7"]
+background_mode = 2
+sky = SubResource("8")
+ssao_intensity = 4.0
+
+[node name="Node3D" type="Node3D"]
+
+[node name="FmodBankLoader" type="FmodBankLoader" parent="."]
+bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank", "res://assets/Banks/SFX.bank"]
+
+[node name="FPSCounter" type="Label" parent="."]
+offset_right = 40.0
+offset_bottom = 14.0
+text = "FPS: 0"
+script = ExtResource("1_sjwuc")
+
+[node name="Help" type="Label" parent="."]
+offset_top = 20.0
+offset_right = 106.0
+offset_bottom = 38.0
+text = "Space = Jump
+WASD = Move"
+
+[node name="Floor" parent="." instance=ExtResource("2_kesb6")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.007, -2, -3.715)
+
+[node name="Ball1" parent="." instance=ExtResource("3_bkia1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 3.2038)
+freeze = true
+script = ExtResource("4_ewod2")
+
+[node name="FmodEventEmitter3D" type="FmodEventEmitter3D" parent="Ball1"]
+event_name = "event:/Vehicles/Car Engine"
+event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
+autoplay = true
+event_parameter/RPM/id = 5864137074015534804
+event_parameter/RPM/value = 1000.0
+event_parameter/RPM/min_value = 0.0
+event_parameter/RPM/max_value = 10000.0
+event_parameter/RPM/default_value = 0.0
+event_parameter/Load/id = -1795603775021193717
+event_parameter/Load/value = -1.0
+event_parameter/Load/min_value = -1.0
+event_parameter/Load/max_value = 1.0
+event_parameter/Load/default_value = -1.0
+script = ExtResource("4_vlj6k")
+
+[node name="Ball2" parent="." instance=ExtResource("3_bkia1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, -1.07225, -3)
+sleeping = true
+
+[node name="FmodEventEmitter3D" type="FmodEventEmitter3D" parent="Ball2"]
+event_name = "event:/Weapons/Explosion"
+event_guid = "{1f687138-e06c-40f5-9bac-57f84bbcedd3}"
+volume = 0.5
+event_parameter/Size/id = 6419405856426461066
+event_parameter/Size/value = 0.5
+event_parameter/Size/min_value = 0.0
+event_parameter/Size/max_value = 3.0
+event_parameter/Size/default_value = 0.0
+event_parameter/Distance/id = -6363846794978107960
+event_parameter/Distance/value = 3.40282e+38
+event_parameter/Distance/min_value = 0.0
+event_parameter/Distance/max_value = 100.0
+event_parameter/Distance/default_value = 3.40282e+38
+script = ExtResource("4_mxf3j")
+
+[node name="Ball3" parent="." instance=ExtResource("3_bkia1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, -1.03226, -3)
+
+[node name="FmodEventEmitter3D" type="FmodEventEmitter3D" parent="Ball3"]
+event_name = "event:/Interactables/Barrel Roll"
+event_guid = "{c42c2240-c4b6-42ed-a473-1a47f19945ea}"
+autoplay = true
+volume = 0.5
+event_parameter/Speed/id = 841507833874797062
+event_parameter/Speed/value = 0.0
+event_parameter/Speed/min_value = 0.0
+event_parameter/Speed/max_value = 8.0
+event_parameter/Speed/default_value = 0.0
+script = ExtResource("5_d681a")
+
+[node name="Wall" parent="." instance=ExtResource("4_jv1x4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.665272, -8.1876)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("7")
+
+[node name="Sun" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(-0.5, -0.296198, 0.813798, 0, 0.939693, 0.34202, -0.866025, 0.17101, -0.469847, 0, 0, 0)
+layers = 262144
+light_color = Color(0.94902, 0.580392, 0.247059, 1)
+light_cull_mask = 4294443007
+shadow_enabled = true
+
+[node name="Player" parent="." instance=ExtResource("5_i7hmm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.47008, 8.47787)
+
+[node name="FmodListener3D" type="FmodListener3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.56489, 0)

@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://dl8xj04oxmnsb"]
+
+[ext_resource type="Material" path="res://high_level_3D/environment/ball_material.tres" id="1_4hjdv"]
+
+[sub_resource type="SphereShape3D" id="7"]
+
+[sub_resource type="SphereMesh" id="8"]
+material = ExtResource("1_4hjdv")
+
+[node name="Ball" type="RigidBody3D"]
+linear_damp_mode = 1
+linear_damp = 2.0
+angular_damp_mode = 1
+angular_damp = 3.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("8")
