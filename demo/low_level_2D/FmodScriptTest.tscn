@@ -1,12 +1,12 @@
 [gd_scene load_steps=11 format=3 uid="uid://cs8nm6h12whh1"]
 
-[ext_resource type="Script" path="res://low_level/FmodTest.gd" id="1_oc8v3"]
-[ext_resource type="Texture2D" uid="uid://jsofj31xeeto" path="res://icon.png" id="2_mamb7"]
-[ext_resource type="Script" path="res://low_level/Emitter.gd" id="3_fx7d3"]
-[ext_resource type="Script" path="res://low_level/Listener.gd" id="4_448uv"]
-[ext_resource type="Script" path="res://low_level/EnterAndLeave.gd" id="5_85yno"]
-[ext_resource type="Script" path="res://low_level/ChangeColor.gd" id="6_fyoq1"]
-[ext_resource type="Script" path="res://low_level/EnterandLeave2.gd" id="7_6vajh"]
+[ext_resource type="Script" path="res://low_level_2D/FmodTest.gd" id="1_oc8v3"]
+[ext_resource type="Texture2D" uid="uid://d4blkybu5ojj6" path="res://icon.png" id="2_mamb7"]
+[ext_resource type="Script" path="res://low_level_2D/Emitter.gd" id="3_fx7d3"]
+[ext_resource type="Script" path="res://low_level_2D/Listener.gd" id="4_448uv"]
+[ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_85yno"]
+[ext_resource type="Script" path="res://low_level_2D/ChangeColor.gd" id="6_fyoq1"]
+[ext_resource type="Script" path="res://low_level_2D/EnterandLeave2.gd" id="7_6vajh"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(87.7038, 82.621)
@@ -23,7 +23,7 @@ position = Vector2(0, -3)
 script = ExtResource("1_oc8v3")
 
 [node name="Node2D" type="Node2D" parent="."]
-position = Vector2(500, 500)
+position = Vector2(691, 495)
 
 [node name="Emitter" type="Sprite2D" parent="Node2D"]
 self_modulate = Color(0.988235, 0, 0, 1)
@@ -82,7 +82,7 @@ Several instances of the same sound can be played at the same time
 "
 
 [node name="SoundArea2" type="Area2D" parent="."]
-position = Vector2(818.43, 97.5364)
+position = Vector2(948, 98)
 script = ExtResource("6_fyoq1")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SoundArea2"]
