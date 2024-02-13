@@ -47,12 +47,13 @@ namespace godot {
 
         List<Parameter> _parameters;
 
+        void ready();
+        void process();
+        void exit_tree();
+
     public:
-        virtual void _ready() override;
-        virtual void _process(double delta) override;
         void _notification(int p_what);
-        virtual void _exit_tree() override;
-        
+
         void play();
         void stop();
         Variant get_parameter(const String& p_name) const;
@@ -110,7 +111,7 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::_ready() {
+    void FmodEventEmitter<Derived, NodeType>::ready() {
 #ifdef TOOLS_ENABLED
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
@@ -134,7 +135,7 @@ namespace godot {
     }
     
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::_process(double delta) {
+    void FmodEventEmitter<Derived, NodeType>::process() {
 #ifdef TOOLS_ENABLED
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
@@ -158,26 +159,39 @@ namespace godot {
     }
     
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::_notification(int p_what) {
-#ifdef TOOLS_ENABLED
-        // ensure we only run FMOD when the game is running!
-        if (Engine::get_singleton()->is_editor_hint()) { return; }
-#endif
-
-        if (p_what == Node::NOTIFICATION_PAUSED) {
-            set_paused(true);
-        } else if (p_what == Node::NOTIFICATION_UNPAUSED) {
-            if (is_paused()) { set_paused(false); }
-        }
-    }
-    
-    template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::_exit_tree() {
+    void FmodEventEmitter<Derived, NodeType>::exit_tree() {
 #ifdef TOOLS_ENABLED
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
 
         stop();
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_notification(int p_what) {
+#ifdef TOOLS_ENABLED
+        // ensure we only run FMOD when the game is running!
+        if (Engine::get_singleton()->is_editor_hint()) { return; }
+#endif
+        switch(p_what){
+            case Node::NOTIFICATION_PAUSED:
+                set_paused(true);
+                break;
+            case Node::NOTIFICATION_UNPAUSED:
+                if (is_paused()) { set_paused(false); }
+                break;
+            case Node::NOTIFICATION_READY:
+                ready();
+                break;
+            case Node::NOTIFICATION_PROCESS:
+                process();
+                break;
+            case Node::NOTIFICATION_EXIT_TREE:
+                exit_tree();
+                break;
+            default:
+                break;
+        }
     }
 
     template<class Derived, class NodeType>
@@ -746,7 +760,6 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &Derived::is_allow_fadeout);
         ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &Derived::set_preload_event);
         ClassDB::bind_method(D_METHOD("is_preload_event"), &Derived::is_preload_event);
-        ClassDB::bind_method(D_METHOD("_notification", "p_what"), &Derived::_notification);
         ClassDB::bind_method(D_METHOD("get_volume"), &Derived::get_volume);
         ClassDB::bind_method(D_METHOD("set_volume", "p_volume"), &Derived::set_volume);
         ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);

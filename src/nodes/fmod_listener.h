@@ -8,9 +8,12 @@
 namespace godot {
     template<class Derived, class NodeType>
     class FmodListener : public NodeType {
+
+        void ready();
+        void exit_tree();
+
     public:
-        virtual void _ready() override;
-        virtual void _exit_tree() override;
+        void _notification(int p_what);
 
         void set_listener_index(const int index);
         int get_listener_index() const;
@@ -38,7 +41,25 @@ namespace godot {
     };
 
     template<class Derived, class NodeType>
-    void FmodListener<Derived, NodeType>::_ready() {
+    void FmodListener<Derived, NodeType>::_notification(int p_what) {
+#ifdef TOOLS_ENABLED
+        // ensure we only run FMOD when the game is running!
+        if (Engine::get_singleton()->is_editor_hint()) { return; }
+#endif
+        switch(p_what){
+            case Node::NOTIFICATION_READY:
+                ready();
+                break;
+            case Node::NOTIFICATION_EXIT_TREE:
+                exit_tree();
+                break;
+            default:
+                break;
+        }
+    }
+
+    template<class Derived, class NodeType>
+    void FmodListener<Derived, NodeType>::ready() {
 #ifdef TOOLS_ENABLED
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
@@ -51,7 +72,7 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodListener<Derived, NodeType>::_exit_tree() {
+    void FmodListener<Derived, NodeType>::exit_tree() {
 #ifdef TOOLS_ENABLED
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
