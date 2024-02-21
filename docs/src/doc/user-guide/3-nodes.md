@@ -50,6 +50,8 @@ func _process(_delta):
 ```  
 To easily retrieve fmod parameters properties path, you can use godot's `Copy Property Path` functionality.
 
+This does not work with User: Discrete or User: Labeled parameters. Make sure you are using User: Continuous parameter type.
+
 ### Signals
 
 `FmodEventEmitter2D` and `FmodEventEmitter3D` emits signals:
