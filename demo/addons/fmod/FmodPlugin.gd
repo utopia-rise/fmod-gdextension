@@ -28,6 +28,9 @@ func _init():
 	
 	bank_explorer = fmod_bank_explorer_window.instantiate()
 	bank_explorer.theme = get_editor_interface().get_base_control().get_theme()
+	bank_explorer.base_color = get_editor_interface().get_editor_settings().get_setting("interface/theme/base_color")
+	bank_explorer.contrast = get_editor_interface().get_editor_settings().get_setting("interface/theme/contrast")
+
 	bank_explorer.visible = false
 	add_child(bank_explorer)
 

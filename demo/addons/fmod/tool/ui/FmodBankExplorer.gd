@@ -25,9 +25,23 @@ var should_display_select_button = false
 
 var _current_select_callable: Callable
 
+var base_color: Color
+var contrast: float
+var background_color: Color
+
 func _ready():
 	var main_window_size = get_parent().get_window().size
 	size = main_window_size * 0.5
+	
+	background_color = base_color.lerp(Color(0,0,0), contrast * 1.5)
+	
+	if base_color == Color(0,0,0):
+		base_color = Color(0.212, 0.239, 0.29)
+	%BaseColorPanel.get_theme_stylebox("panel").bg_color = base_color
+	if background_color == Color(0,0,0):
+		background_color = Color(0.117647, 0.133333, 0.160784)
+	%BGPanel.get_theme_stylebox("panel").bg_color = background_color
+	
 	
 	copy_path_button.text = "Copy"
 	copy_guid_button.text = "Copy"

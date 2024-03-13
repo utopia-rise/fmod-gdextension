@@ -1,7 +1,7 @@
-res://low_level_2D/FmodScriptTest.tscn
-res://low_level_2D/Emitter.gd
-res://high_level_3D/World.tscn
-res://high_level_3D/selfdestroy.gd
-res://high_level_3D/environment/sin_move.gd
-res://high_level_2D/FmodNodesTest.tscn
-res://high_level_2D/sin_move.gd
+res://addons/fmod/tool/ui/TestFmodBankExplorer.tscn
+res://addons/fmod/FmodManager.gd
+res://addons/fmod/FmodPlugin.gd
+res://low_level_2D/FmodTest.gd
+res://addons/fmod/tool/ui/FmodBankExplorer.gd
+res://addons/fmod/tool/ui/ParameterDisplay.gd
+res://high_level_2D/Emitter.gd
