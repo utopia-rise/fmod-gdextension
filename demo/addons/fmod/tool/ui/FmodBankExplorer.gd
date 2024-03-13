@@ -33,6 +33,8 @@ func _ready():
 	copy_guid_button.text = "Copy"
 	copy_path_button.visible = false
 	copy_guid_button.visible = false
+	copy_path_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER + Control.SIZE_EXPAND
+	copy_guid_button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER + Control.SIZE_EXPAND
 	copy_path_button.pressed.connect(_on_copy_path_button)
 	copy_guid_button.pressed.connect(_on_copy_guid_button)
 	
@@ -49,15 +51,17 @@ func _ready():
 	%SelectButton.pressed.connect(emit_path_and_guid_callable)
 	%SelectButton.pressed.connect(close_window)
 	%CloseButton.pressed.connect(close_window)
+	self.close_requested.connect(close_window)
 	
-	%ButtonsContainer.add_child(copy_path_button)
-	%ButtonsContainer.add_child(copy_guid_button)
+	%CopyButtonContainer.add_child(copy_path_button)
+	%CopyButtonContainer.add_child(copy_guid_button)
 	
 	tree = %Tree
 	tree.item_selected.connect(_on_item_selected)
 	
 	tree.columns = 1
 	regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+
 
 func regenerate_tree(to_display: int, callable: Callable = Callable()):
 	%SelectButton.visible = should_display_select_button
@@ -164,7 +168,7 @@ func _on_item_selected():
 		%SelectButton.visible = false
 		%ParameterSectionSeparator.visible = false
 		%ParametersLabel.visible = false
-		%EventParametersDisplay.visible = false
+		%ParametersContainer.visible = false
 		return
 	%GuidLabel.set_text(metadata.get_guid())
 	%PathLabel.set_text(metadata.get_path())
@@ -178,11 +182,11 @@ func _on_item_selected():
 		%EventParametersDisplay.set_fmod_event(metadata)
 		%ParameterSectionSeparator.visible = true
 		%ParametersLabel.visible = true
-		%EventParametersDisplay.visible = true
+		%ParametersContainer.visible = true
 		return
 	%ParameterSectionSeparator.visible = false
 	%ParametersLabel.visible = false
-	%EventParametersDisplay.visible = false
+	%ParametersContainer.visible = false
 
 func _on_copy_path_button():
 	DisplayServer.clipboard_set(%PathLabel.text)

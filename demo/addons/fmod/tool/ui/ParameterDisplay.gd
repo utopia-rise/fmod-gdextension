@@ -1,4 +1,4 @@
-@tool class_name ParameterDisplay extends VBoxContainer
+@tool class_name ParameterDisplay extends MarginContainer
 
 var parameter: FmodParameterDescription
 
