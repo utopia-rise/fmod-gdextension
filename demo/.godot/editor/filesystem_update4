@@ -1,7 +1,1 @@
-res://addons/fmod/tool/ui/TestFmodBankExplorer.tscn
-res://addons/fmod/FmodManager.gd
-res://addons/fmod/FmodPlugin.gd
-res://low_level_2D/FmodTest.gd
-res://addons/fmod/tool/ui/FmodBankExplorer.gd
-res://addons/fmod/tool/ui/ParameterDisplay.gd
-res://high_level_2D/Emitter.gd
+res://addons/fmod/tool/ui/FmodBankExplorer.tscn

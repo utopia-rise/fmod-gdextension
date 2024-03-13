@@ -1,18 +1,25 @@
-[gd_scene load_steps=7 format=3 uid="uid://nr38urn226al"]
+[gd_scene load_steps=9 format=3 uid="uid://nr38urn226al"]
 
 [ext_resource type="Script" path="res://addons/fmod/tool/ui/FmodBankExplorer.gd" id="1_ekqus"]
 [ext_resource type="PackedScene" uid="uid://cppeyr1ke5wre" path="res://addons/fmod/tool/ui/EventParametersDisplay.tscn" id="2_uoyg8"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0awfk"]
-bg_color = Color(0.239412, 0.00431373, 0.129412, 1)
+bg_color = Color(0.117647, 0.133333, 0.160784, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wrr0m"]
-bg_color = Color(0.435294, 0.00784314, 0.235294, 1)
+bg_color = Color(0.212, 0.239, 0.29, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_3jkpq"]
 font_size = 25
 
 [sub_resource type="LabelSettings" id="LabelSettings_d4isr"]
+
+[sub_resource type="InputEventKey" id="InputEventKey_w47tf"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_rarey"]
+events = [SubResource("InputEventKey_w47tf")]
 
 [node name="FmodBankExplorer" type="Window"]
 title = "Fmod banks explorer"
@@ -198,4 +205,5 @@ theme_override_constants/margin_right = 8
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
+shortcut = SubResource("Shortcut_rarey")
 text = "Close"
