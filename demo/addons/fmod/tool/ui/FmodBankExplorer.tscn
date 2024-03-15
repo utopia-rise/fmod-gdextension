@@ -1,118 +1,347 @@
-[gd_scene load_steps=4 format=3 uid="uid://nr38urn226al"]
+[gd_scene load_steps=17 format=3 uid="uid://nr38urn226al"]
 
 [ext_resource type="Script" path="res://addons/fmod/tool/ui/FmodBankExplorer.gd" id="1_ekqus"]
+[ext_resource type="Script" path="res://addons/fmod/tool/ui/EventPlayControls.gd" id="2_mleop"]
 [ext_resource type="PackedScene" uid="uid://cppeyr1ke5wre" path="res://addons/fmod/tool/ui/EventParametersDisplay.tscn" id="2_uoyg8"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wrr0m"]
+bg_color = Color(0, 0, 0, 0.247059)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.207843)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_2pbsy"]
+
 [sub_resource type="LabelSettings" id="LabelSettings_3jkpq"]
-font_size = 25
+font_size = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0awfk"]
+bg_color = Color(0, 0, 0, 0.14902)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.8, 0.8, 0.8, 0.145098)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[sub_resource type="LabelSettings" id="LabelSettings_d4isr"]
+
+[sub_resource type="Image" id="Image_bwsay"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 184, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 181, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 184, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 181, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 181, 224, 224, 224, 255, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 181, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 180, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_sxu7n"]
+image = SubResource("Image_bwsay")
+
+[sub_resource type="Image" id="Image_6755r"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 195, 224, 224, 224, 210, 224, 224, 224, 56, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 253, 224, 224, 224, 139, 224, 224, 224, 8, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 225, 225, 225, 215, 224, 224, 224, 56, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 253, 224, 224, 224, 139, 224, 224, 224, 8, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 225, 225, 225, 183, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 225, 225, 225, 182, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 252, 225, 225, 225, 134, 255, 255, 255, 6, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 212, 226, 226, 226, 52, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 252, 225, 225, 225, 134, 255, 255, 255, 6, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 225, 225, 225, 191, 224, 224, 224, 206, 226, 226, 226, 52, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_hxrge"]
+image = SubResource("Image_6755r")
+
+[sub_resource type="Image" id="Image_05gpv"]
+data = {
+"data": PackedByteArray(255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 176, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 177, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 224, 224, 224, 177, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 255, 224, 224, 224, 176, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0, 255, 255, 255, 0),
+"format": "RGBA8",
+"height": 16,
+"mipmaps": false,
+"width": 16
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_72iew"]
+image = SubResource("Image_05gpv")
+
+[sub_resource type="InputEventKey" id="InputEventKey_w47tf"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_rarey"]
+events = [SubResource("InputEventKey_w47tf")]
 
 [node name="FmodBankExplorer" type="Window"]
 title = "Fmod banks explorer"
 initial_position = 2
-size = Vector2i(1440, 794)
+size = Vector2i(1720, 684)
 script = ExtResource("1_ekqus")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="BGPanel" type="Panel" parent="."]
+unique_name_in_owner = true
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="WindowMargin" type="MarginContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="HSplitContainer" type="HSplitContainer" parent="VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/HSplitContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="WindowMargin"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Tree" type="Tree" parent="VBoxContainer/HSplitContainer/ScrollContainer"]
+[node name="TopPanel" type="PanelContainer" parent="WindowMargin/VBoxContainer"]
+custom_minimum_size = Vector2(0, 42.315)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowMargin/VBoxContainer/TopPanel"]
+layout_mode = 2
+alignment = 2
+
+[node name="RefreshBanksButton" type="Button" parent="WindowMargin/VBoxContainer/TopPanel/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Refresh Banks"
+
+[node name="BaseColorPanel" type="PanelContainer" parent="WindowMargin/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_wrr0m")
+
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HSplitContainer" type="HSplitContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="Tree" type="Tree" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+size_flags_stretch_ratio = 0.54
+theme_override_styles/panel = SubResource("StyleBoxEmpty_2pbsy")
+hide_root = true
 
-[node name="RightPanel" type="ScrollContainer" parent="VBoxContainer/HSplitContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="RightPanelContent" type="VBoxContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RightPanel"]
+[node name="PathsLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 1
+text = "ID:"
+label_settings = SubResource("LabelSettings_3jkpq")
+justification_flags = 35
+
+[node name="PathsBG" type="PanelContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_0awfk")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG"]
 layout_mode = 2
-size_flags_horizontal = 6
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="PathContainer" type="HBoxContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer"]
+layout_mode = 2
+
+[node name="TitleLabelContainer" type="VBoxContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer"]
+layout_mode = 2
+
+[node name="PathTitleLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/TitleLabelContainer"]
+layout_mode = 2
 size_flags_vertical = 6
+text = "Path:"
+label_settings = SubResource("LabelSettings_d4isr")
 
-[node name="TitleContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer"]
+[node name="GuidTitleLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/TitleLabelContainer"]
 layout_mode = 2
-
-[node name="PathTitleLabel" type="Label" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer/TitleContainer"]
-layout_mode = 2
-text = "Path: "
-
-[node name="GuidTitleLabel" type="Label" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer/TitleContainer"]
-layout_mode = 2
+size_flags_vertical = 6
 text = "GUID: "
+label_settings = SubResource("LabelSettings_d4isr")
 
-[node name="ValueContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer"]
+[node name="ValueContainer" type="VBoxContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
 
-[node name="PathLabel" type="Label" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer/ValueContainer"]
+[node name="PathLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/ValueContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+text = "asdfasdfasdfasdf"
 
-[node name="GuidLabel" type="Label" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer/ValueContainer"]
+[node name="CopyPathLabel" type="Button" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/ValueContainer/PathLabel"]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 5.57001
+offset_top = -15.5
+offset_right = 36.57
+offset_bottom = 15.5
+grow_horizontal = 0
+grow_vertical = 2
+icon = SubResource("ImageTexture_sxu7n")
+
+[node name="GuidLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/ValueContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 6
+text = "asdfasdf"
+vertical_alignment = 1
 
-[node name="ButtonsContainer" type="VBoxContainer" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer/HBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
+[node name="CopyGuidLabel" type="Button" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/PathsBG/MarginContainer/PathContainer/ValueContainer/GuidLabel"]
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+offset_left = 6.095
+offset_top = -15.5
+offset_right = 37.095
+offset_bottom = 15.5
+grow_horizontal = 0
+grow_vertical = 2
+icon = SubResource("ImageTexture_sxu7n")
 
-[node name="ParameterSectionSeparator" type="HSeparator" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer"]
+[node name="ParametersLabel" type="Label" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent"]
 unique_name_in_owner = true
 visible = false
-layout_mode = 2
-
-[node name="ParametersLabel" type="Label" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer"]
-unique_name_in_owner = true
-visible = false
+custom_minimum_size = Vector2(0, 45)
 layout_mode = 2
 text = "Parameters:"
 label_settings = SubResource("LabelSettings_3jkpq")
+vertical_alignment = 2
 
-[node name="EventParametersDisplay" parent="VBoxContainer/HSplitContainer/RightPanel/VBoxContainer" instance=ExtResource("2_uoyg8")]
+[node name="ParametersContainer" type="PanelContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_0awfk")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/ParametersContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="EventParametersDisplay" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/ParametersContainer/MarginContainer" instance=ExtResource("2_uoyg8")]
+unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SelectButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="EventPlayControls" type="PanelContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent" node_paths=PackedStringArray("play_button", "stop_button", "fade_out_toggle")]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 55.44)
+layout_mode = 2
+size_flags_vertical = 10
+theme_override_styles/panel = SubResource("StyleBoxFlat_0awfk")
+script = ExtResource("2_mleop")
+play_button = NodePath("MarginContainer/HBoxContainer/PlayEventButton")
+stop_button = NodePath("MarginContainer/HBoxContainer/StopEventButton")
+fade_out_toggle = NodePath("MarginContainer/HBoxContainer/FadeoutToggle")
+
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/EventPlayControls"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/EventPlayControls/MarginContainer"]
+layout_mode = 2
+
+[node name="PlayEventButton" type="Button" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/EventPlayControls/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Play"
+icon = SubResource("ImageTexture_hxrge")
+
+[node name="StopEventButton" type="Button" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/EventPlayControls/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Stop"
+icon = SubResource("ImageTexture_72iew")
+
+[node name="FadeoutToggle" type="CheckButton" parent="WindowMargin/VBoxContainer/BaseColorPanel/MarginContainer/HSplitContainer/MarginContainer/RightPanelContent/EventPlayControls/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Allow fade out"
+
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="WindowMargin/VBoxContainer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="MarginContainer2" type="MarginContainer" parent="WindowMargin/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="SelectButton" type="Button" parent="WindowMargin/VBoxContainer/MarginContainer/HBoxContainer/MarginContainer2"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 4
 text = "Select"
 
-[node name="CloseButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+[node name="MarginContainer" type="MarginContainer" parent="WindowMargin/VBoxContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="CloseButton" type="Button" parent="WindowMargin/VBoxContainer/MarginContainer/HBoxContainer/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 4
+shortcut = SubResource("Shortcut_rarey")
 text = "Close"

@@ -17,22 +17,27 @@ static var _snapshot_icon = load("res://addons/fmod/icons/snapshot_icon.svg")
 signal emit_path_and_guid(path: String, guid: String)
 
 var tree: Tree
-var copy_path_button := Button.new()
-var copy_guid_button := Button.new()
+@onready var copy_path_button := %PathLabel.get_child(0)
+@onready var copy_guid_button := %GuidLabel.get_child(0)
 
 var should_display_copy_buttons = true
 var should_display_select_button = false
 
 var _current_select_callable: Callable
 
+var base_color: Color
+var contrast: float
+var background_color: Color
+
 func _ready():
 	var main_window_size = get_parent().get_window().size
 	size = main_window_size * 0.5
 	
-	copy_path_button.text = "Copy"
-	copy_guid_button.text = "Copy"
-	copy_path_button.visible = false
+	var copy_texture : Texture = EditorInterface.get_editor_theme().get_icon("ActionCopy", "EditorIcons")
+	copy_guid_button.icon = copy_texture
+	copy_path_button.icon = copy_texture
 	copy_guid_button.visible = false
+	copy_path_button.visible = false
 	copy_path_button.pressed.connect(_on_copy_path_button)
 	copy_guid_button.pressed.connect(_on_copy_guid_button)
 	
@@ -49,15 +54,16 @@ func _ready():
 	%SelectButton.pressed.connect(emit_path_and_guid_callable)
 	%SelectButton.pressed.connect(close_window)
 	%CloseButton.pressed.connect(close_window)
-	
-	%ButtonsContainer.add_child(copy_path_button)
-	%ButtonsContainer.add_child(copy_guid_button)
+	close_requested.connect(close_window)
 	
 	tree = %Tree
 	tree.item_selected.connect(_on_item_selected)
 	
 	tree.columns = 1
 	regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+	
+	%RefreshBanksButton.pressed.connect(on_refresh_banks_button_pressed)
+
 
 func regenerate_tree(to_display: int, callable: Callable = Callable()):
 	%SelectButton.visible = should_display_select_button
@@ -117,10 +123,12 @@ func regenerate_tree(to_display: int, callable: Callable = Callable()):
 	
 	%SelectButton.visible = should_display_select_button and %GuidLabel.text != ""
 
+
 func _add_elements_as_tree(elements: Array, parent: TreeItem):
 	var stack = Array()
 	for element in elements:
 		_add_element_to_stack(stack, parent, element)
+
 
 func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
 	var fmod_path: String = path_element.get_path()
@@ -154,20 +162,21 @@ func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
 				tree_item.set_icon(0, _get_icon_for_fmod_path(fmod_path))
 			stack.append(tree_item)
 
+
 func _on_item_selected():
 	var metadata = tree.get_selected().get_metadata(0)
-	if metadata == null:
-		%GuidLabel.set_text("")
-		%PathLabel.set_text("")
+	if metadata == null or !metadata.get_guid():
+		%PathsBG.hide()
+		%EventPlayControls.hide()
 		copy_path_button.visible = false
 		copy_guid_button.visible = false
 		%SelectButton.visible = false
-		%ParameterSectionSeparator.visible = false
 		%ParametersLabel.visible = false
-		%EventParametersDisplay.visible = false
+		%ParametersContainer.visible = false
 		return
 	%GuidLabel.set_text(metadata.get_guid())
 	%PathLabel.set_text(metadata.get_path())
+	%PathsBG.show()
 	if should_display_copy_buttons:
 		copy_path_button.visible = true
 		copy_guid_button.visible = true
@@ -175,14 +184,15 @@ func _on_item_selected():
 		%SelectButton.visible = true
 	
 	if metadata is FmodEventDescription:
-		%EventParametersDisplay.set_fmod_event(metadata)
-		%ParameterSectionSeparator.visible = true
-		%ParametersLabel.visible = true
-		%EventParametersDisplay.visible = true
+		%EventPlayControls.set_fmod_event(metadata)
+		var _show_parameter_controls : bool = %EventParametersDisplay.set_fmod_event(metadata)
+		%ParametersLabel.visible = _show_parameter_controls
+		%ParametersContainer.visible = _show_parameter_controls
 		return
-	%ParameterSectionSeparator.visible = false
+	%EventPlayControls.hide()
+	%EventParametersDisplay.hide()
 	%ParametersLabel.visible = false
-	%EventParametersDisplay.visible = false
+	%ParametersContainer.visible = false
 
 func _on_copy_path_button():
 	DisplayServer.clipboard_set(%PathLabel.text)
@@ -190,7 +200,44 @@ func _on_copy_path_button():
 func _on_copy_guid_button():
 	DisplayServer.clipboard_set(%GuidLabel.text)
 
+
+func on_refresh_banks_button_pressed() -> void:
+	# unload banks
+	var current_banks : Array = FmodServer.get_all_banks()
+	for i : FmodBank in current_banks:
+		FmodServer.unload_bank(i.get_godot_res_path())
+	# get the banks to load
+	var path : String = ProjectSettings.get_setting("Fmod/General/banks_path", "")
+	if !path:
+		printerr("No banks path set in the project settings (Fmod/General/banks_path)")
+		return # no path set in the project settings
+	var bank_paths_to_load : Array[String]
+	var dir : DirAccess = DirAccess.open(path)
+	if dir:
+		dir.list_dir_begin()
+		var file_name : String = dir.get_next()
+		while file_name != "":
+			if dir.current_is_dir():
+				pass # the found item is a directory
+			else:
+				if file_name.ends_with(".bank"):
+					bank_paths_to_load.append(path + "/" + file_name)
+			file_name = dir.get_next()
+		if bank_paths_to_load:
+			# sort to first load the master bank and its strings
+			bank_paths_to_load.sort_custom(func(path1 : String, path2 : String) -> bool: return path1.contains("Master"))
+		else:
+			printerr("Could not find any banks in the specified directory")
+		for bank_path : String in bank_paths_to_load:
+			FmodServer.load_bank(bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	else:
+		printerr("Couldn't access bank path, please make sure you specified a folder with the banks as direct children")
+		
+	regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+
+
 func close_window():
+	%EventPlayControls.stop_event()
 	visible = false
 
 static func _get_icon_for_fmod_path(fmod_path: String) -> Texture2D:
