@@ -25,3 +25,7 @@ void FmodEventEmitter3D::_exit_tree() {
 void FmodEventEmitter3D::_bind_methods() {
     FmodEventEmitter<FmodEventEmitter3D, Node3D>::_bind_methods();
 }
+
+void FmodEventEmitter3D::free_impl() {
+    queue_free();
+}

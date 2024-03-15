@@ -88,18 +88,30 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("create_event_instance_with_guid", "guid"), &FmodServer::create_event_instance_with_guid);
     ClassDB::bind_method(D_METHOD("create_event_instance", "eventPath"), &FmodServer::create_event_instance);
     ClassDB::bind_method(D_METHOD("create_event_instance_from_description", "eventPath"), &FmodServer::create_event_instance_from_description);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_guid", "guid", "game_obj"), &FmodServer::play_one_shot_using_guid);
-    ClassDB::bind_method(D_METHOD("play_one_shot", "event_name", "game_obj"), &FmodServer::play_one_shot);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description", "event_description", "game_obj"), &FmodServer::play_one_shot_using_event_description);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_with_params", "guid", "game_obj", "parameters"), &FmodServer::play_one_shot_using_guid_with_params);
-    ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "event_name", "game_obj", "parameters"), &FmodServer::play_one_shot_with_params);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_with_params", "event_description", "game_obj", "parameters"), &FmodServer::play_one_shot_using_event_description_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_guid", "guid"), &FmodServer::play_one_shot_using_guid);
+    ClassDB::bind_method(D_METHOD("play_one_shot", "event_name"), &FmodServer::play_one_shot);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description", "event_description"), &FmodServer::play_one_shot_using_event_description);
+    ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_with_params", "guid", "parameters"), &FmodServer::play_one_shot_using_guid_with_params);
+    ClassDB::bind_method(D_METHOD("play_one_shot_with_params", "event_name", "parameters"), &FmodServer::play_one_shot_with_params);
+    ClassDB::bind_method(
+      D_METHOD("play_one_shot_using_event_description_with_params", "event_description", "parameters"),
+      &FmodServer::play_one_shot_using_event_description_with_params
+    );
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_attached", "guid", "game_obj"), &FmodServer::play_one_shot_using_guid_attached);
     ClassDB::bind_method(D_METHOD("play_one_shot_attached", "event_name", "game_obj"), &FmodServer::play_one_shot_attached);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_attached", "event_description", "game_obj"), &FmodServer::play_one_shot_using_event_description_attached);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_guid_attached_with_params", "guid", "game_obj", "parameters"), &FmodServer::play_one_shot_using_guid_attached_with_params);
+    ClassDB::bind_method(
+      D_METHOD("play_one_shot_using_event_description_attached", "event_description", "game_obj"),
+      &FmodServer::play_one_shot_using_event_description_attached
+    );
+    ClassDB::bind_method(
+      D_METHOD("play_one_shot_using_guid_attached_with_params", "guid", "game_obj", "parameters"),
+      &FmodServer::play_one_shot_using_guid_attached_with_params
+    );
     ClassDB::bind_method(D_METHOD("play_one_shot_attached_with_params", "event_name", "game_obj", "parameters"), &FmodServer::play_one_shot_attached_with_params);
-    ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description_attached_with_params", "event_description", "game_obj", "parameters"), &FmodServer::play_one_shot_using_event_description_attached_with_params);
+    ClassDB::bind_method(
+      D_METHOD("play_one_shot_using_event_description_attached_with_params", "event_description", "game_obj", "parameters"),
+      &FmodServer::play_one_shot_using_event_description_attached_with_params
+    );
     ClassDB::bind_method(D_METHOD("pause_all_events"), &FmodServer::pause_all_events);
     ClassDB::bind_method(D_METHOD("unpause_all_events"), &FmodServer::unpause_all_events);
     ClassDB::bind_method(D_METHOD("mute_all_events"), &FmodServer::mute_all_events);
@@ -148,13 +160,9 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 
     FMOD_STUDIO_INITFLAGS studio_init_flags = FMOD_STUDIO_INIT_NORMAL;
 
-    if (p_settings->get_is_live_update_enabled()) {
-        studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE;
-    }
+    if (p_settings->get_is_live_update_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE; }
 
-    if (p_settings->get_is_memory_tracking_enabled()) {
-        studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING;
-    }
+    if (p_settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
 
     FMOD_INITFLAGS init_flags = FMOD_INIT_3D_RIGHTHANDED;
 
@@ -213,17 +221,17 @@ void FmodServer::update() {
         FMOD_STUDIO_PLAYBACK_STATE s;
         ERROR_CHECK(oneShot->instance->get_wrapped()->getPlaybackState(&s));
 
-        if (s == FMOD_STUDIO_PLAYBACK_STOPPED || is_dead(oneShot->gameObj)) {
+        if (s == FMOD_STUDIO_PLAYBACK_STOPPED || (oneShot->gameObj && is_dead(oneShot->gameObj))) {
             FMOD_STUDIO_STOP_MODE m = FMOD_STUDIO_STOP_IMMEDIATE;
             oneShot->instance->stop(m);
             oneShots.erase(oneShot);
             continue;
         }
 
-        oneShot->instance->set_node_attributes(oneShot->gameObj);
+        if (oneShot->gameObj) { oneShot->instance->set_node_attributes(oneShot->gameObj); }
     }
 
-    for (Ref<FmodEvent> event : runningEvents) {
+    for (const Ref<FmodEvent>& event : runningEvents) {
         if (!event->is_valid()) { runningEvents.erase(event); }
     }
 
@@ -269,9 +277,7 @@ void FmodServer::_set_listener_attributes() {
 }
 
 void FmodServer::shutdown() {
-    if (!isInitialized) {
-        return;
-    }
+    if (!isInitialized) { return; }
 
     isInitialized = false;
     isNotInitializedPrinted = false;
@@ -449,13 +455,11 @@ void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_se
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
-    ERROR_CHECK(
-      coreSystem->setSoftwareFormat(
+    ERROR_CHECK(coreSystem->setSoftwareFormat(
       p_settings->get_sample_rate(),
       static_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
       p_settings->get_raw_speakers_count()
-      )
-    );
+    ));
 }
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
@@ -598,147 +602,64 @@ Ref<FmodEventDescription> FmodServer::_get_event_description(const FMOD_GUID& gu
     return cache->get_event(guid);
 }
 
-void FmodServer::play_one_shot_using_guid(const String& guid, Node* game_obj) {
-    return play_one_shot_using_guid_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj);
-}
-
-void FmodServer::play_one_shot_using_guid_internal(const FMOD_GUID& guid, godot::Node* game_obj) {
+void FmodServer::play_one_shot_using_guid(const String& guid) {
     EventIdentifier parameter {};
-    parameter.guid = guid;
-    return _play_one_shot<
-      EventIdentifierType::GUID,
-      false,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj);
+    parameter.guid = string_to_fmod_guid(guid.utf8().get_data());
+    return _play_one_shot<EventIdentifierType::GUID, false>(parameter, nullptr);
 }
 
-void FmodServer::play_one_shot(const String& event_name, Node* game_obj) {
-    return _play_one_shot<
-      EventIdentifierType::PATH,
-      false,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >({event_name.utf8().get_data()}, game_obj);
+void FmodServer::play_one_shot(const String& event_name) {
+    return _play_one_shot<EventIdentifierType::PATH, false>({event_name.utf8().get_data()}, nullptr);
 }
 
-void FmodServer::play_one_shot_using_event_description(const Ref<FmodEventDescription>& event_description, Node* game_obj) {
+void FmodServer::play_one_shot_using_event_description(const Ref<FmodEventDescription>& event_description) {
     EventIdentifier parameter {};
     parameter.event_description = event_description.ptr();
-    return _play_one_shot<
-      EventIdentifierType::EVENT_DESCRIPTION,
-      false,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj);
+    return _play_one_shot<EventIdentifierType::EVENT_DESCRIPTION, false>(parameter, nullptr);
 }
 
-void FmodServer::play_one_shot_using_guid_with_params(const String& guid, Node* game_obj, const Dictionary& parameters) {
-    return play_one_shot_using_guid_with_params_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj, parameters);
-}
-
-void FmodServer::play_one_shot_using_guid_with_params_internal(const FMOD_GUID& guid, godot::Node* game_obj, const godot::Dictionary& parameters) {
+void FmodServer::play_one_shot_using_guid_with_params(const String& guid, const Dictionary& parameters) {
     EventIdentifier parameter {};
-    parameter.guid = guid;
+    parameter.guid = string_to_fmod_guid(guid.utf8().get_data());
 
-    return _play_one_shot<
-      EventIdentifierType::GUID,
-      true,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj, parameters);
+    return _play_one_shot<EventIdentifierType::GUID, true>(parameter, nullptr, parameters);
 }
 
-void FmodServer::play_one_shot_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<
-      EventIdentifierType::PATH,
-      true,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >({event_name.utf8().get_data()}, game_obj, parameters);
+void FmodServer::play_one_shot_with_params(const String& event_name, const Dictionary& parameters) {
+    return _play_one_shot<EventIdentifierType::PATH, true>({event_name.utf8().get_data()}, nullptr, parameters);
 }
 
-void FmodServer::play_one_shot_using_event_description_with_params(const Ref<FmodEventDescription>& event_description, Node* game_obj, const Dictionary& parameters) {
+void FmodServer::play_one_shot_using_event_description_with_params(const Ref<FmodEventDescription>& event_description, const Dictionary& parameters) {
     EventIdentifier parameter {};
     parameter.event_description = event_description.ptr();
 
-    return _play_one_shot<
-      EventIdentifierType::EVENT_DESCRIPTION,
-      true,
-      false,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj, parameters);
+    return _play_one_shot<EventIdentifierType::EVENT_DESCRIPTION, true>(parameter, nullptr, parameters);
 }
 
 void FmodServer::play_one_shot_using_guid_attached(const String& guid, Node* game_obj) {
-    return play_one_shot_using_guid_attached_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj);
-}
-
-void FmodServer::play_one_shot_using_guid_attached_internal(const FMOD_GUID& guid, Node* game_obj) {
     EventIdentifier parameter {};
-    parameter.guid = guid;
-    return _play_one_shot<
-      EventIdentifierType::GUID,
-      false,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj);
+    parameter.guid = string_to_fmod_guid(guid.utf8().get_data());
+    return _play_one_shot<EventIdentifierType::GUID, false>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot_attached(const String& event_name, Node* game_obj) {
-    return _play_one_shot<
-      EventIdentifierType::PATH,
-      false,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >({event_name.utf8().get_data()}, game_obj);
+    return _play_one_shot<EventIdentifierType::PATH, false>({event_name.utf8().get_data()}, game_obj);
 }
 
 void FmodServer::play_one_shot_using_event_description_attached(const Ref<FmodEventDescription>& event_description, Node* game_obj) {
     EventIdentifier parameter {};
     parameter.event_description = event_description.ptr();
-    return _play_one_shot<
-      EventIdentifierType::EVENT_DESCRIPTION,
-      false,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj);
+    return _play_one_shot<EventIdentifierType::EVENT_DESCRIPTION, false>(parameter, game_obj);
 }
 
 void FmodServer::play_one_shot_using_guid_attached_with_params(const String& guid, Node* game_obj, const Dictionary& parameters) {
-    return play_one_shot_using_guid_attached_with_params_internal(string_to_fmod_guid(guid.utf8().get_data()), game_obj, parameters);
-}
-
-void FmodServer::play_one_shot_using_guid_attached_with_params_internal(const FMOD_GUID& guid, Node* game_obj, const Dictionary& parameters) {
     EventIdentifier parameter {};
-    parameter.guid = guid;
-
-    return _play_one_shot<
-      EventIdentifierType::GUID,
-      true,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj, parameters);
+    parameter.guid = string_to_fmod_guid(guid.utf8().get_data());
+    return _play_one_shot<EventIdentifierType::GUID, true>(parameter, game_obj, parameters);
 }
 
 void FmodServer::play_one_shot_attached_with_params(const String& event_name, Node* game_obj, const Dictionary& parameters) {
-    return _play_one_shot<
-      EventIdentifierType::PATH,
-      true,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >({event_name.utf8().get_data()}, game_obj, parameters);
+    return _play_one_shot<EventIdentifierType::PATH, true>({event_name.utf8().get_data()}, game_obj, parameters);
 }
 
 void FmodServer::play_one_shot_using_event_description_attached_with_params(
@@ -749,13 +670,7 @@ void FmodServer::play_one_shot_using_event_description_attached_with_params(
     EventIdentifier parameter {};
     parameter.event_description = event_description.ptr();
 
-    return _play_one_shot<
-      EventIdentifierType::EVENT_DESCRIPTION,
-      true,
-      true,
-      Dictionary,
-      &FmodServer::_apply_parameter_dict_to_event
-    >(parameter, game_obj, parameters);
+    return _play_one_shot<EventIdentifierType::EVENT_DESCRIPTION, true>(parameter, game_obj, parameters);
 }
 
 void FmodServer::set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings) {
@@ -920,7 +835,7 @@ Ref<FmodEvent> FmodServer::_create_instance(const Ref<FmodEventDescription>& des
     Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
     if (ref.is_valid()) {
         runningEvents.push_back(ref);
-        if (is_one_shot || game_object) {
+        if (is_one_shot) {
             auto* oneShot = new OneShot();
             oneShot->gameObj = game_object;
             oneShots.push_back(oneShot);
