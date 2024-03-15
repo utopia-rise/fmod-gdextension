@@ -284,6 +284,7 @@ visible = false
 custom_minimum_size = Vector2(0, 55.44)
 layout_mode = 2
 size_flags_vertical = 10
+size_flags_stretch_ratio = 0.1
 theme_override_styles/panel = SubResource("StyleBoxFlat_0awfk")
 script = ExtResource("2_mleop")
 play_button = NodePath("MarginContainer/HBoxContainer/PlayEventButton")
