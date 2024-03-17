@@ -1,8 +1,9 @@
-@tool class_name ParameterDisplay extends VBoxContainer
+@tool class_name ParameterDisplay extends MarginContainer
 
 var parameter: FmodParameterDescription
 
 func set_parameter(p_parameter: FmodParameterDescription):
+	show()
 	parameter = p_parameter
 
 func display_value_selector(should: bool):
@@ -10,10 +11,16 @@ func display_value_selector(should: bool):
 
 func _ready():
 	if parameter == null:
+		hide()
 		return
 	var minimum_value = parameter.get_minimum()
 	var maximum_value = parameter.get_maximum()
 	var default_value = parameter.get_default_value()
+	
+	var copy_icon : Texture = EditorInterface.get_editor_theme().get_icon("ActionCopy", "EditorIcons")
+	%NameCopyButton.icon = copy_icon
+	%IdCopyButton.icon = copy_icon
+	
 	
 	%NameLabel.text = parameter.get_name()
 	%IdLabel.text = str(parameter.get_id())
