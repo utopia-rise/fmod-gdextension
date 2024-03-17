@@ -228,7 +228,7 @@ void FmodServer::update() {
             continue;
         }
 
-        if (oneShot->gameObj) { oneShot->instance->set_node_attributes(oneShot->gameObj); }
+        if (Node* obj = oneShot->gameObj) { oneShot->instance->set_node_attributes(obj); }
     }
 
     for (const Ref<FmodEvent>& event : runningEvents) {
@@ -587,6 +587,7 @@ Ref<FmodEventDescription> FmodServer::_get_event_description(const String& event
     bool found = cache->has_event_path(event_name);
     if (!found) {
         GODOT_LOG_WARNING("Event " + event_name + " can't be found. Check if the path is correct or the bank properly loaded.")
+        return {};
     }
 
     return cache->get_event(event_name);
@@ -597,6 +598,7 @@ Ref<FmodEventDescription> FmodServer::_get_event_description(const FMOD_GUID& gu
     if (!found) {
         String fmod_guid_string {fmod_guid_to_string(guid)};
         GODOT_LOG_WARNING("Event " + fmod_guid_string + " can't be found. Check if the path is correct or the bank properly loaded.")
+        return {};
     }
 
     return cache->get_event(guid);

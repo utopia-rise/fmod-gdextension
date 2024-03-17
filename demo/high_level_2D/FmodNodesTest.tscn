@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://dl6g18ybwc83t"]
+[gd_scene load_steps=12 format=3 uid="uid://dl6g18ybwc83t"]
 
 [ext_resource type="Script" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
 [ext_resource type="Script" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
 [ext_resource type="Script" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
 [ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
+[ext_resource type="PackedScene" uid="uid://glfbseq2tmgg" path="res://high_level_2D/footstep.tscn" id="5_usogy"]
 [ext_resource type="Script" path="res://low_level_2D/EnterandLeave2.gd" id="7_c28gt"]
 
 [sub_resource type="RectangleShape2D" id="1"]
@@ -69,6 +70,7 @@ texture = ExtResource("2_llv2n")
 [node name="Listener" type="CharacterBody2D" parent="FmodBankLoader"]
 position = Vector2(500, 150)
 script = ExtResource("3_dlbku")
+footstep_scene = ExtResource("5_usogy")
 
 [node name="FmodListener2D" type="FmodListener2D" parent="FmodBankLoader/Listener"]
 
