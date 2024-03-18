@@ -20,7 +20,7 @@ void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bo
         PackedStringArray files;
         list_files_in_folder(files, "res://", extension, excluded_folders);
         for (const String& file : files) {
-            GODOT_LOG_INFO(vformat("Adding %s to pck", file));
+            GODOT_LOG_VERBOSE(vformat("Adding %s to pck", file));
             add_file(file, FileAccess::get_file_as_bytes(file), false);
         }
     }

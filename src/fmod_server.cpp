@@ -174,7 +174,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     if (ERROR_CHECK(
           coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
         )) {
-        GODOT_LOG_INFO("Custom File System enabled.")
+        GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
     cache = new FmodCache(system);
 }
@@ -763,7 +763,7 @@ void FmodServer::set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settin
     int num_buffers = p_settings->get_dsp_buffer_count();
 
     if (buffer_length > 0 && num_buffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(buffer_length, num_buffers))) {
-        GODOT_LOG_INFO("FMOD Sound System: Successfully set DSP buffer size")
+        GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set DSP buffer size")
     } else {
         GODOT_LOG_ERROR(vformat("FMOD Sound System: Failed to set DSP buffer size: %s, with buffer count: %s", buffer_length, num_buffers))
     }
@@ -842,7 +842,7 @@ void FmodServer::unload_file(const String& path) {
         return;
     }
     cache->remove_file(path);
-    GODOT_LOG_INFO("FMOD Sound System: UNLOADING FILE" + String(path))
+    GODOT_LOG_VERBOSE("FMOD Sound System: UNLOADING FILE" + String(path))
 }
 
 Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
@@ -867,7 +867,7 @@ void FmodServer::set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_setting
         GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
     } else if (ERROR_CHECK(coreSystem->set3DSettings(p_settings->get_doppler_scale(), distance_factor, p_settings->get_rolloff_scale()))) {
         distanceScale = distance_factor;
-        GODOT_LOG_INFO("FMOD Sound System: Successfully set global 3D settings")
+        GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set global 3D settings")
     } else {
         GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings")
     }
