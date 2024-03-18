@@ -11,6 +11,7 @@
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 #include "templates/hash_map.hpp"
+#include "templates/vector.hpp"
 #include "variant/string.hpp"
 
 #include <callback/event_callbacks.h>
@@ -95,8 +96,8 @@ namespace godot {
         bool listenerWarning = true;
         Listener listeners[FMOD_MAX_LISTENERS];
 
-        List<OneShot*> oneShots;
-        List<Ref<FmodEvent>> runningEvents;
+        Vector<OneShot*> oneShots;
+        Vector<Ref<FmodEvent>> runningEvents;
 
         Ref<FmodPerformanceData> performanceData;
 
@@ -274,14 +275,14 @@ namespace godot {
         ERROR_CHECK(fetch_event_description<parameter_type>(identifier)->get_wrapped()->createInstance(&eventInstance));
 
         Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
-        if (ref.is_valid()) {
-            runningEvents.push_back(ref);
+        if (ref.is_null() || !ref->is_valid()) {
+            GODOT_LOG_WARNING("Event Instance is invalid.")
+            return {};
         }
-
 
         ref->get_wrapped()->setUserData(ref.ptr());
         ref->set_distance_scale(distanceScale);
-
+        runningEvents.push_back(ref);
         return ref;
     }
 
@@ -301,15 +302,17 @@ namespace godot {
 
         if (ref.is_null()) { return; }
 
-        auto* oneShot = new OneShot();
-        oneShot->gameObj = game_obj;
-        oneShot->instance = ref;
-        oneShots.push_back(oneShot);
-
-        if (game_obj) { ref->set_node_attributes(game_obj); }
         if (!parameters.is_empty()) {
             // set the initial parameter values
             _apply_parameter_dict_to_event(ref, parameters);
+        }
+
+        if(game_obj){
+            auto* oneShot = new OneShot();
+            oneShot->gameObj = game_obj;
+            oneShot->instance = ref;
+            ref->set_node_attributes(game_obj);
+            oneShots.push_back(oneShot);
         }
 
         ref->start();

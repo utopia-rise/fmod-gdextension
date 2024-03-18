@@ -212,19 +212,21 @@ void FmodServer::update() {
 
     callback_mutex->unlock();
 
-    for (OneShot* oneShot : oneShots) {
+
+    Vector<OneShot*> one_shots_copy = oneShots;
+    for (OneShot* oneShot : one_shots_copy) {
 
         if (!oneShot->instance->is_valid() || is_dead(oneShot->gameObj)) {
-            //We release one-shots as soon as they are started, the event becomes invalid as soon as it ends
+            //We release one-shots when they are started, the event becomes invalid as soon as it ends
             oneShots.erase(oneShot);
             delete oneShot;
             continue;
         }
-
-        if (Node* obj = oneShot->gameObj) { oneShot->instance->set_node_attributes(obj); }
+        oneShot->instance->set_node_attributes(oneShot->gameObj);
     }
 
-    for (const Ref<FmodEvent>& event : runningEvents) {
+    Vector<Ref<FmodEvent>> events_copy = runningEvents;
+    for (const Ref<FmodEvent>& event : events_copy) {
         if (!event->is_valid()) { runningEvents.erase(event); }
     }
 
