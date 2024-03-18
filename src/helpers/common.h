@@ -22,6 +22,7 @@
 #define MAX_EVENT_INSTANCE_COUNT 128
 
 #define GODOT_LOG_INFO(message) UtilityFunctions::print(message);
+#define GODOT_LOG_VERBOSE(message) UtilityFunctions::print_verbose(message);
 #define GODOT_LOG_WARNING(message) UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 #define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 

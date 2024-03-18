@@ -47,7 +47,7 @@ Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
     ERROR_CHECK(system->loadBankFile(bankPath.utf8().get_data(), flag, &bank));
     if (!bank) { return {}; }
     Ref<FmodBank> ref = FmodBank::create_ref(bank, bankPath);
-    GODOT_LOG_INFO("FMOD Sound System: LOADING BANK " + String(bankPath))
+    GODOT_LOG_VERBOSE("FMOD Sound System: LOADING BANK " + String(bankPath))
     loading_banks.push_back(ref);
     if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) { force_loading(); }
     return ref;
@@ -81,7 +81,7 @@ Ref<FmodFile> FmodCache::add_file(const String& filePath, unsigned int flag) {
     if (sound) {
         Ref<FmodFile> ref = FmodFile::create_ref(sound);
         files[filePath] = ref;
-        GODOT_LOG_INFO("FMOD Sound System: LOADING AS SOUND FILE" + String(filePath))
+        GODOT_LOG_VERBOSE("FMOD Sound System: LOADING AS SOUND FILE" + String(filePath))
         return ref;
     }
     return {};
