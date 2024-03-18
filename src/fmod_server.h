@@ -114,8 +114,6 @@ namespace godot {
         Ref<FmodEventDescription> _get_event_description(const String& event_name);
         Ref<FmodEventDescription> _get_event_description(const FMOD_GUID& guid);
 
-        Ref<FmodEvent> _create_instance(const Ref<FmodEventDescription>& description, bool is_one_shot, Node* game_object);
-
         void _update_performance_data();
 
     public:
@@ -219,7 +217,7 @@ namespace godot {
     private:
         template<EventIdentifierType parameter_type>
         Ref<FmodEventDescription> fetch_event_description(const EventIdentifier& identifier);
-        template<EventIdentifierType parameter_type, bool with_params>
+        template<EventIdentifierType parameter_type>
         void _play_one_shot(const EventIdentifier& identifier, Node* game_obj, const Dictionary& parameters = Dictionary());
         static void _apply_parameter_dict_to_event(const Ref<FmodEvent>& p_event, const Dictionary& parameters);
 
@@ -272,13 +270,22 @@ namespace godot {
 
     template<FmodServer::EventIdentifierType parameter_type>
     Ref<FmodEvent> FmodServer::_create_event_instance(const EventIdentifier& identifier) {
-        Ref<FmodEvent> ref = _create_instance(fetch_event_description<parameter_type>(identifier), false, nullptr);
+        FMOD::Studio::EventInstance* eventInstance = nullptr;
+        ERROR_CHECK(fetch_event_description<parameter_type>(identifier)->get_wrapped()->createInstance(&eventInstance));
+
+        Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
+        if (ref.is_valid()) {
+            runningEvents.push_back(ref);
+        }
+
+
         ref->get_wrapped()->setUserData(ref.ptr());
         ref->set_distance_scale(distanceScale);
+
         return ref;
     }
 
-    template<FmodServer::EventIdentifierType parameter_type, bool with_params>
+    template<FmodServer::EventIdentifierType parameter_type>
     void FmodServer::_play_one_shot(const FmodServer::EventIdentifier& identifier, Node* game_obj, const Dictionary& parameters) {
         Ref<FmodEventDescription> desc =  fetch_event_description<parameter_type>(identifier);
         if (!desc->is_one_shot()){
@@ -286,19 +293,21 @@ namespace godot {
             return;
         }
 
-        if (game_obj && !is_fmod_valid(game_obj)) { return; }
+        if (game_obj && !is_fmod_valid(game_obj)) {
+            return;
+        }
 
-        Ref<FmodEvent> ref = _create_instance(
-         desc,
-          true,
-          game_obj
-        );
+        Ref<FmodEvent> ref = _create_event_instance<parameter_type>(identifier);
 
-        if (!ref.is_valid()) { return; }
+        if (ref.is_null()) { return; }
+
+        auto* oneShot = new OneShot();
+        oneShot->gameObj = game_obj;
+        oneShot->instance = ref;
+        oneShots.push_back(oneShot);
 
         if (game_obj) { ref->set_node_attributes(game_obj); }
-
-        if (with_params) {
+        if (!parameters.is_empty()) {
             // set the initial parameter values
             _apply_parameter_dict_to_event(ref, parameters);
         }
