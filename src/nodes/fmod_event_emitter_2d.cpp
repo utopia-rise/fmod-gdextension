@@ -25,3 +25,7 @@ void FmodEventEmitter2D::_exit_tree() {
 void FmodEventEmitter2D::_bind_methods() {
     FmodEventEmitter<FmodEventEmitter2D, Node2D>::_bind_methods();
 }
+
+void FmodEventEmitter2D::free_impl() {
+    queue_free();
+}

@@ -29,9 +29,7 @@ namespace godot {
             float max_value;
             float default_value;
 
-            bool operator==(const Parameter& parameter) const {
-                return id == parameter.id;
-            }
+            bool operator==(const Parameter& parameter) const { return id == parameter.id; }
         };
 
         Ref<FmodEvent> _event;
@@ -41,6 +39,7 @@ namespace godot {
         bool _attached = true;
         bool _autoplay = false;
         bool _is_one_shot = false;
+        bool _auto_release = false;
         bool _allow_fadeout = true;
         bool _preload_event = true;
         float _volume = true;
@@ -69,7 +68,8 @@ namespace godot {
         bool is_attached() const;
         void set_autoplay(const bool autoplay);
         bool is_autoplay() const;
-        void set_one_shot(const bool p_is_one_shot);
+        void set_auto_release(const bool auto_release);
+        bool is_auto_release() const;
         bool is_one_shot() const;
         void set_allow_fadeout(const bool allow_fadeout);
         bool is_allow_fadeout() const;
@@ -87,18 +87,19 @@ namespace godot {
 
     protected:
         void _emit_callbacks(const Dictionary& dict, const int type) const;
-        bool _set(const StringName &p_name, const Variant &p_property);
-        bool _get(const StringName &p_name, Variant &r_property) const;
-        bool _property_can_revert(const StringName &p_name) const;
-        bool _property_get_revert(const StringName &p_name, Variant &r_property) const;
-        void _get_property_list(List<PropertyInfo> *p_list) const;
+        bool _set(const StringName& p_name, const Variant& p_property);
+        bool _get(const StringName& p_name, Variant& r_property) const;
+        bool _property_can_revert(const StringName& p_name) const;
+        bool _property_get_revert(const StringName& p_name, Variant& r_property) const;
+        void _get_property_list(List<PropertyInfo>* p_list) const;
         static void _bind_methods();
 
     private:
         void set_space_attribute() const;
         void apply_parameters();
+        void free();
         Ref<FmodEventDescription> _load_event_description() const;
-        void preload_event() const;
+        void preload_event();
         void load_event();
         Parameter* find_parameter_by_name(const String& p_name) const;
 
@@ -111,60 +112,73 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::free() {
+        static_cast<Derived*>(this)->free_impl();
+    }
+
+    template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::ready() {
 #ifdef TOOLS_ENABLED
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
-        
-        if (is_preload_event()) {
-            preload_event();
-        }
 
-        if (!_is_one_shot) {
+        if (_autoplay) {
             load_event();
             _event->set_volume(_volume);
             apply_parameters();
             set_space_attribute();
-        }
-
-        if (_autoplay) {
             set_paused(false);
             play();
+        } else if (_preload_event) {
+            // No need to preload if autoplay is on because event is loaded anyway.
+            preload_event();
         }
     }
-    
+
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::process() {
 #ifdef TOOLS_ENABLED
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
 
-        bool should_restart{ false };
-        if (!_event.is_valid() && !_is_one_shot && _autoplay) {
-            load_event();
-            _event->set_volume(_volume);
-            apply_parameters();
-            should_restart = true;
+        if (_event.is_null()) {
+            // No event loaded, nothing to do here
+            return;
         }
 
-        if (!_is_one_shot && _attached && _event.is_valid()) {
-            set_space_attribute();
+        if (!_event->is_valid()) {
+            // Event was loaded and is done playing.
+            if (_auto_release) {
+                free();
+                return;
+            } else if (_autoplay) {
+                load_event();
+                _event->set_volume(_volume);
+                apply_parameters();
+            }
         }
 
-        if (should_restart) {
-            set_paused(false);
-            play();
-        }
+        if (_attached && _event->is_valid()) { set_space_attribute(); }
     }
-    
+
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::exit_tree() {
 #ifdef TOOLS_ENABLED
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
 
-        stop();
+        if (_event.is_null()) {
+            // No event loaded, nothing to stop or free.
+            return;
+        }
+
+        if (_event->is_valid()) {
+            _event->release();
+            stop();
+        }
+
+        _event.unref();
     }
 
     template<class Derived, class NodeType>
@@ -173,7 +187,7 @@ namespace godot {
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
-        switch(p_what){
+        switch (p_what) {
             case Node::NOTIFICATION_PAUSED:
                 set_paused(true);
                 break;
@@ -196,53 +210,23 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::is_paused() {
-        if (!_event.is_valid()) { return false; }
+        if (_event.is_null() || !_event->is_valid()) { return false; }
         return _event->get_paused();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play() {
-        if (!_event.is_valid()) { return; }
+        if (_event.is_null() || !_event->is_valid()) { load_event(); }
 
-        if (!_is_one_shot) {
-            if (_attached) { set_space_attribute(); }
-            _event->start();
-            return;
-        }
-
-        Ref<FmodEventDescription> event_description {_load_event_description()};
-
-        if (_attached) {
-            if (!_parameters.is_empty()) {
-                FmodServer::get_singleton()->play_one_shot_using_event_description_attached_with_params_internal<Parameter>(
-                  event_description,
-                  this,
-                  _parameters
-                );
-                return;
-            }
-
-            FmodServer::get_singleton()->play_one_shot_using_event_description(event_description, this);
-            return;
-        }
-
-        if (!_parameters.is_empty()) {
-            FmodServer::get_singleton()->play_one_shot_using_event_description_with_params_internal<Parameter>(
-              event_description,
-              this,
-              _parameters
-            );
-            return;
-        }
-
-        FmodServer::get_singleton()->play_one_shot_using_event_description(event_description, this);
-        return;
+        if (_attached) { set_space_attribute(); }
+        _event->start();
+        if (_auto_release) { _event->release(); }
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::stop() {
-        if (!_event.is_valid()) { return; }
-        if (_allow_fadeout && !_is_one_shot) {
+        if (_event.is_null() || !_event->is_valid()) { return; }
+        if (_allow_fadeout) {
             _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
         } else {
             _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
@@ -251,7 +235,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     Variant FmodEventEmitter<Derived, NodeType>::get_parameter(const String& p_name) const {
-        if (!_event.is_valid()) { return nullptr; }
+        if (_event.is_null() || !_event->is_valid()) { return nullptr; }
 
         Parameter* parameter {find_parameter_by_name(p_name)};
 
@@ -262,7 +246,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_parameter(const String& p_name, const Variant& p_property) {
-        if (!_event.is_valid()) { return; }
+        if (_event.is_null() || !_event->is_valid()) { return; }
 
         Parameter* parameter {find_parameter_by_name(p_name)};
 
@@ -270,18 +254,18 @@ namespace godot {
 
         parameter->value = p_property;
 
-        #ifdef TOOLS_ENABLED
+#ifdef TOOLS_ENABLED
         if (!Engine::get_singleton()->is_editor_hint()) {
-        #endif
-           apply_parameters();
-        #ifdef TOOLS_ENABLED
+#endif
+            apply_parameters();
+#ifdef TOOLS_ENABLED
         }
-        #endif
+#endif
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_paused(bool p_is_paused) {
-        if (!_event.is_valid()) { return; }
+        if (_event.is_null() || !_event->is_valid()) { return; }
         _event->set_paused(p_is_paused);
     }
 
@@ -296,12 +280,16 @@ namespace godot {
 #ifdef DEBUG_ENABLED
             } else {
                 GODOT_LOG_ERROR(vformat("Cannot find event with path %s, will try with guid", _event_name));
-                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
+                                "only a debug feature");
                 if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
                     ret = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
                 } else {
-                    GODOT_LOG_ERROR(vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name));
-                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                    GODOT_LOG_ERROR(
+                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
+                    );
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
+                                    "is only a debug feature");
                     return ret;
                 }
             }
@@ -314,12 +302,16 @@ namespace godot {
 #ifdef DEBUG_ENABLED
             } else {
                 GODOT_LOG_ERROR(vformat("Cannot find event with guid %s, will try with guid", get_event_guid()));
-                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
+                                "only a debug feature");
                 if (FmodServer::get_singleton()->check_event_path(_event_name)) {
                     ret = FmodServer::get_singleton()->get_event(_event_name);
                 } else {
-                    GODOT_LOG_ERROR(vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name));
-                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is only a debug feature");
+                    GODOT_LOG_ERROR(
+                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
+                    );
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
+                                    "is only a debug feature");
                     return ret;
                 }
             }
@@ -330,20 +322,23 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::preload_event() const {
+    void FmodEventEmitter<Derived, NodeType>::preload_event() {
         Ref<FmodEventDescription> desc = _load_event_description();
         desc->load_sample_data();
+        _is_one_shot = desc->is_one_shot();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
-        _event = FmodServer::get_singleton()->create_event_instance_from_description(_load_event_description());
+        Ref<FmodEventDescription> desc = _load_event_description();
+        _event = FmodServer::get_singleton()->create_event_instance_from_description(desc);
         _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
+        _is_one_shot = desc->is_one_shot();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::apply_parameters() {
-        if (!_event.is_valid()) { return; }
+        if (_event.is_null() || !_event->is_valid()) { return; }
         FmodServer::get_singleton()->apply_parameter_list_to_event(_event, _parameters);
     }
 
@@ -393,8 +388,13 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::set_one_shot(const bool p_is_one_shot) {
-        _is_one_shot = p_is_one_shot;
+    void FmodEventEmitter<Derived, NodeType>::set_auto_release(const bool auto_release) {
+        _auto_release = auto_release;
+    }
+
+    template<class Derived, class NodeType>
+    bool FmodEventEmitter<Derived, NodeType>::is_auto_release() const {
+        return _auto_release;
     }
 
     template<class Derived, class NodeType>
@@ -426,9 +426,7 @@ namespace godot {
     void FmodEventEmitter<Derived, NodeType>::set_volume(const float volume) {
         _volume = volume;
 
-        if (!_event.is_valid()) {
-            return;
-        }
+        if (_event.is_null() || !_event->is_valid()) { return; }
         _event->set_volume(volume);
     }
 
@@ -462,12 +460,11 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    typename FmodEventEmitter<Derived, NodeType>::Parameter* FmodEventEmitter<Derived, NodeType>::find_parameter_by_name(const String& p_name) const {
+    typename FmodEventEmitter<Derived, NodeType>::Parameter* FmodEventEmitter<Derived, NodeType>::find_parameter_by_name(const String& p_name
+    ) const {
         Parameter* parameter {nullptr};
         for (const Parameter& item : _parameters) {
-            if (item.name != p_name) {
-                continue;
-            }
+            if (item.name != p_name) { continue; }
             parameter = const_cast<Parameter*>(&item);
             break;
         }
@@ -479,29 +476,21 @@ namespace godot {
 #ifndef TOOLS_ENABLED
         static
 #endif
-        bool should_load_by_name {
-            ProjectSettings::get_singleton()->get_setting(
-              vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME)
-            )
-        };
+          bool should_load_by_name {ProjectSettings::get_singleton()->get_setting(
+            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME)
+          )};
         return should_load_by_name;
     }
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_set(const StringName& p_name, const Variant& p_property) {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) {
-            return false;
-        }
+        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
 
-        PackedStringArray parts {
-          p_name
-            .trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES))
-            .split("/")
-        };
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
-        const String& parameter_name { parts[0] };
+        const String& parameter_name {parts[0]};
 
-        Parameter* parameter { find_parameter_by_name(parameter_name) };
+        Parameter* parameter {find_parameter_by_name(parameter_name)};
 
         if (!parameter) {
             Parameter param;
@@ -533,7 +522,7 @@ namespace godot {
 #ifdef TOOLS_ENABLED
             if (!Engine::get_singleton()->is_editor_hint()) {
 #endif
-            apply_parameters();
+                apply_parameters();
 #ifdef TOOLS_ENABLED
             }
 #endif
@@ -561,21 +550,13 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_get(const StringName& p_name, Variant& r_property) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) {
-            return false;
-        }
+        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
 
-        PackedStringArray parts {
-          p_name
-            .trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES))
-            .split("/")
-        };
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
-        Parameter* parameter { find_parameter_by_name(parts[0]) };
+        Parameter* parameter {find_parameter_by_name(parts[0])};
 
-        if (!parameter) {
-            return false;
-        }
+        if (!parameter) { return false; }
 
         const String& parameter_end = parts[1];
         if (parameter_end == "id") {
@@ -608,40 +589,24 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_property_can_revert(const StringName& p_name) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) {
-            return false;
-        }
+        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
 
-        PackedStringArray parts {
-          p_name
-            .trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES))
-            .split("/")
-        };
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
-        if (parts[1] == "value") {
-            return true;
-        }
+        if (parts[1] == "value") { return true; }
 
         return false;
     }
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_property_get_revert(const StringName& p_name, Variant& r_property) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) {
-            return false;
-        }
+        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
 
-        PackedStringArray parts {
-          p_name
-            .trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES))
-            .split("/")
-        };
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
-        Parameter* parameter { find_parameter_by_name(parts[0]) };
+        Parameter* parameter {find_parameter_by_name(parts[0])};
 
-        if (!parameter) {
-            return false;
-        }
+        if (!parameter) { return false; }
 
         if (parts[1] == "value") {
             r_property = parameter->default_value;
@@ -654,77 +619,59 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_get_property_list(List<PropertyInfo>* p_list) const {
         for (const Parameter& parameter : _parameters) {
-            const String& parameter_name { parameter.name };
+            const String& parameter_name {parameter.name};
 
-            const float parameter_min_value { parameter.min_value };
-            const float parameter_max_value { parameter.max_value };
-
-            p_list->push_back(
-              PropertyInfo(
-                Variant::Type::INT,
-                vformat("%s/%s/id", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_NONE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
+            const float parameter_min_value {parameter.min_value};
+            const float parameter_max_value {parameter.max_value};
 
             p_list->push_back(
-              PropertyInfo(
-                Variant::Type::FLOAT,
-                vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_RANGE,
-                vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
-              )
+              PropertyInfo(Variant::Type::INT, vformat("%s/%s/id", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name), PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR)
             );
 
-            p_list->push_back(
-              PropertyInfo(
-                Variant::Type::FLOAT,
-                vformat("%s/%s/min_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_RANGE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
+            p_list->push_back(PropertyInfo(
+              Variant::Type::FLOAT,
+              vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+              PROPERTY_HINT_RANGE,
+              vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
+            ));
 
-            p_list->push_back(
-              PropertyInfo(
-                Variant::Type::FLOAT,
-                vformat("%s/%s/max_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_RANGE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
+            p_list->push_back(PropertyInfo(
+              Variant::Type::FLOAT,
+              vformat("%s/%s/min_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+              PROPERTY_HINT_RANGE,
+              "",
+              PROPERTY_USAGE_NO_EDITOR
+            ));
 
-            p_list->push_back(
-              PropertyInfo(
-                Variant::Type::FLOAT,
-                vformat("%s/%s/default_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_NONE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
+            p_list->push_back(PropertyInfo(
+              Variant::Type::FLOAT,
+              vformat("%s/%s/max_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+              PROPERTY_HINT_RANGE,
+              "",
+              PROPERTY_USAGE_NO_EDITOR
+            ));
+
+            p_list->push_back(PropertyInfo(
+              Variant::Type::FLOAT,
+              vformat("%s/%s/default_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+              PROPERTY_HINT_NONE,
+              "",
+              PROPERTY_USAGE_NO_EDITOR
+            ));
         }
     }
 
 #ifdef TOOLS_ENABLED
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::tool_remove_all_parameters() {
-        if (!Engine::get_singleton()->is_editor_hint()) {
-            return;
-        }
+        if (!Engine::get_singleton()->is_editor_hint()) { return; }
         _parameters.clear();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::tool_remove_parameter(uint64_t parameter_id) {
-        if (!Engine::get_singleton()->is_editor_hint()) {
-            return;
-        }
-        
+        if (!Engine::get_singleton()->is_editor_hint()) { return; }
+
         for (int i = _parameters.size() - 1; i >= 0; --i) {
             const Parameter& parameter {_parameters[i]};
             if (parameter.id != parameter_id) continue;
@@ -754,7 +701,8 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("is_attached"), &Derived::is_attached);
         ClassDB::bind_method(D_METHOD("set_autoplay", "_autoplay"), &Derived::set_autoplay);
         ClassDB::bind_method(D_METHOD("is_autoplay"), &Derived::is_autoplay);
-        ClassDB::bind_method(D_METHOD("set_one_shot", "_is_one_shot"), &Derived::set_one_shot);
+        ClassDB::bind_method(D_METHOD("set_auto_release", "_autoplay"), &Derived::set_auto_release);
+        ClassDB::bind_method(D_METHOD("is_auto_release"), &Derived::is_auto_release);
         ClassDB::bind_method(D_METHOD("is_one_shot"), &Derived::is_one_shot);
         ClassDB::bind_method(D_METHOD("set_allow_fadeout", "allow_fadeout"), &Derived::set_allow_fadeout);
         ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &Derived::is_allow_fadeout);
@@ -769,15 +717,15 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("tool_remove_parameter", "parameter_id"), &Derived::tool_remove_parameter);
 #endif
 
-        ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_name", "get_event_name");
-        ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_guid",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_guid", "get_event_guid");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_attached", "is_attached");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_autoplay", "is_autoplay");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "one_shot",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_one_shot", "is_one_shot");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_allow_fadeout", "is_allow_fadeout");
-        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_preload_event", "is_preload_event");
-        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_volume", "get_volume");
-        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "is_paused");
+        ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_name", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_name", "get_event_name");
+        ADD_PROPERTY(PropertyInfo(Variant::STRING, "event_guid", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_event_guid", "get_event_guid");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "attached", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_attached", "is_attached");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "autoplay", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_autoplay", "is_autoplay");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "auto_release", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_auto_release", "is_auto_release");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_allow_fadeout", "is_allow_fadeout");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_preload_event", "is_preload_event");
+        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_volume", "get_volume");
+        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "paused", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "is_paused");
 
         ADD_SIGNAL(MethodInfo(BEAT_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
         ADD_SIGNAL(MethodInfo(MARKER_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));

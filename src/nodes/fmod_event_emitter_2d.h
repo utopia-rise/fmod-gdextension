@@ -13,6 +13,7 @@ namespace godot {
 
     private:
         void set_space_attribute_impl() const;
+        void free_impl();
 
     public:
         FmodEventEmitter2D() = default;
