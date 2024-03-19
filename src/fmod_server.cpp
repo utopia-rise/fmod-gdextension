@@ -1,3 +1,4 @@
+#include "classes/engine.hpp"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "helpers/common.h"
@@ -227,8 +228,16 @@ void FmodServer::update() {
         if (!event->is_valid()) { runningEvents.erase(event); }
     }
 
-    _set_listener_attributes();
-    _update_performance_data();
+#ifdef TOOLS_ENABLED
+    if (!Engine::get_singleton()->is_editor_hint()) {
+#endif
+        // Editor only needs to run the server for events preview in the explorer.
+        //  We don't need to update performance_data and listeners
+        _set_listener_attributes();
+        _update_performance_data();
+#ifdef TOOLS_ENABLED
+    }
+#endif
 
     ERROR_CHECK(system->update());
 }
