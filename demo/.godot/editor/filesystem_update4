@@ -1,12 +1,7 @@
 res://low_level_2D/FmodScriptTest.tscn
-res://high_level_3D/player/Camera.gd
-res://high_level_2D/Emitter.gd
 res://low_level_2D/Emitter.gd
-res://low_level_2D/FmodTest.gd
-res://high_level_3D/FPSCounter.gd
-res://high_level_3D/player/Player.gd
-res://high_level_3D/rollingball.gd
+res://high_level_3D/World.tscn
 res://high_level_3D/selfdestroy.gd
 res://high_level_3D/environment/sin_move.gd
+res://high_level_2D/FmodNodesTest.tscn
 res://high_level_2D/sin_move.gd
-res://high_level_3D/environment/soundcollider.gd
