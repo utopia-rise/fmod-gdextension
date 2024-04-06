@@ -120,6 +120,14 @@ elif env["platform"] == "android":
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
+elif env["platform"] == "web":
+    libfmod = 'fmod%s.wasm' % lfix
+    libfmodstudio = 'fmodstudio%s.wasm' % lfix
+
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc', env['fmod_lib_dir'] + 'web/studio/inc'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/upstream/wasm/', env['fmod_lib_dir'] + 'web/studio/lib/upstream/wasm/'])
+    env.Append(LIBS=[libfmod, libfmodstudio])
+
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
     target_path, env["platform"], target_name, env["platform"], env["target"]
@@ -192,6 +200,9 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     elif env["platform"] == "android":
         fmod_core_lib_dir = env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir
         fmod_studio_lib_dir = env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir
+    elif env["platform"] == "web":
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'web/core/lib/upstream/wasm/'
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'web/studio/lib/upstream/wasm/'
 
     source_files = [env.Glob(os.path.join(source_dir, '*.*')) for source_dir in [fmod_core_lib_dir, fmod_studio_lib_dir]]
     [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
