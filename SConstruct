@@ -121,12 +121,16 @@ elif env["platform"] == "android":
     env.Append(LIBS=[libfmod, libfmodstudio])
 
 elif env["platform"] == "web":
-    libfmod = 'fmod%s.wasm' % lfix
-    libfmodstudio = 'fmodstudio%s.wasm' % lfix
+    web_path = 'web/%s/lib/fastcomp/bitcode/'
+    libfmod_bindings = os.path.join(fmod_lib_dir, web_path % 'core', 'fmod%s_bindings.bc' % lfix)
+    libfmod = os.path.join(fmod_lib_dir, web_path % 'core', 'fmod%s.bc' % lfix)
+    libfmodstudio_bindings = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s_bindings.bc' % lfix)
+    libfmodstudio = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s.bc' % lfix)
 
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc', env['fmod_lib_dir'] + 'web/studio/inc'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/upstream/wasm/', env['fmod_lib_dir'] + 'web/studio/lib/upstream/wasm/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc/', env['fmod_lib_dir'] + 'web/studio/inc/'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/fastcomp/bitcode/', env['fmod_lib_dir'] + 'web/studio/lib/fastcomp/bitcode/'])
+    # Instead of LIBS, directly add to LINKFLAGS for explicit paths
+    env.Append(LINKFLAGS=[libfmod_bindings, libfmod, libfmodstudio_bindings, libfmodstudio])
 
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
@@ -200,9 +204,6 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     elif env["platform"] == "android":
         fmod_core_lib_dir = env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir
         fmod_studio_lib_dir = env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir
-    elif env["platform"] == "web":
-        fmod_core_lib_dir = env['fmod_lib_dir'] + 'web/core/lib/upstream/wasm/'
-        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'web/studio/lib/upstream/wasm/'
 
     source_files = [env.Glob(os.path.join(source_dir, '*.*')) for source_dir in [fmod_core_lib_dir, fmod_studio_lib_dir]]
     [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
