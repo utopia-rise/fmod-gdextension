@@ -122,15 +122,15 @@ elif env["platform"] == "android":
 
 elif env["platform"] == "web":
     web_path = 'web/%s/lib/fastcomp/bitcode/'
-    libfmod_bindings = os.path.join(fmod_lib_dir, web_path % 'core', 'fmod%s_bindings.bc' % lfix)
+    #libfmod_bindings = os.path.join(fmod_lib_dir, web_path % 'core', 'fmod%s_bindings.bc' % lfix)
     libfmod = os.path.join(fmod_lib_dir, web_path % 'core', 'fmod%s.bc' % lfix)
-    libfmodstudio_bindings = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s_bindings.bc' % lfix)
-    libfmodstudio = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s.bc' % lfix)
+    #libfmodstudio_bindings = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s_bindings.bc' % lfix)
+    #libfmodstudio = os.path.join(fmod_lib_dir, web_path % 'studio', 'fmodstudio%s.bc' % lfix)
 
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc/', env['fmod_lib_dir'] + 'web/studio/inc/'])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/fastcomp/bitcode/', env['fmod_lib_dir'] + 'web/studio/lib/fastcomp/bitcode/'])
     # Instead of LIBS, directly add to LINKFLAGS for explicit paths
-    env.Append(LINKFLAGS=[libfmod_bindings, libfmod, libfmodstudio_bindings, libfmodstudio])
+    env.Append(LINKFLAGS=[libfmod])
 
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
@@ -208,8 +208,9 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     source_files = [env.Glob(os.path.join(source_dir, '*.*')) for source_dir in [fmod_core_lib_dir, fmod_studio_lib_dir]]
     [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
 
-
-copy_fmod_libraries_action = Action('', copy_fmod_libraries)
-AddPostAction(library, copy_fmod_libraries_action)
+# web bundles everything inside the final .wasm - no need to export libs
+if env["platform"] != "web":
+    copy_fmod_libraries_action = Action('', copy_fmod_libraries)
+    AddPostAction(library, copy_fmod_libraries_action)
 
 Default(library)
