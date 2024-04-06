@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://cs8nm6h12whh1"]
 
 [ext_resource type="Script" path="res://low_level_2D/FmodTest.gd" id="1_oc8v3"]
-[ext_resource type="Texture2D" uid="uid://d4blkybu5ojj6" path="res://icon.png" id="2_mamb7"]
+[ext_resource type="Texture2D" uid="uid://jsofj31xeeto" path="res://icon.png" id="2_mamb7"]
 [ext_resource type="Script" path="res://low_level_2D/Emitter.gd" id="3_fx7d3"]
 [ext_resource type="Script" path="res://low_level_2D/Listener.gd" id="4_448uv"]
 [ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_85yno"]
