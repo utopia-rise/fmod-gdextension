@@ -7,10 +7,12 @@
 using namespace godot;
 
 void FmodEvent::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameterName"), &FmodEvent::get_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameterName", "value"), &FmodEvent::set_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "long_id"), &FmodEvent::get_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "long_id", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameter_name"), &FmodEvent::get_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameter_name", "value"), &FmodEvent::set_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name_with_label", "parameter_name", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_name_with_label);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "parameter_id"), &FmodEvent::get_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "parameter_id", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id_with_label", "parameter_id", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_id_with_label);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
     ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
@@ -46,14 +48,18 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_node_attributes", "get_3d_attributes");
 }
 
-float FmodEvent::get_parameter_by_name(const String& parameterName) const {
+float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
     float p = -1;
-    ERROR_CHECK(_wrapped->getParameterByName(parameterName.utf8().get_data(), &p));
+    ERROR_CHECK(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p));
     return p;
 }
 
-void FmodEvent::set_parameter_by_name(const String& parameterName, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByName(parameterName.utf8().get_data(), value));
+void FmodEvent::set_parameter_by_name(const String& parameter_name, float value) const {
+    ERROR_CHECK(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value));
+}
+
+void FmodEvent::set_parameter_by_name_with_label(const String& parameter_name, const String& label, bool ignoreseekspeed) const {
+    ERROR_CHECK(_wrapped->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data(), ignoreseekspeed));
 }
 
 float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
@@ -72,6 +78,14 @@ void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {
 
 void FmodEvent::set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const {
     ERROR_CHECK(_wrapped->setParameterByID(parameter_id, value));
+}
+
+void FmodEvent::set_parameter_by_fmod_id_with_label(const FMOD_STUDIO_PARAMETER_ID& parameter_id, const String& label, bool ignoreseekspeed) const {
+    ERROR_CHECK(_wrapped->setParameterByIDWithLabel(parameter_id, label.utf8().get_data(), ignoreseekspeed));
+}
+
+void FmodEvent::set_parameter_by_id_with_label(uint64_t parameter_id, const String& label, bool ignoreseekspeed) const {
+    set_parameter_by_fmod_id_with_label(ulong_to_fmod_parameter_id(parameter_id), label, ignoreseekspeed);
 }
 
 void FmodEvent::release() const {
