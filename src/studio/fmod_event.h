@@ -16,12 +16,15 @@ namespace godot {
         FmodEvent() = default;
         ~FmodEvent() override = default;
 
-        float get_parameter_by_name(const String& parameterName) const;
-        void set_parameter_by_name(const String& parameterName, float value) const;
+        float get_parameter_by_name(const String& parameter_name) const;
+        void set_parameter_by_name(const String& parameter_name, float value) const;
+        void set_parameter_by_name_with_label(const String& parameter_name, const String& label, bool ignoreseekspeed = false) const;
         float get_parameter_by_id(uint64_t long_id) const;
         float get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const;
         void set_parameter_by_id(uint64_t long_id, float value) const;
         void set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const;
+        void set_parameter_by_fmod_id_with_label(const FMOD_STUDIO_PARAMETER_ID& parameter_id, const String& label, bool ignoreseekspeed = false) const;
+        void set_parameter_by_id_with_label(uint64_t parameter_id, const String& label, bool ignoreseekspeed = false) const;
         void release() const;
         void start() const;
         void stop(int stopMode) const;
