@@ -51,10 +51,12 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_performance_data"), &FmodServer::get_performance_data);
 
     // GLOBAL PARAMETERS
-    ClassDB::bind_method(D_METHOD("set_global_parameter_by_name", "parameterName", "value"), &FmodServer::set_global_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_global_parameter_by_name", "parameterName"), &FmodServer::get_global_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_global_parameter_by_id", "idPair", "value"), &FmodServer::set_global_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("get_global_parameter_by_id", "idPair"), &FmodServer::get_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_name", "parameter_name", "value"), &FmodServer::set_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_name_with_label", "parameter_name", "label"), &FmodServer::set_global_parameter_by_name_with_label);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_name", "parameter_name"), &FmodServer::get_global_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_id", "id_pair", "value"), &FmodServer::set_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_global_parameter_by_id_with_label", "id_pair", "label"), &FmodServer::set_global_parameter_by_id_with_label);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_by_id", "id_pair"), &FmodServer::get_global_parameter_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name", "parameterName"), &FmodServer::get_global_parameter_desc_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id", "idPair"), &FmodServer::get_global_parameter_desc_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &FmodServer::get_global_parameter_desc_count);
@@ -869,8 +871,12 @@ Ref<FmodPerformanceData> FmodServer::get_performance_data() {
     return performanceData;
 }
 
-void FmodServer::set_global_parameter_by_name(const String& parameterName, float value) {
-    ERROR_CHECK(system->setParameterByName(parameterName.utf8().get_data(), value));
+void FmodServer::set_global_parameter_by_name(const String& parameter_name, float value) {
+    ERROR_CHECK(system->setParameterByName(parameter_name.utf8().get_data(), value));
+}
+
+void FmodServer::set_global_parameter_by_name_with_label(const String& parameter_name, const String& label) {
+    ERROR_CHECK(system->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data()));
 }
 
 float FmodServer::get_global_parameter_by_name(const String& parameterName) {
@@ -879,15 +885,26 @@ float FmodServer::get_global_parameter_by_name(const String& parameterName) {
     return value;
 }
 
-void FmodServer::set_global_parameter_by_id(const Array& idPair, const float value) {
-    if (idPair.size() != 2) {
+void FmodServer::set_global_parameter_by_id(const Array& id_pair, const float value) {
+    if (id_pair.size() != 2) {
         GODOT_LOG_ERROR("FMOD Sound System: Invalid parameter ID")
         return;
     }
     FMOD_STUDIO_PARAMETER_ID id;
-    id.data1 = idPair[0];
-    id.data2 = idPair[1];
+    id.data1 = id_pair[0];
+    id.data2 = id_pair[1];
     ERROR_CHECK(system->setParameterByID(id, value));
+}
+
+void FmodServer::set_global_parameter_by_id_with_label(const Array& id_pair, const String& label) {
+    if (id_pair.size() != 2) {
+        GODOT_LOG_ERROR("FMOD Sound System: Invalid parameter ID")
+        return;
+    }
+    FMOD_STUDIO_PARAMETER_ID id;
+    id.data1 = id_pair[0];
+    id.data2 = id_pair[1];
+    ERROR_CHECK(system->setParameterByIDWithLabel(id, label.utf8().get_data()));
 }
 
 float FmodServer::get_global_parameter_by_id(const Array& idPair) {
@@ -977,13 +994,22 @@ void FmodServer::add_callback(const Callback& callback) {
 void FmodServer::_apply_parameter_dict_to_event(const Ref<FmodEvent>& p_event, const Dictionary& parameters) {
     Array keys = parameters.keys();
     for (int i = 0; i < keys.size(); ++i) {
-        Variant key_variant = keys[i];
-        float value = parameters[keys[i]];
+        Variant& key = keys[i];
+        const Variant& value = parameters[keys[i]];
 
-        if (key_variant.get_type() == Variant::Type::INT) {
-            p_event->set_parameter_by_id(key_variant, value);
+        if (key.get_type() == Variant::Type::INT) {
+            if (value.get_type() == Variant::Type::STRING) {
+                p_event->set_parameter_by_id_with_label(key, value);
+                continue;
+            }
+            p_event->set_parameter_by_id(key, value);
             continue;
         }
-        p_event->set_parameter_by_name(key_variant.operator String(), value);
+
+        if (value.get_type() == Variant::Type::STRING) {
+            p_event->set_parameter_by_name_with_label(key, value);
+            continue;
+        }
+        p_event->set_parameter_by_name(key, value);
     }
 }
