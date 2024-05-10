@@ -164,12 +164,14 @@ namespace godot {
         Ref<FmodPerformanceData> get_performance_data();
 
         // GLOBAL PARAMETERS
-        void set_global_parameter_by_name(const String& parameterName, float value);
+        void set_global_parameter_by_name(const String& parameter_name, float value);
+        void set_global_parameter_by_name_with_label(const String& parameter_name, const String& label);
         float get_global_parameter_by_name(const String& parameterName);
-        void set_global_parameter_by_id(const Array& idPair, float value);
-        float get_global_parameter_by_id(const Array& idPair);
+        void set_global_parameter_by_id(uint64_t parameter_id, float value);
+        void set_global_parameter_by_id_with_label(uint64_t parameter_id, const String& label);
+        float get_global_parameter_by_id(uint64_t parameter_id);
         Dictionary get_global_parameter_desc_by_name(const String& parameterName);
-        Dictionary get_global_parameter_desc_by_id(const Array& idPair);
+        Dictionary get_global_parameter_desc_by_id(uint64_t parameter_id);
         int get_global_parameter_desc_count();
         Array get_global_parameter_desc_list();
 
