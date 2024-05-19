@@ -10,6 +10,8 @@ void FmodPerformanceData::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_convolution1"), &FmodPerformanceData::get_convolution1);
     ClassDB::bind_method(D_METHOD("get_convolution2"), &FmodPerformanceData::get_convolution2);
 
+    ClassDB::bind_method(D_METHOD("get_studio"), &FmodPerformanceData::get_studio);
+
     ClassDB::bind_method(D_METHOD("get_currently_allocated"), &FmodPerformanceData::get_currently_allocated);
     ClassDB::bind_method(D_METHOD("get_max_allocated"), &FmodPerformanceData::get_max_allocated);
 
@@ -23,6 +25,8 @@ void FmodPerformanceData::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "update", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_update");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "convolution1", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_convolution1");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "convolution2", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_convolution2");
+
+    ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "studio", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_studio");
 
     ADD_PROPERTY(PropertyInfo(Variant::INT, "currently_allocated", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_currently_allocated");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "max_allocated", PropertyHint::PROPERTY_HINT_NONE, "", PROPERTY_USAGE_READ_ONLY), "", "get_max_allocated");
