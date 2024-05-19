@@ -8,7 +8,7 @@ env:
   PROJECT_FOLDER: fmod-gdextension
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.2
+  GODOT_VERSION: 4.2.2
   FMOD_VERSION: 20212
 
 jobs:
