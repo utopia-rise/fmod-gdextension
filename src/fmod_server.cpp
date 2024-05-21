@@ -851,11 +851,7 @@ void FmodServer::_update_performance_data() {
     performanceData->studio = studioCpuUsage.update;
 
     // get the memory usage
-    int currentAlloc = 0;
-    int maxAlloc = 0;
-    ERROR_CHECK(FMOD::Memory_GetStats(&currentAlloc, &maxAlloc));
-    performanceData->currently_allocated = currentAlloc;
-    performanceData->max_allocated = maxAlloc;
+    ERROR_CHECK(FMOD::Memory_GetStats(&performanceData->currently_allocated, &performanceData->max_allocated));
 
     // get the file usage
     long long sampleBytesRead = 0;
