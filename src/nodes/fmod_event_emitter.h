@@ -43,6 +43,7 @@ namespace godot {
         bool _allow_fadeout = true;
         bool _preload_event = true;
         float _volume = true;
+        String _programmer_callback_sound_key;
 
         List<Parameter> _parameters;
 
@@ -77,6 +78,8 @@ namespace godot {
         bool is_preload_event() const;
         void set_volume(const float volume);
         float get_volume() const;
+
+        void set_programmer_callback(const String& p_programmers_callback_sound_key);
 
 #ifdef TOOLS_ENABLED
         void tool_remove_all_parameters();
@@ -219,6 +222,9 @@ namespace godot {
         if (_event.is_null() || !_event->is_valid()) { load_event(); }
 
         if (_attached) { set_space_attribute(); }
+        if (!_programmer_callback_sound_key.is_empty()) {
+            _event->set_programmer_callback(_programmer_callback_sound_key);
+        }
         _event->start();
         if (_auto_release) { _event->release(); }
     }
@@ -433,6 +439,11 @@ namespace godot {
     template<class Derived, class NodeType>
     float FmodEventEmitter<Derived, NodeType>::get_volume() const {
         return _volume;
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_programmer_callback(const String &p_programmers_callback_sound_key) {
+        _programmer_callback_sound_key = p_programmers_callback_sound_key;
     }
 
     template<class Derived, class NodeType>
@@ -710,6 +721,7 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("is_preload_event"), &Derived::is_preload_event);
         ClassDB::bind_method(D_METHOD("get_volume"), &Derived::get_volume);
         ClassDB::bind_method(D_METHOD("set_volume", "p_volume"), &Derived::set_volume);
+        ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &Derived::set_programmer_callback);
         ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);
 
 #ifdef TOOLS_ENABLED

@@ -36,6 +36,8 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
     ClassDB::bind_method(D_METHOD("set_node_attributes", "transform"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
+    ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &FmodEvent::set_programmer_callback);
+    ClassDB::bind_method(D_METHOD("get_programmer_callback_sound_key"), &FmodEvent::get_programmers_callback_sound_key);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
 
@@ -218,13 +220,23 @@ void FmodEvent::set_node_attributes(Node* node) const {
     }
 }
 
-void FmodEvent::set_callback(const Callable& callback, int callbackMask) {
+void FmodEvent::set_callback(const Callable& callback, uint32_t p_callback_mask) {
     eventCallback = callback;
-    ERROR_CHECK(_wrapped->setCallback(Callbacks::eventCallback, callbackMask));
+    callback_mask = p_callback_mask;
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, p_callback_mask));
+}
+
+void FmodEvent::set_programmer_callback(const String& p_programmers_callback_sound_key) {
+    programmers_callback_sound_key = p_programmers_callback_sound_key;
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, callback_mask | FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND | FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND));
 }
 
 const Callable& FmodEvent::get_callback() const {
     return eventCallback;
+}
+
+const String& FmodEvent::get_programmers_callback_sound_key() const {
+    return programmers_callback_sound_key;
 }
 
 void FmodEvent::set_distance_scale(float scale){
