@@ -37,11 +37,12 @@ runs:
         architecture: 'x64'
 
     # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+    #TODO: remove hardcoded scons version when https://github.com/godotengine/godot-cpp/pull/1526 is released
     - name: Configuring Python packages
       shell: ${{ inputs.shell }}
       run: |
         python -c "import sys; print(sys.version)"
-        python -m pip install scons requests ${{ inputs.additional-python-packages }}
+        python -m pip install scons==4.7.0 requests ${{ inputs.additional-python-packages }}
         python --version
         scons --version
 
