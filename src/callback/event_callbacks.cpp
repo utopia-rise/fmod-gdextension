@@ -65,5 +65,4 @@ namespace Callbacks {
 
         return FMOD_OK;
     }
-#pragma clang diagnostic pop
 }// namespace Callbacks
