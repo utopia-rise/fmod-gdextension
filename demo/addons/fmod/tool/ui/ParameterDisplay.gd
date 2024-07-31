@@ -1,6 +1,10 @@
 @tool class_name ParameterDisplay extends MarginContainer
 
+var event_description: FmodEventDescription
 var parameter: FmodParameterDescription
+
+func set_event_description(p_event_description: FmodEventDescription):
+	event_description = p_event_description
 
 func set_parameter(p_parameter: FmodParameterDescription):
 	show()
@@ -24,7 +28,19 @@ func _ready():
 	
 	%NameLabel.text = parameter.get_name()
 	%IdLabel.text = str(parameter.get_id())
-	%RangeLabel.text = "[%s, %s]" % [minimum_value, maximum_value]
+	if parameter.is_labeled():
+		%RangeTitle.text = "Values"
+		var values_text = "["
+		var is_first: bool = true
+		for label: String in event_description.get_parameter_labels_by_id(parameter.get_id()):
+			if not is_first:
+				values_text += ", "
+			values_text += label
+			is_first = false
+		values_text += "]"
+		%RangeLabel.text = values_text
+	else:
+		%RangeLabel.text = "[%s, %s]" % [minimum_value, maximum_value]
 	%DefaultValueLabel.text = str(default_value)
 	%NameCopyButton.pressed.connect(_on_copy_name_button)
 	%IdCopyButton.pressed.connect(_on_copy_id_button)

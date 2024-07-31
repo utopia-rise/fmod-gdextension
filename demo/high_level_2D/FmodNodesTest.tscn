@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
 [ext_resource type="Script" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
-[ext_resource type="Texture2D" uid="uid://c872sqsokojxe" path="res://icon.png" id="2_llv2n"]
+[ext_resource type="Texture2D" uid="uid://dichdnwxg2opa" path="res://icon.png" id="2_llv2n"]
 [ext_resource type="Script" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
 [ext_resource type="Script" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
 [ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
@@ -40,11 +40,13 @@ event_parameter/RPM/value = 600.0
 event_parameter/RPM/min_value = 0.0
 event_parameter/RPM/max_value = 10000.0
 event_parameter/RPM/default_value = 0.0
+event_parameter/RPM/variant_type = 3
 event_parameter/Load/id = -1795603775021193717
 event_parameter/Load/value = -1.0
 event_parameter/Load/min_value = -1.0
 event_parameter/Load/max_value = 1.0
 event_parameter/Load/default_value = -1.0
+event_parameter/Load/variant_type = 3
 self_modulate = Color(0.988235, 0, 0, 1)
 position = Vector2(-3.05176e-05, 0)
 script = ExtResource("2_5cntr")
@@ -121,6 +123,12 @@ script = ExtResource("5_5p5kb")
 event_name = "event:/Music/Level 02"
 event_guid = "{c7f946fd-d695-499b-a820-752799c4921d}"
 autoplay = true
+event_parameter/Area/id = 2292969625611591407
+event_parameter/Area/value = 0.0
+event_parameter/Area/min_value = 0.0
+event_parameter/Area/max_value = 80.0
+event_parameter/Area/default_value = 0.0
+event_parameter/Area/variant_type = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FmodBankLoader/SoundArea2"]
 position = Vector2(52.8021, 45.8286)

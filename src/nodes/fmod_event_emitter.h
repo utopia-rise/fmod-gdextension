@@ -25,9 +25,10 @@ namespace godot {
         struct Parameter : public FmodServer::ParameterValue {
             String name;
             uint64_t id;
-            float min_value;
-            float max_value;
-            float default_value;
+            Variant min_value;
+            Variant max_value;
+            Variant default_value;
+            PackedStringArray labels;
 
             bool operator==(const Parameter& parameter) const { return id == parameter.id; }
         };
@@ -556,6 +557,16 @@ namespace godot {
             return true;
         }
 
+        if (parameter_end == "variant_type") {
+            parameter->variant_type = static_cast<Variant::Type>(p_property.operator int32_t());
+            return true;
+        }
+
+        if (parameter_end == "labels") {
+            parameter->labels = p_property;
+            return true;
+        }
+
         return false;
     }
 
@@ -592,6 +603,16 @@ namespace godot {
 
         if (parameter_end == "default_value") {
             r_property = parameter->default_value;
+            return true;
+        }
+
+        if (parameter_end == "variant_type") {
+            r_property = parameter->variant_type;
+            return true;
+        }
+
+        if (parameter_end == "labels") {
+            r_property = parameter->labels;
             return true;
         }
 
@@ -634,41 +655,80 @@ namespace godot {
 
             const float parameter_min_value {parameter.min_value};
             const float parameter_max_value {parameter.max_value};
+            const Variant::Type parameter_variant_type {parameter.variant_type};
 
             p_list->push_back(
               PropertyInfo(Variant::Type::INT, vformat("%s/%s/id", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name), PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR)
             );
 
-            p_list->push_back(PropertyInfo(
-              Variant::Type::FLOAT,
-              vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-              PROPERTY_HINT_RANGE,
-              vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
-            ));
+            if (!parameter.labels.is_empty()) {
+                p_list->push_back(
+                  PropertyInfo(
+                    parameter_variant_type,
+                    vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    PROPERTY_HINT_ENUM,
+                    vformat(String(",").join(parameter.labels))
+                  )
+                );
+                p_list->push_back(
+                  PropertyInfo(
+                    Variant::Type::PACKED_STRING_ARRAY,
+                    vformat("%s/%s/labels", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    PROPERTY_HINT_NONE,
+                    "",
+                    PROPERTY_USAGE_NO_EDITOR
+                  )
+                );
+            } else {
+                p_list->push_back(
+                  PropertyInfo(
+                    parameter_variant_type,
+                    vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    PROPERTY_HINT_RANGE,
+                    vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
+                  )
+                );
+            }
 
-            p_list->push_back(PropertyInfo(
-              Variant::Type::FLOAT,
-              vformat("%s/%s/min_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-              PROPERTY_HINT_RANGE,
-              "",
-              PROPERTY_USAGE_NO_EDITOR
-            ));
+            p_list->push_back(
+              PropertyInfo(
+                parameter_variant_type,
+                vformat("%s/%s/min_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                PROPERTY_HINT_RANGE,
+                "",
+                PROPERTY_USAGE_NO_EDITOR
+              )
+            );
 
-            p_list->push_back(PropertyInfo(
-              Variant::Type::FLOAT,
-              vformat("%s/%s/max_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-              PROPERTY_HINT_RANGE,
-              "",
-              PROPERTY_USAGE_NO_EDITOR
-            ));
+            p_list->push_back(
+              PropertyInfo(
+                parameter_variant_type,
+                vformat("%s/%s/max_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                PROPERTY_HINT_RANGE,
+                "",
+                PROPERTY_USAGE_NO_EDITOR
+              )
+            );
 
-            p_list->push_back(PropertyInfo(
-              Variant::Type::FLOAT,
-              vformat("%s/%s/default_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-              PROPERTY_HINT_NONE,
-              "",
-              PROPERTY_USAGE_NO_EDITOR
-            ));
+            p_list->push_back(
+              PropertyInfo(
+                parameter_variant_type,
+                vformat("%s/%s/default_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                PROPERTY_HINT_NONE,
+                "",
+                PROPERTY_USAGE_NO_EDITOR
+              )
+            );
+
+            p_list->push_back(
+              PropertyInfo(
+                Variant::Type::INT,
+                vformat("%s/%s/variant_type", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                PROPERTY_HINT_ENUM,
+                "",
+                PROPERTY_USAGE_NO_EDITOR
+              )
+            );
         }
     }
 

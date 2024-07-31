@@ -76,7 +76,8 @@ namespace godot {
 
         struct ParameterValue {
             ParameterIdentifier identifier;
-            float value;
+            Variant value;
+            Variant::Type variant_type;
             bool should_load_by_id;
         };
 
@@ -327,10 +328,18 @@ namespace godot {
     void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters) {
         for (const TParameter& parameter : parameters) {
             if (parameter.should_load_by_id) {
+                if (parameter.variant_type == Variant::Type::STRING) {
+                    p_event->set_parameter_by_id_with_label(parameter.identifier.id, parameter.value);
+                    continue;
+                }
                 p_event->set_parameter_by_id(parameter.identifier.id, parameter.value);
                 continue;
             }
 
+            if (parameter.variant_type == Variant::Type::STRING) {
+                p_event->set_parameter_by_name_with_label(*parameter.identifier.name, parameter.value);
+                continue;
+            }
             p_event->set_parameter_by_name(*parameter.identifier.name, parameter.value);
         }
     }
