@@ -45,18 +45,35 @@ func _update_parameters():
 	
 	var property_matching = existing_parameter_ids.map(func(id): return false)
 	
-	for param in event_description.get_parameters():
+	for param: FmodParameterDescription in event_description.get_parameters():
 		var parameter_name = param.get_name()
 		var parameter_id_param = "%s/%s/id" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_value_param = "%s/%s/value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_min_value_param = "%s/%s/min_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_max_value_param = "%s/%s/max_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_default_value_param = "%s/%s/default_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
+		var parameter_variant_type = "%s/%s/variant_type" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
+		var parameter_labels = "%s/%s/labels" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		
 		var existing_property_name_index = existing_property_ids.find(parameter_id_param)
 		var are_properties_already_in_node = existing_property_name_index != -1
 		
 		var parameter_id = param.get_id()
+		
+		var variant_type: Variant.Type = TYPE_FLOAT
+		var default_value = param.get_default_value()
+		var minimum_value = param.get_minimum()
+		var maximum_value = param.get_maximum()
+		if param.is_labeled():
+			variant_type = TYPE_STRING
+			default_value = event_description.get_parameter_label_by_id(parameter_id, default_value)
+			minimum_value = event_description.get_parameter_label_by_id(parameter_id, minimum_value)
+			maximum_value = event_description.get_parameter_label_by_id(parameter_id, maximum_value)
+		elif param.is_discrete():
+			variant_type = TYPE_INT
+			default_value = int(default_value)
+			minimum_value = int(minimum_value)
+			maximum_value = int(maximum_value)
 		
 		if are_properties_already_in_node:
 			property_matching[existing_property_name_index] = existing_parameter_ids[existing_property_name_index] == parameter_id
@@ -64,13 +81,17 @@ func _update_parameters():
 		if not are_properties_already_in_node or get_edited_object()[parameter_id_param] == null:
 			get_edited_object()[parameter_id_param] = parameter_id
 		if not are_properties_already_in_node or get_edited_object()[parameter_value_param] == null:
-			get_edited_object()[parameter_value_param] = param.get_default_value()
+			get_edited_object()[parameter_value_param] = default_value
 		if not are_properties_already_in_node or get_edited_object()[parameter_min_value_param] == null:
-			get_edited_object()[parameter_min_value_param] = param.get_minimum()
+			get_edited_object()[parameter_min_value_param] = minimum_value
 		if not are_properties_already_in_node or get_edited_object()[parameter_max_value_param] == null:
-			get_edited_object()[parameter_max_value_param] = param.get_maximum()
+			get_edited_object()[parameter_max_value_param] = maximum_value
 		if not are_properties_already_in_node or get_edited_object()[parameter_default_value_param] == null:
-			get_edited_object()[parameter_default_value_param] = param.get_default_value()
+			get_edited_object()[parameter_default_value_param] = default_value
+		if not are_properties_already_in_node or get_edited_object()[parameter_variant_type] == null:
+			get_edited_object()[parameter_variant_type] = variant_type
+		if param.is_labeled() and (not are_properties_already_in_node or get_edited_object()[parameter_labels] == null):
+			get_edited_object()[parameter_labels] = event_description.get_parameter_labels_by_id(parameter_id)
 	
 	for i in property_matching.size():
 		if not property_matching[i]:

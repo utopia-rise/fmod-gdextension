@@ -17,6 +17,11 @@ namespace godot {
         float get_minimum() const;
         float get_maximum() const;
         float get_default_value() const;
+        bool is_read_only() const;
+        bool is_automatic() const;
+        bool is_global() const;
+        bool is_discrete() const;
+        bool is_labeled() const;
 
         inline static Ref<FmodParameterDescription> create_ref(const FMOD_STUDIO_PARAMETER_DESCRIPTION& wrapped) {
             Ref<FmodParameterDescription> ref;

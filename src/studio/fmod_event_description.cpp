@@ -6,6 +6,8 @@
 
 using namespace godot;
 
+constexpr const uint32_t PARAMETER_LABEL_BUFFER_SIZE {256};
+
 void FmodEventDescription::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_length"), &FmodEventDescription::get_length);
     ClassDB::bind_method(D_METHOD("get_instance_list"), &FmodEventDescription::get_instance_list);
@@ -33,6 +35,12 @@ void FmodEventDescription::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_parameter_count"), &FmodEventDescription::get_parameter_count);
     ClassDB::bind_method(D_METHOD("get_parameter_by_index", "index"), &FmodEventDescription::get_parameter_by_index);
     ClassDB::bind_method(D_METHOD("get_parameters"), &FmodEventDescription::get_parameters);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_id"), &FmodEventDescription::get_parameter_label_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_name"), &FmodEventDescription::get_parameter_label_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_index"), &FmodEventDescription::get_parameter_label_by_index);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_id"), &FmodEventDescription::get_parameter_labels_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_name"), &FmodEventDescription::get_parameter_labels_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_index"), &FmodEventDescription::get_parameter_labels_by_index);
     ClassDB::bind_method(D_METHOD("get_user_property", "name"), &FmodEventDescription::get_user_property);
     ClassDB::bind_method(D_METHOD("get_user_property_count"), &FmodEventDescription::get_user_property_count);
     ClassDB::bind_method(D_METHOD("user_property_by_index", "index"), &FmodEventDescription::user_property_by_index);
@@ -132,7 +140,7 @@ float FmodEventDescription::get_sound_size() {
     return soundSize;
 }
 
-Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const String& name) {
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const String& name) const {
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
     if (ERROR_CHECK(_wrapped->getParameterDescriptionByName(name.utf8().get_data(), &fmod_desc))) {
@@ -141,7 +149,7 @@ Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const 
     return param_desc;
 }
 
-Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t id) {
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t id) const {
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_ID param_id { ulong_to_fmod_parameter_id(id) };
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
@@ -157,7 +165,7 @@ int FmodEventDescription::get_parameter_count() {
     return count;
 }
 
-Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_index(int index) {
+Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_index(int index) const {
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
     if (ERROR_CHECK(_wrapped->getParameterDescriptionByIndex(index, &fmod_desc))) {
@@ -172,6 +180,90 @@ Array FmodEventDescription::get_parameters() {
         parameters.append(get_parameter_by_index(i));
     }
     return parameters;
+}
+
+String FmodEventDescription::get_parameter_label_by_id(uint64_t id, int label_index) const {
+    char label[PARAMETER_LABEL_BUFFER_SIZE];
+    int retrieved;
+    _wrapped->getParameterLabelByID(
+      ulong_to_fmod_parameter_id(id),
+      label_index,
+      label,
+      PARAMETER_LABEL_BUFFER_SIZE,
+      &retrieved
+    );
+    return {label};
+}
+
+String FmodEventDescription::get_parameter_label_by_name(const String& parameter_name, int label_index) const {
+    char label[PARAMETER_LABEL_BUFFER_SIZE];
+    int retrieved;
+    _wrapped->getParameterLabelByName(
+      parameter_name.utf8().get_data(),
+      label_index,
+      label,
+      PARAMETER_LABEL_BUFFER_SIZE,
+      &retrieved
+    );
+    return {label};
+}
+
+String FmodEventDescription::get_parameter_label_by_index(int index, int label_index) const {
+    char label[PARAMETER_LABEL_BUFFER_SIZE];
+    int retrieved;
+    _wrapped->getParameterLabelByIndex(
+      index,
+      label_index,
+      label,
+      PARAMETER_LABEL_BUFFER_SIZE,
+      &retrieved
+    );
+    return {label};
+}
+
+PackedStringArray FmodEventDescription::get_parameter_labels_by_id(uint64_t id) const {
+    PackedStringArray labels;
+
+    Ref<FmodParameterDescription> parameter {get_parameter_by_id(id)};
+    if (!parameter->is_labeled()) {
+        return labels;
+    }
+
+    for (int i = 0; i <= static_cast<int>(parameter->get_maximum()); ++i) {
+        labels.append(get_parameter_label_by_id(id, i));
+    }
+
+    return labels;
+}
+
+PackedStringArray FmodEventDescription::get_parameter_labels_by_name(const String& parameter_name) const {
+    PackedStringArray labels;
+
+    Ref<FmodParameterDescription> parameter {get_parameter_by_name(parameter_name)};
+    if (!parameter->is_labeled()) {
+        return labels;
+    }
+
+    for (int i = 0; i <= static_cast<int>(parameter->get_maximum()); ++i) {
+        labels.append(get_parameter_label_by_name(parameter_name, i));
+    }
+
+    return labels;
+}
+
+PackedStringArray FmodEventDescription::get_parameter_labels_by_index(int index) const {
+    PackedStringArray labels;
+
+    Ref<FmodParameterDescription> parameter {get_parameter_by_index(index)};
+    if (!parameter->is_labeled()) {
+        return labels;
+    }
+
+    for (int i = 0; i <= static_cast<int>(parameter->get_maximum()); ++i) {
+        labels.append(get_parameter_label_by_index(index, i));
+    }
+
+    return labels;
 }
 
 Dictionary FmodEventDescription::get_user_property(const String& name) {

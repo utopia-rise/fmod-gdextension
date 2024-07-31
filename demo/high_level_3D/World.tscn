@@ -55,11 +55,13 @@ event_parameter/RPM/value = 1000.0
 event_parameter/RPM/min_value = 0.0
 event_parameter/RPM/max_value = 10000.0
 event_parameter/RPM/default_value = 0.0
+event_parameter/RPM/variant_type = 3
 event_parameter/Load/id = -1795603775021193717
 event_parameter/Load/value = -1.0
 event_parameter/Load/min_value = -1.0
 event_parameter/Load/max_value = 1.0
 event_parameter/Load/default_value = -1.0
+event_parameter/Load/variant_type = 3
 script = ExtResource("4_vlj6k")
 
 [node name="Ball2" parent="." instance=ExtResource("3_bkia1")]
@@ -75,11 +77,13 @@ event_parameter/Size/value = 0.5
 event_parameter/Size/min_value = 0.0
 event_parameter/Size/max_value = 3.0
 event_parameter/Size/default_value = 0.0
+event_parameter/Size/variant_type = 3
 event_parameter/Distance/id = -6363846794978107960
 event_parameter/Distance/value = 3.40282e+38
 event_parameter/Distance/min_value = 0.0
 event_parameter/Distance/max_value = 100.0
 event_parameter/Distance/default_value = 3.40282e+38
+event_parameter/Distance/variant_type = 3
 script = ExtResource("4_mxf3j")
 
 [node name="Ball3" parent="." instance=ExtResource("3_bkia1")]
@@ -95,6 +99,7 @@ event_parameter/Speed/value = 0.0
 event_parameter/Speed/min_value = 0.0
 event_parameter/Speed/max_value = 8.0
 event_parameter/Speed/default_value = 0.0
+event_parameter/Speed/variant_type = 3
 script = ExtResource("5_d681a")
 
 [node name="Wall" parent="." instance=ExtResource("4_jv1x4")]

@@ -12,6 +12,7 @@ func set_fmod_event(event: FmodEventDescription) -> bool: # returns false if the
 		show()
 		for parameter : FmodParameterDescription in event_parameters:
 			var parameter_display: ParameterDisplay = parameter_display_scene.instantiate()
+			parameter_display.set_event_description(event)
 			parameter_display.set_parameter(parameter)
 			if %ParameterDisplaysContainer.get_child_count() > 0:
 				%ParameterDisplaysContainer.add_child(HSeparator.new())
