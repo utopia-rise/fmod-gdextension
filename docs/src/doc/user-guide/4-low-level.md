@@ -102,6 +102,18 @@ func _exit_tree():
 	FmodServer.unload_file("res://assets/Music/jingles_SAX07.ogg")
 ```
 
+## Programmers callback
+
+In order to play a programmer callback you must load the bank with audio table concerned by the programmer callback.  
+then you can use `set_programmer_callback` to specify key from audio table to use.
+
+```gdscript
+FmodServer.load_bank("res://assets/Banks/Dialogue_EN.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+var event_instance = FmodServer.create_event_instance("event:/Character/Dialogue") # event from sfx bank.
+event_instance.set_programmer_callback("welcome") # welcome key in audio table from Dialogue bank.
+event_instance.start()
+```
+
 ## Muting all event
 
 You can mute all event using `mute_all_events`. This will mute the master bus.

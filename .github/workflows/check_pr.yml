@@ -76,7 +76,7 @@ jobs:
             shell: bash
 
           - name: MacOS Editor Compilation
-            os: "macos-11"
+            os: "macos-13"
             platform: macos
             target: editor
             artifact-extension: framework
@@ -89,7 +89,7 @@ jobs:
             shell: bash
 
           - name: MacOS Debug Compilation
-            os: "macos-11"
+            os: "macos-13"
             platform: macos
             target: template_debug
             artifact-extension: framework
@@ -97,7 +97,7 @@ jobs:
             shell: bash
 
           - name: MacOS Release Compilation
-            os: "macos-11"
+            os: "macos-13"
             platform: macos
             target: template_release
             artifact-extension: framework
@@ -132,7 +132,7 @@ jobs:
             shell: bash
 
           - name: iOS Debug Compilation
-            os: "macos-11"
+            os: "macos-13"
             platform: ios
             target: template_debug
             artifact-extension: dylib
@@ -141,7 +141,7 @@ jobs:
             shell: bash
 
           - name: iOS Release Compilation
-            os: "macos-11"
+            os: "macos-13"
             platform: ios
             target: template_release
             artifact-extension: dylib

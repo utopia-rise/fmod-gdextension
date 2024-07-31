@@ -1,7 +1,3 @@
-res://low_level_2D/FmodScriptTest.tscn
-res://low_level_2D/Emitter.gd
-res://high_level_3D/World.tscn
-res://high_level_3D/selfdestroy.gd
-res://high_level_3D/environment/sin_move.gd
 res://high_level_2D/FmodNodesTest.tscn
-res://high_level_2D/sin_move.gd
+res://low_level_2D/FmodScriptTest.tscn
+res://high_level_3D/World.tscn

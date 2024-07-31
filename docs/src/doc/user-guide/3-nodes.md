@@ -89,7 +89,22 @@ No parameters.
 Starts the event.
 
 #### stop
-Stops the event.
+Stops the event.  
+
+### Programmers callbacks
+
+To use a programmer callback, you must first load the bank with the
+audio table used by your event containing the programmer callback.  
+You can then use `set_programmer_callback` on the event to specify the
+key from audio table to use.  
+
+```gdscript
+var event_emitter = FmodEventEmitter2D.new()
+event_emitter.event_guid = "{9aa2ecc5-ea4b-4ebe-85c3-054b11b21dcd}" # event:/Character/Dialogue from sfx bank.
+event_emitter.autoplay = true
+event_emitter.set_programmer_callback("welcome") # welcome key from audio table in Dialogue_EN.bank, Dialogue_JP.bank and Dialogue_CN.bank. One of those bank should be loaded.
+add_child(event_emitter)
+```
 
 ## Fmod listeners
 

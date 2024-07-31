@@ -799,6 +799,22 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     return {};
 }
 
+FMOD_STUDIO_SOUND_INFO FmodServer::get_sound_info(const String& sound_key) const {
+    FMOD_STUDIO_SOUND_INFO sound_info;
+    ERROR_CHECK(
+      system->getSoundInfo(sound_key.utf8().get_data(), &sound_info)
+    );
+    return sound_info;
+}
+
+FMOD::Sound* FmodServer::create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_MODE mode) const {
+    FMOD::Sound* sound {nullptr};
+    ERROR_CHECK(
+      coreSystem->createSound(sound_info.name_or_data, mode | sound_info.mode, &sound_info.exinfo, &sound)
+    );
+    return sound;
+}
+
 void FmodServer::set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_settings) {
     float distance_factor = p_settings->get_distance_factor();
     if (distance_factor <= 0) {

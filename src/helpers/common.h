@@ -34,7 +34,7 @@
         (actualSize) = maxSize;                                                                                        \
     }
 
-#define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
+#define ERROR_CHECK(_result) godot::checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
 
 #define FMODCLASS(m_class, m_inherits, m_owned)               \
     GDCLASS(m_class, m_inherits)                              \
