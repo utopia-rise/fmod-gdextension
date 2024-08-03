@@ -163,7 +163,12 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 
     FMOD_STUDIO_INITFLAGS studio_init_flags = FMOD_STUDIO_INIT_NORMAL;
 
-    if (p_settings->get_is_live_update_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE; }
+    if (
+#ifdef TOOLS_ENABLED
+            !Engine::get_singleton()->is_editor_hint() &&
+#endif
+            p_settings->get_is_live_update_enabled()
+       ) { studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE; }
 
     if (p_settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
 
