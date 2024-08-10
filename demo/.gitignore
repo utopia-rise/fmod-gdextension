@@ -5,3 +5,4 @@ logs/
 **/*.aar
 android/build
 android/.build_version
+.godot
