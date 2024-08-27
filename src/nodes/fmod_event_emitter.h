@@ -129,6 +129,12 @@ namespace godot {
 
         if (_autoplay) {
             load_event();
+
+            if (_event.is_null()) {
+                // No event loaded, nothing to do here
+                return;
+            }
+
             _event->set_volume(_volume);
             apply_parameters();
             set_space_attribute();
@@ -158,6 +164,12 @@ namespace godot {
                 return;
             } else if (_autoplay) {
                 load_event();
+
+                if (_event.is_null()) {
+                    // No event loaded, nothing to do here
+                    return;
+                }
+
                 _event->set_volume(_volume);
                 apply_parameters();
             }
@@ -221,6 +233,11 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play() {
         if (_event.is_null() || !_event->is_valid()) { load_event(); }
+
+        if (_event.is_null()) {
+            // No event loaded, nothing to do here
+            return;
+        }
 
         if (_attached) { set_space_attribute(); }
         if (!_programmer_callback_sound_key.is_empty()) {
@@ -331,6 +348,11 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::preload_event() {
         Ref<FmodEventDescription> desc = _load_event_description();
+
+        if (desc.is_null()) {
+            return;
+        }
+
         desc->load_sample_data();
         _is_one_shot = desc->is_one_shot();
     }
@@ -338,6 +360,11 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
         Ref<FmodEventDescription> desc = _load_event_description();
+
+        if (desc.is_null()) {
+            return;
+        }
+
         _event = FmodServer::get_singleton()->create_event_instance_from_description(desc);
         _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
         _is_one_shot = desc->is_one_shot();

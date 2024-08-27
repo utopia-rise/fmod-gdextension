@@ -144,11 +144,31 @@ Ref<FmodBus> FmodCache::get_bus(const String& busPath) {
 }
 
 Ref<FmodEventDescription> FmodCache::get_event(const FMOD_GUID& guid) {
-    return event_descriptions.get(guid);
+    if (
+      HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator {
+          event_descriptions.find(guid)
+      }
+    ) {
+        return iterator->value;
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find event with guid: %s", fmod_guid_to_string(guid)));
+#endif
+
+    return {};
 }
 
 Ref<FmodEventDescription> FmodCache::get_event(const String& eventPath) {
-    return event_descriptions.get(strings_to_guid.get(eventPath));
+    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(eventPath)}) {
+        return get_event(iterator->value);
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find event with path: %s", eventPath));
+#endif
+
+    return {};
 }
 
 bool FmodCache::is_master_loaded() {
