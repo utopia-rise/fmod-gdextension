@@ -11,6 +11,10 @@ func _update_property():
 		return
 	_update_parameters()
 	var event_description: FmodEventDescription = FmodServer.get_event_from_guid(get_edited_object().event_guid)
+	
+	if event_description == null:
+		event_description = FmodServer.get_event(get_edited_object().event_name)
+	
 	former_event_description = event_description
 
 func _set_path_and_guid(path: String, guid: String):
@@ -22,6 +26,9 @@ func _set_path_and_guid(path: String, guid: String):
 
 func _update_parameters():
 	var event_description: FmodEventDescription = FmodServer.get_event_from_guid(get_edited_object().event_guid)
+	
+	if event_description == null:
+		return
 	
 	if former_event_description != null and event_description != former_event_description:
 		get_edited_object().tool_remove_all_parameters()
