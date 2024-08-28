@@ -11,7 +11,7 @@ const ADDON_PATH = "res://addons/fmod"
 var fmod_bank_explorer_window: PackedScene = load("res://addons/fmod/tool/ui/FmodBankExplorer.tscn")
 var bank_explorer: FmodBankExplorer
 var fmod_button: Button
-var export_plugin = FmodEditorExportPluginProxy.new()
+var export_plugin = FmodEditorExportPlugin.new()
 var emitter_inspector_plugin = FmodEmitterPropertyInspectorPlugin.new(self)
 var bank_loader_inspector_plugin = FmodBankLoaderPropertyInspectorPlugin.new(self)
 
