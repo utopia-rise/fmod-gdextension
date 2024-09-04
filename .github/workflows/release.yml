@@ -195,31 +195,31 @@ jobs:
         uses: ./.github/actions/create-android-plugin
 
       - name: Download linux libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: linux
           path: demo/addons/fmod/libs/linux/
 
       - name: Download windows libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: windows
           path: demo/addons/fmod/libs/windows/
 
       - name: Download macos libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: macos
           path: demo/addons/fmod/libs/macos/
 
       - name: Download iOS libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ios
           path: demo/addons/fmod/libs/iOS/
 
       - name: Download android libraries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: android
           path: demo/addons/fmod/libs/android/
