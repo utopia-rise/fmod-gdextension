@@ -116,7 +116,7 @@ namespace godot {
     }
 
     static bool is_dead(Object* node) {
-        if (!node || !UtilityFunctions::is_instance_valid(node)) {
+        if (!node || !UtilityFunctions::is_instance_id_valid(node->get_instance_id())) {
             return true;
         }
         return !Object::cast_to<Node>(node)->is_inside_tree();

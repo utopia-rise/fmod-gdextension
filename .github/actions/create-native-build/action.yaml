@@ -3,7 +3,7 @@ description: Creates fmod native build for a specific platform
 env:
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.2.2
+  GODOT_VERSION: 4.3
   FMOD_VERSION: 20212
 inputs:
   platform:
@@ -32,9 +32,9 @@ runs:
       uses: actions/setup-python@v4
       with:
         # Semantic version range syntax or exact version of a Python version
-        python-version: '3.x'
+        python-version: "3.x"
         # Optional - x64 or x86 architecture, defaults to x64
-        architecture: 'x64'
+        architecture: "x64"
 
     # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
     #TODO: remove hardcoded scons version when https://github.com/godotengine/godot-cpp/pull/1526 is released
