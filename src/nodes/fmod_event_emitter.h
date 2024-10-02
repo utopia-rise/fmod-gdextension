@@ -87,7 +87,7 @@ namespace godot {
         void tool_remove_parameter(uint64_t parameter_id);
 #endif
 
-        static StringName& get_class_static();
+        static const StringName& get_class_static();
 
     protected:
         void _emit_callbacks(const Dictionary& dict, const int type) const;
@@ -779,7 +779,7 @@ namespace godot {
 #endif
 
     template<class Derived, class NodeType>
-    StringName& FmodEventEmitter<Derived, NodeType>::get_class_static() {
+    const StringName& FmodEventEmitter<Derived, NodeType>::get_class_static() {
         return Derived::get_class_static();
     }
 

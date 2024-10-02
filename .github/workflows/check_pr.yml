@@ -8,7 +8,7 @@ env:
   PROJECT_FOLDER: fmod-gdextension
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.2.2
+  GODOT_VERSION: 4.3
   FMOD_VERSION: 20212
 
 jobs:
@@ -192,7 +192,7 @@ jobs:
           ./run_tests.sh ../${{ matrix.godot-executable }}
 
   create-android-plugin:
-    needs: [ build ]
+    needs: [build]
     strategy:
       matrix:
         include:

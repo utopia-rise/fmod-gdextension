@@ -24,7 +24,7 @@ namespace godot {
         void set_listener_weight(const float p_weight);
         float get_listener_weight() const;
 
-        static StringName& get_class_static();
+        static const StringName& get_class_static();
 
         FmodListener();
         ~FmodListener() = default;
@@ -185,7 +185,7 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    StringName& FmodListener<Derived, NodeType>::get_class_static() {
+    const StringName& FmodListener<Derived, NodeType>::get_class_static() {
         return Derived::get_class_static();
     }
 }// namespace godot

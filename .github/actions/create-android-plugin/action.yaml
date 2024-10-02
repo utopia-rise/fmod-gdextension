@@ -1,7 +1,7 @@
 name: Create Fmod native build
 description: Creates fmod native build for a specific platform
 env:
-  GODOT_VERSION: 4.2.2
+  GODOT_VERSION: 4.3
 runs:
   using: composite
   steps:
