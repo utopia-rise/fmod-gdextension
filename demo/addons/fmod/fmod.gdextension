@@ -18,6 +18,9 @@ android.debug.arm64 = "res://addons/fmod/libs/android/arm64/libGodotFmod.android
 android.release.arm64 = "res://addons/fmod/libs/android/arm64/libGodotFmod.android.template_release.arm64.so"
 ios.debug  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_debug.universal.dylib"
 ios.release  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_release.universal.dylib"
+web.editor = "res://addons/fmod/libs/web/libGodotFmod.web.editor.wasm32.wasm"
+web.debug = "res://addons/fmod/libs/web/libGodotFmod.web.template_debug.wasm32.wasm"
+web.release = "res://addons/fmod/libs/web/libGodotFmod.web.template_release.wasm32.wasm"
 
 [icons]
 FmodEventEmitter2D = "res://addons/fmod/icons/fmod_icon.svg"

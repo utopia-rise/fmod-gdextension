@@ -120,6 +120,14 @@ elif env["platform"] == "android":
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
+elif env["platform"] == "web":
+    libfmodstudio = os.path.join(fmod_lib_dir, 'web/studio/lib/fastcomp/bitcode/', 'fmodstudio%s.bc' % lfix)
+
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc/', env['fmod_lib_dir'] + 'web/studio/inc/'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/fastcomp/bitcode/', env['fmod_lib_dir'] + 'web/studio/lib/fastcomp/bitcode/'])
+    # Instead of LIBS, directly add to LINKFLAGS for explicit paths
+    env.Append(LINKFLAGS=[libfmodstudio])
+
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
     target_path, env["platform"], target_name, env["platform"], env["target"]
@@ -196,8 +204,9 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     source_files = [env.Glob(os.path.join(source_dir, '*.*')) for source_dir in [fmod_core_lib_dir, fmod_studio_lib_dir]]
     [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
 
-
-copy_fmod_libraries_action = Action('', copy_fmod_libraries)
-AddPostAction(library, copy_fmod_libraries_action)
+# web bundles everything inside the final .wasm - no need to export libs
+if env["platform"] != "web":
+    copy_fmod_libraries_action = Action('', copy_fmod_libraries)
+    AddPostAction(library, copy_fmod_libraries_action)
 
 Default(library)
