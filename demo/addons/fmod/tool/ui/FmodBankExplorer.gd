@@ -29,6 +29,8 @@ var base_color: Color
 var contrast: float
 var background_color: Color
 
+var banks: Array = Array()
+
 func _ready():
 	var main_window_size = get_parent().get_window().size
 	size = main_window_size * 0.5
@@ -203,9 +205,8 @@ func _on_copy_guid_button():
 
 func on_refresh_banks_button_pressed() -> void:
 	# unload banks
-	var current_banks : Array = FmodServer.get_all_banks()
-	for i : FmodBank in current_banks:
-		FmodServer.unload_bank(i.get_godot_res_path())
+	banks.clear()
+	
 	# get the banks to load
 	var path : String = ProjectSettings.get_setting("Fmod/General/banks_path", "")
 	if !path:
@@ -229,7 +230,7 @@ func on_refresh_banks_button_pressed() -> void:
 		else:
 			printerr("Could not find any banks in the specified directory")
 		for bank_path : String in bank_paths_to_load:
-			FmodServer.load_bank(bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+			banks.append(FmodServer.load_bank(bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
 	else:
 		printerr("Couldn't access bank path, please make sure you specified a folder with the banks as direct children")
 		

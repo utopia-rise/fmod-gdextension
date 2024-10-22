@@ -1,6 +1,7 @@
 #include "fmod_bank.h"
 
 #include "helpers/common.h"
+#include "fmod_server.h"
 
 using namespace godot;
 
@@ -126,4 +127,8 @@ const List<Ref<FmodVCA>>& FmodBank::getVcAs() const {
 
 const String& FmodBank::get_godot_res_path() const {
     return _godot_res_path;
+}
+
+FmodBank::~FmodBank() {
+    FmodServer::get_singleton()->unload_bank(_godot_res_path);
 }

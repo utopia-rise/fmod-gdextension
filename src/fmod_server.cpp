@@ -82,7 +82,6 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
-    ClassDB::bind_method(D_METHOD("unload_bank", "pathToBank"), &FmodServer::unload_bank);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
@@ -583,8 +582,8 @@ Array FmodServer::get_all_event_descriptions() {
 
 Array FmodServer::get_all_banks() {
     Array array;
-    for (KeyValue<String, Ref<FmodBank>>& entry : cache->banks) {
-        array.append(entry.value);
+    for (KeyValue<String, FmodBank*>& entry : cache->banks) {
+        array.append(Ref<FmodBank>(entry.value));
     }
     return array;
 }

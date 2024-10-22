@@ -4,6 +4,7 @@
 #define GODOTFMOD_FMOD_EDITOR_PLUGIN_H
 
 #include "fmod_editor_export_plugin.h"
+#include "studio/fmod_bank.h"
 
 #include <classes/editor_plugin.hpp>
 
@@ -17,6 +18,8 @@ namespace godot {
         ~FmodEditorPlugin() = default;
 
     private:
+        Vector<Ref<FmodBank>> banks;
+
         static void add_setting(
           const String& p_name,
           const Variant& p_default_value,

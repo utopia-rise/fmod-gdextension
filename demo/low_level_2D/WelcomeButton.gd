@@ -11,7 +11,7 @@ func _ready():
 	welcome_option_button = get_node(welcome_option_button_path)
 
 func _on_pressed():
-	if welcome_option_button.current_index == -1:
+	if welcome_option_button.lang_bank == null:
 		return
 	var event_instance = FmodServer.create_event_instance("event:/Character/Dialogue")
 	event_instance.set_programmer_callback("welcome")

@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
 [ext_resource type="Script" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
-[ext_resource type="Texture2D" uid="uid://dichdnwxg2opa" path="res://icon.png" id="2_llv2n"]
+[ext_resource type="Texture2D" uid="uid://c872sqsokojxe" path="res://icon.png" id="2_llv2n"]
 [ext_resource type="Script" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
 [ext_resource type="Script" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
 [ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
@@ -175,7 +175,6 @@ offset_right = 986.0
 offset_bottom = 646.0
 item_count = 3
 popup/item_0/text = "CN"
-popup/item_0/id = 0
 popup/item_1/text = "EN"
 popup/item_1/id = 1
 popup/item_2/text = "JP"

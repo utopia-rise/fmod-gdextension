@@ -19,17 +19,6 @@ void FmodBankLoader::_enter_tree() {
     }
 }
 
-void FmodBankLoader::_exit_tree() {
-#ifdef TOOLS_ENABLED
-    if (Engine::get_singleton()->is_editor_hint()) {
-        return;
-    }
-#endif
-    for (int i = 0; i < bank_paths.size(); ++i) {
-        FmodServer::get_singleton()->unload_bank(bank_paths[i]);
-    }
-}
-
 void FmodBankLoader::set_bank_paths(const Array& p_paths) {
     bank_paths = p_paths;
 }

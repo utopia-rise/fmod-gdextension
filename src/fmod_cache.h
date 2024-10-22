@@ -34,7 +34,7 @@ namespace godot {
         List<Ref<FmodBank>> loading_banks;
 
         HashMap<String, Ref<FmodFile>> files;
-        HashMap<String, Ref<FmodBank>> banks;
+        HashMap<String, FmodBank*> banks;
 
         HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> event_descriptions;
         HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> buses;
@@ -43,7 +43,7 @@ namespace godot {
         HashMap<String, FMOD_GUID> strings_to_guid;
 
         void _get_bank_data(Ref<FmodBank> bank);
-        void _remove_bank_data(Ref<FmodBank> bank);
+        void _remove_bank_data(FmodBank* bank);
 
     public:
         FmodCache() = delete;
