@@ -63,8 +63,8 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_list"), &FmodServer::get_global_parameter_desc_list);
 
     // LISTENERS
-    ClassDB::bind_method(D_METHOD("add_listener", "index", "gameObj"), &FmodServer::add_listener);
-    ClassDB::bind_method(D_METHOD("remove_listener", "index"), &FmodServer::remove_listener);
+    ClassDB::bind_method(D_METHOD("add_listener", "index", "game_obj"), &FmodServer::add_listener);
+    ClassDB::bind_method(D_METHOD("remove_listener", "index", "game_obj"), &FmodServer::remove_listener);
     ClassDB::bind_method(D_METHOD("set_listener_number", "listenerNumber"), &FmodServer::set_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_number"), &FmodServer::get_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &FmodServer::get_system_listener_weight);
@@ -308,11 +308,11 @@ void FmodServer::set_system_listener_number(int p_listenerNumber) {
     }
 }
 
-void FmodServer::add_listener(int index, Object* gameObj) {
-    if (!is_fmod_valid(gameObj)) { return; }
+void FmodServer::add_listener(int index, Object* game_obj) {
+    if (!is_fmod_valid(game_obj)) { return; }
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
-        listener->gameObj = gameObj;
+        listener->gameObj = game_obj;
         ERROR_CHECK(system->setListenerWeight(index, listener->weight));
         int count = 0;
         for (int i = 0; i < systemListenerNumber; ++i) {
@@ -325,9 +325,14 @@ void FmodServer::add_listener(int index, Object* gameObj) {
     }
 }
 
-void FmodServer::remove_listener(int index) {
+void FmodServer::remove_listener(int index, Object* game_obj) {
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
+
+        if (listener->gameObj != game_obj) {
+            return;
+        }
+
         listener->gameObj = nullptr;
         ERROR_CHECK(system->setListenerWeight(index, 0));
         int count = 0;

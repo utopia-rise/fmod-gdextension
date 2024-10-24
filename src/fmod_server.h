@@ -177,8 +177,8 @@ namespace godot {
         Array get_global_parameter_desc_list();
 
         // LISTENERS
-        void add_listener(int index, Object* gameObj);
-        void remove_listener(int index);
+        void add_listener(int index, Object* game_obj);
+        void remove_listener(int index, Object* game_obj);
         void set_system_listener_number(int listenerNumber);
         int get_system_listener_number() const;
         float get_system_listener_weight(int index);

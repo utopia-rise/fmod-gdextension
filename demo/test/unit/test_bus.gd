@@ -33,7 +33,7 @@ class TestBus:
 	
 	func after_all():
 		fmodEvent.release()
-		FmodServer.remove_listener(0)
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_should_has_master_bus():
 		var wanted: String = "bus:/"

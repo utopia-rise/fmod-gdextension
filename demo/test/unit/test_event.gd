@@ -36,7 +36,7 @@ class TestEvent:
 	func after_all():
 		fmodEvent.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
 		fmodEvent.release()
-		FmodServer.remove_listener(0)
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_should_has_event():
 		var wanted: String = "event:/Vehicles/Car Engine"

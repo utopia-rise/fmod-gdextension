@@ -33,7 +33,7 @@ class TestEventDescription:
 	
 	func after_all():
 		fmodEvent.release()
-		FmodServer.remove_listener(0)
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_should_create_and_release():
 		var desired_value: int = 2

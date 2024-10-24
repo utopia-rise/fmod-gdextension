@@ -30,7 +30,7 @@ class TestGlobal:
 		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		FmodServer.remove_listener(0)
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_should_have_performance_data():
 		var perf_data: FmodPerformanceData = FmodServer.get_performance_data()

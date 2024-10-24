@@ -78,7 +78,7 @@ namespace godot {
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
 
-        FmodServer::get_singleton()->remove_listener(_listener_index);
+        FmodServer::get_singleton()->remove_listener(_listener_index, this);
         _is_added = false;
     }
 

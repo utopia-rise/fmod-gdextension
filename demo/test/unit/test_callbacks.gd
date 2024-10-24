@@ -27,7 +27,7 @@ func before_all():
 	FmodServer.add_listener(0, sprite)
 
 func after_all():
-	FmodServer.remove_listener(0)
+	FmodServer.remove_listener(0, sprite)
 
 func test_assert_has_signals():
 	var emitter: FmodEventEmitter2D = FmodEventEmitter2D.new()
