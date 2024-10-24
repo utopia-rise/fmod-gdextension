@@ -23,7 +23,7 @@ namespace godot {
 
     public:
         FmodBank() = default;
-        ~FmodBank() override = default;
+        ~FmodBank() override;
 
         int get_loading_state();
 

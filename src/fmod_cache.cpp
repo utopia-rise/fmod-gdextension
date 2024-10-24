@@ -15,19 +15,19 @@ FmodCache::~FmodCache() {
 
 void FmodCache::update_pending() {
     if (loading_banks.size() == 0) { return; }
-    List<Ref<FmodBank>> toDelete;
-    for (Ref<FmodBank> loadingBank : loading_banks) {
-        int loading_state = loadingBank->get_loading_state();
+    List<Ref<FmodBank>> to_delete;
+    for (const Ref<FmodBank>& loading_bank : loading_banks) {
+        int loading_state = loading_bank->get_loading_state();
         if (loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
-            _get_bank_data(loadingBank);
-            banks[loadingBank->get_godot_res_path()] = loadingBank;
-            toDelete.push_back(loadingBank);
+            _get_bank_data(loading_bank);
+            banks[loading_bank->get_godot_res_path()] = loading_bank.ptr();
+            to_delete.push_back(loading_bank);
         } else if (loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
-            toDelete.push_back(loadingBank);
+            to_delete.push_back(loading_bank);
             GODOT_LOG_ERROR("Fmod Sound System: Error loading bank.")
         }
     }
-    for (const Ref<FmodBank>& element : toDelete) {
+    for (const Ref<FmodBank>& element : to_delete) {
         loading_banks.erase(element);
     }
 }
@@ -58,7 +58,7 @@ void FmodCache::remove_bank(const String& bankPath) {
         GODOT_LOG_ERROR(vformat("Cannot unload bank with path %s, not in cache.", bankPath));
         return;
     }
-    Ref<FmodBank> bank = banks[bankPath];
+    FmodBank* bank = banks[bankPath];
     _remove_bank_data(bank);
     ERROR_CHECK(bank->get_wrapped()->unload());
     banks.erase(bankPath);
@@ -202,7 +202,7 @@ void FmodCache::_get_bank_data(Ref<FmodBank> bank) {
     }
 }
 
-void FmodCache::_remove_bank_data(Ref<FmodBank> bank) {
+void FmodCache::_remove_bank_data(FmodBank* bank) {
     for (Ref<FmodBus> bus : bank->getBuses()) {
         strings_to_guid.erase(bus->get_path());
         buses.erase(bus->get_guid());

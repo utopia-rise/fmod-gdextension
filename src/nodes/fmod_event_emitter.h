@@ -57,7 +57,7 @@ namespace godot {
 
         void play();
         void stop();
-        Variant get_parameter(const String& p_name);
+        Variant get_parameter(const String& p_name) const;
         void set_parameter(const String& p_name, const Variant& p_property);
         void set_paused(bool p_is_paused);
         const Ref<FmodEvent>& get_event() const;
@@ -105,7 +105,6 @@ namespace godot {
         Ref<FmodEventDescription> _load_event_description() const;
         void preload_event();
         void load_event();
-        void _load_event_if_null();
         Parameter* find_parameter_by_name(const String& p_name) const;
 
         static bool _should_load_by_event_name();
@@ -227,20 +226,15 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::is_paused() {
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return false;
-        }
-
+        if (_event.is_null() || !_event->is_valid()) { return false; }
         return _event->get_paused();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play() {
-        _load_event_if_null();
+        if (_event.is_null() || !_event->is_valid()) { load_event(); }
 
-        if (_event.is_null() || !_event->is_valid()) {
+        if (_event.is_null()) {
             // No event loaded, nothing to do here
             return;
         }
@@ -264,12 +258,8 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    Variant FmodEventEmitter<Derived, NodeType>::get_parameter(const String& p_name) {
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return nullptr;
-        }
+    Variant FmodEventEmitter<Derived, NodeType>::get_parameter(const String& p_name) const {
+        if (_event.is_null() || !_event->is_valid()) { return nullptr; }
 
         Parameter* parameter {find_parameter_by_name(p_name)};
 
@@ -280,11 +270,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_parameter(const String& p_name, const Variant& p_property) {
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return;
-        }
+        if (_event.is_null() || !_event->is_valid()) { return; }
 
         Parameter* parameter {find_parameter_by_name(p_name)};
 
@@ -303,12 +289,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_paused(bool p_is_paused) {
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return;
-        }
-
+        if (_event.is_null() || !_event->is_valid()) { return; }
         _event->set_paused(p_is_paused);
     }
 
@@ -390,20 +371,8 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::_load_event_if_null() {
-        if (!_event.is_null()) { return; }
-
-        load_event();
-    }
-
-    template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::apply_parameters() {
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return;
-        }
-
+        if (_event.is_null() || !_event->is_valid()) { return; }
         FmodServer::get_singleton()->apply_parameter_list_to_event(_event, _parameters);
     }
 
@@ -491,12 +460,7 @@ namespace godot {
     void FmodEventEmitter<Derived, NodeType>::set_volume(const float volume) {
         _volume = volume;
 
-        _load_event_if_null();
-
-        if (!_event->is_valid()) {
-            return;
-        }
-
+        if (_event.is_null() || !_event->is_valid()) { return; }
         _event->set_volume(volume);
     }
 

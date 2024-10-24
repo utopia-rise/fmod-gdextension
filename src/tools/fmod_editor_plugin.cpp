@@ -113,7 +113,9 @@ void FmodEditorPlugin::_ready() {
         return;
     }
 
-    FmodServer::get_singleton()->load_bank(master_strings_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+    banks.append(
+            FmodServer::get_singleton()->load_bank(master_strings_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL)
+    );
 
     const String master_bank_path {vformat("%s/%s", banks_root, MASTER_BANK_NAME)};
     if (!FileAccess::file_exists(master_bank_path)) {
@@ -121,7 +123,9 @@ void FmodEditorPlugin::_ready() {
         return;
     }
 
-    FmodServer::get_singleton()->load_bank(master_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+    banks.append(
+            FmodServer::get_singleton()->load_bank(master_bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL)
+    );
 
     PackedStringArray banks_path;
     list_files_in_folder(banks_path, banks_root, ".bank");
@@ -129,7 +133,9 @@ void FmodEditorPlugin::_ready() {
         if (bank_path.ends_with(MASTER_BANK_NAME) || bank_path.ends_with(MASTER_STRINGS_BANK_NAME)) {
             continue;
         }
-        FmodServer::get_singleton()->load_bank(bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL);
+        banks.append(
+                FmodServer::get_singleton()->load_bank(bank_path, FMOD_STUDIO_LOAD_BANK_NORMAL)
+        );
     }
 }
 

@@ -26,4 +26,3 @@ func _process(_delta):
 	var time = Time.get_ticks_msec()/1000.0
 	self.position.x = 300 * sin(time)
 	event.set_2d_attributes(self.global_transform)
-
