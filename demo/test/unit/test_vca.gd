@@ -30,7 +30,7 @@ class TestVCA:
 		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		FmodServer.remove_listener(0)
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_valid_paths():
 		assert_true(FmodServer.check_vca_path("vca:/Environment"), "vca:/Environment should be present")

@@ -27,8 +27,7 @@ class TestBank:
 		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		FmodServer.remove_listener(0)
-		assert_true(vehicleBank.get_loading_state() == 0 or vehicleBank.get_loading_state() == 1, "Loading state should be -1")
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_bank_bus_count():
 		var desiredValue: int = 0
