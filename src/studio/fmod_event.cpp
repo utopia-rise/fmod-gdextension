@@ -57,8 +57,11 @@ float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
 }
 
 void FmodEvent::set_parameter_by_name(const String& parameter_name, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value));
+    // Removed error check
+    // ERROR_CHECK(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value));
+    _wrapped->setParameterByName(parameter_name.utf8().get_data(), value);
 }
+
 
 void FmodEvent::set_parameter_by_name_with_label(const String& parameter_name, const String& label, bool ignoreseekspeed) const {
     ERROR_CHECK(_wrapped->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data(), ignoreseekspeed));
