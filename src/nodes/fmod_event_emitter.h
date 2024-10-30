@@ -36,17 +36,16 @@ namespace godot {
         Ref<FmodEvent> _event;
 
         String _event_name;
+        String _programmer_callback_sound_key;
+        List<Parameter> _parameters;
         FMOD_GUID _event_guid;
+        float _volume = 1.0;
         bool _attached = true;
         bool _autoplay = false;
         bool _is_one_shot = false;
         bool _auto_release = false;
         bool _allow_fadeout = true;
         bool _preload_event = true;
-        float _volume = 1.0;
-        String _programmer_callback_sound_key;
-
-        List<Parameter> _parameters;
 
         void ready();
         void process();
@@ -109,6 +108,7 @@ namespace godot {
         void load_event();
         Parameter* _find_parameter(const String& p_name) const;
         Parameter* _find_parameter(uint64_t p_id) const;
+        void _stop_and_restart_if_autoplay();
 
 
         static bool _should_load_by_event_name();
@@ -155,16 +155,9 @@ namespace godot {
             if (_auto_release) {
                 free();
                 return;
-            } else if (_autoplay) {
-                load_event();
-
-                if (_event.is_null()) {
-                    // No event loaded, nothing to do here
-                    return;
-                }
-
-                _event->set_volume(_volume);
-                apply_parameters();
+            }
+            if (_autoplay) {
+                play();
             }
         }
 
@@ -186,8 +179,6 @@ namespace godot {
             _event->release();
             stop();
         }
-
-        _event.unref();
     }
 
     template<class Derived, class NodeType>
@@ -240,7 +231,7 @@ namespace godot {
             _event->set_programmer_callback(_programmer_callback_sound_key);
         }
         _event->start();
-        if (_auto_release) { _event->release(); }
+        _event->release();
     }
 
     template<class Derived, class NodeType>
@@ -248,9 +239,10 @@ namespace godot {
         if (_event.is_null() || !_event->is_valid()) { return; }
         if (_allow_fadeout) {
             _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
-        } else {
-            _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+
+            return;
         }
+        _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
     }
 
     template<class Derived, class NodeType>
@@ -421,6 +413,9 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_event_name(const String& name) {
         _event_name = name;
+        _event_guid = FmodServer::get_singleton()->get_event_guid_internal(_event_name);
+
+        _stop_and_restart_if_autoplay();
     }
 
     template<class Derived, class NodeType>
@@ -431,11 +426,32 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_event_guid(const String& guid) {
         _event_guid = string_to_fmod_guid(guid.utf8().get_data());
+        _event_name = FmodServer::get_singleton()->get_event_path_internal(_event_guid);
+
+        _stop_and_restart_if_autoplay();
     }
 
     template<class Derived, class NodeType>
     String FmodEventEmitter<Derived, NodeType>::get_event_guid() const {
         return fmod_guid_to_string(_event_guid);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_stop_and_restart_if_autoplay() {
+        if (!reinterpret_cast<Derived*>(this)->is_node_ready()) return;
+
+        stop();
+
+        _event = Ref<FmodEvent>();
+        if (_preload_event) {
+            preload_event();
+        }
+
+        _parameters.clear();
+
+        if (!_autoplay) return;
+
+        play();
     }
 
     template<class Derived, class NodeType>

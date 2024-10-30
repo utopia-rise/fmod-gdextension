@@ -39,6 +39,8 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_bus", "busPath"), &FmodServer::get_bus);
     ClassDB::bind_method(D_METHOD("get_event_from_guid", "guid"), &FmodServer::get_event_from_guid);
     ClassDB::bind_method(D_METHOD("get_event", "eventPath"), &FmodServer::get_event);
+    ClassDB::bind_method(D_METHOD("get_event_guid", "event_path"), &FmodServer::get_event_guid);
+    ClassDB::bind_method(D_METHOD("get_event_path", "guid"), &FmodServer::get_event_path);
     ClassDB::bind_method(D_METHOD("get_all_vca"), &FmodServer::get_all_vca);
     ClassDB::bind_method(D_METHOD("get_all_buses"), &FmodServer::get_all_buses);
     ClassDB::bind_method(D_METHOD("get_all_event_descriptions"), &FmodServer::get_all_event_descriptions);
@@ -559,6 +561,22 @@ Ref<FmodEventDescription> FmodServer::get_event_from_guid_internal(const FMOD_GU
 
 Ref<FmodEventDescription> FmodServer::get_event(const String& eventPath) {
     return cache->get_event(eventPath);
+}
+
+FMOD_GUID FmodServer::get_event_guid_internal(const String& event_path) {
+    return cache->get_event_guid(event_path);
+}
+
+String FmodServer::get_event_guid(const String& event_path) {
+    return fmod_guid_to_string(get_event_guid_internal(event_path));
+}
+
+String FmodServer::get_event_path_internal(const FMOD_GUID& guid) {
+    return cache->get_event_path(guid);
+}
+
+String FmodServer::get_event_path(const String& guid) {
+    return cache->get_event_path(string_to_fmod_guid(guid.utf8().get_data()));
 }
 
 Array FmodServer::get_all_vca() {

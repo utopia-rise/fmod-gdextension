@@ -153,6 +153,10 @@ namespace godot {
         Ref<FmodEventDescription> get_event_from_guid(const String& guid);
         Ref<FmodEventDescription> get_event_from_guid_internal(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
+        FMOD_GUID get_event_guid_internal(const String& event_path);
+        String get_event_guid(const String& event_path);
+        String get_event_path_internal(const FMOD_GUID& guid);
+        String get_event_path(const String& guid);
         Array get_all_vca();
         Array get_all_buses();
         Array get_all_event_descriptions();

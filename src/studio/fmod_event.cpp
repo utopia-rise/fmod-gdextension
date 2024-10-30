@@ -91,7 +91,6 @@ void FmodEvent::set_parameter_by_id_with_label(uint64_t parameter_id, const Stri
 }
 
 void FmodEvent::release() const {
-    _wrapped->setUserData(nullptr);
     ERROR_CHECK(_wrapped->release());
 }
 
@@ -241,4 +240,10 @@ const String& FmodEvent::get_programmers_callback_sound_key() const {
 
 void FmodEvent::set_distance_scale(float scale){
     distanceScale = scale;
+}
+
+FmodEvent::~FmodEvent() {
+    if (is_valid()) {
+        _wrapped->setUserData(nullptr);
+    }
 }
