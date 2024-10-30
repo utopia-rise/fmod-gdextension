@@ -67,6 +67,7 @@ namespace godot {
 
         FmodServer::get_singleton()->add_listener(_listener_index, this);
         FmodServer::get_singleton()->set_listener_lock(_listener_index, _is_locked);
+        FmodServer::get_singleton()->set_system_listener_weight(_listener_index, _weight);
 
         _is_added = true;
     }
