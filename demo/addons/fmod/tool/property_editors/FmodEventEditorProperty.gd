@@ -53,6 +53,9 @@ func _update_parameters():
 	var property_matching = existing_parameter_ids.map(func(id): return false)
 	
 	for param: FmodParameterDescription in event_description.get_parameters():
+		if param.is_global():
+			continue
+		
 		var parameter_name = param.get_name()
 		var parameter_id_param = "%s/%s/id" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_value_param = "%s/%s/value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
@@ -103,6 +106,5 @@ func _update_parameters():
 	for i in property_matching.size():
 		if not property_matching[i]:
 			get_edited_object().tool_remove_parameter(existing_parameter_ids[i])
-		pass
 	
 	get_edited_object().notify_property_list_changed()
