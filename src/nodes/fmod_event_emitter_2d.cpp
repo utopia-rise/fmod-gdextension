@@ -2,8 +2,8 @@
 
 using namespace godot;
 
-void FmodEventEmitter2D::set_space_attribute_impl() const {
-    get_event()->set_2d_attributes(get_global_transform());
+void FmodEventEmitter2D::set_space_attribute_impl(const Ref<FmodEvent>& p_event) const {
+    p_event->set_2d_attributes(get_global_transform());
 }
 
 void FmodEventEmitter2D::_ready() {
