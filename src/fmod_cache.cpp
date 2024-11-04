@@ -171,6 +171,26 @@ Ref<FmodEventDescription> FmodCache::get_event(const String& eventPath) {
     return {};
 }
 
+FMOD_GUID FmodCache::get_event_guid(const String& event_path) {
+    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(event_path)}) {
+        return iterator->value;
+    }
+
+    return {};
+}
+
+String FmodCache::get_event_path(const FMOD_GUID& guid) {
+    if (
+            HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
+                    event_descriptions.find(guid)
+            }
+            ) {
+        return iterator->value->get_path();
+    }
+
+    return {};
+}
+
 bool FmodCache::is_master_loaded() {
     return banks.size() > 0;
 }

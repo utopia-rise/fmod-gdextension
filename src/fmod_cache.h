@@ -82,6 +82,8 @@ namespace godot {
         Ref<FmodBus> get_bus(const String& busPath);
         Ref<FmodEventDescription> get_event(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
+        FMOD_GUID get_event_guid(const String& event_path);
+        String get_event_path(const FMOD_GUID& guid);
     };
 }// namespace godot
 

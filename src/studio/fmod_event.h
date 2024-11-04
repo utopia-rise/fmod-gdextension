@@ -16,7 +16,7 @@ namespace godot {
 
     public:
         FmodEvent() = default;
-        ~FmodEvent() override = default;
+        ~FmodEvent() override;
 
         float get_parameter_by_name(const String& parameter_name) const;
         void set_parameter_by_name(const String& parameter_name, float value) const;

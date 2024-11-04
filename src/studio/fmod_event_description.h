@@ -30,9 +30,9 @@ namespace godot {
         float get_sound_size();
         Ref<FmodParameterDescription> get_parameter_by_name(const String& name) const;
         Ref<FmodParameterDescription> get_parameter_by_id(uint64_t id) const;
-        int get_parameter_count();
+        int get_parameter_count() const;
         Ref<FmodParameterDescription> get_parameter_by_index(int index) const;
-        Array get_parameters();
+        Array get_parameters() const;
         String get_parameter_label_by_id(uint64_t id, int label_index) const;
         String get_parameter_label_by_name(const String& parameter_name, int label_index) const;
         String get_parameter_label_by_index(int index, int label_index) const;

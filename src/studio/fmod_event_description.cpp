@@ -159,7 +159,7 @@ Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t
     return param_desc;
 }
 
-int FmodEventDescription::get_parameter_count() {
+int FmodEventDescription::get_parameter_count() const {
     int count = 0;
     ERROR_CHECK(_wrapped->getParameterDescriptionCount(&count));
     return count;
@@ -174,7 +174,7 @@ Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_index(int i
     return param_desc;
 }
 
-Array FmodEventDescription::get_parameters() {
+Array FmodEventDescription::get_parameters() const {
     Array parameters;
     for (int i = 0; i < get_parameter_count(); ++i) {
         parameters.append(get_parameter_by_index(i));
