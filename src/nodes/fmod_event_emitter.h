@@ -42,7 +42,6 @@ namespace godot {
         float _volume = 1.0;
         bool _attached = true;
         bool _autoplay = false;
-        bool _is_one_shot = false;
         bool _auto_release = false;
         bool _allow_fadeout = true;
         bool _preload_event = true;
@@ -56,6 +55,7 @@ namespace godot {
 
         void play();
         void stop();
+        void play_one_shot();
         Variant get_parameter(const String& p_name) const;
         void set_parameter(const String& p_name, const Variant& p_property);
         Variant get_parameter_by_id(uint64_t p_id) const;
@@ -73,7 +73,6 @@ namespace godot {
         bool is_autoplay() const;
         void set_auto_release(bool auto_release);
         bool is_auto_release() const;
-        bool is_one_shot() const;
         void set_allow_fadeout(bool allow_fadeout);
         bool is_allow_fadeout() const;
         void set_preload_event(bool preload_event);
@@ -100,12 +99,14 @@ namespace godot {
         static void _bind_methods();
 
     private:
-        void set_space_attribute() const;
+        template<bool is_one_shot> void _play();
+        void set_space_attribute(const Ref<FmodEvent>& p_event) const;
         void apply_parameters();
         void free();
         Ref<FmodEventDescription> _load_event_description() const;
         void preload_event();
         void load_event();
+        Ref<FmodEvent> _create_event();
         Parameter* _find_parameter(const String& p_name) const;
         Parameter* _find_parameter(uint64_t p_id) const;
         void _stop_and_restart_if_autoplay();
@@ -115,8 +116,8 @@ namespace godot {
     };
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::set_space_attribute() const {
-        static_cast<const Derived*>(this)->set_space_attribute_impl();
+    void FmodEventEmitter<Derived, NodeType>::set_space_attribute(const Ref<FmodEvent>& p_event) const {
+        static_cast<const Derived*>(this)->set_space_attribute_impl(p_event);
     }
 
     template<class Derived, class NodeType>
@@ -161,7 +162,7 @@ namespace godot {
             }
         }
 
-        if (_attached && _event->is_valid()) { set_space_attribute(); }
+        if (_attached && _event->is_valid()) { set_space_attribute(_event); }
     }
 
     template<class Derived, class NodeType>
@@ -216,22 +217,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play() {
-        if (_event.is_null() || !_event->is_valid()) { load_event(); }
-
-        if (_event.is_null()) {
-            // No event loaded, nothing to do here
-            return;
-        }
-
-        _event->set_volume(_volume);
-        apply_parameters();
-
-        set_space_attribute();
-        if (!_programmer_callback_sound_key.is_empty()) {
-            _event->set_programmer_callback(_programmer_callback_sound_key);
-        }
-        _event->start();
-        _event->release();
+        _play<false>();
     }
 
     template<class Derived, class NodeType>
@@ -243,6 +229,39 @@ namespace godot {
             return;
         }
         _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::play_one_shot() {
+        _play<true>();
+    }
+
+    template<class Derived, class NodeType>
+    template<bool is_one_shot>
+    void FmodEventEmitter<Derived, NodeType>::_play() {
+        Ref<FmodEvent> event;
+        if (is_one_shot) {
+            event = _create_event();
+        } else {
+            if (_event.is_null() || !_event->is_valid()) { load_event(); }
+
+            event = _event;
+        }
+
+        if (event.is_null()) {
+            // No event loaded, nothing to do here
+            return;
+        }
+
+        event->set_volume(_volume);
+        apply_parameters();
+
+        set_space_attribute(event);
+        if (!_programmer_callback_sound_key.is_empty()) {
+            event->set_programmer_callback(_programmer_callback_sound_key);
+        }
+        event->start();
+        event->release();
     }
 
     template<class Derived, class NodeType>
@@ -383,20 +402,28 @@ namespace godot {
         }
 
         desc->load_sample_data();
-        _is_one_shot = desc->is_one_shot();
     }
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
-        Ref<FmodEventDescription> desc = _load_event_description();
+        _event = _create_event();
 
-        if (desc.is_null()) {
+        if (_event.is_null()) {
             return;
         }
 
-        _event = FmodServer::get_singleton()->create_event_instance_from_description(desc);
         _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
-        _is_one_shot = desc->is_one_shot();
+    }
+
+    template<class Derived, class NodeType>
+    Ref<FmodEvent> FmodEventEmitter<Derived, NodeType>::_create_event() {
+        Ref<FmodEventDescription> desc = _load_event_description();
+
+        if (desc.is_null()) {
+            return Ref<FmodEvent>();
+        }
+
+        return FmodServer::get_singleton()->create_event_instance_from_description(desc);
     }
 
     template<class Derived, class NodeType>
@@ -482,11 +509,6 @@ namespace godot {
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::is_auto_release() const {
         return _auto_release;
-    }
-
-    template<class Derived, class NodeType>
-    bool FmodEventEmitter<Derived, NodeType>::is_one_shot() const {
-        return _is_one_shot;
     }
 
     template<class Derived, class NodeType>
@@ -850,6 +872,7 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_bind_methods() {
         ClassDB::bind_method(D_METHOD("play"), &Derived::play);
+        ClassDB::bind_method(D_METHOD("play_one_shot"), &Derived::play_one_shot);
         ClassDB::bind_method(D_METHOD("stop"), &Derived::stop);
         ClassDB::bind_method(D_METHOD("set_parameter", "name", "value"), &Derived::set_parameter);
         ClassDB::bind_method(D_METHOD("get_parameter", "name"), &Derived::get_parameter);
@@ -867,7 +890,6 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("is_autoplay"), &Derived::is_autoplay);
         ClassDB::bind_method(D_METHOD("set_auto_release", "_autoplay"), &Derived::set_auto_release);
         ClassDB::bind_method(D_METHOD("is_auto_release"), &Derived::is_auto_release);
-        ClassDB::bind_method(D_METHOD("is_one_shot"), &Derived::is_one_shot);
         ClassDB::bind_method(D_METHOD("set_allow_fadeout", "allow_fadeout"), &Derived::set_allow_fadeout);
         ClassDB::bind_method(D_METHOD("is_allow_fadeout"), &Derived::is_allow_fadeout);
         ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &Derived::set_preload_event);

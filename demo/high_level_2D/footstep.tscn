@@ -4,11 +4,10 @@
 event_name = "event:/Character/Player Footsteps"
 event_guid = "{e905d401-76f5-4741-a885-f7844b244671}"
 attached = false
-autoplay = true
-auto_release = true
 allow_fadeout = false
 event_parameter/Surface/id = -8832756274813665449
 event_parameter/Surface/value = 0.0
 event_parameter/Surface/min_value = 0.0
 event_parameter/Surface/max_value = 2.0
 event_parameter/Surface/default_value = 0.0
+event_parameter/Surface/variant_type = 33547433
