@@ -23,7 +23,6 @@ jobs:
             os: "windows-2022"
             platform: windows
             target: editor
-            artifact-extension: dll
             additional-python-packages: pywin32
             fmod-executable-suffix: win-installer.exe
             shell: pwsh
@@ -32,7 +31,6 @@ jobs:
             os: "windows-2022"
             platform: windows
             target: template_debug
-            artifact-extension: dll
             additional-python-packages: pywin32
             fmod-executable-suffix: win-installer.exe
             shell: pwsh
@@ -41,7 +39,6 @@ jobs:
             os: "windows-2022"
             platform: windows
             target: template_release
-            artifact-extension: dll
             additional-python-packages: pywin32
             fmod-executable-suffix: win-installer.exe
             shell: pwsh
@@ -50,7 +47,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: linux
             target: editor
-            artifact-extension: so
             fmod-executable-suffix: linux.tar.gz
             fmod-core-platform-folder: linux/core/lib/x86_64
             fmod-studio-platform-folder: linux/studio/lib/x86_64
@@ -63,7 +59,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: linux
             target: template_debug
-            artifact-extension: so
             fmod-executable-suffix: linux.tar.gz
             shell: bash
 
@@ -71,7 +66,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: linux
             target: template_release
-            artifact-extension: so
             fmod-executable-suffix: linux.tar.gz
             shell: bash
 
@@ -79,7 +73,6 @@ jobs:
             os: "macos-13"
             platform: macos
             target: editor
-            artifact-extension: framework
             fmod-executable-suffix: osx.dmg
             fmod-core-platform-folder: osx/core/lib
             fmod-studio-platform-folder: osx/studio/lib
@@ -92,7 +85,6 @@ jobs:
             os: "macos-13"
             platform: macos
             target: template_debug
-            artifact-extension: framework
             fmod-executable-suffix: osx.dmg
             shell: bash
 
@@ -100,7 +92,6 @@ jobs:
             os: "macos-13"
             platform: macos
             target: template_release
-            artifact-extension: framework
             fmod-executable-suffix: osx.dmg
             shell: bash
 
@@ -108,7 +99,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: android
             target: editor
-            artifact-extension: so
             fmod-executable-suffix: android.tar.gz
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
             shell: bash
@@ -117,7 +107,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: android
             target: template_debug
-            artifact-extension: so
             fmod-executable-suffix: android.tar.gz
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
             shell: bash
@@ -126,7 +115,6 @@ jobs:
             os: "ubuntu-20.04"
             platform: android
             target: template_release
-            artifact-extension: so
             fmod-executable-suffix: android.tar.gz
             flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
             shell: bash
@@ -135,18 +123,14 @@ jobs:
             os: "macos-13"
             platform: ios
             target: template_debug
-            artifact-extension: dylib
             fmod-executable-suffix: ios.dmg
-            flags: arch=arm64
             shell: bash
 
           - name: iOS Release Compilation
             os: "macos-13"
             platform: ios
             target: template_release
-            artifact-extension: dylib
             fmod-executable-suffix: ios.dmg
-            flags: arch=arm64
             shell: bash
 
     steps:
@@ -168,7 +152,6 @@ jobs:
         with:
           platform: ${{ matrix.platform }}
           target: ${{ matrix.target }}
-          artifact-extension: ${{ matrix.artifact-extension }}
           additional-python-packages: ${{ matrix.additional-python-packages }}
           flags: ${{ matrix.flags }}
           fmod-executable-suffix: ${{ matrix.fmod-executable-suffix }}
