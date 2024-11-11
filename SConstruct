@@ -143,14 +143,15 @@ else:
 
 library = env.SharedLibrary(target=target, source=sources)
 
+
+def sys_exec(args):
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    (out, err) = proc.communicate()
+    return out.rstrip("\r\n").lstrip()
+
+
 #Necessary so the extension library can find the Fmod libraries
 if env["platform"] == "macos":
-    def sys_exec(args):
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
-        (out, err) = proc.communicate()
-        return out.rstrip("\r\n").lstrip()
-
-    
     lib_name = "{}.{}.{}".format(
         target,
         target_name,
@@ -165,6 +166,24 @@ if env["platform"] == "macos":
     change_id_action = Action('', change_id)
 
     AddPostAction(library, change_id_action)
+
+
+if env["platform"] == "ios":
+    xcframework_path = "{}{}/{}.{}.{}.xcframework".format(
+        target_path,
+        env["platform"],
+        target_name,
+        env["platform"],
+        env["target"]
+    )
+
+    def create_xcframework(self, arg, env, executor = None):
+        sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
+        sys_exec(["rm", target])
+
+    create_xcframework_action = Action('', create_xcframework)
+
+    AddPostAction(library, create_xcframework_action)
 
 
 def copy_fmod_libraries(self, arg, env, executor = None):

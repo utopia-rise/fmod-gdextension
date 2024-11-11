@@ -2,4 +2,5 @@
 *.a
 *.dylib
 *.so
+*.xcframework
 !libs/

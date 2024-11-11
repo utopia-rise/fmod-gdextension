@@ -10,8 +10,6 @@ inputs:
     description: The platform to build for.
   target:
     description: The target to build.
-  artifact-extension:
-    description: Extension of the compiled artifact
   additional-python-packages:
     description: Additional python package to install.
   flags:
