@@ -104,7 +104,6 @@ namespace godot {
         void apply_parameters();
         void free();
         Ref<FmodEventDescription> _load_event_description() const;
-        void preload_event();
         void load_event();
         Ref<FmodEvent> _create_event();
         Parameter* _find_parameter(const String& p_name) const;
@@ -136,7 +135,7 @@ namespace godot {
             play();
         } else if (_preload_event) {
             // No need to preload if autoplay is on because event is loaded anyway.
-            preload_event();
+            load_event();
         }
     }
 
@@ -394,17 +393,6 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::preload_event() {
-        Ref<FmodEventDescription> desc = _load_event_description();
-
-        if (desc.is_null()) {
-            return;
-        }
-
-        desc->load_sample_data();
-    }
-
-    template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::load_event() {
         _event = _create_event();
 
@@ -471,7 +459,7 @@ namespace godot {
 
         _event = Ref<FmodEvent>();
         if (_preload_event) {
-            preload_event();
+            load_event();
         }
 
         _parameters.clear();
