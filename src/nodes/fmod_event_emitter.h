@@ -53,7 +53,7 @@ namespace godot {
     public:
         void _notification(int p_what);
 
-        void play();
+        void play(bool restart_if_playing = true);
         void stop();
         void play_one_shot();
         Variant get_parameter(const String& p_name) const;
@@ -99,7 +99,7 @@ namespace godot {
         static void _bind_methods();
 
     private:
-        template<bool is_one_shot> void _play();
+        template<bool is_one_shot> void _play(bool should_start_event);
         void set_space_attribute(const Ref<FmodEvent>& p_event) const;
         void apply_parameters();
         void free();
@@ -216,8 +216,8 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::play() {
-        _play<false>();
+    void FmodEventEmitter<Derived, NodeType>::play(bool restart_if_playing) {
+        _play<false>(restart_if_playing);
     }
 
     template<class Derived, class NodeType>
@@ -233,12 +233,12 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::play_one_shot() {
-        _play<true>();
+        _play<true>(true);
     }
 
     template<class Derived, class NodeType>
     template<bool is_one_shot>
-    void FmodEventEmitter<Derived, NodeType>::_play() {
+    void FmodEventEmitter<Derived, NodeType>::_play(bool should_start_event) {
         Ref<FmodEvent> event;
         if (is_one_shot) {
             event = _create_event();
@@ -260,6 +260,11 @@ namespace godot {
         if (!_programmer_callback_sound_key.is_empty()) {
             event->set_programmer_callback(_programmer_callback_sound_key);
         }
+
+        if (!should_start_event) {
+            return;
+        }
+
         event->start();
         event->release();
     }
@@ -871,7 +876,7 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_bind_methods() {
-        ClassDB::bind_method(D_METHOD("play"), &Derived::play);
+        ClassDB::bind_method(D_METHOD("play", "restart_if_playing"), &Derived::play, DEFVAL(true));
         ClassDB::bind_method(D_METHOD("play_one_shot"), &Derived::play_one_shot);
         ClassDB::bind_method(D_METHOD("stop"), &Derived::stop);
         ClassDB::bind_method(D_METHOD("set_parameter", "name", "value"), &Derived::set_parameter);
