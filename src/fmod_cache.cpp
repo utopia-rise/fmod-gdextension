@@ -128,19 +128,59 @@ bool FmodCache::has_event_path(const String& eventPath) {
 }
 
 Ref<FmodVCA> FmodCache::get_vca(const FMOD_GUID& guid) {
-    return vcas.get(guid);
+    if (
+            HashMap<FMOD_GUID, Ref<FmodVCA>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
+                    vcas.find(guid)
+            }
+    ) {
+        return iterator->value;
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find vca with guid: %s", fmod_guid_to_string(guid)));
+#endif
+
+    return {};
 }
 
-Ref<FmodVCA> FmodCache::get_vca(const String& vcaPath) {
-    return vcas.get(strings_to_guid.get(vcaPath));
+Ref<FmodVCA> FmodCache::get_vca(const String& vca_path) {
+    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(vca_path)}) {
+        return get_vca(iterator->value);
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find vca with path: %s", vca_path));
+#endif
+
+    return {};
 }
 
 Ref<FmodBus> FmodCache::get_bus(const FMOD_GUID& guid) {
-    return buses.get(guid);
+    if (
+            HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
+                    buses.find(guid)
+            }
+    ) {
+        return iterator->value;
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find bus with guid: %s", fmod_guid_to_string(guid)));
+#endif
+
+    return {};
 }
 
-Ref<FmodBus> FmodCache::get_bus(const String& busPath) {
-    return buses.get(strings_to_guid.get(busPath));
+Ref<FmodBus> FmodCache::get_bus(const String& bus_path) {
+    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(bus_path)}) {
+        return get_bus(iterator->value);
+    }
+
+#ifdef DEBUG_ENABLED
+    GODOT_LOG_WARNING(vformat("Cannot find bus with path: %s", bus_path));
+#endif
+
+    return {};
 }
 
 Ref<FmodEventDescription> FmodCache::get_event(const FMOD_GUID& guid) {

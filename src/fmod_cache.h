@@ -77,9 +77,9 @@ namespace godot {
         bool has_event_path(const String& eventPath);
 
         Ref<FmodVCA> get_vca(const FMOD_GUID& guid);
-        Ref<FmodVCA> get_vca(const String& vcaPath);
+        Ref<FmodVCA> get_vca(const String& vca_path);
         Ref<FmodBus> get_bus(const FMOD_GUID& guid);
-        Ref<FmodBus> get_bus(const String& busPath);
+        Ref<FmodBus> get_bus(const String& bus_path);
         Ref<FmodEventDescription> get_event(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
         FMOD_GUID get_event_guid(const String& event_path);
