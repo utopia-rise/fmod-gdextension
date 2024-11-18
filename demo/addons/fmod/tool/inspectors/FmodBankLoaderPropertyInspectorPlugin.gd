@@ -17,4 +17,4 @@ func _parse_category(object: Object, category: String):
 	if category != "FmodBankLoader":
 		return
 	var editor_property := FmodBankPathEditorProperty.new(_open_project_explorer_callable)
-	add_property_editor_for_multiple_properties("Fmod banks", PackedStringArray(["bank_paths"]), editor_property)
+	add_property_editor("bank_paths", editor_property, false, "Fmod banks")

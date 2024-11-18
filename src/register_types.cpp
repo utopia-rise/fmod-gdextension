@@ -12,6 +12,7 @@
 #include "studio/fmod_event.h"
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
+#include "fmod_string_names.h"
 
 #ifdef TOOLS_ENABLED
 #include <tools//fmod_editor_export_plugin.h>
@@ -64,6 +65,7 @@ void initialize_fmod() {
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
         // initialise filerunner singleton by calling it.
+        FmodStringNames::create();
         Callbacks::GodotFileRunner::get_singleton();
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
@@ -112,7 +114,10 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
-    if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) { Callbacks::GodotFileRunner::get_singleton()->finish(); }
+    if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
+        Callbacks::GodotFileRunner::get_singleton()->finish();
+        FmodStringNames::free();
+    }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         fmod_singleton->shutdown();
 
