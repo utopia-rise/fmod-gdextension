@@ -14,6 +14,9 @@ namespace godot {
         void set_bank_paths(const Array& p_paths);
         const Array& get_bank_paths() const;
 
+        bool _property_can_revert(const StringName& p_property) const;
+        bool _property_get_revert(const StringName& p_property, Variant& result) const;
+
     private:
         Vector<Ref<FmodBank>> bank;
         Array bank_paths;
