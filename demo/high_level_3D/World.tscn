@@ -50,18 +50,12 @@ script = ExtResource("4_ewod2")
 event_name = "event:/Vehicles/Car Engine"
 event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
 autoplay = true
-event_parameter/RPM/id = 5864137074015534804
-event_parameter/RPM/value = 1000.0
-event_parameter/RPM/min_value = 0.0
-event_parameter/RPM/max_value = 10000.0
-event_parameter/RPM/default_value = 0.0
-event_parameter/RPM/variant_type = 3
-event_parameter/Load/id = -1795603775021193717
-event_parameter/Load/value = -1.0
-event_parameter/Load/min_value = -1.0
-event_parameter/Load/max_value = 1.0
-event_parameter/Load/default_value = -1.0
-event_parameter/Load/variant_type = 3
+fmod_parameters/RPM/id = 5864137074015534804
+fmod_parameters/RPM = 600.0
+fmod_parameters/RPM/variant_type = 3
+fmod_parameters/Load/id = -1795603775021193717
+fmod_parameters/Load = -1.0
+fmod_parameters/Load/variant_type = 3
 script = ExtResource("4_vlj6k")
 
 [node name="Ball2" parent="." instance=ExtResource("3_bkia1")]
@@ -72,18 +66,12 @@ sleeping = true
 event_name = "event:/Weapons/Explosion"
 event_guid = "{1f687138-e06c-40f5-9bac-57f84bbcedd3}"
 volume = 0.5
-event_parameter/Size/id = 6419405856426461066
-event_parameter/Size/value = 0.5
-event_parameter/Size/min_value = 0.0
-event_parameter/Size/max_value = 3.0
-event_parameter/Size/default_value = 0.0
-event_parameter/Size/variant_type = 3
-event_parameter/Distance/id = -6363846794978107960
-event_parameter/Distance/value = 3.40282e+38
-event_parameter/Distance/min_value = 0.0
-event_parameter/Distance/max_value = 100.0
-event_parameter/Distance/default_value = 3.40282e+38
-event_parameter/Distance/variant_type = 3
+fmod_parameters/Size/id = 6419405856426461066
+fmod_parameters/Size = 0.5
+fmod_parameters/Size/variant_type = 3
+fmod_parameters/Distance/id = -6363846794978107960
+fmod_parameters/Distance = 3.40282e+38
+fmod_parameters/Distance/variant_type = 3
 script = ExtResource("4_mxf3j")
 
 [node name="Ball3" parent="." instance=ExtResource("3_bkia1")]
@@ -94,12 +82,9 @@ event_name = "event:/Interactables/Barrel Roll"
 event_guid = "{c42c2240-c4b6-42ed-a473-1a47f19945ea}"
 autoplay = true
 volume = 0.5
-event_parameter/Speed/id = 841507833874797062
-event_parameter/Speed/value = 0.0
-event_parameter/Speed/min_value = 0.0
-event_parameter/Speed/max_value = 8.0
-event_parameter/Speed/default_value = 0.0
-event_parameter/Speed/variant_type = 3
+fmod_parameters/Speed/id = 841507833874797062
+fmod_parameters/Speed = 0.0
+fmod_parameters/Speed/variant_type = 3
 script = ExtResource("5_d681a")
 
 [node name="Wall" parent="." instance=ExtResource("4_jv1x4")]

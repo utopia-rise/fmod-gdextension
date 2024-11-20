@@ -7,4 +7,4 @@ func _process(_delta: float):
 	var value:= parent.angular_velocity.length() / 2
 	if value < 0.1:
 		value = 0
-	self["event_parameter/Speed/value"] = value
+	self["fmod_parameters/Speed"] = value
