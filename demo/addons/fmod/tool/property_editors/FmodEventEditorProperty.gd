@@ -1,7 +1,7 @@
 @tool class_name FmodEventEditorProperty extends FmodPathEditorProperty
 
 
-static var EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "event_parameter"
+static var EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "fmod_parameters"
 
 var former_event_description: FmodEventDescription
 
@@ -58,10 +58,7 @@ func _update_parameters():
 		
 		var parameter_name = param.get_name()
 		var parameter_id_param = "%s/%s/id" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
-		var parameter_value_param = "%s/%s/value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
-		var parameter_min_value_param = "%s/%s/min_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
-		var parameter_max_value_param = "%s/%s/max_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
-		var parameter_default_value_param = "%s/%s/default_value" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
+		var parameter_value_param = "%s/%s" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_variant_type = "%s/%s/variant_type" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		var parameter_labels = "%s/%s/labels" % [EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name]
 		
@@ -92,12 +89,6 @@ func _update_parameters():
 			get_edited_object()[parameter_id_param] = parameter_id
 		if not are_properties_already_in_node or get_edited_object()[parameter_value_param] == null:
 			get_edited_object()[parameter_value_param] = default_value
-		if not are_properties_already_in_node or get_edited_object()[parameter_min_value_param] == null:
-			get_edited_object()[parameter_min_value_param] = minimum_value
-		if not are_properties_already_in_node or get_edited_object()[parameter_max_value_param] == null:
-			get_edited_object()[parameter_max_value_param] = maximum_value
-		if not are_properties_already_in_node or get_edited_object()[parameter_default_value_param] == null:
-			get_edited_object()[parameter_default_value_param] = default_value
 		if not are_properties_already_in_node or get_edited_object()[parameter_variant_type] == null:
 			get_edited_object()[parameter_variant_type] = variant_type
 		if param.is_labeled() and (not are_properties_already_in_node or get_edited_object()[parameter_labels] == null):

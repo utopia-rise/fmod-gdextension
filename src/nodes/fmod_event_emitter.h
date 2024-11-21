@@ -16,7 +16,7 @@ static constexpr const char* STARTED_SIGNAL_STRING = "started";
 static constexpr const char* RESTARTED_SIGNAL_STRING = "restarted";
 static constexpr const char* STOPPED_SIGNAL_STRING = "stopped";
 
-static constexpr const char* EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "event_parameter";
+static constexpr const char* EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "fmod_parameters";
 
 namespace godot {
 
@@ -25,14 +25,12 @@ namespace godot {
         struct Parameter : public FmodServer::ParameterValue {
             String name;
             uint64_t id;
-            Variant min_value;
-            Variant max_value;
-            Variant default_value;
             PackedStringArray labels;
 
             bool operator==(const Parameter& parameter) const { return id == parameter.id; }
         };
 
+        mutable Ref<FmodEventDescription> _event_description;
         Ref<FmodEvent> _event;
 
         String _event_name;
@@ -101,14 +99,17 @@ namespace godot {
     private:
         template<bool is_one_shot> void _play(bool should_start_event);
         void set_space_attribute(const Ref<FmodEvent>& p_event) const;
+        void _set_parameter_value(Parameter* parameter, const Variant& p_property);
         void apply_parameters();
         void free();
-        Ref<FmodEventDescription> _load_event_description() const;
-        void load_event();
+        void _load_event_description_if_needed() const;
+        void _load_event();
+        void _unload_event();
         Ref<FmodEvent> _create_event();
         Parameter* _find_parameter(const String& p_name) const;
         Parameter* _find_parameter(uint64_t p_id) const;
         void _stop_and_restart_if_autoplay();
+        Ref<FmodParameterDescription> _get_parameter_description(const Parameter& parameter) const;
 
 
         static bool _should_load_by_event_name();
@@ -135,7 +136,7 @@ namespace godot {
             play();
         } else if (_preload_event) {
             // No need to preload if autoplay is on because event is loaded anyway.
-            load_event();
+            _load_event();
         }
     }
 
@@ -242,7 +243,7 @@ namespace godot {
         if (is_one_shot) {
             event = _create_event();
         } else {
-            if (_event.is_null() || !_event->is_valid()) { load_event(); }
+            if (_event.is_null() || !_event->is_valid()) { _load_event(); }
 
             event = _event;
         }
@@ -291,17 +292,7 @@ namespace godot {
             parameter->should_load_by_id = false;
         }
 
-        parameter->value = p_property;
-
-        if (_event.is_null() || !_event->is_valid()) { return; }
-
-#ifdef TOOLS_ENABLED
-        if (!Engine::get_singleton()->is_editor_hint()) {
-#endif
-            apply_parameters();
-#ifdef TOOLS_ENABLED
-        }
-#endif
+        _set_parameter_value(parameter, p_property);
     }
 
     template<class Derived, class NodeType>
@@ -326,6 +317,97 @@ namespace godot {
             parameter->identifier.id = p_id;
         }
 
+        _set_parameter_value(parameter, p_property);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_paused(bool p_is_paused) {
+        if (_event.is_null() || !_event->is_valid()) { return; }
+        _event->set_paused(p_is_paused);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_load_event_description_if_needed() const {
+        if (!_event_description.is_null()) {
+            return;
+        }
+
+        if (_should_load_by_event_name()) {
+#ifdef DEBUG_ENABLED
+            if (FmodServer::get_singleton()->check_event_path(_event_name)) {
+#endif
+                _event_description = FmodServer::get_singleton()->get_event(_event_name);
+#ifdef DEBUG_ENABLED
+            } else {
+                GODOT_LOG_ERROR(vformat("Cannot find event with path %s, will try with guid", _event_name));
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
+                                "only a debug feature");
+                if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
+                    _event_description = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
+                } else {
+                    GODOT_LOG_ERROR(
+                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
+                    );
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
+                                    "is only a debug feature");
+                }
+            }
+#endif
+        } else {
+#ifdef DEBUG_ENABLED
+            if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
+#endif
+                _event_description = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
+#ifdef DEBUG_ENABLED
+            } else {
+                GODOT_LOG_ERROR(vformat("Cannot find event with guid %s, will try with guid", get_event_guid()));
+                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
+                                "only a debug feature");
+                if (FmodServer::get_singleton()->check_event_path(_event_name)) {
+                    _event_description = FmodServer::get_singleton()->get_event(_event_name);
+                } else {
+                    GODOT_LOG_ERROR(
+                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
+                    );
+                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
+                                    "is only a debug feature");
+                }
+            }
+#endif
+        }
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_load_event() {
+        _event = _create_event();
+
+        if (_event.is_null()) {
+            return;
+        }
+
+        _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_unload_event() {
+        _event_description = Ref<FmodEventDescription>();
+        _event = Ref<FmodEvent>();
+    }
+
+    template<class Derived, class NodeType>
+    Ref<FmodEvent> FmodEventEmitter<Derived, NodeType>::_create_event() {
+        _load_event_description_if_needed();
+
+        if (_event_description.is_null()) {
+            return Ref<FmodEvent>();
+        }
+
+        return FmodServer::get_singleton()->create_event_instance_from_description(_event_description);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_set_parameter_value(FmodEventEmitter::Parameter* parameter,
+                                                                   const Variant& p_property) {
         parameter->value = p_property;
 
         if (_event.is_null() || !_event->is_valid()) { return; }
@@ -337,86 +419,6 @@ namespace godot {
 #ifdef TOOLS_ENABLED
         }
 #endif
-    }
-
-    template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::set_paused(bool p_is_paused) {
-        if (_event.is_null() || !_event->is_valid()) { return; }
-        _event->set_paused(p_is_paused);
-    }
-
-    template<class Derived, class NodeType>
-    Ref<FmodEventDescription> FmodEventEmitter<Derived, NodeType>::_load_event_description() const {
-        Ref<FmodEventDescription> ret;
-        if (_should_load_by_event_name()) {
-#ifdef DEBUG_ENABLED
-            if (FmodServer::get_singleton()->check_event_path(_event_name)) {
-#endif
-                ret = FmodServer::get_singleton()->get_event(_event_name);
-#ifdef DEBUG_ENABLED
-            } else {
-                GODOT_LOG_ERROR(vformat("Cannot find event with path %s, will try with guid", _event_name));
-                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
-                                "only a debug feature");
-                if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
-                    ret = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
-                } else {
-                    GODOT_LOG_ERROR(
-                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
-                    );
-                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
-                                    "is only a debug feature");
-                    return ret;
-                }
-            }
-#endif
-        } else {
-#ifdef DEBUG_ENABLED
-            if (FmodServer::get_singleton()->check_event_guid_internal(_event_guid)) {
-#endif
-                ret = FmodServer::get_singleton()->get_event_from_guid_internal(_event_guid);
-#ifdef DEBUG_ENABLED
-            } else {
-                GODOT_LOG_ERROR(vformat("Cannot find event with guid %s, will try with guid", get_event_guid()));
-                GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback is "
-                                "only a debug feature");
-                if (FmodServer::get_singleton()->check_event_path(_event_name)) {
-                    ret = FmodServer::get_singleton()->get_event(_event_name);
-                } else {
-                    GODOT_LOG_ERROR(
-                      vformat("Cannot find event with guid %s and path %s. Please set right data from editor.", get_event_guid(), _event_name)
-                    );
-                    GODOT_LOG_ERROR("You should fix this before releasing your game, check event exists and fallback "
-                                    "is only a debug feature");
-                    return ret;
-                }
-            }
-#endif
-        }
-
-        return ret;
-    }
-
-    template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::load_event() {
-        _event = _create_event();
-
-        if (_event.is_null()) {
-            return;
-        }
-
-        _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
-    }
-
-    template<class Derived, class NodeType>
-    Ref<FmodEvent> FmodEventEmitter<Derived, NodeType>::_create_event() {
-        Ref<FmodEventDescription> desc = _load_event_description();
-
-        if (desc.is_null()) {
-            return Ref<FmodEvent>();
-        }
-
-        return FmodServer::get_singleton()->create_event_instance_from_description(desc);
     }
 
     template<class Derived, class NodeType>
@@ -462,9 +464,10 @@ namespace godot {
 
         stop();
 
-        _event = Ref<FmodEvent>();
+        _unload_event();
+
         if (_preload_event) {
-            load_event();
+            _load_event();
         }
 
         _parameters.clear();
@@ -619,6 +622,12 @@ namespace godot {
             parameter->should_load_by_id = !_should_load_by_event_name();
         }
 
+        if (parts.size() == 1) {
+            _set_parameter_value(parameter, p_property);
+
+            return true;
+        }
+
         const String& parameter_end = parts[1];
         if (parameter_end == "id") {
             uint64_t parameter_id = p_property.operator uint64_t();
@@ -631,35 +640,6 @@ namespace godot {
             }
 
             parameter->identifier.name = &parameter->name;
-            return true;
-        }
-
-        if (parameter_end == "value") {
-            parameter->value = p_property;
-
-#ifdef TOOLS_ENABLED
-            if (!Engine::get_singleton()->is_editor_hint()) {
-#endif
-                apply_parameters();
-#ifdef TOOLS_ENABLED
-            }
-#endif
-
-            return true;
-        }
-
-        if (parameter_end == "min_value") {
-            parameter->min_value = p_property;
-            return true;
-        }
-
-        if (parameter_end == "max_value") {
-            parameter->max_value = p_property;
-            return true;
-        }
-
-        if (parameter_end == "default_value") {
-            parameter->default_value = p_property;
             return true;
         }
 
@@ -686,29 +666,14 @@ namespace godot {
 
         if (!parameter) { return false; }
 
-        const String& parameter_end = parts[1];
-        if (parameter_end == "id") {
-            r_property = parameter->id;
-            return true;
-        }
-
-        if (parameter_end == "value") {
+        if (parts.size() == 1) {
             r_property = parameter->value;
             return true;
         }
 
-        if (parameter_end == "min_value") {
-            r_property = parameter->min_value;
-            return true;
-        }
-
-        if (parameter_end == "max_value") {
-            r_property = parameter->max_value;
-            return true;
-        }
-
-        if (parameter_end == "default_value") {
-            r_property = parameter->default_value;
+        const String& parameter_end = parts[1];
+        if (parameter_end == "id") {
+            r_property = parameter->id;
             return true;
         }
 
@@ -731,7 +696,7 @@ namespace godot {
 
         PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
-        if (parts[1] == "value") { return true; }
+        if (parts.size() == 1) { return true; }
 
         return false;
     }
@@ -746,8 +711,8 @@ namespace godot {
 
         if (!parameter) { return false; }
 
-        if (parts[1] == "value") {
-            r_property = parameter->default_value;
+        if (parts.size() == 1) {
+            r_property = _get_parameter_description(*parameter)->get_default_value();
             return true;
         }
 
@@ -756,11 +721,23 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_get_property_list(List<PropertyInfo>* p_list) const {
+        p_list->push_back(
+            PropertyInfo(
+                Variant::Type::DICTIONARY,
+                EVENT_PARAMETER_PREFIX_FOR_PROPERTIES,
+                PROPERTY_HINT_NONE,
+                "",
+                PROPERTY_USAGE_NO_EDITOR
+            )
+        );
+
         for (const Parameter& parameter : _parameters) {
             const String& parameter_name {parameter.name};
 
-            const float parameter_min_value {parameter.min_value};
-            const float parameter_max_value {parameter.max_value};
+            Ref<FmodParameterDescription> parameter_description{_get_parameter_description(parameter) };
+
+            const float parameter_min_value {parameter_description->get_minimum()};
+            const float parameter_max_value {parameter_description->get_maximum()};
             const Variant::Type parameter_variant_type {parameter.variant_type};
 
             p_list->push_back(
@@ -771,7 +748,7 @@ namespace godot {
                 p_list->push_back(
                   PropertyInfo(
                     parameter_variant_type,
-                    vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    vformat("%s/%s", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                     PROPERTY_HINT_ENUM,
                     vformat(String(",").join(parameter.labels))
                   )
@@ -789,42 +766,12 @@ namespace godot {
                 p_list->push_back(
                   PropertyInfo(
                     parameter_variant_type,
-                    vformat("%s/%s/value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    vformat("%s/%s", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                     PROPERTY_HINT_RANGE,
                     vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
                   )
                 );
             }
-
-            p_list->push_back(
-              PropertyInfo(
-                parameter_variant_type,
-                vformat("%s/%s/min_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_RANGE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
-
-            p_list->push_back(
-              PropertyInfo(
-                parameter_variant_type,
-                vformat("%s/%s/max_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_RANGE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
-
-            p_list->push_back(
-              PropertyInfo(
-                parameter_variant_type,
-                vformat("%s/%s/default_value", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
-                PROPERTY_HINT_NONE,
-                "",
-                PROPERTY_USAGE_NO_EDITOR
-              )
-            );
 
             p_list->push_back(
               PropertyInfo(
@@ -836,6 +783,16 @@ namespace godot {
               )
             );
         }
+    }
+
+    template<class Derived, class NodeType>
+    Ref<FmodParameterDescription>
+    FmodEventEmitter<Derived, NodeType>::_get_parameter_description(const FmodEventEmitter::Parameter& parameter) const {
+        _load_event_description_if_needed();
+
+        return parameter.should_load_by_id
+               ? _event_description->get_parameter_by_id(parameter.id)
+               : _event_description->get_parameter_by_name(parameter.name);
     }
 
 #ifdef TOOLS_ENABLED
