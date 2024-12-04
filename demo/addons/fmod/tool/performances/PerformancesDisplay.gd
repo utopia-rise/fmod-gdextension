@@ -35,6 +35,27 @@ func _enter_tree():
 	add_monitor(FILE_STREAM_CATEGORY, func(): return performance_data.stream_bytes_read)
 	add_monitor(FILE_OTHER_CATEGORY, func(): return performance_data.other_bytes_read)
 
+func _exit_tree() -> void:
+	remove_monitor(CORE_CPU_DSP_CATEGORY)
+	remove_monitor(CORE_CPU_GEOMETRY_CATEGORY)
+	remove_monitor(CORE_CPU_STREAM_CATEGORY)
+	remove_monitor(CORE_CPU_UPDATE_CATEGORY)
+	remove_monitor(CORE_CPU_CONVOLUTION_THREAD1_CATEGORY)
+	remove_monitor(CORE_CPU_CONVOLUTION_THREAD2_CATEGORY)
+	
+	remove_monitor(STUDIO_CPU_UPDATE_CATEGORY)
+	
+	remove_monitor(MEMORY_CURRENTLY_ALLOCATED_CATEGORY)
+	remove_monitor(MEMORY_MAX_ALLOCATED_CATEGORY)
+	
+	remove_monitor(FILE_SAMPLE_CATEGORY)
+	remove_monitor(FILE_STREAM_CATEGORY)
+	remove_monitor(FILE_OTHER_CATEGORY)
+
 func add_monitor(title: String, callable: Callable) -> void:
 	if not Performance.has_custom_monitor(title):
 		Performance.add_custom_monitor(title, callable)
+
+func remove_monitor(title: String) -> void:
+	if Performance.has_custom_monitor(title):
+		Performance.remove_custom_monitor(title)
