@@ -3,6 +3,8 @@
 #include "fmod_editor_plugin.h"
 
 #include "fmod_editor_export_plugin.h"
+#include "classes/os.hpp"
+#include "resources/fmod_plugins_settings.h"
 
 #include <constants.h>
 #include <fmod_server.h>
@@ -64,12 +66,26 @@ void FmodEditorPlugin::_ready() {
       Variant::Type::INT
     );
 
-    const String& bank_path_option_name =
+    String bank_path_option_name =
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::BANKS_PATH_OPTION);
+
     add_setting(bank_path_option_name,
       FmodGeneralSettings::DEFAULT_BANKS_PATH,
       Variant::Type::STRING,
       PROPERTY_HINT_DIR
+    );
+
+    add_setting(
+            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::BASE_PATH_OPTION),
+        FmodPluginsSettings::DEFAULT_BASE_PATH,
+        Variant::Type::STRING,
+        PROPERTY_HINT_DIR
+    );
+
+    add_setting(
+            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::DYNAMIC_PLUGIN_LIST_OPTION),
+            PackedStringArray(),
+            Variant::Type::PACKED_STRING_ARRAY
     );
 
     add_setting(

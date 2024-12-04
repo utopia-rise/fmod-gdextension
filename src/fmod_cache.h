@@ -30,11 +30,13 @@ namespace godot {
         friend class FmodServer;
 
         FMOD::Studio::System* system;
+        FMOD::System* core_system;
 
         List<Ref<FmodBank>> loading_banks;
 
         HashMap<String, Ref<FmodFile>> files;
         HashMap<String, FmodBank*> banks;
+        Vector<uint32_t> plugin_handles;
 
         HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> event_descriptions;
         HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> buses;
@@ -48,7 +50,7 @@ namespace godot {
     public:
         FmodCache() = delete;
         FmodCache(const FmodCache& other) = delete;
-        explicit FmodCache(FMOD::Studio::System* p_system);
+        FmodCache(FMOD::Studio::System* p_system, FMOD::System* p_core_system);
 
         ~FmodCache();
 
@@ -57,7 +59,13 @@ namespace godot {
         Ref<FmodBank> get_bank(const String& bankPath);
         void remove_bank(const String& bank_path);
 
-        Ref<FmodFile> add_file(const String& file_path, unsigned int flag);
+#ifndef IOS_ENABLED
+        uint32_t add_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+        bool has_plugin(uint32_t p_plugin_handle) const;
+        void remove_plugin(uint32_t p_plugin_handle);
+#endif
+
+        Ref<FmodFile> add_file(const String& filePath, unsigned int flag);
         bool has_file(const String& filePath);
         Ref<FmodFile> get_file(const String& filePath);
         void remove_file(const String& filePath);

@@ -3,6 +3,8 @@
 #include "data/performance_data.h"
 #include "helpers/common.h"
 #include "helpers/maths.h"
+#include "classes/os.hpp"
+#include "classes/dir_access.hpp"
 
 #include <fmod_server.h>
 
@@ -81,9 +83,15 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
 
+    // BANKS
     ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
+
+    // PLUGINS
+    ClassDB::bind_method(D_METHOD("load_plugin", "p_plugin_path", "p_priority"), &FmodServer::load_plugin, DEFVAL(0));
+    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_path"), &FmodServer::unload_plugin);
+    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_path"), &FmodServer::is_plugin_loaded);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
@@ -201,7 +209,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         )) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
-    cache = new FmodCache(system);
+    cache = new FmodCache(system, coreSystem);
 }
 
 void FmodServer::update() {
@@ -523,6 +531,81 @@ void FmodServer::unload_bank(const String& pathToBank) {
 
 bool FmodServer::banks_still_loading() {
     return cache->is_loading();
+}
+
+String FmodServer::get_plugins_base_path(const Ref<FmodPluginsSettings>& p_settings) {
+#ifdef TOOLS_ENABLED
+    return p_settings->get_plugins_base_path();
+#else
+    return OS::get_singleton()
+        ->get_executable_path()
+        .get_base_dir()
+#ifdef MACOS_ENABLED
+        .path_join("../PlugIns/")
+#endif
+    ;
+#endif
+}
+
+Vector<String> FmodServer::get_plugins_libraries_paths(const Ref<FmodPluginsSettings>& p_settings) {
+    String plugin_directory = get_plugins_base_path(p_settings);
+    String os_lower_name = OS::get_singleton()->get_name().to_lower();
+
+#ifdef TOOLS_ENABLED
+    plugin_directory = plugin_directory.path_join(os_lower_name);
+#endif
+
+    String plugin_extension;
+    String plugin_lib_prefix = "lib";
+    if (os_lower_name == "windows") {
+        plugin_extension = "dll";
+        plugin_lib_prefix = "";
+    } else if (os_lower_name == "macos") {
+        plugin_extension = "dylib";
+    } else {
+        plugin_extension = "so";
+    }
+
+    const PackedStringArray& plugin_list = p_settings->get_dynamic_plugin_list();
+
+    Vector<String> result;
+
+    for (const String& plugin : plugin_list) {
+        result.append(plugin_directory.path_join(vformat("%s%s.%s", plugin_lib_prefix, plugin, plugin_extension)));
+    }
+
+    return result;
+}
+
+void FmodServer::load_all_plugins(const Ref<FmodPluginsSettings>& p_settings) {
+#ifndef IOS_ENABLED
+    Vector<String> plugin_paths = get_plugins_libraries_paths(p_settings);
+    for (const String& path : plugin_paths) {
+#ifdef DEBUG_ENABLED
+        GODOT_LOG_INFO(vformat("Will load %s", path));
+#endif
+        load_plugin(path);
+    }
+#endif
+}
+
+uint32_t FmodServer::load_plugin(const String& p_plugin_path, uint32_t p_priority) {
+#ifndef IOS_ENABLED
+    return cache->add_plugin(p_plugin_path, p_priority);
+#endif
+    return 0xFFFFFFFF;
+}
+
+void FmodServer::unload_plugin(uint32_t p_plugin_handle) {
+    cache->remove_plugin(p_plugin_handle);
+}
+
+bool FmodServer::is_plugin_loaded(uint32_t p_plugin_handle) {
+#ifndef IOS_ENABLED
+    return cache->has_plugin(p_plugin_handle);
+#else
+    return false;
+#endif
 }
 
 bool FmodServer::check_vca_guid(const String& guid) {

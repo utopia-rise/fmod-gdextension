@@ -2,15 +2,18 @@
 #include "fmod_cache.h"
 
 #include "helpers/common.h"
+#include "classes/project_settings.hpp"
 
 using namespace godot;
 
-FmodCache::FmodCache(FMOD::Studio::System* p_system) {
-    system = p_system;
+FmodCache::FmodCache(FMOD::Studio::System* p_system, FMOD::System* p_core_system) :
+    system(p_system), core_system(p_core_system) {
+
 }
 
 FmodCache::~FmodCache() {
     system = nullptr;
+    core_system = nullptr;
 }
 
 void FmodCache::update_pending() {
@@ -71,6 +74,30 @@ bool FmodCache::has_bank(const String& bankPath) {
 Ref<FmodBank> FmodCache::get_bank(const String& bankPath) {
     return banks.get(bankPath);
 }
+
+#ifndef IOS_ENABLED
+
+uint32_t FmodCache::add_plugin(const String& p_plugin_path, uint32_t p_priority) {
+    uint32_t handle;
+    ERROR_CHECK(core_system->loadPlugin(ProjectSettings::get_singleton()->globalize_path(p_plugin_path).utf8().get_data(), &handle, p_priority));
+    plugin_handles.append(handle);
+    return handle;
+}
+
+bool FmodCache::has_plugin(uint32_t p_plugin_handle) const {
+    return plugin_handles.has(p_plugin_handle);
+}
+
+void FmodCache::remove_plugin(uint32_t p_plugin_handle) {
+    if (!has_plugin(p_plugin_handle)) {
+        GODOT_LOG_ERROR(vformat("Cannot unload plugin with path %s, not in cache.", p_plugin_handle));
+    }
+
+    ERROR_CHECK(core_system->unloadPlugin(p_plugin_handle));
+    plugin_handles.erase(p_plugin_handle);
+}
+
+#endif
 
 Ref<FmodFile> FmodCache::add_file(const String& file_path, unsigned int flag) {
     FMOD::System* core = nullptr;
