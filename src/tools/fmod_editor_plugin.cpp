@@ -3,6 +3,7 @@
 #include "fmod_editor_plugin.h"
 
 #include "fmod_editor_export_plugin.h"
+#include "classes/os.hpp"
 
 #include <constants.h>
 #include <fmod_server.h>
@@ -64,12 +65,23 @@ void FmodEditorPlugin::_ready() {
       Variant::Type::INT
     );
 
-    const String& bank_path_option_name =
+    String bank_path_option_name =
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::BANKS_PATH_OPTION);
+
     add_setting(bank_path_option_name,
       FmodGeneralSettings::DEFAULT_BANKS_PATH,
       Variant::Type::STRING,
       PROPERTY_HINT_DIR
+    );
+
+    String plugins_path_option_name =
+            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::PLUGINS_PATH_OPTION);
+
+    add_setting(
+        plugins_path_option_name,
+        FmodGeneralSettings::DEFAULT_PLUGINS_PATH,
+        Variant::Type::STRING,
+        PROPERTY_HINT_DIR
     );
 
     add_setting(
@@ -104,6 +116,31 @@ void FmodEditorPlugin::_ready() {
       FmodSound3DSettings::DEFAULT_ROLLOFF_SCALE,
       Variant::Type::FLOAT
     );
+
+    String plugins_root {ProjectSettings::get_singleton()->get_setting(plugins_path_option_name)};
+    String os_lower_name = OS::get_singleton()->get_name().to_lower();
+
+    if (DirAccess::open(plugins_root)->dir_exists(os_lower_name)) {
+        String plugins_os_dir {vformat("%s/%s", plugins_root, os_lower_name)};
+
+        //TODO: rework
+        String plugin_extension;
+        if (os_lower_name == "windows") {
+            plugin_extension = "dll";
+        } else if (os_lower_name == "macos") {
+            plugin_extension = "dylib";
+        } else {
+            plugin_extension = "so";
+        }
+
+        PackedStringArray plugin_paths;
+        list_files_in_folder(plugin_paths, plugins_root, plugin_extension);
+
+        for (const String& path: plugin_paths) {
+            GODOT_LOG_INFO(vformat("Will load %s", path));
+            FmodServer::get_singleton()->load_plugin(path);
+        }
+    }
 
     String banks_root = ProjectSettings::get_singleton()->get_setting(bank_path_option_name);
 

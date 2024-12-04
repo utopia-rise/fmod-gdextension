@@ -81,9 +81,15 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
 
+    // BANKS
     ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
+
+    // PLUGINS
+    ClassDB::bind_method(D_METHOD("load_plugin", "p_plugin_path", "p_priority"), &FmodServer::load_plugin, DEFVAL(0));
+    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_path"), &FmodServer::unload_plugin);
+    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_path"), &FmodServer::is_plugin_loaded);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
@@ -193,7 +199,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         )) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
-    cache = new FmodCache(system);
+    cache = new FmodCache(system, coreSystem);
 }
 
 void FmodServer::update() {
@@ -505,6 +511,26 @@ void FmodServer::unload_bank(const String& pathToBank) {
 
 bool FmodServer::banks_still_loading() {
     return cache->is_loading();
+}
+
+void FmodServer::load_plugin(const String& p_plugin_path, uint32_t p_priority) {
+#ifndef IOS_ENABLED
+    cache->add_plugin(p_plugin_path, p_priority);
+#endif
+}
+
+void FmodServer::unload_plugin(const String& p_plugin_path) {
+#ifndef IOS_ENABLED
+    cache->remove_plugin(p_plugin_path);
+#endif
+}
+
+bool FmodServer::is_plugin_loaded(const String& p_plugin_path) {
+#ifndef IOS_ENABLED
+    return cache->has_plugin(p_plugin_path);
+#else
+    return false;
+#endif
 }
 
 bool FmodServer::check_vca_guid(const String& guid) {

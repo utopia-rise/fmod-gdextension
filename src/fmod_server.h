@@ -202,6 +202,11 @@ namespace godot {
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
 
+        // PLUGINS
+        void load_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+        void unload_plugin(const String& p_plugin_path);
+        bool is_plugin_loaded(const String& p_plugin_path);
+
         // EVENTS
     private:
         template<EventIdentifierType parameter_type>

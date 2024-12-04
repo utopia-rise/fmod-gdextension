@@ -35,6 +35,7 @@ namespace godot {
         static constexpr const char* IS_LIVE_MEMORY_TRACKING_ENABLED_OPTION = "is_memory_tracking_enabled";
         static constexpr const char* DEFAULT_LISTENER_COUNT_OPTION = "default_listener_count";
         static constexpr const char* BANKS_PATH_OPTION = "banks_path";
+        static constexpr const char* PLUGINS_PATH_OPTION = "plugins_path";
         static constexpr const char* SHOULD_LOAD_BY_NAME = "should_load_by_name";
 
         static constexpr const int DEFAULT_CHANNEL_COUNT = 1024;
@@ -42,6 +43,7 @@ namespace godot {
         static constexpr const bool DEFAULT_IS_MEMORY_TRACKING = false;
         static constexpr const int DEFAULT_DEFAULT_LISTENER_COUNT = 1;
         static constexpr const char* DEFAULT_BANKS_PATH = "res://";
+        static constexpr const char* DEFAULT_PLUGINS_PATH = "res://";
         static constexpr const bool DEFAULT_SHOULD_LOAD_BY_NAME = false;
 
     private:
