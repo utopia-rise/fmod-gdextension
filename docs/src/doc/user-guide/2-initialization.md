@@ -44,7 +44,10 @@ Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.02/api/core-api-
 ## 3d Settings
 
 - "Doppler Scale": A scaling factor for doppler shift. Default 1.
-- "Distance Factor": A factor for converting game distance units to FMOD distance units. Default 1.
+- "Distance Factor": A factor for converting game distance units to FMOD distance units. Default 1.  
+  !!! warning
+  In 2D this value represents pixels, so you should set it to the number of pixel for your world meter (If your world
+  meter is 64px, set it to 64). In 3D this represents meter, so we recommend to set it to 1.
 - "Rolloff Scale": A scaling factor for distance attenuation. When a sound uses a roll-off mode other than
 FMOD_3D_CUSTOMROLLOFF and the distance is greater than the sound's minimum distance, the distance is scaled by the
 roll-off scale.
