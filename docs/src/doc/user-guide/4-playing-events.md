@@ -7,8 +7,6 @@ You have two ways of doing:
 
 ## FmodEventEmitter nodes
 
-//TODO
-
 `FmodEventEmitter2D` and `FmodEventEmitter3D` are nodes to play Fmod events and their position will be updated
 automatically.  
 Events and their parameters are loaded by id or name according to [Fmod General settings](./2-initialization.md#general).
