@@ -15,14 +15,14 @@ abstractions for convenience.
 
 ## Summary
 - Loading banks
-  - [Using node](4-loading-banks.md#fmodbankloader-node)
-  - [Using FmodServer](4-loading-banks.md#fmodserver-api)
+    - [Using node](4-loading-banks.md#fmodbankloader-node)
+    - [Using FmodServer](4-loading-banks.md#fmodserver-api)
 - Playing events
-  - [Using node](5-playing-events.md#fmodeventemitter-nodes)
-  - [Using FmodServer](5-playing-events.md#fmodserver-api)
+    - [Using node](5-playing-events.md#fmodeventemitter-nodes)
+    - [Using FmodServer](5-playing-events.md#fmodserver-api)
 - Listeners
-  - [Using node](6-listeners.md#fmod-listener-nodes)
-  - [Using FmodServer](6-listeners.md#using-fmodserver-api)
+    - [Using node](6-listeners.md#fmod-listener-nodes)
+    - [Using FmodServer](6-listeners.md#using-fmodserver-api)
 - [Playing sounds](7-playing-sounds.md)
 - [Other low level examples](8-other-low-level-examples.md)
 

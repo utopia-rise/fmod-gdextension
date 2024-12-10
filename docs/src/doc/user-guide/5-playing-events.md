@@ -13,12 +13,12 @@ Events and their parameters are loaded by id or name according to [Fmod General 
 ### Properties
 
 You first should set event that emitter will play. You can set name or guid manually or using event selection button.  
-Then you have few toogle options:
-- *attached*: if `true`, Fmod event position will be updated alongside node's position.
-- *autoplay*: if `true`, it will autoplay event, without need to call `play` method.
-- *auto_release*: if `true`, the emitter will be free when done playing event.
-- *allow_fadeout*: if `true`, event will be stop with fadeout mode.
-- *preload_event*: if `true`, event will be preloaded when node is ready.
+Then you have few toogle options:  
+- *attached*: if `true`, Fmod event position will be updated alongside node's position.  
+- *autoplay*: if `true`, it will autoplay event, without need to call `play` method.  
+- *auto_release*: if `true`, the emitter will be free when done playing event.  
+- *allow_fadeout*: if `true`, event will be stop with fadeout mode.  
+- *preload_event*: if `true`, event will be preloaded when node is ready.  
 
 #### Fmod parameters
 
@@ -38,10 +38,10 @@ func _process(_delta):
 To easily retrieve fmod parameters properties path, you can use godot's `Copy Property Path` functionality.  
 
 You can also use following methods:  
-- `get_parameter`: Get the value of a parameter using its name.
-- `set_parameter`: Set the value of a parameter using its name.
-- `get_parameter_by_id`: Get the value of a parameter using its id.
-- `set_parameter_by_id`: Set the value of a parameter using its id.
+- `get_parameter`: Get the value of a parameter using its name.  
+- `set_parameter`: Set the value of a parameter using its name.  
+- `get_parameter_by_id`: Get the value of a parameter using its id.  
+- `set_parameter_by_id`: Set the value of a parameter using its id.  
 
 Example:  
 ```gdscript
@@ -57,19 +57,19 @@ emitter.get_parameter_by_id(5864137074015534804)
 `FmodEventEmitter2D` and `FmodEventEmitter3D` emits signals:
 #### timeline_beat
 Emitted on fmod event's timeline beat callback.
-Parameters (as dictionary):
-- `beat`: Beat number within bar (starting from 1).
-- `bar`: Bar number (starting from 1).
-- `tempo`: Current tempo in beats per minute.
-- `time_signature_upper`: Current time signature upper number (beats per bar).
-- `time_signature_lower`: Current time signature lower number (beat unit).
-- `position`: Position of the beat on the timeline in milliseconds.
+Parameters (as dictionary):  
+- `beat`: Beat number within bar (starting from 1).  
+- `bar`: Bar number (starting from 1).  
+- `tempo`: Current tempo in beats per minute.  
+- `time_signature_upper`: Current time signature upper number (beats per bar).  
+- `time_signature_lower`: Current time signature lower number (beat unit).  
+- `position`: Position of the beat on the timeline in milliseconds.  
 
 #### timeline_marker:
 Emitted when fmod event timeline passes a named marker.
-Parameters (as dictionary):
-- `name`: Marker name.
-- `position`: Position of the marker on the timeline in milliseconds.
+Parameters (as dictionary):  
+- `name`: Marker name.  
+- `position`: Position of the marker on the timeline in milliseconds.  
 
 #### started
 Emitted when event starts and was not playing.
@@ -90,7 +90,7 @@ No parameters.
 Starts the event.
 
 *parameters:*  
-- `restart_if_playing`: If true, will restart event if it is already playing. Default value: `true`.
+- `restart_if_playing`: If true, will restart event if it is already playing. Default value: `true`.  
 
 #### play_one_shot
 
