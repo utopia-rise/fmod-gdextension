@@ -1,4 +1,4 @@
-# Other low level api examples
+# Other FmodServer api examples
 
 ## Muting all event
 

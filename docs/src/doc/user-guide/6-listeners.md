@@ -1,6 +1,6 @@
 # Listeners
 
-You can add FMOD listeners by using `FmodListener2D` and `FmodListener3D` nodes or by using low-level api.  
+In this guide we'll cover how to add FMOD listeners to your godot project.
 
 ## Fmod listener nodes
 
@@ -18,7 +18,7 @@ If `true`, listener will not update its position according to node's position.
 #### weight
 Used to compute the relative contribution to the final sound.
 
-## Using low-level api
+## Using FmodServer api
 
 You can add and remove listeners using `FmodServer` api:  
 

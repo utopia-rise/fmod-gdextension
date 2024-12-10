@@ -1,6 +1,6 @@
 # Playing sounds
 
-You can play sounds using low-level `FmodServer` api.  
+You can play sounds using `FmodServer` api.  
 
 Here is an example:  
 ```gdscript

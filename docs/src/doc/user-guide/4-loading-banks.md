@@ -1,9 +1,6 @@
 # Loading banks
 
 In this guide we'll explore how to load banks within your game.  
-There is two ways to load banks for your game:
-- Using an FmodBanksLoader node
-- Using low level functions
 
 ## FmodBankLoader node
 
@@ -22,9 +19,9 @@ line edit. You can also remove and re-order banks:
 Make sure to first place `Master.strings.bank` first, and `Master.bank` in second. Those banks are dependencies needed
 by other banks. So if you don't load them first, you won't be able to load other banks.
 
-## Low level api
+## FmodServer api
 
-You can also load banks using low-level api.  
+You can also load banks using `FmodServer` api.  
 For this purpose, you should use `load_bank` method of `FmodServer` singleton.  
 
 Here is an example:  

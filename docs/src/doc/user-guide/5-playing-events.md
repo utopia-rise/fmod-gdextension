@@ -1,9 +1,6 @@
 # Playing events
 
 In this guide we'll explore how to play Fmod events.  
-You have two ways of doing:
-- Using `FmodEventEmitter2D` or `FmodEventEmitter3D` node.
-- Using low-level api
 
 ## FmodEventEmitter nodes
 
@@ -129,9 +126,9 @@ event_emitter.set_programmer_callback("welcome") # welcome key from audio table 
 add_child(event_emitter)
 ```
 
-## Low-level api
+## FmodServer api
 
-You can also use low-level api to play events. Here is an example script:  
+You can also use `FmodServer` api to play events. Here is an example script:  
 ```gdscript
 extends Sprite2D
 
