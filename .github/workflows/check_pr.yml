@@ -70,7 +70,7 @@ jobs:
             shell: bash
 
           - name: MacOS Editor Compilation
-            os: "macos-13"
+            os: "macos-14"
             platform: macos
             target: editor
             fmod-executable-suffix: osx.dmg
@@ -82,14 +82,14 @@ jobs:
             shell: bash
 
           - name: MacOS Debug Compilation
-            os: "macos-13"
+            os: "macos-14"
             platform: macos
             target: template_debug
             fmod-executable-suffix: osx.dmg
             shell: bash
 
           - name: MacOS Release Compilation
-            os: "macos-13"
+            os: "macos-14"
             platform: macos
             target: template_release
             fmod-executable-suffix: osx.dmg
@@ -120,14 +120,14 @@ jobs:
             shell: bash
 
           - name: iOS Debug Compilation
-            os: "macos-13"
+            os: "macos-14"
             platform: ios
             target: template_debug
             fmod-executable-suffix: ios.dmg
             shell: bash
 
           - name: iOS Release Compilation
-            os: "macos-13"
+            os: "macos-14"
             platform: ios
             target: template_release
             fmod-executable-suffix: ios.dmg
