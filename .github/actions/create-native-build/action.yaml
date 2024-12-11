@@ -82,7 +82,7 @@ runs:
         cd ../../
 
     - name: create android fmod artifact
-      if: inputs.platform == 'android'
+      if: inputs.platform == 'android' && inputs.target == 'template_release'
       shell: ${{ inputs.shell }}
       run: |
         mkdir android-fmod-artifact
@@ -90,8 +90,8 @@ runs:
         cp android-plugin/library/src/main/resources/fmod-android-license.txt android-fmod-artifact/
 
     - name: Upload fmod jar
-      if: inputs.platform == 'android'
-      uses: actions/upload-artifact@v3
+      if: inputs.platform == 'android' && inputs.target == 'template_release'
+      uses: actions/upload-artifact@v4
       with:
         name: fmod-jar
         path: android-fmod-artifact
@@ -108,8 +108,8 @@ runs:
         scons platform=${{ inputs.platform }} generate_bindings=yes target=${{ inputs.target }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j${{ steps.cpu-cores.outputs.count }} ${{ inputs.flags }}
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.platform }}
+        name: ${{ inputs.platform }}-${{ inputs.target }}
         path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.*
         if-no-files-found: error

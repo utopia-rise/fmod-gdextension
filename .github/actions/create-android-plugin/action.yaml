@@ -11,7 +11,7 @@ runs:
         java-version: 17
 
     - name: Download fmod jar
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fmod-jar
         path: android-plugin/library/libraries/

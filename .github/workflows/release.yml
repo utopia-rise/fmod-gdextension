@@ -177,34 +177,88 @@ jobs:
       - name: Create android plugin
         uses: ./.github/actions/create-android-plugin
 
-      - name: Download linux libraries
+      - name: Download linux editor libraries
         uses: actions/download-artifact@v4
         with:
-          name: linux
+          name: linux-editor
           path: demo/addons/fmod/libs/linux/
 
-      - name: Download windows libraries
+      - name: Download linux template_debug libraries
         uses: actions/download-artifact@v4
         with:
-          name: windows
+          name: linux-template_debug
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download linux template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-template_release
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download windows editor libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-editor
           path: demo/addons/fmod/libs/windows/
 
-      - name: Download macos libraries
+      - name: Download windows template_debug libraries
         uses: actions/download-artifact@v4
         with:
-          name: macos
+          name: windows-template_debug
+          path: demo/addons/fmod/libs/windows/
+
+      - name: Download windows template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-template_release
+          path: demo/addons/fmod/libs/windows/
+
+      - name: Download macos editor libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-editor
           path: demo/addons/fmod/libs/macos/
 
-      - name: Download iOS libraries
+      - name: Download macos template_debug libraries
         uses: actions/download-artifact@v4
         with:
-          name: ios
+          name: macos-template_debug
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download macos template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-template_release
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download iOS template_debug libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-template_debug
           path: demo/addons/fmod/libs/iOS/
 
-      - name: Download android libraries
+      - name: Download iOS template_release libraries
         uses: actions/download-artifact@v4
         with:
-          name: android
+          name: ios-template_release
+          path: demo/addons/fmod/libs/iOS/
+
+      - name: Download android editor libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: android-editor
+          path: demo/addons/fmod/libs/android/
+
+      - name: Download android template_debug libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: android-template_debug
+          path: demo/addons/fmod/libs/android/
+
+      - name: Download android template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: android-template_release
           path: demo/addons/fmod/libs/android/
 
       - name: Create Release
