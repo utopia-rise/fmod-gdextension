@@ -156,7 +156,7 @@ namespace godot {
             "listener_index",
             PROPERTY_HINT_NONE,
             "",
-            PROPERTY_USAGE_EDITOR
+            PROPERTY_USAGE_DEFAULT
           ),
           "set_listener_index",
           "get_listener_index"
