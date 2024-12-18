@@ -21,7 +21,10 @@ class FmodStringNames {
 public:
     static FmodStringNames* get_instance();
 
+    static constexpr const char* EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "fmod_parameters";
+
     StringName bank_path_property_name;
+    StringName event_parameter_prefix_for_properties;
 };
 
 #endif //GODOTFMOD_FMOD_STRING_NAMES_H
