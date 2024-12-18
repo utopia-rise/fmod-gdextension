@@ -64,6 +64,8 @@ if env["platform"] == "macos":
         ]
     )
 
+    env.Append(LDFLAGS=["-headerpad_max_install_names"])
+
 elif env["platform"] == "linux":
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
