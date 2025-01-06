@@ -162,7 +162,7 @@ jobs:
       - name: Download godot engine
         if: matrix.platform != 'android' && matrix.platform != 'ios' && matrix.platform != 'windows' && matrix.target == 'editor'
         run: |
-          wget https://downloads.tuxfamily.org/godotengine/${{env.GODOT_VERSION}}/Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
+          wget https://github.com/godotengine/godot-builds/releases/download/${{env.GODOT_VERSION}}-stable/Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
           unzip Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
           rm Godot_v${{env.GODOT_VERSION}}-stable_${{ matrix.godot-executable-download-suffix }}
 
