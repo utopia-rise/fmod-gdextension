@@ -11,11 +11,13 @@
 using namespace godot;
 
 constexpr const char* FMOD_FILE_EXTENSIONS[4] {".bank", ".ogg", ".mp3", ".wav"};
-constexpr const char* ANDROID_BUILD_DIR = "res://android/build";
+constexpr const char* ANDROID_BUILD_DIRS[2] = { "res://android/build", "res:///android/build" };
 
 void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bool is_debug, const String& path, uint32_t flags) {
     PackedStringArray excluded_folders;
-    excluded_folders.append(ANDROID_BUILD_DIR);
+    for (const char* dir : ANDROID_BUILD_DIRS) {
+        excluded_folders.append(dir);
+    }
     for (const char* extension : FMOD_FILE_EXTENSIONS) {
         PackedStringArray files;
         list_files_in_folder(files, "res://", extension, excluded_folders);
