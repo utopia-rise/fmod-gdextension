@@ -61,6 +61,7 @@ if env["platform"] == "macos":
             "-framework",
             "Cocoa",
             "-Wl,-undefined,dynamic_lookup",
+            "-rpath", "@loader_path/.."
         ]
     )
 
@@ -148,24 +149,6 @@ def sys_exec(args):
     proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
     (out, err) = proc.communicate()
     return out.rstrip("\r\n").lstrip()
-
-
-#Necessary so the extension library can find the Fmod libraries
-if env["platform"] == "macos":
-    lib_name = "{}.{}.{}".format(
-        target,
-        target_name,
-        env["platform"],
-        env["target"]
-    )
-
-    def change_id(self, arg, env, executor = None):
-        sys_exec(["install_name_tool", "-id", "@rpath/%s" % lib_name , target])
-        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmodstudio, "@loader_path/../%s" % libfmodstudio, target])
-        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmod, "@loader_path/../%s" % libfmod, target])
-    change_id_action = Action('', change_id)
-
-    AddPostAction(library, change_id_action)
 
 
 if env["platform"] == "ios":

@@ -5,6 +5,7 @@
 
 #include <constants.h>
 #include <fmod_server.h>
+#include <fmod_string_names.h>
 
 #include <classes/engine.hpp>
 #include <classes/project_settings.hpp>
@@ -15,8 +16,6 @@ static constexpr const char* START_FAILED_SIGNAL_STRING = "start_failed";
 static constexpr const char* STARTED_SIGNAL_STRING = "started";
 static constexpr const char* RESTARTED_SIGNAL_STRING = "restarted";
 static constexpr const char* STOPPED_SIGNAL_STRING = "stopped";
-
-static constexpr const char* EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "fmod_parameters";
 
 namespace godot {
 
@@ -605,9 +604,10 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_set(const StringName& p_name, const Variant& p_property) {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (!p_name.begins_with(FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (p_name == FmodStringNames::get_instance()->event_parameter_prefix_for_properties) { return false; }
 
-        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
         const String& parameter_name {parts[0]};
 
@@ -658,9 +658,10 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_get(const StringName& p_name, Variant& r_property) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (!p_name.begins_with(FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (p_name == FmodStringNames::get_instance()->event_parameter_prefix_for_properties) { return false; }
 
-        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
         Parameter* parameter {_find_parameter(parts[0])};
 
@@ -692,9 +693,10 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_property_can_revert(const StringName& p_name) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (!p_name.begins_with(FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (p_name == FmodStringNames::get_instance()->event_parameter_prefix_for_properties) { return false; }
 
-        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
         if (parts.size() == 1) { return true; }
 
@@ -703,9 +705,10 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_property_get_revert(const StringName& p_name, Variant& r_property) const {
-        if (!p_name.begins_with(EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (!p_name.begins_with(FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)) { return false; }
+        if (p_name == FmodStringNames::get_instance()->event_parameter_prefix_for_properties) { return false; }
 
-        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
+        PackedStringArray parts {p_name.trim_prefix(vformat("%s/", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES)).split("/")};
 
         Parameter* parameter {_find_parameter(parts[0])};
 
@@ -724,7 +727,7 @@ namespace godot {
         p_list->push_back(
             PropertyInfo(
                 Variant::Type::DICTIONARY,
-                EVENT_PARAMETER_PREFIX_FOR_PROPERTIES,
+                FmodStringNames::get_instance()->event_parameter_prefix_for_properties,
                 PROPERTY_HINT_NONE,
                 "",
                 PROPERTY_USAGE_NO_EDITOR
@@ -741,14 +744,14 @@ namespace godot {
             const Variant::Type parameter_variant_type {parameter.variant_type};
 
             p_list->push_back(
-              PropertyInfo(Variant::Type::INT, vformat("%s/%s/id", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name), PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR)
+              PropertyInfo(Variant::Type::INT, vformat("%s/%s/id", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name), PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NO_EDITOR)
             );
 
             if (!parameter.labels.is_empty()) {
                 p_list->push_back(
                   PropertyInfo(
                     parameter_variant_type,
-                    vformat("%s/%s", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    vformat("%s/%s", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                     PROPERTY_HINT_ENUM,
                     vformat(String(",").join(parameter.labels))
                   )
@@ -756,7 +759,7 @@ namespace godot {
                 p_list->push_back(
                   PropertyInfo(
                     Variant::Type::PACKED_STRING_ARRAY,
-                    vformat("%s/%s/labels", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    vformat("%s/%s/labels", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                     PROPERTY_HINT_NONE,
                     "",
                     PROPERTY_USAGE_NO_EDITOR
@@ -766,7 +769,7 @@ namespace godot {
                 p_list->push_back(
                   PropertyInfo(
                     parameter_variant_type,
-                    vformat("%s/%s", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                    vformat("%s/%s", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                     PROPERTY_HINT_RANGE,
                     vformat("%s,%s,0.1", parameter_min_value, parameter_max_value)
                   )
@@ -776,7 +779,7 @@ namespace godot {
             p_list->push_back(
               PropertyInfo(
                 Variant::Type::INT,
-                vformat("%s/%s/variant_type", EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
+                vformat("%s/%s/variant_type", FmodStringNames::EVENT_PARAMETER_PREFIX_FOR_PROPERTIES, parameter_name),
                 PROPERTY_HINT_ENUM,
                 "",
                 PROPERTY_USAGE_NO_EDITOR
