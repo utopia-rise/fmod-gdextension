@@ -53,7 +53,7 @@ func _update_parameters():
 	var property_matching = existing_parameter_ids.map(func(id): return false)
 	
 	for param: FmodParameterDescription in event_description.get_parameters():
-		if param.is_global():
+		if param.is_global() or param.is_automatic() or param.is_read_only():
 			continue
 		
 		var parameter_name = param.get_name()
