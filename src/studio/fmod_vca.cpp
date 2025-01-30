@@ -17,10 +17,10 @@ void FmodVCA::_bind_methods() {
 
 float FmodVCA::get_volume() {
     float volume = 0.0f;
-    ERROR_CHECK(_wrapped->getVolume(&volume));
+    ERROR_CHECK_WITH_REASON(_wrapped->getVolume(&volume), vformat("Cannot get VCA %s volume.", get_path()));
     return volume;
 }
 
 void FmodVCA::set_volume(float volume) {
-    ERROR_CHECK(_wrapped->setVolume(volume));
+    ERROR_CHECK_WITH_REASON(_wrapped->setVolume(volume), vformat("Cannot set VCA %s volume to %f", get_path(), volume));
 }

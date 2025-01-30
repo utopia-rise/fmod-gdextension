@@ -52,16 +52,19 @@ void FmodEvent::_bind_methods() {
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
     float p = -1;
-    ERROR_CHECK(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p));
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p),
+                            vformat("Cannot get parameter %s", parameter_name));
     return p;
 }
 
 void FmodEvent::set_parameter_by_name(const String& parameter_name, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value));
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value),
+                            vformat("Cannot set parameter %s to value %f", parameter_name, value));
 }
 
 void FmodEvent::set_parameter_by_name_with_label(const String& parameter_name, const String& label, bool ignoreseekspeed) const {
-    ERROR_CHECK(_wrapped->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data(), ignoreseekspeed));
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data(), ignoreseekspeed),
+                            vformat("Cannot set parameter %s value to %s", parameter_name, label));
 }
 
 float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
@@ -70,7 +73,8 @@ float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
 
 float FmodEvent::get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const {
     float value = -1.0f;
-    ERROR_CHECK(_wrapped->getParameterByID(parameter_id, &value));
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, &value),
+                            vformat("Cannot get parameter with id: %d", fmod_parameter_id_to_ulong(parameter_id)));
     return value;
 }
 
@@ -79,11 +83,13 @@ void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {
 }
 
 void FmodEvent::set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByID(parameter_id, value));
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByID(parameter_id, value),
+                            vformat("Cannot set parameter with id %d to value %f", fmod_parameter_id_to_ulong(parameter_id), value));
 }
 
 void FmodEvent::set_parameter_by_fmod_id_with_label(const FMOD_STUDIO_PARAMETER_ID& parameter_id, const String& label, bool ignoreseekspeed) const {
-    ERROR_CHECK(_wrapped->setParameterByIDWithLabel(parameter_id, label.utf8().get_data(), ignoreseekspeed));
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByIDWithLabel(parameter_id, label.utf8().get_data(), ignoreseekspeed),
+                            vformat("Cannot set parameter to id %d to value %s", fmod_parameter_id_to_ulong(parameter_id), label));
 }
 
 void FmodEvent::set_parameter_by_id_with_label(uint64_t parameter_id, const String& label, bool ignoreseekspeed) const {

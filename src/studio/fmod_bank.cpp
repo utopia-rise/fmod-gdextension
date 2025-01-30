@@ -22,7 +22,8 @@ void FmodBank::_bind_methods() {
 
 int FmodBank::get_loading_state() {
     FMOD_STUDIO_LOADING_STATE state;
-    ERROR_CHECK(_wrapped->getLoadingState(&state));
+
+    ERROR_CHECK_WITH_REASON(_wrapped->getLoadingState(&state), vformat("Cannot get loading state for bank %s", get_path()));
     return state;
 }
 
@@ -40,7 +41,7 @@ int FmodBank::get_vca_count() const {
 
 int FmodBank::get_string_count() const {
     int count = -1;
-    ERROR_CHECK(_wrapped->getStringCount(&count));
+    ERROR_CHECK_WITH_REASON(_wrapped->getStringCount(&count), vformat("Cannot get string count for bank %s", get_path()));
     return count;
 }
 
@@ -77,7 +78,7 @@ void FmodBank::update_bank_data() {
 void FmodBank::load_all_vca() {
     FMOD::Studio::VCA* array[MAX_VCA_COUNT];
     int size = 0;
-    if (ERROR_CHECK(_wrapped->getVCAList(array, MAX_VCA_COUNT, &size))) {
+    if (ERROR_CHECK_WITH_REASON(_wrapped->getVCAList(array, MAX_VCA_COUNT, &size), vformat("Cannot get VCA list for bank %s", get_path()))) {
         CHECK_SIZE(MAX_VCA_COUNT, size, VCAs)
         VCAs.clear();
         for (int i = 0; i < size; ++i) {
@@ -90,7 +91,7 @@ void FmodBank::load_all_vca() {
 void FmodBank::load_all_buses() {
     FMOD::Studio::Bus* array[MAX_BUS_COUNT];
     int size = 0;
-    if (ERROR_CHECK(_wrapped->getBusList(array, MAX_BUS_COUNT, &size))) {
+    if (ERROR_CHECK_WITH_REASON(_wrapped->getBusList(array, MAX_BUS_COUNT, &size), vformat("Cannot get bus list for bank %s", get_path()))) {
         CHECK_SIZE(MAX_BUS_COUNT, size, buses)
         buses.clear();
         for (int i = 0; i < size; ++i) {
@@ -103,7 +104,7 @@ void FmodBank::load_all_buses() {
 void FmodBank::load_all_event_descriptions() {
     FMOD::Studio::EventDescription* array[MAX_EVENT_DESCRIPTION_COUNT];
     int size = 0;
-    if (ERROR_CHECK(_wrapped->getEventList(array, MAX_EVENT_DESCRIPTION_COUNT, &size))) {
+    if (ERROR_CHECK_WITH_REASON(_wrapped->getEventList(array, MAX_EVENT_DESCRIPTION_COUNT, &size), vformat("Cannot get event list for bank %s", get_path()))) {
         CHECK_SIZE(MAX_EVENT_DESCRIPTION_COUNT, size, Events)
         eventDescriptions.clear();
         for (int i = 0; i < size; ++i) {

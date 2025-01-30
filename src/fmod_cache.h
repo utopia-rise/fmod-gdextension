@@ -52,12 +52,12 @@ namespace godot {
 
         ~FmodCache();
 
-        Ref<FmodBank> add_bank(const String& bankPath, unsigned int flag);
+        Ref<FmodBank> add_bank(const String& bank_path, unsigned int flag);
         bool has_bank(const String& bankPath);
         Ref<FmodBank> get_bank(const String& bankPath);
-        void remove_bank(const String& bankPath);
+        void remove_bank(const String& bank_path);
 
-        Ref<FmodFile> add_file(const String& filePath, unsigned int flag);
+        Ref<FmodFile> add_file(const String& file_path, unsigned int flag);
         bool has_file(const String& filePath);
         Ref<FmodFile> get_file(const String& filePath);
         void remove_file(const String& filePath);
