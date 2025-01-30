@@ -48,6 +48,13 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_listener_mask", "get_listener_mask");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_node_attributes", "get_3d_attributes");
+
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_PLAYING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_SUSTAINING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPED);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_FORCEINT);
 }
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
@@ -106,10 +113,10 @@ void FmodEvent::event_key_off() const {
     ERROR_CHECK(_wrapped->keyOff());
 }
 
-int FmodEvent::get_playback_state() const {
-    int s = -1;
-    ERROR_CHECK(_wrapped->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE*) &s));
-    return s;
+FMOD_STUDIO_PLAYBACK_STATE FmodEvent::get_playback_state() const {
+    FMOD_STUDIO_PLAYBACK_STATE playback_state;
+    ERROR_CHECK(_wrapped->getPlaybackState(&playback_state));
+    return playback_state;
 }
 
 bool FmodEvent::get_paused() const {

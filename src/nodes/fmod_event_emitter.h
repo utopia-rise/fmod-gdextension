@@ -260,7 +260,7 @@ namespace godot {
             event->set_programmer_callback(_programmer_callback_sound_key);
         }
 
-        if (!should_start_event) {
+        if (!should_start_event && event->get_playback_state() != FMOD_STUDIO_PLAYBACK_STOPPED) {
             return;
         }
 
@@ -433,8 +433,14 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_event_name(const String& name) {
+        FMOD_GUID event_guid {FmodServer::get_singleton()->get_event_guid_internal(name)};
+
+        if (equals(_event_guid, event_guid)) {
+            return;
+        }
+
         _event_name = name;
-        _event_guid = FmodServer::get_singleton()->get_event_guid_internal(_event_name);
+        _event_guid = event_guid;
 
         _stop_and_restart_if_autoplay();
     }
@@ -446,7 +452,13 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_event_guid(const String& guid) {
-        _event_guid = string_to_fmod_guid(guid.utf8().get_data());
+        FMOD_GUID event_guid {string_to_fmod_guid(guid.utf8().get_data())};
+
+        if (equals(_event_guid, event_guid)) {
+            return;
+        }
+
+        _event_guid = event_guid;
         _event_name = FmodServer::get_singleton()->get_event_path_internal(_event_guid);
 
         _stop_and_restart_if_autoplay();

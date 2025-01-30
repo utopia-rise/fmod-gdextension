@@ -31,7 +31,7 @@ namespace godot {
         void start() const;
         void stop(int stopMode) const;
         void event_key_off() const;
-        int get_playback_state() const;
+        FMOD_STUDIO_PLAYBACK_STATE get_playback_state() const;
         bool get_paused() const;
         void set_paused(bool paused) const;
         float get_pitch() const;
@@ -60,4 +60,7 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
+
+VARIANT_ENUM_CAST(FMOD_STUDIO_PLAYBACK_STATE)
+
 #endif// GODOTFMOD_FMOD_EVENT_H

@@ -169,6 +169,20 @@ namespace godot {
         paramId.data1 = static_cast<unsigned int>((converted >> 32) & 0xFFFFFFFF);
         return paramId;
     }
+
+    static inline bool equals(const FMOD_GUID& first, const FMOD_GUID& second) {
+        return first.Data1 == second.Data1
+        && first.Data2 == second.Data2
+        && first.Data3 == second.Data3
+        && first.Data4[0] == second.Data4[0]
+        && first.Data4[1] == second.Data4[1]
+        && first.Data4[2] == second.Data4[2]
+        && first.Data4[3] == second.Data4[3]
+        && first.Data4[4] == second.Data4[4]
+        && first.Data4[5] == second.Data4[5]
+        && first.Data4[6] == second.Data4[6]
+        && first.Data4[7] == second.Data4[7];
+    }
 }// namespace godot
 
 #endif// GODOTFMOD_COMMON_H
