@@ -42,26 +42,26 @@ bool FmodCache::is_loading() {
     return loading_banks.size() > 0;
 }
 
-Ref<FmodBank> FmodCache::add_bank(const String& bankPath, unsigned int flag) {
+Ref<FmodBank> FmodCache::add_bank(const String& bank_path, unsigned int flag) {
     FMOD::Studio::Bank* bank = nullptr;
-    ERROR_CHECK(system->loadBankFile(bankPath.utf8().get_data(), flag, &bank));
+    ERROR_CHECK_WITH_REASON(system->loadBankFile(bank_path.utf8().get_data(), flag, &bank), vformat("Cannot load bank %s", bank_path));
     if (!bank) { return {}; }
-    Ref<FmodBank> ref = FmodBank::create_ref(bank, bankPath);
-    GODOT_LOG_VERBOSE("FMOD Sound System: LOADING BANK " + String(bankPath))
+    Ref<FmodBank> ref = FmodBank::create_ref(bank, bank_path);
+    GODOT_LOG_VERBOSE("FMOD Sound System: LOADING BANK " + String(bank_path))
     loading_banks.push_back(ref);
     if (flag != FMOD_STUDIO_LOAD_BANK_NONBLOCKING) { force_loading(); }
     return ref;
 }
 
-void FmodCache::remove_bank(const String& bankPath) {
-    if (!banks.has(bankPath)) {
-        GODOT_LOG_ERROR(vformat("Cannot unload bank with path %s, not in cache.", bankPath));
+void FmodCache::remove_bank(const String& bank_path) {
+    if (!banks.has(bank_path)) {
+        GODOT_LOG_ERROR(vformat("Cannot unload bank with path %s, not in cache.", bank_path));
         return;
     }
-    FmodBank* bank = banks[bankPath];
+    FmodBank* bank = banks[bank_path];
     _remove_bank_data(bank);
-    ERROR_CHECK(bank->get_wrapped()->unload());
-    banks.erase(bankPath);
+    ERROR_CHECK_WITH_REASON(bank->get_wrapped()->unload(), vformat("Cannot unload bank %s", bank_path));
+    banks.erase(bank_path);
 }
 
 bool FmodCache::has_bank(const String& bankPath) {
@@ -72,16 +72,16 @@ Ref<FmodBank> FmodCache::get_bank(const String& bankPath) {
     return banks.get(bankPath);
 }
 
-Ref<FmodFile> FmodCache::add_file(const String& filePath, unsigned int flag) {
+Ref<FmodFile> FmodCache::add_file(const String& file_path, unsigned int flag) {
     FMOD::System* core = nullptr;
     ERROR_CHECK(system->getCoreSystem(&core));
 
     FMOD::Sound* sound = nullptr;
-    ERROR_CHECK(core->createSound(filePath.utf8().get_data(), flag, nullptr, &sound));
+    ERROR_CHECK_WITH_REASON(core->createSound(file_path.utf8().get_data(), flag, nullptr, &sound), vformat("Cannot create sound %s", file_path));
     if (sound) {
         Ref<FmodFile> ref = FmodFile::create_ref(sound);
-        files[filePath] = ref;
-        GODOT_LOG_VERBOSE("FMOD Sound System: LOADING AS SOUND FILE" + String(filePath))
+        files[file_path] = ref;
+        GODOT_LOG_VERBOSE("FMOD Sound System: LOADING AS SOUND FILE" + String(file_path))
         return ref;
     }
     return {};

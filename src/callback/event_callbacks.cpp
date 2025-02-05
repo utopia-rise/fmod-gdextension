@@ -1,12 +1,11 @@
 #include "fmod_studio.hpp"
-#include "studio/fmod_event.h"
+#include <studio/fmod_event.h>
 #include "fmod_server.h"
 
 #include <callback/event_callbacks.h>
 
 #include <variant/callable.hpp>
 #include <variant/dictionary.hpp>
-#include <variant/variant.hpp>
 
 namespace Callbacks {
 
@@ -32,6 +31,7 @@ namespace Callbacks {
             if (type == FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND) {
                 auto* props { reinterpret_cast<FMOD_STUDIO_PROGRAMMER_SOUND_PROPERTIES*>(parameters) };
                 auto* sound {(FMOD::Sound*) props->sound};
+
                 ERROR_CHECK(sound->release());
 
                 return FMOD_OK;

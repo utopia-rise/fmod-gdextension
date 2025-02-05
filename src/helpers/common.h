@@ -34,7 +34,12 @@
         (actualSize) = maxSize;                                                                                        \
     }
 
-#define ERROR_CHECK(_result) godot::checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
+#define ERROR_CHECK_WITH_REASON(_result, _reason) \
+(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(FMOD_ErrorString(_result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), \
+                           godot::UtilityFunctions::push_error(_reason, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
+
+#define ERROR_CHECK(_result) \
+(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(FMOD_ErrorString(_result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
 
 #define FMODCLASS(m_class, m_inherits, m_owned)               \
     GDCLASS(m_class, m_inherits)                              \
@@ -107,14 +112,6 @@ public:                                                                  \
 private:
 
 namespace godot {
-    static bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
-        if (result != FMOD_OK) {
-            UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
-            return false;
-        }
-        return true;
-    }
-
     static bool is_dead(Object* node) {
         if (!node || !UtilityFunctions::is_instance_id_valid(node->get_instance_id())) {
             return true;

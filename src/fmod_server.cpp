@@ -267,7 +267,7 @@ void FmodServer::_set_listener_attributes() {
         if (listener->listenerLock) { continue; }
         if (is_dead(listener->gameObj)) {
             listener->gameObj = nullptr;
-            ERROR_CHECK(system->setListenerWeight(i, 0));
+            ERROR_CHECK_WITH_REASON(system->setListenerWeight(i, 0), vformat("Cannot set listener %d weight to 0", i));
             continue;
         }
 
@@ -276,13 +276,13 @@ void FmodServer::_set_listener_attributes() {
 
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
-            ERROR_CHECK(system->setListenerAttributes(i, &attr));
+            ERROR_CHECK_WITH_REASON(system->setListenerAttributes(i, &attr), vformat("Cannot set listener %d attributes", i));
             continue;
         }
 
         if (auto* s {Node::cast_to<Node3D>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(s->get_global_transform(), distanceScale);
-            ERROR_CHECK(system->setListenerAttributes(i, &attr));
+            ERROR_CHECK_WITH_REASON(system->setListenerAttributes(i, &attr), vformat("Cannot set listener %d attributes", i));
             continue;
         }
     }
@@ -304,7 +304,10 @@ void FmodServer::shutdown() {
 
 void FmodServer::set_system_listener_number(int p_listenerNumber) {
     if (p_listenerNumber > 0 && p_listenerNumber <= FMOD_MAX_LISTENERS) {
-        if (ERROR_CHECK(system->setNumListeners(p_listenerNumber))) { systemListenerNumber = p_listenerNumber; }
+        if (ERROR_CHECK_WITH_REASON(system->setNumListeners(p_listenerNumber),
+                                    vformat("Cannot set listener count to %d", p_listenerNumber))) {
+            systemListenerNumber = p_listenerNumber;
+        }
     } else {
         GODOT_LOG_ERROR("Number of listeners must be set between 1 and 8")
     }
@@ -315,7 +318,8 @@ void FmodServer::add_listener(int index, Object* game_obj) {
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
         listener->gameObj = game_obj;
-        ERROR_CHECK(system->setListenerWeight(index, listener->weight));
+        ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, listener->weight),
+                                vformat("Cannot set listener %d weight to %f", index, listener->weight));
         int count = 0;
         for (int i = 0; i < systemListenerNumber; ++i) {
             if ((&listeners[i])->gameObj != nullptr) count++;
@@ -336,7 +340,8 @@ void FmodServer::remove_listener(int index, Object* game_obj) {
         }
 
         listener->gameObj = nullptr;
-        ERROR_CHECK(system->setListenerWeight(index, 0));
+        ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, 0),
+                    vformat("Cannot set listener %d weight to 0", index));
         int count = 0;
         for (int i = 0; i < systemListenerNumber; ++i) {
             if ((&listeners[i])->gameObj != nullptr) count++;
@@ -355,7 +360,8 @@ int FmodServer::get_system_listener_number() const {
 float FmodServer::get_system_listener_weight(const int index) {
     if (index >= 0 && index < systemListenerNumber) {
         float weight = 0;
-        ERROR_CHECK(system->getListenerWeight(index, &weight));
+        ERROR_CHECK_WITH_REASON(system->getListenerWeight(index, &weight),
+                                vformat("Cannot get listener %d weight", index));
         listeners[index].weight = weight;
         return weight;
     } else {
@@ -367,7 +373,8 @@ float FmodServer::get_system_listener_weight(const int index) {
 void FmodServer::set_system_listener_weight(const int index, float weight) {
     if (index >= 0 && index < systemListenerNumber) {
         listeners[index].weight = weight;
-        ERROR_CHECK(system->setListenerWeight(index, weight));
+        ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, weight),
+                                vformat("Cannot set listener %d weight to %f", index, weight));
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -377,7 +384,8 @@ Transform3D FmodServer::get_listener_transform3d(int index) {
     Transform3D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr),
+                                vformat("Cannot get listener %d transform3d", index));
         transform = get_transform3d_from_3d_attributes(attr, distanceScale);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
@@ -389,7 +397,8 @@ Transform2D FmodServer::get_listener_transform2d(int index) {
     Transform2D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr),
+                                vformat("Cannot get listener %d transform2d", index));
         transform = get_transform2d_from_3d_attributes(attr, distanceScale);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
@@ -401,7 +410,8 @@ Vector3 FmodServer::get_listener_3d_velocity(int index) {
     Vector3 velocity;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr),
+                                vformat("Cannot get listener %d velocity", index));
         velocity = get_velocity3d_from_3d_attributes(attr, distanceScale);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
@@ -413,7 +423,8 @@ Vector2 FmodServer::get_listener_2d_velocity(int index) {
     Vector2 velocity;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK(system->getListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr),
+                                vformat("Cannot get listener %d velocity", index));
         velocity = get_velocity2d_from_3d_attributes(attr, distanceScale);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
@@ -424,7 +435,8 @@ Vector2 FmodServer::get_listener_2d_velocity(int index) {
 void FmodServer::set_listener_transform3d(int index, const Transform3D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
-        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->setListenerAttributes(index, &attr),
+                                vformat("Cannot set listener %d transform3d", index));
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -433,7 +445,8 @@ void FmodServer::set_listener_transform3d(int index, const Transform3D& transfor
 void FmodServer::set_listener_transform2d(int index, const Transform2D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(transform, distanceScale);
-        ERROR_CHECK(system->setListenerAttributes(index, &attr));
+        ERROR_CHECK_WITH_REASON(system->setListenerAttributes(index, &attr),
+                                vformat("Cannot set listener %d transform2d", index));
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -818,7 +831,8 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
 
     Ref<FmodFile> file = cache->get_file(path);
     FMOD::Channel* channel = nullptr;
-    ERROR_CHECK(coreSystem->playSound(file->get_wrapped(), nullptr, true, &channel));
+    ERROR_CHECK_WITH_REASON(coreSystem->playSound(file->get_wrapped(), nullptr, true, &channel),
+                            vformat("Cannot play sound %s", path));
     if (channel) {
         Ref<FmodSound> ref = FmodSound::create_ref(channel);
         return ref;
@@ -828,16 +842,18 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
 
 FMOD_STUDIO_SOUND_INFO FmodServer::get_sound_info(const String& sound_key) const {
     FMOD_STUDIO_SOUND_INFO sound_info;
-    ERROR_CHECK(
-      system->getSoundInfo(sound_key.utf8().get_data(), &sound_info)
+    ERROR_CHECK_WITH_REASON(
+      system->getSoundInfo(sound_key.utf8().get_data(), &sound_info),
+      vformat("Cannot get sound info for %s", sound_key)
     );
     return sound_info;
 }
 
 FMOD::Sound* FmodServer::create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_MODE mode) const {
     FMOD::Sound* sound {nullptr};
-    ERROR_CHECK(
-      coreSystem->createSound(sound_info.name_or_data, mode | sound_info.mode, &sound_info.exinfo, &sound)
+    ERROR_CHECK_WITH_REASON(
+      coreSystem->createSound(sound_info.name_or_data, mode | sound_info.mode, &sound_info.exinfo, &sound),
+      vformat("Cannot create sound %s with mode %s", sound_info.name_or_data, mode)
     );
     return sound;
 }
@@ -926,38 +942,45 @@ Ref<FmodPerformanceData> FmodServer::get_performance_data() {
 }
 
 void FmodServer::set_global_parameter_by_name(const String& parameter_name, float value) {
-    ERROR_CHECK(system->setParameterByName(parameter_name.utf8().get_data(), value));
+    ERROR_CHECK_WITH_REASON(system->setParameterByName(parameter_name.utf8().get_data(), value),
+                            vformat("Cannot set global parameter %s to value %f", parameter_name, value));
 }
 
 void FmodServer::set_global_parameter_by_name_with_label(const String& parameter_name, const String& label) {
-    ERROR_CHECK(system->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data()));
+    ERROR_CHECK_WITH_REASON(system->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data()),
+                            vformat("Cannot set global parameter %s to value %s", parameter_name, label));
 }
 
-float FmodServer::get_global_parameter_by_name(const String& parameterName) {
+float FmodServer::get_global_parameter_by_name(const String& parameter_name) {
     float value = 0.f;
-    ERROR_CHECK(system->getParameterByName(parameterName.utf8().get_data(), &value));
+    ERROR_CHECK_WITH_REASON(system->getParameterByName(parameter_name.utf8().get_data(), &value),
+                            vformat("Cannot get global parameter %s", parameter_name, value));
     return value;
 }
 
 void FmodServer::set_global_parameter_by_id(uint64_t parameter_id, const float value) {
-    ERROR_CHECK(system->setParameterByID(ulong_to_fmod_parameter_id(parameter_id), value));
+    ERROR_CHECK_WITH_REASON(system->setParameterByID(ulong_to_fmod_parameter_id(parameter_id), value),
+                            vformat("Cannot set global parameter %d to value %f", parameter_id, value));
 }
 
 void FmodServer::set_global_parameter_by_id_with_label(uint64_t parameter_id, const String& label) {
-    ERROR_CHECK(system->setParameterByIDWithLabel(ulong_to_fmod_parameter_id(parameter_id), label.utf8().get_data()));
+    ERROR_CHECK_WITH_REASON(system->setParameterByIDWithLabel(ulong_to_fmod_parameter_id(parameter_id), label.utf8().get_data()),
+                            vformat("Cannot set global parameter %d to value %s", parameter_id, label));
 }
 
 float FmodServer::get_global_parameter_by_id(uint64_t parameter_id) {
     float value = -1.f;
-    ERROR_CHECK(system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &value));
+    ERROR_CHECK_WITH_REASON(system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &value),
+                            vformat("Cannot set global parameter %d", parameter_id, value));
     return value;
 }
 
-Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameterName) {
+Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameter_name) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION
     pDesc;
-    if (ERROR_CHECK(system->getParameterDescriptionByName(parameterName.utf8().get_data(), &pDesc))) {
+    if (ERROR_CHECK_WITH_REASON(system->getParameterDescriptionByName(parameter_name.utf8().get_data(), &pDesc),
+                                vformat("Cannot get global parameter %s", parameter_name))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
@@ -972,7 +995,8 @@ Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameter
 Dictionary FmodServer::get_global_parameter_desc_by_id(uint64_t parameter_id) {
     Dictionary paramDesc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION pDesc;
-    if (ERROR_CHECK(system->getParameterDescriptionByID(ulong_to_fmod_parameter_id(parameter_id), &pDesc))) {
+    if (ERROR_CHECK_WITH_REASON(system->getParameterDescriptionByID(ulong_to_fmod_parameter_id(parameter_id), &pDesc),
+                                vformat("Cannot get global parameter %d", parameter_id))) {
         paramDesc["name"] = String(pDesc.name);
         paramDesc["id_first"] = pDesc.id.data1;
         paramDesc["id_second"] = pDesc.id.data2;
