@@ -271,10 +271,10 @@ namespace godot {
     template<class Derived, class NodeType>
     Variant FmodEventEmitter<Derived, NodeType>::get_parameter(const String& p_name) const {
         if (Parameter* parameter {_find_parameter(p_name)}) {
-            return parameter;
+            return parameter->value;
         }
 
-        return nullptr;
+        return Variant();
     }
 
     template<class Derived, class NodeType>
@@ -297,10 +297,10 @@ namespace godot {
     template<class Derived, class NodeType>
     Variant FmodEventEmitter<Derived, NodeType>::get_parameter_by_id(uint64_t p_id) const {
         if (Parameter* parameter {_find_parameter(p_id)}) {
-            return parameter;
+            return parameter->value;
         }
 
-        return nullptr;
+        return Variant();
     }
 
     template<class Derived, class NodeType>
