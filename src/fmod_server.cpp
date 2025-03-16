@@ -162,6 +162,14 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
 
+    // editing advanced settings to set random seed before system initialization
+    FMOD_ADVANCEDSETTINGS advancedSettings = {};
+    advancedSettings.cbSize = sizeof(FMOD_ADVANCEDSETTINGS);
+    ERROR_CHECK(coreSystem->getAdvancedSettings(&advancedSettings));
+
+    advancedSettings.randomSeed = static_cast<unsigned int>(std::time(0));// Use time as a seed
+    ERROR_CHECK(coreSystem->setAdvancedSettings(&advancedSettings));
+
     FMOD_STUDIO_INITFLAGS studio_init_flags = FMOD_STUDIO_INIT_NORMAL;
 
     if (
