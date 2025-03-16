@@ -26,10 +26,10 @@ Implies FMOD_INIT_MEMORY_TRACKING.
 
 - "Sample Rate": Sample rate of the mixer. Range: [8000, 192000] Units: Hertz Default: 48000
 - "Speaker Mode": Speaker setup of the mixer.
-[FMOD_SPEAKERMODE](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_speakermode)
+[FMOD_SPEAKERMODE](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_speakermode)
 - "Raw Speaker Count": Number of speakers for
-[FMOD_SPEAKERMODE_RAW](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_speakermode_raw) mode.
-Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_max_channel_width)]
+[FMOD_SPEAKERMODE_RAW](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_speakermode_raw) mode.
+Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_max_channel_width)]
 
 ![software-format-tab]
 

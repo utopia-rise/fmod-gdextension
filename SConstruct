@@ -7,7 +7,7 @@ from SCons.Script import SConscript, ARGUMENTS, Action, Copy
 
 target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
-fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "libs/")
+fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
 env = SConscript("godot-cpp/SConstruct")
 
@@ -52,8 +52,8 @@ if env["platform"] == "macos":
     libfmod = 'libfmod%s.dylib' % lfix
     libfmodstudio = 'libfmodstudio%s.dylib' % lfix
 
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'macos/core/inc/', env['fmod_lib_dir'] + 'macos/studio/inc/'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'macos/core/lib/', env['fmod_lib_dir'] + 'macos/studio/lib/'])
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'osx/core/inc/', env['fmod_lib_dir'] + 'osx/studio/inc/'])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'osx/core/lib/', env['fmod_lib_dir'] + 'osx/studio/lib/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
     env.Append(
@@ -92,10 +92,7 @@ elif env["platform"] == "windows":
 
     env.Append(LINKFLAGS=["/WX"])
     if debug:
-        if "mingw" in env.get("CC", ""):  
-            env.Append(CCFLAGS=["-g"])  
-        else:
-            env.Append(CCFLAGS=["/FS", "/Zi"])  
+        env.Append(CCFLAGS=["/FS", "/Zi"])
 
 elif env["platform"] == "ios":
     libfmod = 'libfmod%s_iphoneos.a' % lfix
@@ -183,8 +180,8 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     )
 
     if env["platform"] == "macos":
-        fmod_core_lib_dir = env['fmod_lib_dir'] + 'macos/core/lib/'
-        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'macos/studio/lib/'
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'osx/core/lib/'
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'osx/studio/lib/'
     elif env["platform"] == "linux":
         fmod_core_lib_dir = env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"]
         fmod_studio_lib_dir = env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]
