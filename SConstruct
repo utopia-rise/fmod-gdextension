@@ -92,7 +92,10 @@ elif env["platform"] == "windows":
 
     env.Append(LINKFLAGS=["/WX"])
     if debug:
-        env.Append(CCFLAGS=["/FS", "/Zi"])
+        if "mingw" in env.get("CC", ""):  
+            env.Append(CCFLAGS=["-g"])  
+        else:
+            env.Append(CCFLAGS=["/FS", "/Zi"])  
 
 elif env["platform"] == "ios":
     libfmod = 'libfmod%s_iphoneos.a' % lfix
