@@ -5,18 +5,16 @@ Clone project with `--recurse_submodules`.
 ## Typical Project structure
 
 ```
-└── Project root
+└── fmod-gdextension (Project root)
     ├── libs
-    |   └── fmod
-    |       └── {platform}
-    |           └── specific platform fmod api goes here
-    └── fmod-gdnative (this repo, consider using it as a submodule of you GDNatives repo)
-        ├── CMakeLists.txt (Here for CLion)
-        ├── LICENSE
-        ├── README.md
-        ├── SConstruct (here to build on Windows, Linux, OSX and IOS
-        ├── godot-cpp (gdextension bindings, submodule)
-        └── src
+    |    └── {platform}
+    |        └── specific platform fmod api goes here (folders `core`and `studio`)
+    ├── CMakeLists.txt (Here for CLion)
+    ├── SConstruct (here to build on Windows, Linux, MacOS and IOS)
+    ├── godot-cpp (gdextension bindings, submodule)
+    ├── LICENSE
+    ├── README.md
+    └── src
 ```
 
 You are supposed to put fmod libraries under `libs/fmod/{platform}`, according to the platforms you want to support.  
@@ -30,5 +28,5 @@ Sconstruct.
 In order to compile you should run `scons` command, as for all gdextension projects.
 
 ```
-scons platform=<platform> target=<editor|template_debug|template_release> debug_symbols<yes|no> --jobs=<desired number of threads>
+scons platform=<macos|linux|windows|ios|android> target=<editor|template_debug|template_release> debug_symbols<yes|no> --jobs=<desired number of threads>
 ```
