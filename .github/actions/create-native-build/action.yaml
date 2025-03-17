@@ -53,6 +53,7 @@ runs:
         New-Item -ItemType directory -Path fmod; cd fmod
         python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
         7z x fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        ls
         mv api/ windows
         cd ../../
 
