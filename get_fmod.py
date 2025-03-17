@@ -21,7 +21,7 @@ elif platform == 'macos':
 elif platform == 'windows':
     # Windows...
     filename = f'fmodstudioapi{fmod_version}win-installer.exe'
-    downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/Win/&filename=fmodstudioapi{fmod_version}win-installer.exe&user='
+    downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/Windows/&filename=fmodstudioapi{fmod_version}win-installer.exe&user='
 elif platform == 'android':
     # Android...
     filename = f'fmodstudioapi{fmod_version}android.tar.gz'
