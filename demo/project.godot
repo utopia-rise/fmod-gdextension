@@ -34,12 +34,16 @@ modules="org/godotengine/godot/FmodSingleton"
 
 config/name="Fmod Demo"
 run/main_scene="res://low_level_2D/FmodScriptTest.tscn"
-config/features=PackedStringArray("4.3")
-config/icon="res://icon.png"
+config/features=PackedStringArray("4.4")
+config/icon="uid://bi1sr00ktdavg"
 
 [autoload]
 
 FmodManager="*res://addons/fmod/FmodManager.gd"
+
+[dotnet]
+
+project/assembly_name="Fmod Demo"
 
 [editor_plugins]
 

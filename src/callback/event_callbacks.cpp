@@ -9,7 +9,7 @@
 
 namespace Callbacks {
 
-    FMOD_RESULT F_CALLBACK event_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE* event, void* parameters) {
+    FMOD_RESULT F_CALL event_callback(FMOD_STUDIO_EVENT_CALLBACK_TYPE type, FMOD_STUDIO_EVENTINSTANCE* event, void* parameters) {
         auto* instance = reinterpret_cast<FMOD::Studio::EventInstance*>(event);
         godot::FmodEvent* event_instance;
         instance->getUserData((void**) &event_instance);

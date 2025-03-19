@@ -100,7 +100,7 @@ namespace Callbacks {
         fileThread.join();
     }
 
-    FMOD_RESULT F_CALLBACK godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata) {
+    FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata) {
         godot::Ref<godot::FileAccess> access = godot::FileAccess::open(name, godot::FileAccess::ModeFlags::READ);
 
         if (access->get_error() == godot::Error::OK) {
@@ -112,13 +112,13 @@ namespace Callbacks {
         return FMOD_RESULT::FMOD_ERR_FILE_BAD;
     }
 
-    FMOD_RESULT F_CALLBACK godotFileClose(void* handle, void* userdata) {
+    FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata) {
         godot::Ref<godot::FileAccess> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
         delete reinterpret_cast<GodotFileHandle*>(handle);
         return FMOD_RESULT::FMOD_OK;
     }
 
-    FMOD_RESULT F_CALLBACK godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata) {
+    FMOD_RESULT F_CALL godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata) {
         GodotFileRunner* runner {GodotFileRunner::get_singleton()};
         int priority {info->priority};
 
@@ -132,7 +132,7 @@ namespace Callbacks {
         return FMOD_RESULT::FMOD_OK;
     }
 
-    FMOD_RESULT F_CALLBACK godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata) {
+    FMOD_RESULT F_CALL godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata) {
         GodotFileRunner* runner {GodotFileRunner::get_singleton()};
         runner->cancelReadRequest(info);
         return FMOD_RESULT::FMOD_OK;

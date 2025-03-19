@@ -1,14 +1,14 @@
 [gd_scene load_steps=13 format=3 uid="uid://cs8nm6h12whh1"]
 
-[ext_resource type="Script" path="res://low_level_2D/FmodTest.gd" id="1_oc8v3"]
-[ext_resource type="Texture2D" uid="uid://c872sqsokojxe" path="res://icon.png" id="2_mamb7"]
-[ext_resource type="Script" path="res://low_level_2D/Emitter.gd" id="3_fx7d3"]
-[ext_resource type="Script" path="res://low_level_2D/Listener.gd" id="4_448uv"]
-[ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_85yno"]
-[ext_resource type="Script" path="res://low_level_2D/ChangeColor.gd" id="6_fyoq1"]
-[ext_resource type="Script" path="res://low_level_2D/EnterandLeave2.gd" id="7_6vajh"]
-[ext_resource type="Script" path="res://low_level_2D/LangChooseButton.gd" id="8_f6f5a"]
-[ext_resource type="Script" path="res://low_level_2D/WelcomeButton.gd" id="9_jo4tj"]
+[ext_resource type="Script" uid="uid://dn0b4rle1712" path="res://low_level_2D/FmodTest.gd" id="1_oc8v3"]
+[ext_resource type="Texture2D" uid="uid://dfhlh5qegtr24" path="res://icon.png" id="2_mamb7"]
+[ext_resource type="Script" uid="uid://cxg2l03odbmwv" path="res://low_level_2D/Emitter.gd" id="3_fx7d3"]
+[ext_resource type="Script" uid="uid://c4p1w0xlxjs4l" path="res://low_level_2D/Listener.gd" id="4_448uv"]
+[ext_resource type="Script" uid="uid://dae10jufdshyv" path="res://low_level_2D/EnterAndLeave.gd" id="5_85yno"]
+[ext_resource type="Script" uid="uid://be1jwed20nkjr" path="res://low_level_2D/ChangeColor.gd" id="6_fyoq1"]
+[ext_resource type="Script" uid="uid://rxnfus6cxfle" path="res://low_level_2D/EnterandLeave2.gd" id="7_6vajh"]
+[ext_resource type="Script" uid="uid://bd3konietc7md" path="res://low_level_2D/LangChooseButton.gd" id="8_f6f5a"]
+[ext_resource type="Script" uid="uid://cpd21piypux6c" path="res://low_level_2D/WelcomeButton.gd" id="9_jo4tj"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(87.7038, 82.621)
@@ -132,6 +132,7 @@ offset_right = 986.0
 offset_bottom = 646.0
 item_count = 3
 popup/item_0/text = "CN"
+popup/item_0/id = 0
 popup/item_1/text = "EN"
 popup/item_1/id = 1
 popup/item_2/text = "JP"

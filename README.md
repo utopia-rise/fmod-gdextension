@@ -55,6 +55,10 @@ This project is a forked from [godot-fmod-integration](https://github.com/alexfo
 from [alexfonseka](https://github.com/alexfonseka). We'd like to thank him for the work he did, we simply adapted his
 work to GDNative.
 
+# Tested Versions
+
+- **Godot Version:** 4.4 stable
+- **FMOD Version:** 2.03
 
 [fmodsingleton]: .README/fmodsingleton.png
 [usecustombuild]: .README/usecustombuild.png
