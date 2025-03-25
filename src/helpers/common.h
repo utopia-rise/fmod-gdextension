@@ -16,9 +16,6 @@
 #define MAX_PATH_SIZE 512
 #define MAX_DRIVER_NAME_SIZE 256
 
-#define MAX_VCA_COUNT 64
-#define MAX_BUS_COUNT 64
-#define MAX_EVENT_DESCRIPTION_COUNT 256
 #define MAX_EVENT_INSTANCE_COUNT 128
 
 #define GODOT_LOG_INFO(message) UtilityFunctions::print(message);
@@ -112,74 +109,74 @@ public:                                                                  \
 private:
 
 namespace godot {
-    static bool is_dead(Object* node) {
-        if (!node || !UtilityFunctions::is_instance_id_valid(node->get_instance_id())) {
-            return true;
-        }
-        return !Object::cast_to<Node>(node)->is_inside_tree();
-    }
+	static bool is_dead(Object* node) {
+		if (!node || !UtilityFunctions::is_instance_id_valid(node->get_instance_id())) {
+			return true;
+		}
+		return !Object::cast_to<Node>(node)->is_inside_tree();
+	}
 
-    static bool is_fmod_valid(Object* node) {
-        if (node) {
-            bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
-            if (!ret) { GODOT_LOG_ERROR("Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
-            return ret;
-        }
-        GODOT_LOG_ERROR("Object is null")
-        return false;
-    }
+	static bool is_fmod_valid(Object* node) {
+		if (node) {
+			bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
+			if (!ret) { GODOT_LOG_ERROR("Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
+			return ret;
+		}
+		GODOT_LOG_ERROR("Object is null")
+			return false;
+	}
 
-    template<class T>
-    static inline Ref<T> create_ref() {
-        Ref<T> ref;
-        ref.instantiate();
-        return ref;
-    }
+	template<class T>
+	static inline Ref<T> create_ref() {
+		Ref<T> ref;
+		ref.instantiate();
+		return ref;
+	}
 
-    static inline FMOD_GUID string_to_fmod_guid(const char* guid) {
-        FMOD_GUID result;
-        sscanf(guid,
-               "{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
-               &result.Data1, &result.Data2, &result.Data3,
-               &result.Data4[0], &result.Data4[1], &result.Data4[2], &result.Data4[3],
-               &result.Data4[4], &result.Data4[5], &result.Data4[6], &result.Data4[7]);
-        return result;
-    }
+	static inline FMOD_GUID string_to_fmod_guid(const char* guid) {
+		FMOD_GUID result;
+		sscanf(guid,
+			"{%8x-%4hx-%4hx-%2hhx%2hhx-%2hhx%2hhx%2hhx%2hhx%2hhx%2hhx}",
+			&result.Data1, &result.Data2, &result.Data3,
+			&result.Data4[0], &result.Data4[1], &result.Data4[2], &result.Data4[3],
+			&result.Data4[4], &result.Data4[5], &result.Data4[6], &result.Data4[7]);
+		return result;
+	}
 
-    static inline String fmod_guid_to_string(const FMOD_GUID& guid) {
-        char result[39];
-        snprintf(result, sizeof(result), "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
-                 guid.Data1, guid.Data2, guid.Data3,
-                 guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
-                 guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
-        return result;
-    }
+	static inline String fmod_guid_to_string(const FMOD_GUID& guid) {
+		char result[39];
+		snprintf(result, sizeof(result), "{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
+			guid.Data1, guid.Data2, guid.Data3,
+			guid.Data4[0], guid.Data4[1], guid.Data4[2], guid.Data4[3],
+			guid.Data4[4], guid.Data4[5], guid.Data4[6], guid.Data4[7]);
+		return result;
+	}
 
-    static inline uint64_t fmod_parameter_id_to_ulong(const FMOD_STUDIO_PARAMETER_ID& parameter_id) {
-        const unsigned int first_id_part {parameter_id.data1};
-        return (static_cast<uint64_t>(first_id_part) << 32) | static_cast<uint64_t>(parameter_id.data2);
-    }
+	static inline uint64_t fmod_parameter_id_to_ulong(const FMOD_STUDIO_PARAMETER_ID& parameter_id) {
+		const unsigned int first_id_part{ parameter_id.data1 };
+		return (static_cast<uint64_t>(first_id_part) << 32) | static_cast<uint64_t>(parameter_id.data2);
+	}
 
-    static inline FMOD_STUDIO_PARAMETER_ID ulong_to_fmod_parameter_id(uint64_t converted) {
-        FMOD_STUDIO_PARAMETER_ID paramId;
-        paramId.data2 = static_cast<unsigned int>(converted & 0xFFFFFFFF);
-        paramId.data1 = static_cast<unsigned int>((converted >> 32) & 0xFFFFFFFF);
-        return paramId;
-    }
+	static inline FMOD_STUDIO_PARAMETER_ID ulong_to_fmod_parameter_id(uint64_t converted) {
+		FMOD_STUDIO_PARAMETER_ID paramId;
+		paramId.data2 = static_cast<unsigned int>(converted & 0xFFFFFFFF);
+		paramId.data1 = static_cast<unsigned int>((converted >> 32) & 0xFFFFFFFF);
+		return paramId;
+	}
 
-    static inline bool equals(const FMOD_GUID& first, const FMOD_GUID& second) {
-        return first.Data1 == second.Data1
-        && first.Data2 == second.Data2
-        && first.Data3 == second.Data3
-        && first.Data4[0] == second.Data4[0]
-        && first.Data4[1] == second.Data4[1]
-        && first.Data4[2] == second.Data4[2]
-        && first.Data4[3] == second.Data4[3]
-        && first.Data4[4] == second.Data4[4]
-        && first.Data4[5] == second.Data4[5]
-        && first.Data4[6] == second.Data4[6]
-        && first.Data4[7] == second.Data4[7];
-    }
+	static inline bool equals(const FMOD_GUID& first, const FMOD_GUID& second) {
+		return first.Data1 == second.Data1
+			&& first.Data2 == second.Data2
+			&& first.Data3 == second.Data3
+			&& first.Data4[0] == second.Data4[0]
+			&& first.Data4[1] == second.Data4[1]
+			&& first.Data4[2] == second.Data4[2]
+			&& first.Data4[3] == second.Data4[3]
+			&& first.Data4[4] == second.Data4[4]
+			&& first.Data4[5] == second.Data4[5]
+			&& first.Data4[6] == second.Data4[6]
+			&& first.Data4[7] == second.Data4[7];
+	}
 }// namespace godot
 
 #endif// GODOTFMOD_COMMON_H
