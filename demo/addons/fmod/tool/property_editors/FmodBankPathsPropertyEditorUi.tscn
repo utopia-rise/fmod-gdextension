@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dtlwk8wdeal3h"]
 
-[ext_resource type="Texture2D" uid="uid://bkqdeaojmbbaj" path="res://addons/fmod/icons/bank_icon.svg" id="1_11c48"]
+[ext_resource type="Texture2D" uid="uid://o2chsr07oeqs" path="res://addons/fmod/icons/bank_icon.svg" id="1_11c48"]
 
 [node name="FmodBankPathsPropertyEditorUi" type="VBoxContainer"]
 offset_right = 92.0
