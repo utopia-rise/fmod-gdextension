@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bfdldojk5i6u3"]
 
-[ext_resource type="Script" path="res://addons/fmod/tool/ui/ParameterDisplay.gd" id="1_fxyw8"]
+[ext_resource type="Script" uid="uid://ve6g43nb1hdd" path="res://addons/fmod/tool/ui/ParameterDisplay.gd" id="1_fxyw8"]
 
 [node name="ParameterDisplay" type="MarginContainer"]
 visible = false

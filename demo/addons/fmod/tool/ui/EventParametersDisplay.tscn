@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cppeyr1ke5wre"]
 
-[ext_resource type="Script" path="res://addons/fmod/tool/ui/EventParametersDisplay.gd" id="1_2l58q"]
+[ext_resource type="Script" uid="uid://7relkis52fsu" path="res://addons/fmod/tool/ui/EventParametersDisplay.gd" id="1_2l58q"]
 
 [node name="EventParametersDisplay" type="ScrollContainer"]
 anchors_preset = 15
