@@ -505,7 +505,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 
 #ifdef DEBUG_ENABLED
     if (!FileAccess::file_exists(pathToBank)) {
-        GODOT_LOG_ERROR(vformat("Cannot load bank at %s", pathToBank));
+        GODOT_LOG_ERROR(vformat("Cannot load bank at %s", pathToBank))
         return {};
     }
 #endif
@@ -516,7 +516,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 void FmodServer::unload_bank(const String& pathToBank) {
 #ifdef DEBUG_ENABLED
     if (!FileAccess::file_exists(pathToBank)) {
-        GODOT_LOG_ERROR(vformat("Cannot unload bank at %s", pathToBank));
+        GODOT_LOG_ERROR(vformat("Cannot unload bank at %s", pathToBank))
         return;
     }
 #endif
