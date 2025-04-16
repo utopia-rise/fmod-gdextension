@@ -4,10 +4,10 @@
 #include "classes/canvas_item.hpp"
 #include "classes/node3d.hpp"
 #include "fmod_common.h"
-#include <fmod_studio_common.h>
 #include "variant/utility_functions.hpp"
 
 #include <fmod_errors.h>
+#include <fmod_studio_common.h>
 #include <helpers/current_function.h>
 
 #include <godot.hpp>
@@ -112,22 +112,38 @@ public:                                                                  \
 private:
 
 namespace godot {
-    static bool is_dead(Object* node) {
-        if (!node || !UtilityFunctions::is_instance_id_valid(node->get_instance_id())) {
-            return true;
-        }
-        return !Object::cast_to<Node>(node)->is_inside_tree();
-    }
 
-    static bool is_fmod_valid(Object* node) {
-        if (node) {
-            bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
-            if (!ret) { GODOT_LOG_ERROR("Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
-            return ret;
+    class NodeWrapper {
+        Node* node {nullptr};
+        ObjectID id;
+
+    public:
+        _FORCE_INLINE_ static bool is_spatial_node(Object* p_object) {
+            return Node::cast_to<Node3D>(p_object) || Node::cast_to<CanvasItem>(p_object);
         }
-        GODOT_LOG_ERROR("Object is null")
-        return false;
-    }
+
+        bool is_valid() {
+            if (!node || !id.is_valid() || !UtilityFunctions::is_instance_id_valid(id)) { return false; }
+            return node->is_inside_tree();
+        }
+
+        Node* get_node() { return node; }
+
+        void set_node(Node* p_node) {
+            if (p_node) {
+                if (is_spatial_node(p_node)) {
+                    node = p_node;
+                    id = p_node->get_instance_id();
+                    return;
+                }
+                GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
+            }
+            node = nullptr;
+        }
+
+        NodeWrapper() = default;
+        explicit NodeWrapper(Node* p_node) { set_node(p_node); };
+    };
 
     template<class T>
     static inline Ref<T> create_ref() {

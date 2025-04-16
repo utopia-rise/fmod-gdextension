@@ -45,7 +45,7 @@ jobs:
             shell: pwsh
 
           - name: Ubuntu Editor Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: linux
             target: editor
             fmod-executable-suffix: linux.tar.gz
@@ -57,14 +57,14 @@ jobs:
             shell: bash
 
           - name: Ubuntu Debug Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: linux
             target: template_debug
             fmod-executable-suffix: linux.tar.gz
             shell: bash
 
           - name: Ubuntu Release Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: linux
             target: template_release
             fmod-executable-suffix: linux.tar.gz
@@ -97,7 +97,7 @@ jobs:
             shell: bash
 
           - name: Android Editor Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: android
             target: editor
             fmod-executable-suffix: android.tar.gz
@@ -105,7 +105,7 @@ jobs:
             shell: bash
 
           - name: Android Debug Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: android
             target: template_debug
             fmod-executable-suffix: android.tar.gz
@@ -113,7 +113,7 @@ jobs:
             shell: bash
 
           - name: Android Release Compilation
-            os: "ubuntu-20.04"
+            os: "ubuntu-22.04"
             platform: android
             target: template_release
             fmod-executable-suffix: android.tar.gz

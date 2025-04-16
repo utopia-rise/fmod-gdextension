@@ -167,7 +167,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     advancedSettings.cbSize = sizeof(FMOD_ADVANCEDSETTINGS);
     ERROR_CHECK(coreSystem->getAdvancedSettings(&advancedSettings));
 
-    advancedSettings.randomSeed = static_cast<unsigned int>(std::time(0));// Use time as a seed
+    advancedSettings.randomSeed = static_cast<unsigned int>(std::time(nullptr));// Use time as a seed
     ERROR_CHECK(coreSystem->setAdvancedSettings(&advancedSettings));
 
     FMOD_STUDIO_INITFLAGS studio_init_flags = FMOD_STUDIO_INIT_NORMAL;
@@ -217,29 +217,26 @@ void FmodServer::update() {
     cache->update_pending();
 
     callback_mutex->lock();
-
     for (const Callback& callback : callbacks_to_process) {
+        if (!callback.callable.is_valid()) { continue; } // Don't run the callback if the object has been killed
         godot::Array args = godot::Array();
         args.append(callback.fmod_callback_properties);
         args.append(callback.type);
         callback.callable.callv(args);
     }
-
     callbacks_to_process.clear();
-
     callback_mutex->unlock();
-
 
     Vector<OneShot*> one_shots_copy = oneShots;
     for (OneShot* oneShot : one_shots_copy) {
 
-        if (!oneShot->instance->is_valid() || is_dead(oneShot->gameObj)) {
-            //We release one-shots when they are started, the event becomes invalid as soon as it ends
+        if (!oneShot->instance->is_valid() || !oneShot->wrapper.is_valid()) {
+            // We free oneShot when their event or Object is dead.
             oneShots.erase(oneShot);
             delete oneShot;
             continue;
         }
-        oneShot->instance->set_node_attributes(oneShot->gameObj);
+        oneShot->instance->set_node_attributes(oneShot->wrapper.get_node());
     }
 
     Vector<Ref<FmodEvent>> events_copy = runningEvents;
@@ -273,13 +270,13 @@ void FmodServer::_set_listener_attributes() {
     for (int i = 0; i < systemListenerNumber; ++i) {
         Listener* listener = &listeners[i];
         if (listener->listenerLock) { continue; }
-        if (is_dead(listener->gameObj)) {
-            listener->gameObj = nullptr;
+        if (!listener->wrapper.is_valid()) {
+            listener->wrapper.set_node(nullptr);
             ERROR_CHECK_WITH_REASON(system->setListenerWeight(i, 0), vformat("Cannot set listener %d weight to 0", i));
             continue;
         }
 
-        Node* node {Object::cast_to<Node>(listener->gameObj)};
+        Node* node {listener->wrapper.get_node()};
         if (!node->is_inside_tree()) { return; }
 
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
@@ -321,16 +318,16 @@ void FmodServer::set_system_listener_number(int p_listenerNumber) {
     }
 }
 
-void FmodServer::add_listener(int index, Object* game_obj) {
-    if (!is_fmod_valid(game_obj)) { return; }
+void FmodServer::add_listener(int index, Node* game_obj) {
+    if (!NodeWrapper::is_spatial_node(game_obj)) { return; }
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
-        listener->gameObj = game_obj;
+        listener->wrapper.set_node(game_obj);
         ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, listener->weight),
                                 vformat("Cannot set listener %d weight to %f", index, listener->weight));
         int count = 0;
         for (int i = 0; i < systemListenerNumber; ++i) {
-            if ((&listeners[i])->gameObj != nullptr) count++;
+            if ((&listeners[i])->wrapper.get_node() != nullptr) count++;
         }
         actualListenerNumber = count;
         if (actualListenerNumber > 0) listenerWarning = true;
@@ -339,20 +336,20 @@ void FmodServer::add_listener(int index, Object* game_obj) {
     }
 }
 
-void FmodServer::remove_listener(int index, Object* game_obj) {
+void FmodServer::remove_listener(int index, Node* game_obj) {
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
 
-        if (listener->gameObj != game_obj) {
+        if (listener->wrapper.get_node() != game_obj) {
             return;
         }
 
-        listener->gameObj = nullptr;
+        listener->wrapper.set_node(nullptr);
         ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, 0),
                     vformat("Cannot set listener %d weight to 0", index));
         int count = 0;
         for (int i = 0; i < systemListenerNumber; ++i) {
-            if ((&listeners[i])->gameObj != nullptr) count++;
+            if ((&listeners[i])->wrapper.get_node() != nullptr) count++;
         }
         actualListenerNumber = count;
         if (actualListenerNumber > 0) listenerWarning = true;
@@ -482,7 +479,7 @@ Object* FmodServer::get_object_attached_to_listener(int index) {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
     } else {
-        Object* node = listeners[index].gameObj;
+        Object* node = listeners[index].wrapper.get_node();
         if (!node) { GODOT_LOG_WARNING("No node was set on listener") }
         return node;
     }
@@ -505,7 +502,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 
 #ifdef DEBUG_ENABLED
     if (!FileAccess::file_exists(pathToBank)) {
-        GODOT_LOG_ERROR(vformat("Cannot load bank at %s", pathToBank));
+        GODOT_LOG_ERROR(vformat("Cannot load bank at %s", pathToBank))
         return {};
     }
 #endif
@@ -516,7 +513,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
 void FmodServer::unload_bank(const String& pathToBank) {
 #ifdef DEBUG_ENABLED
     if (!FileAccess::file_exists(pathToBank)) {
-        GODOT_LOG_ERROR(vformat("Cannot unload bank at %s", pathToBank));
+        GODOT_LOG_ERROR(vformat("Cannot unload bank at %s", pathToBank))
         return;
     }
 #endif

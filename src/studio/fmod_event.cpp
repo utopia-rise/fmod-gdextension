@@ -218,7 +218,7 @@ Transform3D FmodEvent::get_3d_attributes() const {
 }
 
 void FmodEvent::set_node_attributes(Node* node) const {
-    if (is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
+    if (node->is_inside_tree()) {
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
             ERROR_CHECK(_wrapped->set3DAttributes(&attr));
@@ -230,6 +230,7 @@ void FmodEvent::set_node_attributes(Node* node) const {
             return;
         }
     }
+    GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
 }
 
 void FmodEvent::set_callback(const Callable& callback, uint32_t p_callback_mask) {
