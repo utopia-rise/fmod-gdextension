@@ -217,24 +217,21 @@ void FmodServer::update() {
     cache->update_pending();
 
     callback_mutex->lock();
-
     for (const Callback& callback : callbacks_to_process) {
+        if (!callback.callable.is_valid()) { continue; } // Don't run the callback if the object has been killed
         godot::Array args = godot::Array();
         args.append(callback.fmod_callback_properties);
         args.append(callback.type);
         callback.callable.callv(args);
     }
-
     callbacks_to_process.clear();
-
     callback_mutex->unlock();
-
 
     Vector<OneShot*> one_shots_copy = oneShots;
     for (OneShot* oneShot : one_shots_copy) {
 
-        if (!oneShot->instance->is_valid() || oneShot->wrapper.is_valid()) {
-            //We release one-shots when they are started, the event becomes invalid as soon as it ends
+        if (!oneShot->instance->is_valid() || !oneShot->wrapper.is_valid()) {
+            // We free oneShot when their event or Object is dead.
             oneShots.erase(oneShot);
             delete oneShot;
             continue;
