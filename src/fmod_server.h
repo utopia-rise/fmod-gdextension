@@ -35,12 +35,12 @@
 namespace godot {
 
     struct OneShot {
-        Node* gameObj = nullptr;
+        NodeWrapper wrapper;
         Ref<FmodEvent> instance;
     };
 
     struct Listener {
-        Object* gameObj = nullptr;
+        NodeWrapper wrapper;
         bool listenerLock = false;
         float weight = 1.0;
     };
@@ -181,8 +181,8 @@ namespace godot {
         Array get_global_parameter_desc_list();
 
         // LISTENERS
-        void add_listener(int index, Object* game_obj);
-        void remove_listener(int index, Object* game_obj);
+        void add_listener(int index, Node* game_obj);
+        void remove_listener(int index, Node* game_obj);
         void set_system_listener_number(int listenerNumber);
         int get_system_listener_number() const;
         float get_system_listener_weight(int index);
@@ -303,7 +303,8 @@ namespace godot {
             return;
         }
 
-        if (game_obj && !is_fmod_valid(game_obj)) {
+        if (game_obj && !NodeWrapper::is_spatial_node(game_obj)) {
+            GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
             return;
         }
 
@@ -317,9 +318,7 @@ namespace godot {
         }
 
         if(game_obj){
-            auto* oneShot = new OneShot();
-            oneShot->gameObj = game_obj;
-            oneShot->instance = ref;
+            auto* oneShot = new OneShot {NodeWrapper {game_obj}, ref};
             ref->set_node_attributes(game_obj);
             oneShots.push_back(oneShot);
         }
