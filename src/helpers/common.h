@@ -131,12 +131,12 @@ namespace godot {
 
         void set_node(Node* p_node) {
             if (p_node) {
-                if (!is_spatial_node(p_node)) {
-                    GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
+                if (is_spatial_node(p_node)) {
+                    node = p_node;
+                    id = p_node->get_instance_id();
                     return;
                 }
-                node = p_node;
-                id = p_node->get_instance_id();
+                GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
             }
             node = nullptr;
         }
