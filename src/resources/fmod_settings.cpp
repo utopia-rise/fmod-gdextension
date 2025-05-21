@@ -6,6 +6,8 @@
 
 using namespace godot;
 
+const PackedStringArray FmodGeneralSettings::DEFAULT_PLUGIN_PATHS = PackedStringArray();
+
 void FmodGeneralSettings::set_channel_count(const int p_channel_count) {
     _channel_count = p_channel_count;
 }
@@ -54,6 +56,14 @@ bool FmodGeneralSettings::get_should_load_by_name() const {
     return _should_load_by_name;
 }
 
+void FmodGeneralSettings::set_plugin_paths(const PackedStringArray& p_paths) {
+    _plugin_paths = p_paths;
+}
+
+const PackedStringArray& FmodGeneralSettings::get_plugin_paths() const {
+    return _plugin_paths;
+}
+
 Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     Ref<FmodGeneralSettings> settings;
     settings.instantiate();
@@ -78,6 +88,9 @@ Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     String should_load_by_name_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, SHOULD_LOAD_BY_NAME);
     settings->set_should_load_by_name(project_settings->get_setting(should_load_by_name_setting_path, DEFAULT_SHOULD_LOAD_BY_NAME));
 
+    String plugin_paths_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, PLUGIN_PATHS_OPTION);
+    settings->set_plugin_paths(project_settings->get_setting(plugin_paths_setting_path, DEFAULT_PLUGIN_PATHS));
+
     return settings;
 }
 
@@ -99,6 +112,9 @@ void FmodGeneralSettings::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_should_load_by_name", "p_should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
     ClassDB::bind_method(D_METHOD("get_should_load_by_name"), &FmodGeneralSettings::get_should_load_by_name);
+
+    ClassDB::bind_method(D_METHOD("set_plugin_paths", "p_paths"), &FmodGeneralSettings::set_plugin_paths);
+    ClassDB::bind_method(D_METHOD("get_plugin_paths"), &FmodGeneralSettings::get_plugin_paths);
 
     ADD_PROPERTY(
       PropertyInfo(
@@ -170,5 +186,17 @@ void FmodGeneralSettings::_bind_methods() {
       ),
       "set_should_load_by_name",
       "get_should_load_by_name"
+    );
+
+    ADD_PROPERTY(
+      PropertyInfo(
+        Variant::PACKED_STRING_ARRAY,
+        "plugin_paths",
+        PROPERTY_HINT_NONE,
+        "",
+        PROPERTY_USAGE_DEFAULT
+      ),
+      "set_plugin_paths",
+      "get_plugin_paths"
     );
 }

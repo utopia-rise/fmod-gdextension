@@ -117,6 +117,7 @@ namespace godot {
         Ref<FmodEventDescription> _get_event_description(const FMOD_GUID& guid);
 
         void _update_performance_data();
+        void _load_plugin(const String& path);
 
     public:
         FmodServer();
@@ -255,6 +256,7 @@ namespace godot {
         void mute_all_events();
         void unmute_all_events();
         void wait_for_all_loads();
+        void load_plugin(const String& path);
 
     protected:
         static void _bind_methods();
