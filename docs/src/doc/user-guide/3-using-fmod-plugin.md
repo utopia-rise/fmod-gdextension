@@ -24,6 +24,7 @@ abstractions for convenience.
     - [Using node](6-listeners.md#fmod-listener-nodes)
     - [Using FmodServer](6-listeners.md#using-fmodserver-api)
 - [Playing sounds](7-playing-sounds.md)
+- [Custom FMOD Plugins](2a-custom-plugins.md) (Covers both automatic and manual loading, including `FmodServer.load_plugin`)
 - [Other low level examples](8-other-low-level-examples.md)
 
 
