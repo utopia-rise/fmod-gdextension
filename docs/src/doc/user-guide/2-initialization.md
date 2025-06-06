@@ -54,6 +54,12 @@ roll-off scale.
 
 ![3d-tab]
 
+## Custom FMOD Plugins
+
+This integration supports loading custom FMOD plugins (e.g., custom effects or codecs) to extend the FMOD Core API's functionality. You can load plugins automatically at startup via Project Settings or manually at runtime using GDScript.
+
+For detailed information on how to set up and use custom FMOD plugins, please refer to the [Custom FMOD Plugins](./2a-custom-plugins.md) page.
+
 ## Fmod explorer
 
 When all is setup you can explore your project's banks using `Fmod Explorer`.  

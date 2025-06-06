@@ -84,6 +84,7 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
+    ClassDB::bind_method(D_METHOD("load_plugin", "path"), &FmodServer::load_plugin);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
@@ -160,6 +161,30 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
+    }
+
+    // Load plugins specified in settings
+    if (coreSystem) { // Check if coreSystem was successfully obtained
+        const PackedStringArray& plugin_paths = p_settings->get_plugin_paths();
+        if (!plugin_paths.is_empty()) {
+            GODOT_LOG_INFO(vformat("Found %d plugin(s) to load from settings.", plugin_paths.size()));
+            for (int i = 0; i < plugin_paths.size(); ++i) {
+                const String& plugin_path = plugin_paths[i];
+                if (!plugin_path.is_empty()) {
+                    CharString plugin_path_char_string = plugin_path.utf8();
+                    const char* plugin_path_utf8 = plugin_path_char_string.get_data();
+                    unsigned int plugin_handle = 0;
+                    FMOD_RESULT result = coreSystem->loadPlugin(plugin_path_utf8, &plugin_handle, 0);
+                    if (result != FMOD_OK) {
+                        GODOT_LOG_ERROR(vformat("Failed to load FMOD plugin (from settings) at path '%s'. Error: %s", plugin_path, FMOD_ErrorString(result)));
+                    } else {
+                        GODOT_LOG_INFO(vformat("Successfully loaded FMOD plugin (from settings) at path '%s' with handle %u.", plugin_path, plugin_handle));
+                    }
+                } else {
+                    GODOT_LOG_WARNING("Empty plugin path found in FmodGeneralSettings at index " + String::num_int64(i));
+                }
+            }
+        }
     }
 
     // editing advanced settings to set random seed before system initialization
@@ -256,6 +281,30 @@ void FmodServer::update() {
 #endif
 
     ERROR_CHECK(system->update());
+}
+
+void FmodServer::_load_plugin(const String& path) {
+    if (!isInitialized || !coreSystem) {
+        GODOT_LOG_ERROR("FMOD System not initialized, cannot load plugin: " + path);
+        return;
+    }
+
+    // Convert Godot String to char* for FMOD
+    // Ensure the string is null-terminated for FMOD.
+    // The get_data() method on CharString returns a pointer to a null-terminated C-style string.
+    CharString plugin_path_char_string = path.utf8();
+    const char* plugin_path_utf8 = plugin_path_char_string.get_data();
+
+    unsigned int plugin_handle = 0; // FMOD returns a handle, can be stored if needed
+    FMOD_RESULT result = coreSystem->loadPlugin(plugin_path_utf8, &plugin_handle, 0); // Priority 0 for now
+
+    if (result != FMOD_OK) {
+        GODOT_LOG_ERROR(vformat("Failed to load FMOD plugin at path '%s'. Error: %s - %s", path, FMOD_ErrorString(result), result));
+    } else {
+        GODOT_LOG_INFO(vformat("Successfully loaded FMOD plugin at path '%s' with handle %u.", path, plugin_handle));
+        // Optionally, store the plugin_handle if you need to refer to it later,
+        // e.g., in a HashMap<String, unsigned int> plugin_handles;
+    }
 }
 
 void FmodServer::_set_listener_attributes() {
@@ -878,6 +927,12 @@ void FmodServer::set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_setting
 void FmodServer::wait_for_all_loads() {
     ERROR_CHECK(system->flushSampleLoading());
     cache->update_pending();
+}
+
+void FmodServer::load_plugin(const String& path) {
+    // This public method can directly call the private one.
+    // It primarily serves as the C++ entry point that will be bound to GDScript.
+    _load_plugin(path);
 }
 
 Array FmodServer::get_available_drivers() {
