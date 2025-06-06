@@ -41,27 +41,27 @@ windows.release.x86_64 = {
 }
 linux.editor.x86_64  = {
 "libs/linux/libfmodL.so": "",
-"libs/linux/libfmodL.so.13": "",
-"libs/linux/libfmodL.so.13.12": "",
+"libs/linux/libfmodL.so.14": "",
+"libs/linux/libfmodL.so.14.6": "",
 "libs/linux/libfmodstudioL.so": "",
-"libs/linux/libfmodstudioL.so.13": "",
-"libs/linux/libfmodstudioL.so.13.12": ""
+"libs/linux/libfmodstudioL.so.14": "",
+"libs/linux/libfmodstudioL.so.14.6": ""
 }
 linux.debug.x86_64  = {
 "libs/linux/libfmodL.so": "",
-"libs/linux/libfmodL.so.13": "",
-"libs/linux/libfmodL.so.13.12": "",
+"libs/linux/libfmodL.so.14": "",
+"libs/linux/libfmodL.so.14.6": "",
 "libs/linux/libfmodstudioL.so": "",
-"libs/linux/libfmodstudioL.so.13": "",
-"libs/linux/libfmodstudioL.so.13.12": ""
+"libs/linux/libfmodstudioL.so.14": "",
+"libs/linux/libfmodstudioL.so.14.6": ""
 }
 linux.release.x86_64 = {
 "libs/linux/libfmod.so": "",
-"libs/linux/libfmod.so.13": "",
-"libs/linux/libfmod.so.13.12": "",
+"libs/linux/libfmod.so.14": "",
+"libs/linux/libfmod.so.14.6": "",
 "libs/linux/libfmodstudio.so": "",
-"libs/linux/libfmodstudio.so.13": "",
-"libs/linux/libfmodstudio.so.13.12": ""
+"libs/linux/libfmodstudio.so.14": "",
+"libs/linux/libfmodstudio.so.14.6": ""
 }
 macos.editor  = {
 "libs/macos/libfmodL.dylib": "",
