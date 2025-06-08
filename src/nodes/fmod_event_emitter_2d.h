@@ -13,6 +13,7 @@ namespace godot {
 
     private:
         void set_space_attribute_impl(const Ref<FmodEvent>& p_event) const;
+        void reset_space_attribute_impl(const Ref<FmodEvent>& p_event) const;
         void free_impl();
 
     public:

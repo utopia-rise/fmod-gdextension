@@ -98,6 +98,7 @@ namespace godot {
     private:
         template<bool is_one_shot> void _play(bool should_start_event);
         void set_space_attribute(const Ref<FmodEvent>& p_event) const;
+        void reset_space_attribute(const Ref<FmodEvent>& p_event) const;
         void _set_parameter_value(Parameter* parameter, const Variant& p_property);
         void apply_parameters();
         void free();
@@ -117,6 +118,11 @@ namespace godot {
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_space_attribute(const Ref<FmodEvent>& p_event) const {
         static_cast<const Derived*>(this)->set_space_attribute_impl(p_event);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::reset_space_attribute(const Ref<FmodEvent>& p_event) const {
+        static_cast<const Derived*>(this)->reset_space_attribute_impl(p_event);
     }
 
     template<class Derived, class NodeType>
@@ -161,7 +167,9 @@ namespace godot {
             }
         }
 
-        if (_attached && _event->is_valid()) { set_space_attribute(_event); }
+        if (_attached && _event->is_valid()) {
+            set_space_attribute(_event);
+        }
     }
 
     template<class Derived, class NodeType>
@@ -255,7 +263,11 @@ namespace godot {
         event->set_volume(_volume);
         apply_parameters();
 
-        set_space_attribute(event);
+        if (_attached) {
+            set_space_attribute(event);
+        } else {
+            reset_space_attribute(event);
+        }
         if (!_programmer_callback_sound_key.is_empty()) {
             event->set_programmer_callback(_programmer_callback_sound_key);
         }

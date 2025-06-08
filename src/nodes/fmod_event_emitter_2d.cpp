@@ -6,6 +6,10 @@ void FmodEventEmitter2D::set_space_attribute_impl(const Ref<FmodEvent>& p_event)
     p_event->set_2d_attributes(get_global_transform());
 }
 
+void FmodEventEmitter2D::reset_space_attribute_impl(const Ref<FmodEvent>& p_event) const {
+    p_event->set_2d_attributes(FmodServer::get_singleton()->get_listener_transform2d(0));
+}
+
 void FmodEventEmitter2D::_ready() {
     FmodEventEmitter<FmodEventEmitter2D, Node2D>::_ready();
 }

@@ -6,6 +6,10 @@ void FmodEventEmitter3D::set_space_attribute_impl(const Ref<FmodEvent>& p_event)
     p_event->set_3d_attributes(get_global_transform());
 }
 
+void FmodEventEmitter3D::reset_space_attribute_impl(const Ref<FmodEvent>& p_event) const {
+    p_event->set_3d_attributes(FmodServer::get_singleton()->get_listener_transform3d(0));
+}
+
 void FmodEventEmitter3D::_ready() {
     FmodEventEmitter<FmodEventEmitter3D, Node3D>::_ready();
 }
