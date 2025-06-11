@@ -498,7 +498,9 @@ void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_se
 }
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
-    if (cache->has_bank(pathToBank)) return {cache->get_bank(pathToBank)};// bank is already loaded
+    if (cache->has_bank(pathToBank)) {
+        return cache->get_bank(pathToBank);
+    }// bank is already loaded
 
 #ifdef DEBUG_ENABLED
     if (!FileAccess::file_exists(pathToBank)) {

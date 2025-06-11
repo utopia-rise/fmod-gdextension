@@ -62,18 +62,22 @@ func _ready():
     tree.item_selected.connect(_on_item_selected)
     
     tree.columns = 1
-    regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+    generate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
     
     %RefreshBanksButton.pressed.connect(on_refresh_banks_button_pressed)
 
 
 func regenerate_tree(to_display: int, callable: Callable = Callable()):
+    tree.clear()
+    generate_tree(to_display, callable)
+
+
+func generate_tree(to_display: int, callable: Callable = Callable()):
     %SelectButton.visible = should_display_select_button
     if _current_select_callable != Callable() && _current_select_callable.get_object() != null:
         emit_path_and_guid.disconnect(_current_select_callable)
     _current_select_callable = callable
     
-    tree.clear()
     var root_item := tree.create_item()
     root_item.set_text(0, "Fmod objects")
     root_item.set_icon(0, _fmod_icon)
@@ -206,35 +210,11 @@ func _on_copy_guid_button():
 func on_refresh_banks_button_pressed() -> void:
     # unload banks
     banks.clear()
+    tree.clear()
     
-    # get the banks to load
-    var path : String = ProjectSettings.get_setting("Fmod/General/banks_path", "")
-    if !path:
-        printerr("No banks path set in the project settings (Fmod/General/banks_path)")
-        return # no path set in the project settings
-    var bank_paths_to_load : Array[String]
-    var dir : DirAccess = DirAccess.open(path)
-    if dir:
-        dir.list_dir_begin()
-        var file_name : String = dir.get_next()
-        while file_name != "":
-            if dir.current_is_dir():
-                pass # the found item is a directory
-            else:
-                if file_name.ends_with(".bank"):
-                    bank_paths_to_load.append(path + "/" + file_name)
-            file_name = dir.get_next()
-        if bank_paths_to_load:
-            # sort to first load the master bank and its strings
-            bank_paths_to_load.sort_custom(func(path1 : String, path2 : String) -> bool: return path1.contains("Master"))
-        else:
-            printerr("Could not find any banks in the specified directory")
-        for bank_path : String in bank_paths_to_load:
-            banks.append(FmodServer.load_bank(bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
-    else:
-        printerr("Couldn't access bank path, please make sure you specified a folder with the banks as direct children")
-        
-    regenerate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
+    FmodBankDatabase.reload_all_banks()
+    
+    generate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
 
 
 func close_window():
