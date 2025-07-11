@@ -204,8 +204,6 @@ namespace godot {
         bool banks_still_loading();
 
         // PLUGINS
-        static String get_plugins_base_path(const Ref<FmodPluginsSettings>& p_settings);
-        static Vector<String> get_plugins_libraries_paths(const Ref<FmodPluginsSettings>& p_settings);
         void load_all_plugins(const Ref<FmodPluginsSettings>& p_settings);
         uint32_t load_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
         void unload_plugin(uint32_t p_plugin_handle);

@@ -61,9 +61,11 @@ namespace godot {
 
 #ifndef IOS_ENABLED
         uint32_t add_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+#else
+        void add_plugin(uint32_t p_plugin_handle);
+#endif
         bool has_plugin(uint32_t p_plugin_handle) const;
         void remove_plugin(uint32_t p_plugin_handle);
-#endif
 
         Ref<FmodFile> add_file(const String& filePath, unsigned int flag);
         bool has_file(const String& filePath);

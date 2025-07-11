@@ -84,6 +84,14 @@ uint32_t FmodCache::add_plugin(const String& p_plugin_path, uint32_t p_priority)
     return handle;
 }
 
+#else
+
+void FmodCache::add_plugin(uint32_t p_plugin_handle) {
+    plugin_handles.append(p_plugin_handle);
+}
+
+#endif
+
 bool FmodCache::has_plugin(uint32_t p_plugin_handle) const {
     return plugin_handles.has(p_plugin_handle);
 }
@@ -97,7 +105,6 @@ void FmodCache::remove_plugin(uint32_t p_plugin_handle) {
     plugin_handles.erase(p_plugin_handle);
 }
 
-#endif
 
 Ref<FmodFile> FmodCache::add_file(const String& file_path, unsigned int flag) {
     FMOD::System* core = nullptr;

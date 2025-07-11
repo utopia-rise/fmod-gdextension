@@ -76,16 +76,10 @@ void FmodEditorPlugin::_ready() {
     );
 
     add_setting(
-            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::BASE_PATH_OPTION),
-        FmodPluginsSettings::DEFAULT_BASE_PATH,
+            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::RESOURCE_OPTION),
+        FmodPluginsSettings::DEFAULT_RESOURCE_OPTION,
         Variant::Type::STRING,
-        PROPERTY_HINT_DIR
-    );
-
-    add_setting(
-            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::DYNAMIC_PLUGIN_LIST_OPTION),
-            PackedStringArray(),
-            Variant::Type::PACKED_STRING_ARRAY
+        PROPERTY_HINT_FILE
     );
 
     add_setting(

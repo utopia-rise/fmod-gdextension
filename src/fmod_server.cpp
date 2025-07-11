@@ -5,6 +5,8 @@
 #include "helpers/maths.h"
 #include "classes/os.hpp"
 #include "classes/dir_access.hpp"
+#include "plugins/plugins_helper.h"
+#include "plugins/ios_plugins_loader.h"
 
 #include <fmod_server.h>
 
@@ -533,59 +535,43 @@ bool FmodServer::banks_still_loading() {
     return cache->is_loading();
 }
 
-String FmodServer::get_plugins_base_path(const Ref<FmodPluginsSettings>& p_settings) {
-#ifdef TOOLS_ENABLED
-    return p_settings->get_plugins_base_path();
-#else
-    return OS::get_singleton()
-        ->get_executable_path()
-        .get_base_dir()
-#ifdef MACOS_ENABLED
-        .path_join("../PlugIns/")
-#endif
-    ;
-#endif
+#ifdef IOS_ENABLED
+uint32_t register_ios_dsp(FMOD_SYSTEM_PTR system, FMOD_DSP_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerDSP(description, handle);
 }
 
-Vector<String> FmodServer::get_plugins_libraries_paths(const Ref<FmodPluginsSettings>& p_settings) {
-    String plugin_directory = get_plugins_base_path(p_settings);
-    String os_lower_name = OS::get_singleton()->get_name().to_lower();
-
-#ifdef TOOLS_ENABLED
-    plugin_directory = plugin_directory.path_join(os_lower_name);
-#endif
-
-    String plugin_extension;
-    String plugin_lib_prefix = "lib";
-    if (os_lower_name == "windows") {
-        plugin_extension = "dll";
-        plugin_lib_prefix = "";
-    } else if (os_lower_name == "macos") {
-        plugin_extension = "dylib";
-    } else {
-        plugin_extension = "so";
-    }
-
-    const PackedStringArray& plugin_list = p_settings->get_dynamic_plugin_list();
-
-    Vector<String> result;
-
-    for (const String& plugin : plugin_list) {
-        result.append(plugin_directory.path_join(vformat("%s%s.%s", plugin_lib_prefix, plugin, plugin_extension)));
-    }
-
-    return result;
+uint32_t register_ios_codec(FMOD_SYSTEM_PTR system, FMOD_CODEC_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerCodec(description, handle);
 }
+
+uint32_t register_ios_output(FMOD_SYSTEM_PTR system, FMOD_OUTPUT_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerOutput(description, handle);
+}
+#endif
 
 void FmodServer::load_all_plugins(const Ref<FmodPluginsSettings>& p_settings) {
 #ifndef IOS_ENABLED
-    Vector<String> plugin_paths = get_plugins_libraries_paths(p_settings);
+    Vector<String> plugin_paths = get_fmod_plugins_libraries_paths(p_settings);
     for (const String& path : plugin_paths) {
 #ifdef DEBUG_ENABLED
         GODOT_LOG_INFO(vformat("Will load %s", path));
 #endif
         load_plugin(path);
     }
+#else
+    FMOD_IOS_INTERFACE interface {
+        .system = coreSystem,
+        .register_dsp_method = &register_ios_dsp,
+        .register_codec_method = &register_ios_codec,
+        .register_output_method = &register_ios_output
+    };
+
+    uint32_t plugin_count;
+    uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
+    for (uint32_t i = 0; i < plugin_count; ++i) {
+        cache->add_plugin(plugin_handles[i]);
+    }
+    std::free(plugin_handles);
 #endif
 }
 
