@@ -103,7 +103,7 @@ elif env["platform"] == "ios":
     env.Append(LIBS=[libfmod, libfmodstudio])
 
     env.Append(LINKFLAGS=[
-        '-Wl,-undefined,dynamic_lookup',
+        '-Wl,-undefined,dynamic_lookup', "-miphoneos-version-min=" + env["ios_min_version"]
     ])
 
 elif env["platform"] == "android":
@@ -163,6 +163,7 @@ if env["platform"] == "ios":
     def create_xcframework(self, arg, env, executor = None):
         sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
         sys_exec(["rm", target])
+        sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
 
     create_xcframework_action = Action('', create_xcframework)
 
