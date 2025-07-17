@@ -79,7 +79,12 @@ Ref<FmodBank> FmodCache::get_bank(const String& bankPath) {
 
 uint32_t FmodCache::add_plugin(const String& p_plugin_path, uint32_t p_priority) {
     uint32_t handle;
-    ERROR_CHECK(core_system->loadPlugin(ProjectSettings::get_singleton()->globalize_path(p_plugin_path).utf8().get_data(), &handle, p_priority));
+#if defined(ANDROID_ENABLED) && !defined(TOOLS_ENABLED)
+    const char* plugin_path = p_plugin_path.utf8().get_data();
+#else
+    const char* plugin_path = ProjectSettings::get_singleton()->globalize_path(p_plugin_path).utf8().get_data();
+#endif
+    ERROR_CHECK(core_system->loadPlugin(plugin_path, &handle, p_priority));
     plugin_handles.append(handle);
     return handle;
 }

@@ -45,8 +45,8 @@ void FmodPluginsSettings::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_dynamic_plugin_list", "p_dynamic_plugin_list"), &FmodPluginsSettings::set_dynamic_plugin_list);
     ClassDB::bind_method(D_METHOD("get_dynamic_plugin_list"), &FmodPluginsSettings::get_dynamic_plugin_list);
 
-    ClassDB::bind_method(D_METHOD("set_static_plugins_settings", "p_static_plugins_settings"), &FmodPluginsSettings::set_static_plugins_settings);
-    ClassDB::bind_method(D_METHOD("get_static_plugins_settings"), &FmodPluginsSettings::get_static_plugins_settings);
+    ClassDB::bind_method(D_METHOD("set_static_plugins_methods", "p_static_plugins_settings"), &FmodPluginsSettings::set_static_plugins_methods);
+    ClassDB::bind_method(D_METHOD("get_static_plugins_methods"), &FmodPluginsSettings::get_static_plugins_methods);
 
     ADD_PROPERTY(
             PropertyInfo(
@@ -75,22 +75,22 @@ void FmodPluginsSettings::_bind_methods() {
     ADD_PROPERTY(
             PropertyInfo(
                     Variant::ARRAY,
-                    "static_plugins_settings",
+                    "static_plugins_methods",
                     PROPERTY_HINT_ARRAY_TYPE,
-                    vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "FmodStaticPluginSetting"),
+                    vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "FmodStaticPluginMethod"),
                     PROPERTY_USAGE_DEFAULT
             ),
-            "set_static_plugins_settings",
-            "get_static_plugins_settings"
+            "set_static_plugins_methods",
+            "get_static_plugins_methods"
     );
 }
 
-void FmodPluginsSettings::set_static_plugins_settings(const Array& p_static_plugins_settings) {
-    _static_plugins_settings = p_static_plugins_settings;
+void FmodPluginsSettings::set_static_plugins_methods(const Array& p_static_plugins_settings) {
+    _static_plugins_methods = p_static_plugins_settings;
 }
 
-const Array& FmodPluginsSettings::get_static_plugins_settings() const {
-    return _static_plugins_settings;
+const Array& FmodPluginsSettings::get_static_plugins_methods() const {
+    return _static_plugins_methods;
 }
 
 void FmodStaticPluginMethod::set_type(FmodStaticPluginMethod::Type p_type) {
@@ -143,73 +143,4 @@ void FmodStaticPluginMethod::_bind_methods() {
     BIND_ENUM_CONSTANT(CODEC);
     BIND_ENUM_CONSTANT(DSP);
     BIND_ENUM_CONSTANT(OUTPUT);
-}
-
-void FmodStaticPluginSetting::set_plugin_name(const String& p_plugin_name) {
-    _plugin_name = p_plugin_name;
-}
-
-const String& FmodStaticPluginSetting::get_plugin_name() const {
-    return _plugin_name;
-}
-
-void FmodStaticPluginSetting::set_methods(const Array& p_methods) {
-    _methods = p_methods;
-}
-
-const Array& FmodStaticPluginSetting::get_methods() const {
-    return _methods;
-}
-
-void FmodStaticPluginSetting::set_dependent_libraries(const PackedStringArray& p_dependent_libraries) {
-    _dependent_libraries = p_dependent_libraries;
-}
-
-const PackedStringArray& FmodStaticPluginSetting::get_dependent_libraries() const {
-    return _dependent_libraries;
-}
-
-void FmodStaticPluginSetting::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_plugin_name", "p_plugin_name"), &FmodStaticPluginSetting::set_plugin_name);
-    ClassDB::bind_method(D_METHOD("get_plugin_name"), &FmodStaticPluginSetting::get_plugin_name);
-
-    ClassDB::bind_method(D_METHOD("set_methods", "p_methods"), &FmodStaticPluginSetting::set_methods);
-    ClassDB::bind_method(D_METHOD("get_methods"), &FmodStaticPluginSetting::get_methods);
-
-    ClassDB::bind_method(D_METHOD("set_dependent_libraries", "p_dependent_libraries"), &FmodStaticPluginSetting::set_dependent_libraries);
-    ClassDB::bind_method(D_METHOD("get_dependent_libraries"), &FmodStaticPluginSetting::get_dependent_libraries);
-
-    ADD_PROPERTY(
-            PropertyInfo(
-                    Variant::STRING,
-                    "plugin_name",
-                    PROPERTY_HINT_NONE,
-                    "",
-                    PROPERTY_USAGE_DEFAULT
-            ),
-            "set_plugin_name",
-            "get_plugin_name"
-    );
-
-    ADD_PROPERTY(
-            PropertyInfo(
-                    Variant::ARRAY,
-                    "methods",
-                    PROPERTY_HINT_ARRAY_TYPE,
-                    vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "FmodStaticPluginMethod"),
-                    PROPERTY_USAGE_DEFAULT
-            ),
-            "set_methods",
-            "get_methods"
-    );
-
-    ADD_PROPERTY(
-      PropertyInfo(
-        Variant::PACKED_STRING_ARRAY,
-        "dependent_libraries",
-        PROPERTY_HINT_NONE
-      ),
-      "set_dependent_libraries",
-      "get_dependent_libraries"
-    );
 }

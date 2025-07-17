@@ -30,29 +30,31 @@ void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bo
     bool is_linux_export = features.has("linux");
     bool is_macos_export = features.has("macos");
     bool is_ios_export = features.has("ios");
+    bool is_android_export = features.has("android");
 
     Ref<FmodPluginsSettings> plugins_settings = FmodPluginsSettings::get_from_project_settings();
 
     if (is_macos_export) {
-        Vector<String> plugins_paths = get_fmod_plugins_libraries_paths(plugins_settings, "macos");
-        for (const String& plugin_path : plugins_paths) {
-            add_macos_plugin_file(plugin_path);
+        PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, "macos", ".dylib");
+        for (const String& library_path : plugins_libraries_path) {
+            add_macos_plugin_file(library_path);
         }
     } else if (is_linux_export || is_windows_export) {
         String target_dir = path.get_base_dir();
         String os_name = is_linux_export ? "linux" : "windows";
-        Vector<String> plugins_paths = get_fmod_plugins_libraries_paths(plugins_settings, os_name);
+        String extension = is_linux_export ? ".so" : ".dll";
+        PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, os_name, extension);
 
         Ref<DirAccess> dir_access = DirAccess::open(target_dir);
-        for (const String& plugin_path : plugins_paths) {
-            GODOT_LOG_INFO(vformat("Will copy %s to %s", plugin_path, target_dir));
-            Ref<FileAccess> file_access = FileAccess::open(plugin_path, FileAccess::READ);
-            dir_access->copy(plugin_path, target_dir.path_join(file_access->get_path().get_file()));
+        for (const String& library_path : plugins_libraries_path) {
+            GODOT_LOG_INFO(vformat("Will copy %s to %s", library_path, target_dir));
+            Ref<FileAccess> file_access = FileAccess::open(library_path, FileAccess::READ);
+            dir_access->copy(library_path, target_dir.path_join(file_access->get_path().get_file()));
         }
     } else if (is_ios_export) {
-        Vector<String> plugins_paths = get_fmod_plugins_libraries_paths(plugins_settings, "ios");
-        for (const String& plugin_path : plugins_paths) {
-            add_ios_project_static_lib(plugin_path);
+        PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, "ios", ".a");
+        for (const String& library_path : plugins_libraries_path) {
+            add_ios_project_static_lib(library_path);
         }
 
         String cpp_code_declaration = R"(
@@ -85,40 +87,34 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) uint32_t
     uint32_t* handles = reinterpret_cast<uint32_t*>(std::malloc(sizeof(uint32_t) * %s));
 
 )";
-        const Array& static_plugins_settings = plugins_settings->get_static_plugins_settings();
-        int count = 0;
-        for (int i = 0; i < static_plugins_settings.size(); ++i) {
-            const Ref<FmodStaticPluginSetting>& static_plugin_setting = static_plugins_settings[i];
-            const Array& plugin_methods = static_plugin_setting->get_methods();
-
-            for (int j = 0; j < plugin_methods.size(); ++j) {
-                const Ref<FmodStaticPluginMethod>& plugin_method = plugin_methods[j];
-                const String& method_name = plugin_method->get_method_name();
-                switch (plugin_method->get_type()) {
-                    case FmodStaticPluginMethod::CODEC:
-                        cpp_code_external_plugin_declaration +=
-                                vformat("    FMOD_CODEC_DESCRIPTION* %s();\n", method_name);
-                        cpp_code_load_method +=
-                                vformat("    p_interface->register_codec_method(fmod_system, %s(), &handle);\n", method_name);
-                        break;
-                    case FmodStaticPluginMethod::DSP:
-                        cpp_code_external_plugin_declaration +=
-                                vformat("    FMOD_DSP_DESCRIPTION* %s();\n", method_name);
-                        cpp_code_load_method +=
-                                vformat("    p_interface->register_dsp_method(fmod_system, %s(), &handle);\n", method_name);
-                        break;
-                    case FmodStaticPluginMethod::OUTPUT:
-                        cpp_code_external_plugin_declaration +=
-                                vformat("    FMOD_OUTPUT_DESCRIPTION* %s();\n", method_name);
-                        cpp_code_load_method +=
-                                vformat("    p_interface->register_output_method(fmod_system, %s(), &handle);\n", method_name);
-                        break;
-                    case FmodStaticPluginMethod::COUNT:
-                        break;
-                }
-                cpp_code_load_method += vformat("handles[%s] = handle;\n", count);
-                ++count;
+        const Array& plugin_methods = plugins_settings->get_static_plugins_methods();
+        int64_t method_count = plugin_methods.size();
+        for (int i = 0; i < method_count; ++i) {
+            const Ref<FmodStaticPluginMethod>& plugin_method = plugin_methods[i];
+            const String& method_name = plugin_method->get_method_name();
+            switch (plugin_method->get_type()) {
+                case FmodStaticPluginMethod::CODEC:
+                    cpp_code_external_plugin_declaration +=
+                            vformat("    FMOD_CODEC_DESCRIPTION* %s();\n", method_name);
+                    cpp_code_load_method +=
+                            vformat("    p_interface->register_codec_method(fmod_system, %s(), &handle);\n", method_name);
+                    break;
+                case FmodStaticPluginMethod::DSP:
+                    cpp_code_external_plugin_declaration +=
+                            vformat("    FMOD_DSP_DESCRIPTION* %s();\n", method_name);
+                    cpp_code_load_method +=
+                            vformat("    p_interface->register_dsp_method(fmod_system, %s(), &handle);\n", method_name);
+                    break;
+                case FmodStaticPluginMethod::OUTPUT:
+                    cpp_code_external_plugin_declaration +=
+                            vformat("    FMOD_OUTPUT_DESCRIPTION* %s();\n", method_name);
+                    cpp_code_load_method +=
+                            vformat("    p_interface->register_output_method(fmod_system, %s(), &handle);\n", method_name);
+                    break;
+                case FmodStaticPluginMethod::COUNT:
+                    break;
             }
+            cpp_code_load_method += vformat("handles[%s] = handle;\n", i);
         }
 
         cpp_code_external_plugin_declaration += "}\n";
@@ -132,9 +128,34 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) uint32_t
                         "%s%s%s",
                         cpp_code_declaration,
                         cpp_code_external_plugin_declaration,
-                        vformat(cpp_code_load_method, count, count)
+                        vformat(cpp_code_load_method, method_count, method_count)
                 )
         );
+    } else if (is_android_export) {
+        bool is_x86 = features.has("x86_64");
+        bool is_arm64 = features.has("arm64");
+
+        if (is_x86) {
+            PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, "android", ".so", "x86_64");
+
+            PackedStringArray tags;
+            tags.append("x86_64");
+
+            for (const String& library_path : plugins_libraries_path) {
+                add_shared_object(library_path, tags, String());
+            }
+        }
+
+        if (is_arm64) {
+            PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, "android", ".so", "arm64");
+
+            PackedStringArray tags;
+            tags.append("arm64-v8a");
+
+            for (const String& library_path : plugins_libraries_path) {
+                add_shared_object(library_path, tags, String());
+            }
+        }
     }
 }
 
@@ -143,5 +164,14 @@ String FmodEditorExportPlugin::_get_name() const {
 }
 
 void FmodEditorExportPlugin::_bind_methods() {}
+
+PackedStringArray FmodEditorExportPlugin::_get_libraries_to_export(const Ref<FmodPluginsSettings>& settings, const String& p_os_name, const String& p_extension, const String& p_arch) {
+    PackedStringArray result;
+
+    String plugins_libraries_path = get_plugins_os_directory(settings, p_os_name, p_arch);
+    list_files_in_folder(result, plugins_libraries_path, p_extension);
+
+    return result;
+}
 
 #endif

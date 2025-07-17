@@ -20,13 +20,27 @@ namespace godot {
 #endif
     }
 
-    static Vector<String> get_fmod_plugins_libraries_paths(const Ref<FmodPluginsSettings>& p_settings, const String& os_override = "") {
+#if !defined(ANDROID_ENABLED) || defined(TOOLS_ENABLED)
+    static String get_plugins_os_directory(const Ref<FmodPluginsSettings>& p_settings, const String& p_os_lower_name, const String& p_arch) {
         String plugin_directory = get_fmod_plugins_base_path(p_settings);
-        String os_lower_name = os_override.is_empty() ? OS::get_singleton()->get_name().to_lower() : os_override;
 
 #ifdef TOOLS_ENABLED
-        plugin_directory = plugin_directory.path_join(os_lower_name);
+        plugin_directory = plugin_directory.path_join(p_os_lower_name);
+
+        if (!p_arch.is_empty()) {
+            plugin_directory = plugin_directory.path_join(p_arch);
+        }
 #endif
+        return plugin_directory;
+    }
+#endif
+
+    static Vector<String> get_fmod_plugins_libraries_paths(const Ref<FmodPluginsSettings>& p_settings, const String& os_override = "", const String& arch = "") {
+        Vector<String> result;
+
+#if !defined(ANDROID_ENABLED) || defined(TOOLS_ENABLED)
+        String os_lower_name = os_override.is_empty() ? OS::get_singleton()->get_name().to_lower() : os_override.to_lower();
+        String plugin_directory = get_plugins_os_directory(p_settings, os_lower_name, arch);
 
         String plugin_extension;
         String plugin_lib_prefix = "lib";
@@ -35,32 +49,20 @@ namespace godot {
             plugin_lib_prefix = "";
         } else if (os_lower_name == "macos") {
             plugin_extension = "dylib";
-        } else if (os_lower_name == "ios") {
-            plugin_extension = "a";
         } else {
             plugin_extension = "so";
         }
 
-        PackedStringArray plugin_list;
-        Vector<String> result;
-
-        if (os_lower_name == "ios") {
-            Array static_plugin_settings = p_settings->get_static_plugins_settings();
-            for (int i = 0; i < static_plugin_settings.size(); ++i) {
-                Ref<FmodStaticPluginSetting> static_setting = static_plugin_settings[i];
-                plugin_list.append(static_setting->get_plugin_name());
-
-                for (const String& dependent_library : static_setting->get_dependent_libraries()) {
-                    result.append(plugin_directory.path_join(dependent_library));
-                }
-            }
-        } else {
-            plugin_list = p_settings->get_dynamic_plugin_list();
-        }
+        PackedStringArray plugin_list = p_settings->get_dynamic_plugin_list();
 
         for (const String& plugin : plugin_list) {
             result.append(plugin_directory.path_join(vformat("%s%s.%s", plugin_lib_prefix, plugin, plugin_extension)));
         }
+#else
+        for (const String& plugin : p_settings->get_dynamic_plugin_list()) {
+            result.append(vformat("lib%s.so", plugin));
+        }
+#endif
 
         return result;
     }

@@ -100,7 +100,6 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodDspSettings>();
         ClassDB::register_class<FmodSound3DSettings>();
         ClassDB::register_class<FmodStaticPluginMethod>();
-        ClassDB::register_class<FmodStaticPluginSetting>();
         ClassDB::register_class<FmodPluginsSettings>();
 
         // Server

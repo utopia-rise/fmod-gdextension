@@ -31,27 +31,6 @@ namespace godot {
         static void _bind_methods();
     };
 
-    class FmodStaticPluginSetting : public Resource {
-        GDCLASS(FmodStaticPluginSetting, Resource)
-
-    public:
-        void set_plugin_name(const String& p_plugin_name);
-        const String& get_plugin_name() const;
-
-        void set_methods(const Array& p_methods);
-        const Array& get_methods() const;
-
-        void set_dependent_libraries(const PackedStringArray& p_dependent_libraries);
-        const PackedStringArray& get_dependent_libraries() const;
-    private:
-        String _plugin_name;
-        Array _methods;
-        PackedStringArray _dependent_libraries;
-
-    protected:
-        static void _bind_methods();
-    };
-
     class FmodPluginsSettings : public Resource {
         GDCLASS(FmodPluginsSettings, Resource)
 
@@ -62,8 +41,8 @@ namespace godot {
         void set_dynamic_plugin_list(const PackedStringArray& p_dynamic_plugin_list);
         const PackedStringArray& get_dynamic_plugin_list() const;
 
-        void set_static_plugins_settings(const Array& p_static_plugins_settings);
-        const Array& get_static_plugins_settings() const;
+        void set_static_plugins_methods(const Array& p_static_plugins_settings);
+        const Array& get_static_plugins_methods() const;
 
         static Ref<FmodPluginsSettings> get_from_project_settings();
 
@@ -78,7 +57,7 @@ namespace godot {
     private:
         String _plugins_base_path;
         PackedStringArray _dynamic_plugin_list;
-        Array _static_plugins_settings;
+        Array _static_plugins_methods;
 
     protected:
         static void _bind_methods();
