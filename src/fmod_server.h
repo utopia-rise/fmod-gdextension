@@ -13,6 +13,7 @@
 #include "templates/hash_map.hpp"
 #include "templates/vector.hpp"
 #include "variant/string.hpp"
+#include "resources/fmod_plugins_settings.h"
 
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
@@ -201,6 +202,12 @@ namespace godot {
         Ref<FmodBank> load_bank(const String& pathToBank, unsigned int flag);
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
+
+        // PLUGINS
+        void load_all_plugins(const Ref<FmodPluginsSettings>& p_settings);
+        uint32_t load_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+        void unload_plugin(uint32_t p_plugin_handle);
+        bool is_plugin_loaded(uint32_t p_plugin_handle);
 
         // EVENTS
     private:
