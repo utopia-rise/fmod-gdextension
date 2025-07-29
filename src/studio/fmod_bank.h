@@ -12,9 +12,9 @@ namespace godot {
     class FmodBank : public RefCounted {
         FMODCLASSWITHPATH(FmodBank, RefCounted, FMOD::Studio::Bank);
 
-        List<Ref<FmodEventDescription>> eventDescriptions;
-        List<Ref<FmodBus>> buses;
-        List<Ref<FmodVCA>> VCAs;
+        List<Ref<FmodEventDescription>> _event_descriptions;
+        List<Ref<FmodBus>> _buses;
+        List<Ref<FmodVCA>> _vcas;
         String _godot_res_path;
 
         void load_all_vca();
@@ -27,9 +27,9 @@ namespace godot {
 
         int get_loading_state();
 
-        int get_event_description_count();
-        int get_bus_count();
-        int get_vca_count() const;
+        int64_t get_event_description_count();
+        int64_t get_bus_count();
+        int64_t get_vca_count() const;
         int get_string_count() const;
 
         Array get_description_list() const;
@@ -38,9 +38,9 @@ namespace godot {
 
         void update_bank_data();
 
-        const List<Ref<FmodEventDescription>>& getEventDescriptions() const;
-        const List<Ref<FmodBus>>& getBuses() const;
-        const List<Ref<FmodVCA>>& getVcAs() const;
+        const List<Ref<FmodEventDescription>>& get_event_descriptions() const;
+        const List<Ref<FmodBus>>& get_buses() const;
+        const List<Ref<FmodVCA>>& get_vcas() const;
 
         const String& get_godot_res_path() const;
 

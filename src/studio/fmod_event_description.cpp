@@ -58,15 +58,21 @@ int FmodEventDescription::get_length() {
 
 Array FmodEventDescription::get_instance_list() {
     Array array;
-    FMOD::Studio::EventInstance* instances[MAX_EVENT_INSTANCE_COUNT];
-    int count = 0;
-    ERROR_CHECK_WITH_REASON(_wrapped->getInstanceList(instances, MAX_EVENT_INSTANCE_COUNT, &count), vformat("Cannot get instances list for event %s with guid %s", get_path(), get_guid_as_string()));
-    CHECK_SIZE(MAX_EVENT_INSTANCE_COUNT, count, events)
-    for (int i = 0; i < count; ++i) {
-        godot::FmodEvent* event_instance;
-        instances[i]->getUserData((void**) &event_instance);
-        array.append(Ref(event_instance));
+
+    int size = 0;
+    if (ERROR_CHECK_WITH_REASON(_wrapped->getInstanceCount(&size), vformat("Cannot get instances count for event %s with guid %s", get_path(), get_guid_as_string()))) {
+        Vector<FMOD::Studio::EventInstance*> instances;
+        instances.resize(size);
+
+        if (ERROR_CHECK_WITH_REASON(_wrapped->getInstanceList(instances.ptrw(), size, &size), vformat("Cannot get instances list for event %s with guid %s", get_path(), get_guid_as_string()))) {
+            for (int i = 0; i < size; ++i) {
+                godot::FmodEvent* event_instance;
+                instances[i]->getUserData((void**) &event_instance);
+                array.append(Ref(event_instance));
+            }
+        }
     }
+
     return array;
 }
 

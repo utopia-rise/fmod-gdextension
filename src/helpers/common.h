@@ -16,23 +16,10 @@
 #define MAX_PATH_SIZE 512
 #define MAX_DRIVER_NAME_SIZE 256
 
-#define MAX_VCA_COUNT 64
-#define MAX_BUS_COUNT 64
-#define MAX_EVENT_DESCRIPTION_COUNT 256
-#define MAX_EVENT_INSTANCE_COUNT 128
-
 #define GODOT_LOG_INFO(message) UtilityFunctions::print(message);
 #define GODOT_LOG_VERBOSE(message) UtilityFunctions::print_verbose(message);
 #define GODOT_LOG_WARNING(message) UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 #define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
-
-#define CHECK_SIZE(maxSize, actualSize, type)                                                                          \
-    if ((actualSize) > (maxSize)) {                                                                                    \
-        String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " \
-                       + String::num(actualSize) + " entries";                                                         \
-        GODOT_LOG_ERROR(message)                                                                                          \
-        (actualSize) = maxSize;                                                                                        \
-    }
 
 #define ERROR_CHECK_WITH_REASON(_result, _reason) \
 (((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(FMOD_ErrorString(_result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), \
