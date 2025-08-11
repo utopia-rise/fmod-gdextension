@@ -34,6 +34,7 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
     ClassDB::bind_method(D_METHOD("set_3d_attributes", "transform"), &FmodEvent::set_3d_attributes);
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_3d_attributes_with_velocity", "transform", "velocity"), &FmodEvent::set_3d_attributes_with_velocity);
     ClassDB::bind_method(D_METHOD("set_node_attributes", "transform"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
     ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &FmodEvent::set_programmer_callback);
@@ -215,6 +216,11 @@ Transform3D FmodEvent::get_3d_attributes() const {
     ERROR_CHECK(_wrapped->get3DAttributes(&attr));
     _3Dattr = get_transform3d_from_3d_attributes(attr, distanceScale);
     return _3Dattr;
+}
+
+void FmodEvent::set_3d_attributes_with_velocity(const Transform3D& transform, const Vector3& velocity) const {
+    FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, velocity, distanceScale);
+    ERROR_CHECK(_wrapped->set3DAttributes(&attr));
 }
 
 void FmodEvent::set_node_attributes(Node* node) const {
