@@ -13,7 +13,7 @@ Events and their parameters are loaded by id or name according to [Fmod General 
 ### Properties
 
 You first should set event that emitter will play. You can set name or guid manually or using event selection button.  
-Then you have few toogle options:  
+Then you have few toggle options:  
 - *attached*: if `true`, Fmod event position will be updated alongside node's position.  
 - *autoplay*: if `true`, it will autoplay event, without need to call `play` method.  
 - *auto_release*: if `true`, the emitter will be free when done playing event.  
