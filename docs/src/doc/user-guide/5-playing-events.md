@@ -4,21 +4,21 @@ In this guide we'll explore how to play Fmod events.
 
 ## FmodEventEmitter nodes
 
-`FmodEventEmitter2D` and `FmodEventEmitter3D` are nodes to play Fmod events and their position will be updated
-automatically.  
+`FmodEventEmitter2D` and `FmodEventEmitter3D` are nodes which play Fmod events.
 Events and their parameters are loaded by id or name according to [Fmod General settings](./2-initialization.md#general).
 
 ![emitter-image]
 
 ### Properties
 
-You first should set event that emitter will play. You can set name or guid manually or using event selection button.  
-Then you have few toggle options:  
-- *attached*: if `true`, Fmod event position will be updated alongside node's position.  
-- *autoplay*: if `true`, it will autoplay event, without need to call `play` method.  
-- *auto_release*: if `true`, the emitter will be free when done playing event.  
-- *allow_fadeout*: if `true`, event will be stop with fadeout mode.  
-- *preload_event*: if `true`, event will be preloaded when node is ready.  
+First, set the event that the emitter will play. You can set the name or guid of the event manually, or use the event selection button.  
+
+Then, there are a few options you can toggle:
+- *attached*: if `true`, the Fmod event's position will update alongside the node's position.  
+- *autoplay*: if `true`, the event will autoplay (if `false`, it will play when the `play()` function is called on it).  
+- *auto_release*: if `true`, the emitter node will be automatically freed when the event finishes playing.  
+- *allow_fadeout*: if `true`, the event will fade out when stopped.  
+- *preload_event*: if `true`, the event will be preloaded when the node is ready. 
 
 #### Fmod parameters
 
