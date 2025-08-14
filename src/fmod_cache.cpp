@@ -245,17 +245,17 @@ void FmodCache::clear() {
 
 void FmodCache::_get_bank_data(Ref<FmodBank> bank) {
     bank->update_bank_data();
-    for (Ref<FmodBus> bus : bank->getBuses()) {
+    for (Ref<FmodBus> bus : bank->get_buses()) {
         FMOD_GUID guid {bus->get_guid()};
         buses[guid] = bus;
         strings_to_guid[bus->get_path()] = guid;
     }
-    for (Ref<FmodVCA> vca : bank->getVcAs()) {
+    for (Ref<FmodVCA> vca : bank->get_vcas()) {
         FMOD_GUID guid {vca->get_guid()};
         vcas[guid] = vca;
         strings_to_guid[vca->get_path()] = guid;
     }
-    for (Ref<FmodEventDescription> desc : bank->getEventDescriptions()) {
+    for (Ref<FmodEventDescription> desc : bank->get_event_descriptions()) {
         FMOD_GUID guid {desc->get_guid()};
         event_descriptions[guid] = desc;
         strings_to_guid[desc->get_path()] = guid;
@@ -263,15 +263,15 @@ void FmodCache::_get_bank_data(Ref<FmodBank> bank) {
 }
 
 void FmodCache::_remove_bank_data(FmodBank* bank) {
-    for (Ref<FmodBus> bus : bank->getBuses()) {
+    for (Ref<FmodBus> bus : bank->get_buses()) {
         strings_to_guid.erase(bus->get_path());
         buses.erase(bus->get_guid());
     }
-    for (Ref<FmodVCA> vca : bank->getVcAs()) {
+    for (Ref<FmodVCA> vca : bank->get_vcas()) {
         strings_to_guid.erase(vca->get_path());
         vcas.erase(vca->get_guid());
     }
-    for (Ref<FmodEventDescription> desc : bank->getEventDescriptions()) {
+    for (Ref<FmodEventDescription> desc : bank->get_event_descriptions()) {
         strings_to_guid.erase(desc->get_path());
         event_descriptions.erase(desc->get_guid());
     }
