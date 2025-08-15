@@ -39,7 +39,8 @@ sources = [
     Glob('src/helpers/*.cpp'),
     Glob('src/nodes/*.cpp'),
     Glob('src/resources/*.cpp'),
-    Glob('src/studio/*.cpp')
+    Glob('src/studio/*.cpp'),
+    Glob('src/plugins/*.cpp')
     ]
 
 lfix = ""

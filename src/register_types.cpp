@@ -42,6 +42,8 @@ void initialize_fmod_with_settings() {
     FmodServer::get_singleton()->init(general_settings);
     FmodServer::get_singleton()->set_sound_3d_settings(three_d_settings);
     FmodServer::get_singleton()->set_system_listener_number(general_settings->get_default_listener_count());
+
+    FmodServer::get_singleton()->load_all_plugins(FmodPluginsSettings::get_from_project_settings());
 }
 
 void initialize_fmod() {
@@ -97,6 +99,8 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodSoftwareFormatSettings>();
         ClassDB::register_class<FmodDspSettings>();
         ClassDB::register_class<FmodSound3DSettings>();
+        ClassDB::register_class<FmodStaticPluginMethod>();
+        ClassDB::register_class<FmodPluginsSettings>();
 
         // Server
         ClassDB::register_class<FmodServer>();

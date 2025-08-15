@@ -20,4 +20,4 @@ mono_crash.*.json
 logs/
 **/*.aar
 android/build
-android/.build_version
+android/

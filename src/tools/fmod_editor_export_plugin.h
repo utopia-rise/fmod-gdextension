@@ -3,6 +3,8 @@
 #ifndef GODOTFMOD_FMOD_EDITOR_EXPORT_PLUGIN_H
 #define GODOTFMOD_FMOD_EDITOR_EXPORT_PLUGIN_H
 
+#include <resources/fmod_plugins_settings.h>
+
 #include <classes/editor_export_plugin.hpp>
 
 namespace godot {
@@ -17,6 +19,9 @@ namespace godot {
 
         FmodEditorExportPlugin() = default;
         ~FmodEditorExportPlugin() = default;
+
+    private:
+        static PackedStringArray _get_libraries_to_export(const Ref<FmodPluginsSettings>& settings, const String& p_os_name, const String& p_extension, const String& p_arch = "");
     };
 }
 
