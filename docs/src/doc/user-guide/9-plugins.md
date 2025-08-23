@@ -1,5 +1,8 @@
 # Plugins
 
+!!! warning
+    This feature is experimental. Please report any bug you find.
+
 This addon supports FMOD plugins.  
 First you'll need to add plugins libraries (`.dll`, `.dylib`, `.so`, `.a`) in a project's folder.  
 In this documentation we will use `assets/plugins` as an example.  
