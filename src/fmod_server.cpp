@@ -587,11 +587,7 @@ void FmodServer::unload_plugin(uint32_t p_plugin_handle) {
 }
 
 bool FmodServer::is_plugin_loaded(uint32_t p_plugin_handle) {
-#ifndef IOS_ENABLED
     return cache->has_plugin(p_plugin_handle);
-#else
-    return false;
-#endif
 }
 
 bool FmodServer::check_vca_guid(const String& guid) {
