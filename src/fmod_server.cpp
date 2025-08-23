@@ -3,6 +3,10 @@
 #include "data/performance_data.h"
 #include "helpers/common.h"
 #include "helpers/maths.h"
+#include "classes/os.hpp"
+#include "classes/dir_access.hpp"
+#include "plugins/plugins_helper.h"
+#include "plugins/ios_plugins_loader.h"
 
 #include <fmod_server.h>
 
@@ -81,9 +85,15 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
 
+    // BANKS
     ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
+
+    // PLUGINS
+    ClassDB::bind_method(D_METHOD("load_plugin", "p_plugin_path", "p_priority"), &FmodServer::load_plugin, DEFVAL(0));
+    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_handle"), &FmodServer::unload_plugin);
+    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_handle"), &FmodServer::is_plugin_loaded);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
@@ -201,7 +211,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         )) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
-    cache = new FmodCache(system);
+    cache = new FmodCache(system, coreSystem);
 }
 
 void FmodServer::update() {
@@ -525,6 +535,61 @@ void FmodServer::unload_bank(const String& pathToBank) {
 
 bool FmodServer::banks_still_loading() {
     return cache->is_loading();
+}
+
+#ifdef IOS_ENABLED
+uint32_t register_ios_dsp(FMOD_SYSTEM_PTR system, FMOD_DSP_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerDSP(description, handle);
+}
+
+uint32_t register_ios_codec(FMOD_SYSTEM_PTR system, FMOD_CODEC_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerCodec(description, handle);
+}
+
+uint32_t register_ios_output(FMOD_SYSTEM_PTR system, FMOD_OUTPUT_DESCRIPTION* description, uint32_t* handle) {
+    return reinterpret_cast<FMOD::System*>(system)->registerOutput(description, handle);
+}
+#endif
+
+void FmodServer::load_all_plugins(const Ref<FmodPluginsSettings>& p_settings) {
+#ifndef IOS_ENABLED
+    Vector<String> plugin_paths = get_fmod_plugins_libraries_paths(p_settings);
+    for (const String& path : plugin_paths) {
+#ifdef DEBUG_ENABLED
+        GODOT_LOG_INFO(vformat("Will load %s", path));
+#endif
+        load_plugin(path);
+    }
+#else
+    FMOD_IOS_INTERFACE interface {
+        .system = coreSystem,
+        .register_dsp_method = &register_ios_dsp,
+        .register_codec_method = &register_ios_codec,
+        .register_output_method = &register_ios_output
+    };
+
+    uint32_t plugin_count;
+    uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
+    for (uint32_t i = 0; i < plugin_count; ++i) {
+        cache->add_plugin(plugin_handles[i]);
+    }
+    std::free(plugin_handles);
+#endif
+}
+
+uint32_t FmodServer::load_plugin(const String& p_plugin_path, uint32_t p_priority) {
+#ifndef IOS_ENABLED
+    return cache->add_plugin(p_plugin_path, p_priority);
+#endif
+    return 0xFFFFFFFF;
+}
+
+void FmodServer::unload_plugin(uint32_t p_plugin_handle) {
+    cache->remove_plugin(p_plugin_handle);
+}
+
+bool FmodServer::is_plugin_loaded(uint32_t p_plugin_handle) {
+    return cache->has_plugin(p_plugin_handle);
 }
 
 bool FmodServer::check_vca_guid(const String& guid) {
