@@ -104,6 +104,7 @@ bool FmodCache::has_plugin(uint32_t p_plugin_handle) const {
 void FmodCache::remove_plugin(uint32_t p_plugin_handle) {
     if (!has_plugin(p_plugin_handle)) {
         GODOT_LOG_ERROR(vformat("Cannot unload plugin with handle %s, not in cache.", p_plugin_handle));
+        return;
     }
 
     ERROR_CHECK(core_system->unloadPlugin(p_plugin_handle));

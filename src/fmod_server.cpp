@@ -92,8 +92,8 @@ void FmodServer::_bind_methods() {
 
     // PLUGINS
     ClassDB::bind_method(D_METHOD("load_plugin", "p_plugin_path", "p_priority"), &FmodServer::load_plugin, DEFVAL(0));
-    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_path"), &FmodServer::unload_plugin);
-    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_path"), &FmodServer::is_plugin_loaded);
+    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_handle"), &FmodServer::unload_plugin);
+    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_handle"), &FmodServer::is_plugin_loaded);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);

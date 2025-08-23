@@ -46,9 +46,21 @@ void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bo
         PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, os_name, extension);
 
         Ref<DirAccess> dir_access = DirAccess::open(target_dir);
+
+        if (dir_access.is_null()) {
+            GODOT_LOG_ERROR(vformat("Failed to open target directory: %s", target_dir));
+            return;
+        }
+
         for (const String& library_path : plugins_libraries_path) {
             GODOT_LOG_INFO(vformat("Will copy %s to %s", library_path, target_dir));
             Ref<FileAccess> file_access = FileAccess::open(library_path, FileAccess::READ);
+
+            if (file_access.is_null()) {
+                GODOT_LOG_ERROR(vformat("Failed to open library file: %s", library_path));
+                continue;
+            }
+
             dir_access->copy(library_path, target_dir.path_join(file_access->get_path().get_file()));
         }
     } else if (is_ios_export) {
@@ -98,23 +110,25 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) uint32_t
                             vformat("    FMOD_CODEC_DESCRIPTION* %s();\n", method_name);
                     cpp_code_load_method +=
                             vformat("    p_interface->register_codec_method(fmod_system, %s(), &handle);\n", method_name);
+                    cpp_code_load_method += vformat("    handles[%s] = handle;\n", i);
                     break;
                 case FmodStaticPluginMethod::DSP:
                     cpp_code_external_plugin_declaration +=
                             vformat("    FMOD_DSP_DESCRIPTION* %s();\n", method_name);
                     cpp_code_load_method +=
                             vformat("    p_interface->register_dsp_method(fmod_system, %s(), &handle);\n", method_name);
+                    cpp_code_load_method += vformat("    handles[%s] = handle;\n", i);
                     break;
                 case FmodStaticPluginMethod::OUTPUT:
                     cpp_code_external_plugin_declaration +=
                             vformat("    FMOD_OUTPUT_DESCRIPTION* %s();\n", method_name);
                     cpp_code_load_method +=
                             vformat("    p_interface->register_output_method(fmod_system, %s(), &handle);\n", method_name);
+                    cpp_code_load_method += vformat("    handles[%s] = handle;\n", i);
                     break;
                 case FmodStaticPluginMethod::COUNT:
                     break;
             }
-            cpp_code_load_method += vformat("handles[%s] = handle;\n", i);
         }
 
         cpp_code_external_plugin_declaration += "}\n";
