@@ -275,12 +275,12 @@ jobs:
       - name: Zip fmod addon
         run: |
           cd demo/addons/
-          zip -r addons.zip fmod
+          zip -r addons.zip fmod -x '*/.gitignore'
 
       - name: Zip android fmod plugin
         run: |
           cd demo/
-          zip -r android.zip android
+          zip -r android.zip android -x '*/.gitignore'
 
       - name: Upload Addon Asset
         uses: actions/upload-release-asset@v1
