@@ -8,7 +8,7 @@ namespace Callbacks {
     }
 
     void GodotFileRunner::queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority) {
-        // High priority requests have to be processed first.
+        // High-priority requests have to be processed first.
         if (priority == ReadPriority::HIGH) {
             // lock so we can't add and remove elements from the queue at the same time.
             std::lock_guard<std::mutex> lk(read_mut);
@@ -21,11 +21,15 @@ namespace Callbacks {
         read_cv.notify_one();
     }
 
-    void GodotFileRunner::cancelReadRequest(FMOD_ASYNCREADINFO* request) {
+    FMOD_RESULT GodotFileRunner::cancelReadRequest(FMOD_ASYNCREADINFO* request) {
         // lock so we can't add and remove elements from the queue at the same time.
         {
             std::lock_guard<std::mutex> lk(read_mut);
-            requests.erase(request);
+            if (requests.erase(request)) {
+                request->bytesread = 0;
+                request->done(request, FMOD_RESULT::FMOD_ERR_FILE_DISKEJECTED);
+                return FMOD_RESULT::FMOD_ERR_FILE_DISKEJECTED;
+            }
         }
 
         // We lock and check if the current request is the one being canceled.
@@ -34,6 +38,8 @@ namespace Callbacks {
             std::unique_lock<std::mutex> lk(cancel_mut);
             if (request == current_request) { cancel_cv.wait(lk); }
         }
+
+        return FMOD_RESULT::FMOD_OK;
     }
 
     void GodotFileRunner::run() {
@@ -46,7 +52,7 @@ namespace Callbacks {
 
             while (!requests.is_empty()) {
                 // lock so we can't add and remove elements from the queue at the same time.
-                // also store the current request so it cannot be cancel during process.
+                // also store the current request so it cannot be canceled during processing.
                 {
                     std::lock_guard<std::mutex> lk(read_mut);
                     current_request = requests.front()->get();
@@ -69,13 +75,8 @@ namespace Callbacks {
                 memcpy(current_request->buffer, data, size * sizeof(uint8_t));
                 current_request->bytesread = size;
 
-                // Don't forget the return an error if end of the file is reached
-                FMOD_RESULT result;
-                if (file->eof_reached()) {
-                    result = FMOD_RESULT::FMOD_ERR_FILE_EOF;
-                } else {
-                    result = FMOD_RESULT::FMOD_OK;
-                }
+                // Remember to return an error if the end of the file is reached
+                FMOD_RESULT result = (size < current_request->sizebytes) ? FMOD_RESULT::FMOD_ERR_FILE_EOF : FMOD_RESULT::FMOD_OK;
                 current_request->done(current_request, result);
 
                 // Request no longer processed
@@ -109,7 +110,7 @@ namespace Callbacks {
             *handle = reinterpret_cast<void*>(fileHandle);
             return FMOD_RESULT::FMOD_OK;
         }
-        return FMOD_RESULT::FMOD_ERR_FILE_BAD;
+        return FMOD_RESULT::FMOD_ERR_FILE_NOTFOUND;
     }
 
     FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata) {
@@ -123,7 +124,7 @@ namespace Callbacks {
         int priority {info->priority};
 
         GodotFileRunner::ReadPriority priorityRank;
-        if (priority == 100) {
+        if (priority >= 50) {
             priorityRank = GodotFileRunner::ReadPriority::HIGH;
         } else {
             priorityRank = GodotFileRunner::ReadPriority::NORMAL;
@@ -134,7 +135,6 @@ namespace Callbacks {
 
     FMOD_RESULT F_CALL godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata) {
         GodotFileRunner* runner {GodotFileRunner::get_singleton()};
-        runner->cancelReadRequest(info);
-        return FMOD_RESULT::FMOD_OK;
+        return runner->cancelReadRequest(info);
     }
 }// namespace Callbacks

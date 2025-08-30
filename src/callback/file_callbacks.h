@@ -47,7 +47,7 @@ namespace Callbacks {
 
     public:
         void queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority);
-        void cancelReadRequest(FMOD_ASYNCREADINFO* request);
+        FMOD_RESULT cancelReadRequest(FMOD_ASYNCREADINFO* request);
         void start();
         void finish();
     };
