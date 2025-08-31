@@ -433,6 +433,13 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::set_event_name(const String& name) {
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            _event_name = name;
+            _stop_and_restart_if_autoplay();
+            return;
+        }
+#endif
         FMOD_GUID event_guid {FmodServer::get_singleton()->get_event_guid_internal(name)};
 
         if (equals(_event_guid, event_guid)) {
@@ -459,6 +466,13 @@ namespace godot {
         }
 
         _event_guid = event_guid;
+
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            _stop_and_restart_if_autoplay();
+            return;
+        }
+#endif
         _event_name = FmodServer::get_singleton()->get_event_path_internal(_event_guid);
 
         _stop_and_restart_if_autoplay();
@@ -471,6 +485,15 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_stop_and_restart_if_autoplay() {
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            // In editor, we still need to clear parameters and unload events
+            // but skip FMOD operations
+            _unload_event();
+            _parameters.clear();
+            return;
+        }
+#endif
         if (!reinterpret_cast<Derived*>(this)->is_node_ready()) return;
 
         stop();
@@ -605,6 +628,11 @@ namespace godot {
 
     template<class Derived, class NodeType>
     bool FmodEventEmitter<Derived, NodeType>::_should_load_by_event_name() {
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            return false; // Default to loading by GUID in editor
+        }
+#endif
 #ifndef TOOLS_ENABLED
         static
 #endif
@@ -727,6 +755,12 @@ namespace godot {
         if (!parameter) { return false; }
 
         if (parts.size() == 1) {
+#ifdef TOOLS_ENABLED
+            if (Engine::get_singleton()->is_editor_hint()) {
+                r_property = 0.0f; // Default value for editor
+                return true;
+            }
+#endif
             r_property = _get_parameter_description(*parameter)->get_default_value();
             return true;
         }
@@ -745,6 +779,12 @@ namespace godot {
                 PROPERTY_USAGE_NO_EDITOR
             )
         );
+
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            return;
+        }
+#endif
 
         for (const Parameter& parameter : _parameters) {
             const String& parameter_name {parameter.name};
@@ -803,6 +843,11 @@ namespace godot {
     template<class Derived, class NodeType>
     Ref<FmodParameterDescription>
     FmodEventEmitter<Derived, NodeType>::_get_parameter_description(const FmodEventEmitter::Parameter& parameter) const {
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) {
+            return Ref<FmodParameterDescription>();
+        }
+#endif
         _load_event_description_if_needed();
 
         return parameter.should_load_by_id
