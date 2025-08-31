@@ -14,6 +14,11 @@ namespace godot {
         }
 
         Ref<DirAccess> folder_access {DirAccess::open(folder)};
+
+        if (folder_access.is_null()) {
+            return;
+        }
+
         folder_access->list_dir_begin();
         String current_file{folder_access->get_next()};
         while (!current_file.is_empty()) {
