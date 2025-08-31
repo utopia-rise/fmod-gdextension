@@ -1,7 +1,12 @@
 #include "fmod_plugins_settings.h"
+
+#include "constants.h"
+
+#include <helpers/common.h>
+
+#include <classes/file_access.hpp>
 #include <classes/project_settings.hpp>
 #include <classes/resource_loader.hpp>
-#include "constants.h"
 
 using namespace godot;
 
@@ -29,6 +34,14 @@ Ref<FmodPluginsSettings> FmodPluginsSettings::get_from_project_settings() {
       FmodPluginsSettings::DEFAULT_RESOURCE_OPTION
     );
     if (resource_path.is_empty()) {
+        Ref<FmodPluginsSettings> settings;
+        settings.instantiate();
+        return settings;
+    }
+
+    if (!FileAccess::file_exists(resource_path)) {
+        GODOT_LOG_WARNING(vformat("Cannot find FmodPluginsSettings at %s", resource_path));
+
         Ref<FmodPluginsSettings> settings;
         settings.instantiate();
         return settings;
