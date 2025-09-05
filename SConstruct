@@ -11,6 +11,7 @@ fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
 env = SConscript("godot-cpp/SConstruct")
 
+
 # Add those directory manually, so we can skip the godot_cpp directory when including headers in C++ files
 source_path = [
     os.path.join("godot-cpp", "include","godot_cpp"),
@@ -79,6 +80,7 @@ elif env["platform"] == "linux":
     env.Append(LINKFLAGS=["-m64", "-fuse-ld=gold"])
 
 elif env["platform"] == "windows":
+    print("winner")
     libfmod = 'fmod%s_vc'% lfix
     libfmodstudio = 'fmodstudio%s_vc'% lfix
     fmod_info_table = {

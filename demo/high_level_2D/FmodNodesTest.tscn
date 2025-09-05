@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dbw46rru0a7ab" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
 [ext_resource type="Script" uid="uid://d2j35xjdrcpu0" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
-[ext_resource type="Texture2D" uid="uid://ddwfplq00r6jt" path="res://icon.png" id="2_llv2n"]
+[ext_resource type="Texture2D" uid="uid://dedj40j25nc0p" path="res://icon.png" id="2_llv2n"]
 [ext_resource type="Script" uid="uid://bgrknjkxmlwqw" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
 [ext_resource type="Script" uid="uid://ddkyglwgd83qf" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
 [ext_resource type="Script" uid="uid://dae10jufdshyv" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
@@ -24,13 +24,32 @@ size = Vector2(289.938, 284.96)
 [node name="FmodNodesTest" type="Node"]
 
 [node name="FmodBankLoader" type="FmodBankLoader" parent="."]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 bank_paths = ["res://assets/Banks/Master.strings.bank", "res://assets/Banks/Master.bank", "res://assets/Banks/Music.bank", "res://assets/Banks/Vehicles.bank", "res://assets/Banks/SFX.bank"]
+script = null
 
 [node name="Node2D" type="Node2D" parent="FmodBankLoader"]
 position = Vector2(703, 486)
 script = ExtResource("1_2lkrj")
 
 [node name="Emitter" type="FmodEventEmitter2D" parent="FmodBankLoader/Node2D"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 event_name = "event:/Vehicles/Car Engine"
 event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
 autoplay = true
@@ -71,6 +90,16 @@ script = ExtResource("3_dlbku")
 footstep_scene = ExtResource("5_usogy")
 
 [node name="FmodListener2D" type="FmodListener2D" parent="FmodBankLoader/Listener"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
+script = null
 
 [node name="icon" type="Sprite2D" parent="FmodBankLoader/Listener"]
 position = Vector2(1.89996, 4.12415)
@@ -114,9 +143,19 @@ position = Vector2(818.43, 97.5364)
 script = ExtResource("5_5p5kb")
 
 [node name="FmodEventEmitter2D" type="FmodEventEmitter2D" parent="FmodBankLoader/SoundArea2"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 event_name = "event:/Music/Level 02"
 event_guid = "{c7f946fd-d695-499b-a820-752799c4921d}"
 autoplay = true
+script = null
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="FmodBankLoader/SoundArea2"]
 position = Vector2(52.8021, 45.8286)
