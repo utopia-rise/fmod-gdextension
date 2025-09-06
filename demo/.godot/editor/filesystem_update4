@@ -1,0 +1,4 @@
+res://high_level_3D/World.tscn
+res://low_level_2D/FmodScriptTest.tscn
+res://high_level_2D/FmodNodesTest.tscn
+res://addons/fmod/Autoload/FmodManager.tscn

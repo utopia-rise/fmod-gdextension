@@ -25,6 +25,7 @@ DSP/dsp_buffer_count=4
 "3D Settings/rolloff_scale"=1.0
 General/banks_path="res://assets/Banks"
 General/should_load_by_name=false
+Plugins/path_to_plugin_configuration=""
 
 [android]
 
@@ -39,7 +40,7 @@ config/icon="uid://cih2yjmtjoohg"
 
 [autoload]
 
-FmodManager="*res://addons/fmod/FmodManager.gd"
+FmodManager="*res://addons/fmod/Autoload/FmodManager.tscn"
 
 [dotnet]
 

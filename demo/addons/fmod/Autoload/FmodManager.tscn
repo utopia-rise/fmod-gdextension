@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxog5xtpu41ax"]
+
+[ext_resource type="Script" uid="uid://cds10pm7hwn3p" path="res://addons/fmod/Autoload/FmodManager.gd" id="1_6u1ce"]
+
+[node name="FmodManager" type="Node"]
+process_mode = 3
+script = ExtResource("1_6u1ce")
+
+[node name="MasterBankLoader" type="FmodBankLoader" parent="."]
+bank_paths = ["res://assets/Banks/Master.bank"]
+unique_name_in_owner = true
