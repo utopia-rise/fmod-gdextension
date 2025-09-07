@@ -7,7 +7,7 @@
 **Godot 4 GDExtension that integrates with the FMOD Studio API.** [FMOD is an audio engine and middleware solution](https://www.fmod.com/) for interactive audio in games. It has been the audio engine behind many
 titles such as **Transistor**, **Into the Breach** and **Celeste**. This Godot extension is used by games such as [Koira](https://dont-nod.com/en/games/koira/).
 
-If you need any help, you can join our [Discord Server](https://discord.gg/DHhV8uWR).
+If you need any help, you can join our [Discord Server](https://discord.com/invite/u2NM2vTGMn).
 
 # Installation
 
