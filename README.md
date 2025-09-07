@@ -12,7 +12,6 @@ If you need any help, you can join our [Discord Server](https://discord.com/invi
 # Installation
 
 1. [Download Latest Release](https://github.com/utopia-rise/fmod-gdextension/releases/latest)
-    - (optional) access latest build for [Godot 3.x](https://github.com/utopia-rise/fmod-gdextension/archive/refs/heads/godot-3.x.zip), [Godot 4.x](https://github.com/utopia-rise/fmod-gdextension/archive/refs/heads/master.zip)
 2. Unpack the `addons/fmod` folder into your `/addons` folder within the Godot project
 3. Enable this addon within the Godot settings: `Project > Project Settings > Plugins`
 
