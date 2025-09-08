@@ -111,6 +111,13 @@ void FmodEditorPlugin::_ready() {
       FmodSound3DSettings::DEFAULT_ROLLOFF_SCALE,
       Variant::Type::FLOAT
     );
+    add_setting(
+    vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::DEBUG_LEVEL_OPTION),
+    FmodGeneralSettings::DEFAULT_DEBUG_LEVEL,
+    Variant::Type::INT,
+    PROPERTY_HINT_ENUM,
+    "None,Error Only,Error and Warning,Full Log,Verbose"
+  );
 }
 
 void FmodEditorPlugin::add_setting(

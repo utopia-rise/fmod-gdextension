@@ -54,6 +54,14 @@ bool FmodGeneralSettings::get_should_load_by_name() const {
     return _should_load_by_name;
 }
 
+void FmodGeneralSettings::set_debug_level(int p_debug_level) {
+    debug_level = p_debug_level;
+}
+
+int FmodGeneralSettings::get_debug_level() const {
+    return debug_level;
+}
+
 Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     Ref<FmodGeneralSettings> settings;
     settings.instantiate();
@@ -78,6 +86,11 @@ Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
     String should_load_by_name_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, SHOULD_LOAD_BY_NAME);
     settings->set_should_load_by_name(project_settings->get_setting(should_load_by_name_setting_path, DEFAULT_SHOULD_LOAD_BY_NAME));
 
+    settings->debug_level = project_settings->get_setting(
+        vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, DEBUG_LEVEL_OPTION),
+        DEFAULT_DEBUG_LEVEL
+    );
+
     return settings;
 }
 
@@ -99,6 +112,18 @@ void FmodGeneralSettings::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_should_load_by_name", "p_should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
     ClassDB::bind_method(D_METHOD("get_should_load_by_name"), &FmodGeneralSettings::get_should_load_by_name);
+
+    ClassDB::bind_method(D_METHOD("set_debug_level", "debug_level"), &FmodGeneralSettings::set_debug_level);
+    ClassDB::bind_method(D_METHOD("get_debug_level"), &FmodGeneralSettings::get_debug_level);
+    ADD_PROPERTY(PropertyInfo(Variant::INT, "debug_level", PROPERTY_HINT_ENUM, 
+        "None,Error Only,Error and Warning,Full Log,Verbose"), 
+        "set_debug_level", "get_debug_level");
+
+    BIND_ENUM_CONSTANT(DEBUG_NONE);
+    BIND_ENUM_CONSTANT(DEBUG_ERROR);
+    BIND_ENUM_CONSTANT(DEBUG_WARNING);
+    BIND_ENUM_CONSTANT(DEBUG_LOG);
+    BIND_ENUM_CONSTANT(DEBUG_VERBOSE);
 
     ADD_PROPERTY(
       PropertyInfo(
