@@ -101,6 +101,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodSound3DSettings>();
         ClassDB::register_class<FmodStaticPluginMethod>();
         ClassDB::register_class<FmodPluginsSettings>();
+        ClassDB::register_class<FmodLoggingSettings>();
 
         // Server
         ClassDB::register_class<FmodServer>();

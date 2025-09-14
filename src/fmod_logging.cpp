@@ -7,58 +7,25 @@
 
 namespace godot {
 
-    // FMODLogQueue implementation
-    void FMODLogQueue::push(LogLevel level, const std::string& message) {
-        if (shutting_down_.load()) { return; }
+    // Direct logging function implementation
+    void log_fmod_message(FMODLogLevel level, const std::string& message) {
+        String godot_message(message.c_str());
 
-        std::lock_guard<std::mutex> lock(mutex_);
-        messages_.push({level, message});
-    }
-
-    void FMODLogQueue::processQueue() {
-        std::queue<LogMessage> localQueue;
-
-        // Quickly swap queues under lock to minimize lock time
-        {
-            std::lock_guard<std::mutex> lock(mutex_);
-            std::swap(localQueue, messages_);
+        switch (level) {
+            case LOG_ERROR:
+                UtilityFunctions::push_error(godot_message);
+                break;
+            case LOG_WARNING:
+                UtilityFunctions::push_warning(godot_message);
+                break;
+            case LOG_VERBOSE:
+                UtilityFunctions::print_verbose(godot_message);
+                break;
+            case LOG_INFO:
+            default:
+                UtilityFunctions::print(godot_message);
+                break;
         }
-
-        // Process messages outside of lock
-        while (!localQueue.empty()) {
-            const LogMessage& msg = localQueue.front();
-            String godot_message(msg.message.c_str());
-
-            switch (msg.level) {
-                case LOG_ERROR:
-                    UtilityFunctions::push_error(godot_message);
-                    break;
-                case LOG_WARNING:
-                    UtilityFunctions::push_warning(godot_message);
-                    break;
-                case LOG_INFO:
-                default:
-                    UtilityFunctions::print(godot_message);
-                    break;
-            }
-
-            localQueue.pop();
-        }
-    }
-
-    void FMODLogQueue::clear() {
-        std::lock_guard<std::mutex> lock(mutex_);
-        std::queue<LogMessage> empty;
-        std::swap(messages_, empty);
-    }
-
-    void FMODLogQueue::shutdown() {
-        shutting_down_.store(true);
-        // Process any remaining messages one last time
-        processQueue();
-
-        // Clear anything that might have been added during processing
-        clear();
     }
 
     extern "C" {
@@ -68,13 +35,13 @@ namespace godot {
         std::stringstream ss;
 
         // Determine the log level and prefix
-        FMODLogQueue::LogLevel log_level = FMODLogQueue::LOG_INFO;
+        FMODLogLevel log_level = LOG_INFO;
         if (flags & FMOD_DEBUG_LEVEL_ERROR) {
             ss << "[FMOD ERROR]";
-            log_level = FMODLogQueue::LOG_ERROR;
+            log_level = LOG_ERROR;
         } else if (flags & FMOD_DEBUG_LEVEL_WARNING) {
             ss << "[FMOD WARN]";
-            log_level = FMODLogQueue::LOG_WARNING;
+            log_level = LOG_WARNING;
         } else if (flags & FMOD_DEBUG_LEVEL_LOG) {
             ss << "[FMOD INFO]";
         } else {
@@ -106,15 +73,9 @@ namespace godot {
             debug_message.pop_back();
         }
 
-        // Queue the message for processing on main thread
-        FMODLogQueue::getInstance().push(log_level, debug_message);
-
+        log_fmod_message(log_level, debug_message);
         return FMOD_OK;
     }
-    }
-
-    void process_fmod_log_queue() {
-        FMODLogQueue::getInstance().processQueue();
     }
 
 }// namespace godot

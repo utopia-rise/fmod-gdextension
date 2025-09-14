@@ -8,6 +8,8 @@
 #include "helpers/maths.h"
 #include "plugins/ios_plugins_loader.h"
 #include "plugins/plugins_helper.h"
+#include <resources/fmod_logging_settings.h>
+#include <classes/project_settings.hpp>
 
 #include <fmod_server.h>
 
@@ -167,9 +169,50 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         return;
     }
 
-    Ref<FmodGeneralSettings> settings = FmodGeneralSettings::get_from_project_settings();
-    unsigned int debug_flags = settings->get_debug_level();
-    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_CALLBACK, fmod_debug_callback, nullptr);
+    const Ref<FmodLoggingSettings> p_logging_settings = FmodLoggingSettings::get_from_project_settings();
+
+    if (p_logging_settings.is_valid()) {
+        unsigned int debug_flags = p_logging_settings->get_debug_level();
+        FMOD_DEBUG_MODE log_output = static_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
+
+        switch (log_output) {
+            case FMOD_DEBUG_MODE_TTY:
+            {
+                // Output to terminal/console
+                FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
+                break;
+            }
+
+            case FMOD_DEBUG_MODE_CALLBACK:
+            {
+                // Output to a callback -> GODOT
+                FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_CALLBACK, fmod_debug_callback, nullptr);
+                break;
+            }
+
+            case FMOD_DEBUG_MODE_FILE:
+            {
+                UtilityFunctions::push_warning("FMOD log output set to File");
+                // Output to a file
+                String file_path = p_logging_settings->get_log_file_path();
+                CharString file_path_utf8 = file_path.utf8();
+
+                file_path = ProjectSettings::get_singleton()->globalize_path(file_path);
+                file_path_utf8 = file_path.utf8();
+
+                FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_FILE, nullptr, file_path_utf8);
+                break;
+            }
+            
+            default:
+            {
+                // Fallback to TTY if somehow an invalid value is set
+                FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
+                UtilityFunctions::push_warning("Invalid FMOD log output setting, defaulting to TTY");
+                break;
+            }
+        }
+    }
 
     // initialize FMOD Studio and FMOD Core System with provided flags
     if (system == nullptr && coreSystem == nullptr) {
@@ -229,8 +272,6 @@ void FmodServer::update() {
         }
         return;
     }
-
-    process_fmod_log_queue();
 
     // Check if bank are loaded, load buses, vca and event descriptions.
     cache->update_pending();
@@ -314,12 +355,7 @@ void FmodServer::_set_listener_attributes() {
 void FmodServer::shutdown() {
     if (!isInitialized) { return; }
 
-    Ref<FmodGeneralSettings> settings = FmodGeneralSettings::get_from_project_settings();
-    unsigned int debug_flags = settings->get_debug_level();
-
-    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
-
-    FMODLogQueue::getInstance().shutdown();
+    FMOD::Debug_Initialize(FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
 
     isInitialized = false;
     isNotInitializedPrinted = false;

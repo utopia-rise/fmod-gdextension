@@ -9,13 +9,6 @@ namespace godot {
     class FmodGeneralSettings : public Resource {
         GDCLASS(FmodGeneralSettings, Resource)
     public:
-        enum DebugLevel {
-            DEBUG_NONE = FMOD_DEBUG_LEVEL_NONE,
-            DEBUG_ERROR = FMOD_DEBUG_LEVEL_ERROR,
-            DEBUG_WARNING = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING,
-            DEBUG_LOG = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG,
-            DEBUG_VERBOSE = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE
-        };
         void set_channel_count(const int p_channel_count);
         int get_channel_count() const;
 
@@ -33,8 +26,6 @@ namespace godot {
 
         void set_should_load_by_name(const bool p_should_load_by_name);
         bool get_should_load_by_name() const;
-        void set_debug_level(int p_debug_level);
-        int get_debug_level() const;
 
         static Ref<FmodGeneralSettings> get_from_project_settings();
 
@@ -52,9 +43,6 @@ namespace godot {
         static constexpr const int DEFAULT_DEFAULT_LISTENER_COUNT = 1;
         static constexpr const char* DEFAULT_BANKS_PATH = "res://";
         static constexpr const bool DEFAULT_SHOULD_LOAD_BY_NAME = false;
-        static constexpr const char* DEBUG_LEVEL_OPTION = "debug_level";
-        static constexpr const int DEFAULT_DEBUG_LEVEL = DEBUG_ERROR;
-        
 
     private:
         int _channel_count;
@@ -63,14 +51,11 @@ namespace godot {
         bool _is_memory_tracking_enabled;
         String _banks_path;
         bool _should_load_by_name;
-        int debug_level;
 
     protected:
         static void _bind_methods();
 
     };
 }
-
-VARIANT_ENUM_CAST(FmodGeneralSettings::DebugLevel);
 
 #endif// GODOTFMOD_FMOD_SETTINGS_H

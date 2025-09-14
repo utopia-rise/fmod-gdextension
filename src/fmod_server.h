@@ -22,6 +22,7 @@
 #include <resources/fmod_settings.h>
 #include <resources/fmod_software_format_settings.h>
 #include <resources/fmod_sound_3d_settings.h>
+#include <resources/fmod_logging_settings.h>
 
 #include <classes/canvas_item.hpp>
 #include <classes/global_constants.hpp>
