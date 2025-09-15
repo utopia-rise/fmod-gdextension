@@ -117,7 +117,7 @@ void FmodEditorPlugin::_ready() {
     FmodLoggingSettings::DEFAULT_DEBUG_LEVEL,
     Variant::Type::INT,
     PROPERTY_HINT_ENUM,
-    "None,Error Only,Error and Warning,Full Log,Verbose"
+    "Inherit,None,Error,Warning,Log,Verbose"
   );
   add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_OUTPUT_OPTION),

@@ -12,15 +12,17 @@ namespace godot {
 
     public:
         enum DebugLevel {
-            DEBUG_NONE = FMOD_DEBUG_LEVEL_NONE,
-            DEBUG_ERROR = FMOD_DEBUG_LEVEL_ERROR,
-            DEBUG_WARNING = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING,
-            DEBUG_LOG = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG,
-            DEBUG_VERBOSE = FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE
+            DEBUG_INHERIT,
+            DEBUG_NONE,
+            DEBUG_ERROR,
+            DEBUG_WARNING,
+            DEBUG_LOG,
+            DEBUG_VERBOSE,
         };
 
         void set_debug_level(int p_debug_level);
         int get_debug_level() const;
+        int _debug_level_to_fmod() const;
 
         void set_log_output(int p_log_output);
         int get_log_output() const;
@@ -38,8 +40,8 @@ namespace godot {
         static constexpr const char* LOG_FILE_PATH_OPTION = "log_file_path";
 
         // Default values
-        static constexpr const int DEFAULT_DEBUG_LEVEL = DEBUG_ERROR;
-        static constexpr const int DEFAULT_LOG_OUTPUT = FMOD_DEBUG_MODE_TTY;
+        static constexpr const int DEFAULT_DEBUG_LEVEL = DEBUG_INHERIT;
+        static constexpr const int DEFAULT_LOG_OUTPUT = FMOD_DEBUG_MODE_CALLBACK;
         static constexpr const char* DEFAULT_LOG_FILE_PATH = "user://fmod.log";
 
     private:

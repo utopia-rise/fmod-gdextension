@@ -172,7 +172,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     const Ref<FmodLoggingSettings> p_logging_settings = FmodLoggingSettings::get_from_project_settings();
 
     if (p_logging_settings.is_valid()) {
-        unsigned int debug_flags = p_logging_settings->get_debug_level();
+        unsigned int debug_flags = p_logging_settings->_debug_level_to_fmod();
         FMOD_DEBUG_MODE log_output = static_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
 
         switch (log_output) {

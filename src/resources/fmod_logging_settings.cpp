@@ -3,6 +3,7 @@
 #include <constants.h>
 
 #include <classes/project_settings.hpp>
+#include <godot_cpp/classes/os.hpp>
 
 using namespace godot;
 
@@ -12,6 +13,29 @@ void FmodLoggingSettings::set_debug_level(int p_debug_level) {
 
 int FmodLoggingSettings::get_debug_level() const {
     return _debug_level;
+}
+
+int FmodLoggingSettings::_debug_level_to_fmod() const {
+       switch (_debug_level) {
+        case DEBUG_INHERIT:
+            if (OS::get_singleton()->is_stdout_verbose()) {
+                return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE;
+            } else {
+                return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING;
+            }
+        case DEBUG_NONE:
+            return FMOD_DEBUG_LEVEL_NONE;
+        case DEBUG_ERROR:
+            return FMOD_DEBUG_LEVEL_ERROR;
+        case DEBUG_WARNING:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING;
+        case DEBUG_LOG:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG;
+        case DEBUG_VERBOSE:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE;
+        default:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING;
+    }
 }
 
 void FmodLoggingSettings::set_log_output(int p_log_output) {
