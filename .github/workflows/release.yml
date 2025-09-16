@@ -282,6 +282,17 @@ jobs:
           cd demo/
           zip -r android.zip android -x '*/.gitignore'
 
+      - name: Zip demo project (without .godot and GUT)
+        run: |
+          cd demo
+          zip -r demo.zip . \
+            -x '*/.gitignore' \
+               '*.zip' \
+               '.godot/*' '.godot/**' \
+               'addons/gut/*' 'addons/gut/**' 'addons/gut'\
+               '.gut*' \
+               'tests/*' 'tests/**'
+
       - name: Upload Addon Asset
         uses: actions/upload-release-asset@v1
         env:
@@ -300,4 +311,14 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
           asset_path: ./demo/android.zip
           asset_name: android.zip
+          asset_content_type: application/zip
+
+      - name: Upload Demo Project Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./demo/demo.zip
+          asset_name: demo.zip
           asset_content_type: application/zip
