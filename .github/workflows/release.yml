@@ -289,7 +289,7 @@ jobs:
             -x '*/.gitignore' \
                '*.zip' \
                '.godot/*' '.godot/**' \
-               'addons/gut/*' 'addons/gut/**' 'addons/gut'\
+               'addons/gut/*' 'addons/gut/**' 'addons/gut'\ 
                '.gut*' \
                'tests/*' 'tests/**'
 
