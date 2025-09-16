@@ -63,5 +63,5 @@ tasks.build {
 dependencies {
     implementation("androidx.core:core-ktx:1.10.1")
     implementation(files("libraries/fmod.jar"))
-    compileOnly(files("libraries/godot-lib.4.4.stable.template_release.aar"))
+    compileOnly(files("libraries/godot-lib.4.5.stable.template_release.aar"))
 }

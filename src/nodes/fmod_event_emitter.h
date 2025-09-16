@@ -34,7 +34,7 @@ namespace godot {
 
         String _event_name;
         String _programmer_callback_sound_key;
-        List<Parameter> _parameters;
+        LocalVector<Parameter> _parameters;
         FMOD_GUID _event_guid;
         float _volume = 1.0;
         bool _attached = true;
@@ -398,7 +398,7 @@ namespace godot {
         _load_event_description_if_needed();
 
         if (_event_description.is_null()) {
-            return Ref<FmodEvent>();
+            return {};
         }
 
         return FmodServer::get_singleton()->create_event_instance_from_description(_event_description);
