@@ -5,6 +5,7 @@
 
 #include <sstream>
 #include <variant/string.hpp>
+#include <resources/fmod_logging_settings.h>
 
 namespace godot {
 
@@ -15,6 +16,8 @@ namespace godot {
         LOG_ERROR,
         LOG_VERBOSE// Added for verbose logging
     };
+
+    void logging_init();
 
     // Core logging function
     void log_fmod_message(FMODLogLevel level, const String& message);

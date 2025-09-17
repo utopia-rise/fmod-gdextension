@@ -1,5 +1,6 @@
 #include "fmod_logging.h"
 
+#include <classes/project_settings.hpp>
 #include <fmod.hpp>
 #include <sstream>
 #include <variant/string.hpp>
@@ -7,9 +8,52 @@
 
 namespace godot {
 
+    // initialize FMOD logging based on project settings
+    void logging_init() {
+        const Ref<FmodLoggingSettings> p_logging_settings = FmodLoggingSettings::get_from_project_settings();
+
+        if (p_logging_settings.is_valid()) {
+            unsigned int debug_flags = p_logging_settings->_debug_level_to_fmod();
+            FMOD_DEBUG_MODE log_output = static_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
+
+            switch (log_output) {
+                case FMOD_DEBUG_MODE_TTY: {
+                    // Output to terminal/console
+                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
+                    break;
+                }
+
+                case FMOD_DEBUG_MODE_CALLBACK: {
+                    // Output to a callback -> GODOT
+                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_CALLBACK, fmod_debug_callback, nullptr);
+                    break;
+                }
+
+                case FMOD_DEBUG_MODE_FILE: {
+                    UtilityFunctions::push_warning("FMOD log output set to File");
+                    // Output to a file
+                    String file_path = p_logging_settings->get_log_file_path();
+                    CharString file_path_utf8 = file_path.utf8();
+
+                    file_path = ProjectSettings::get_singleton()->globalize_path(file_path);
+                    file_path_utf8 = file_path.utf8();
+
+                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_FILE, nullptr, file_path_utf8);
+                    break;
+                }
+
+                default: {
+                    // Fallback to TTY if somehow an invalid value is set
+                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_TTY, nullptr, nullptr);
+                    UtilityFunctions::push_warning("Invalid FMOD log output setting, defaulting to TTY");
+                    break;
+                }
+            }
+        }
+    }
+
     // Direct logging function implementation
     void log_fmod_message(FMODLogLevel level, const String& message) {
-
         switch (level) {
             case LOG_ERROR:
                 UtilityFunctions::push_error(message);

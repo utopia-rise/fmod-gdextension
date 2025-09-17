@@ -13,6 +13,7 @@
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 #include "fmod_string_names.h"
+#include "resources/fmod_logging_settings.h"
 
 #ifdef TOOLS_ENABLED
 #include <tools//fmod_editor_export_plugin.h>
