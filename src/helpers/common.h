@@ -21,7 +21,8 @@
 #define GODOT_LOG_WARNING(message) UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 #define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 
-#define ERROR_CHECK_WITH_REASON(_result, _reason) ((void)(_reason), ((_result) == FMOD_OK))
+#define ERROR_CHECK_WITH_REASON(_result, _reason) \
+(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(_reason, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
 
 #define ERROR_CHECK(_result) ((_result) == FMOD_OK)
 
