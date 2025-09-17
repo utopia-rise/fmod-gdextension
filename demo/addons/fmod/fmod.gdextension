@@ -1,7 +1,6 @@
 [configuration]
 entry_symbol = "fmod_library_init"
 compatibility_minimum = 4.5
-android_aar_plugin = true
 
 [libraries]
 windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"

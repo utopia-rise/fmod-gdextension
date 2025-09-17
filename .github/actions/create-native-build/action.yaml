@@ -1,10 +1,5 @@
 name: Create Fmod native build
 description: Creates fmod native build for a specific platform
-env:
-  TARGET_PATH: demo/addons/fmod/libs/
-  TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.5
-  FMOD_VERSION: 20306
 inputs:
   platform:
     description: The platform to build for.
