@@ -1,7 +1,9 @@
 name: 🌈 Check Pull Request
 on:
   pull_request:
-    branches: "*"
+    types: [opened, synchronize, reopened]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
 
 # Global Settings
 env:
@@ -13,6 +15,17 @@ env:
 
 jobs:
   build:
+    # EXCLUSIVE PATHS:
+    # - In-repo PRs use pull_request
+    # - External PRs use pull_request_target, so secrets are available, but only after the run is approved
+    if: >
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      ) || (
+        github.event_name == 'pull_request_target' &&
+        github.event.pull_request.head.repo.full_name != github.repository
+      )
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -134,11 +147,21 @@ jobs:
             shell: bash
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout (in-repo PR)
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
         with:
           lfs: true
           submodules: recursive
+
+      - name: Checkout (external PR via target)
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
 
       - name: Android dependencies
         if: ${{ matrix.platform == 'android' }}
