@@ -96,7 +96,6 @@ namespace godot {
         if (flags & FMOD_DEBUG_TYPE_FILE) { debug_message += "[FILE]"; }
         if (flags & FMOD_DEBUG_TYPE_CODEC) { debug_message += "[CODEC]"; }
         if (flags & FMOD_DEBUG_TYPE_TRACE) { debug_message += "[TRACE]"; }
-        if (flags & FMOD_DEBUG_TYPE_VIRTUAL) { debug_message += "[VIRT]"; }
 
         // Format the message based on display flags
         if ((flags & FMOD_DEBUG_DISPLAY_LINENUMBERS) && file && func) {
