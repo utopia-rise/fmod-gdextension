@@ -1,4 +1,20 @@
-$1 -s --headless --path $PWD addons/gut/gut_cmdln.gd | (
+if [ -z "$1" ]; then
+  echo "ERROR: Please provide the path to the Godot executable as the first argument."
+  exit 1
+fi
+
+GODOT_BIN="$1"
+PROJECT_PATH="$PWD"
+
+# Pre-import the project (headless). Try --import first, then fall back to headless editor.
+if ! "$GODOT_BIN" --headless --path "$PROJECT_PATH" --import; then
+  echo "INFO: '--import' failed or unsupported. Falling back to headless editor import..."
+  if ! "$GODOT_BIN" --headless --path "$PROJECT_PATH" --editor --quit; then
+    echo "WARNING: Pre-import step failed. Continuing anyway..."
+  fi
+fi
+
+"$GODOT_BIN" -s --headless --path "$PROJECT_PATH" addons/gut/gut_cmdln.gd | (
     tests=0
     passing=0
 
