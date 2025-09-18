@@ -22,11 +22,9 @@
 #define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 
 #define ERROR_CHECK_WITH_REASON(_result, _reason) \
-(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(FMOD_ErrorString(_result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), \
-                           godot::UtilityFunctions::push_error(_reason, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
+(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(_reason, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
 
-#define ERROR_CHECK(_result) \
-(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(FMOD_ErrorString(_result), BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
+#define ERROR_CHECK(_result) ((_result) == FMOD_OK)
 
 #define FMODCLASS(m_class, m_inherits, m_owned)               \
     GDCLASS(m_class, m_inherits)                              \

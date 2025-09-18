@@ -14,6 +14,7 @@
 #include <resources/fmod_settings.h>
 #include <resources/fmod_software_format_settings.h>
 #include <resources/fmod_sound_3d_settings.h>
+#include <resources/fmod_logging_settings.h>
 
 #include <classes/project_settings.hpp>
 
@@ -110,6 +111,27 @@ void FmodEditorPlugin::_ready() {
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSound3DSettings::THREE_D_SETTINGS_BASE_PATH, FmodSound3DSettings::ROLLOFF_SCALE_OPTION),
       FmodSound3DSettings::DEFAULT_ROLLOFF_SCALE,
       Variant::Type::FLOAT
+    );
+    add_setting(
+    vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::DEBUG_LEVEL_OPTION),
+    FmodLoggingSettings::DEFAULT_DEBUG_LEVEL,
+    Variant::Type::INT,
+    PROPERTY_HINT_ENUM,
+    "Inherit,None,Error,Warning,Log,Verbose"
+  );
+  add_setting(
+      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_OUTPUT_OPTION),
+      FmodLoggingSettings::DEFAULT_LOG_OUTPUT,
+      Variant::Type::INT,
+      PROPERTY_HINT_ENUM,
+      "TTY,File,Godot"
+    );
+    add_setting(
+      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_FILE_PATH_OPTION),
+      FmodLoggingSettings::DEFAULT_LOG_FILE_PATH,
+      Variant::Type::STRING,
+      PROPERTY_HINT_FILE,
+      "*.txt,*.log"
     );
 }
 
