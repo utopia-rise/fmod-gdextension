@@ -5,6 +5,7 @@
 #include <sstream>
 #include <variant/string.hpp>
 #include <variant/utility_functions.hpp>
+#include <resources/fmod_logging_settings.h>
 
 namespace godot {
 
