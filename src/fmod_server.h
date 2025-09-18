@@ -95,8 +95,6 @@ namespace godot {
         FmodCache* cache;
 
         int systemListenerNumber = 1;
-        int actualListenerNumber = 0;
-        bool listenerWarning = true;
         Listener listeners[FMOD_MAX_LISTENERS];
 
         Vector<OneShot*> oneShots;
@@ -311,10 +309,6 @@ namespace godot {
             return;
         }
 
-        if (game_obj && !NodeWrapper::is_spatial_node(game_obj)) {
-            GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
-            return;
-        }
 
         Ref<FmodEvent> ref = _create_event_instance<parameter_type>(identifier);
 

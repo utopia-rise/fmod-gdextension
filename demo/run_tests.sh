@@ -22,16 +22,18 @@ fi
     do
         echo "$line"
 
-        # Capture the number of tests
-        if echo "$line" | grep -q "Tests"; then
-            tests=$(echo "$line" | awk '{print $2}')
+        # Match line that starts with "Tests"
+        if echo "$line" | grep -q "^Tests"; then
+            tests=$(echo "$line" | awk '{print $NF}')
         fi
 
-        # Capture the number of passing tests
-        if echo "$line" | grep -q "Passing"; then
-            passing=$(echo "$line" | awk '{print $2}')
+        # Match line that starts with "Passing Tests"
+        if echo "$line" | grep -q "^Passing Tests"; then
+            passing=$(echo "$line" | awk '{print $NF}')
         fi
     done
+
+    echo "Retrieved values: tests=$tests passing=$passing"
 
     if [[ "$tests" -eq 0 ]]; then
        echo "ERROR: No tests were found."
