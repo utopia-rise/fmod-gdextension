@@ -178,8 +178,6 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) uint32_t
     }
 }
 
-
-
 String FmodEditorExportPlugin::_get_name() const {
     return "FmodEditorExportPlugin";
 }
