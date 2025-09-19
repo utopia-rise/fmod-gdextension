@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://glfbseq2tmgg"]
 
 [node name="Footstep" type="FmodEventEmitter2D"]
-event_name = "event:/Character/Player Footsteps"
 event_guid = "{e905d401-76f5-4741-a885-f7844b244671}"
 attached = false
 allow_fadeout = false

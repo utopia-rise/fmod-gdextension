@@ -64,5 +64,3 @@ static func is_being_edited_in_editor(which):
 		if(!is_scene_root):
 			trav = trav.get_parent()
 	return is_scene_root
-
-
