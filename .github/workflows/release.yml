@@ -287,6 +287,7 @@ jobs:
                '.godot/*' '.godot/**' \
                'addons/gut/*' 'addons/gut/**' 'addons/gut'\ 
                '.gut*' \
+               'run_tests.sh' \
                'tests/*' 'tests/**'
 
       - name: Upload Addon Asset

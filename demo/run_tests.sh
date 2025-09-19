@@ -5,14 +5,34 @@ fi
 
 GODOT_BIN="$1"
 PROJECT_PATH="$PWD"
+DELAY_SEC=5
+MAX_ATTEMPTS=3
+
+retry_import() {
+  for (( attempt=1; attempt<=MAX_ATTEMPTS; attempt++ )); do
+    echo "INFO: Attempt $attempt/$MAX_ATTEMPTS: waiting $DELAY_SEC before import…"
+    sleep "$DELAY_SEC"
+
+    if "$GODOT_BIN" --headless --path "$PROJECT_PATH" --import; then
+      echo "INFO: Import succeeded on attempt $attempt."
+      return 0
+    else
+      echo "WARN: Import failed on attempt $attempt. Retrying…"
+    fi
+  done
+  return 1
+}
+
 
 # Pre-import the project (headless). Try --import first, then fall back to headless editor.
-if ! "$GODOT_BIN" --headless --path "$PROJECT_PATH" --import; then
-  echo "INFO: '--import' failed or unsupported. Falling back to headless editor import..."
+if ! retry_import; then
+  echo "INFO: All --import attempts failed. Falling back to headless editor import…"
+  sleep "$DELAY_SEC"
   if ! "$GODOT_BIN" --headless --path "$PROJECT_PATH" --editor --quit; then
-    echo "WARNING: Pre-import step failed. Continuing anyway..."
+    echo "WARNING: Fallback import (--editor --quit) failed. Continuing anyway…"
   fi
 fi
+
 
 "$GODOT_BIN" -s --headless --path "$PROJECT_PATH" addons/gut/gut_cmdln.gd | (
     tests=0
