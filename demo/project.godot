@@ -48,7 +48,7 @@ project/assembly_name="Fmod Demo"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+enabled=PackedStringArray("res://addons/fmod/plugin.cfg", "res://addons/gut/plugin.cfg")
 
 [filesystem]
 
