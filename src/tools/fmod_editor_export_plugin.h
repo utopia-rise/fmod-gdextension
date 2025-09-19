@@ -4,7 +4,7 @@
 #define GODOTFMOD_FMOD_EDITOR_EXPORT_PLUGIN_H
 
 #include <resources/fmod_plugins_settings.h>
-
+#include <godot_cpp/classes/editor_export_platform.hpp> 
 #include <classes/editor_export_plugin.hpp>
 
 namespace godot {
@@ -14,6 +14,7 @@ namespace godot {
     public:
         void _export_begin(const PackedStringArray &features, bool is_debug, const String &path, uint32_t flags) override;
         String _get_name() const override;
+        virtual TypedArray<Dictionary> _get_export_options(const Ref<EditorExportPlatform>& platform) const override;
 
         static void _bind_methods();
 

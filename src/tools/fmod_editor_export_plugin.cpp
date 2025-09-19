@@ -13,17 +13,22 @@ constexpr const char* FMOD_FILE_EXTENSIONS[4] {".bank", ".ogg", ".mp3", ".wav"};
 constexpr const char* ANDROID_BUILD_DIRS[2] = { "res://android/build", "res:///android/build" };
 
 void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bool is_debug, const String& path, uint32_t flags) {
-    PackedStringArray excluded_folders;
-    for (const char* dir : ANDROID_BUILD_DIRS) {
-        excluded_folders.append(dir);
-    }
-    for (const char* extension : FMOD_FILE_EXTENSIONS) {
-        PackedStringArray files;
-        list_files_in_folder(files, "res://", extension, excluded_folders);
-        for (const String& file : files) {
-            GODOT_LOG_VERBOSE(vformat("Adding %s to pck", file));
-            add_file(file, FileAccess::get_file_as_bytes(file), false);
+
+    if (get_option("fmod/auto_export_banks") != Variant(false)) {
+
+        PackedStringArray excluded_folders;
+        for (const char* dir : ANDROID_BUILD_DIRS) {
+            excluded_folders.append(dir);
         }
+        for (const char* extension : FMOD_FILE_EXTENSIONS) {
+            PackedStringArray files;
+            list_files_in_folder(files, "res://", extension, excluded_folders);
+            for (const String& file : files) {
+                GODOT_LOG_VERBOSE(vformat("Adding %s to pck", file));
+                add_file(file, FileAccess::get_file_as_bytes(file), false);
+            }
+        }
+
     }
 
     bool is_windows_export = features.has("windows");
@@ -173,8 +178,29 @@ extern "C" __attribute__((visibility("default"))) __attribute__((used)) uint32_t
     }
 }
 
+
+
 String FmodEditorExportPlugin::_get_name() const {
     return "FmodEditorExportPlugin";
+}
+
+TypedArray<Dictionary> FmodEditorExportPlugin::_get_export_options(const Ref<EditorExportPlatform>& platform) const {
+    TypedArray<Dictionary> options;
+
+    {
+        Dictionary option_dict;
+        Dictionary option;
+        option["name"] = "fmod/auto_export_banks";
+        option["type"] = Variant::BOOL;
+        
+        option_dict["option"] = option;
+        option_dict["default_value"] = true;
+        option_dict["update_visibility"] = true;
+        
+        options.append(option_dict);
+    }
+    
+    return options;
 }
 
 void FmodEditorExportPlugin::_bind_methods() {}
