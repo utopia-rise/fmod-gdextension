@@ -140,8 +140,7 @@ void FmodEditorPlugin::add_setting(
   const Variant& p_default_value,
   Variant::Type p_type,
   PropertyHint p_hint,
-  const String& p_hint_string,
-  int p_usage
+  const String& p_hint_string
 ) {
     Dictionary setting;
     setting["name"] = p_name;
@@ -149,14 +148,14 @@ void FmodEditorPlugin::add_setting(
     setting["hint"] = p_hint;
     setting["hint_string"] = p_hint_string;
 
-    if (ProjectSettings::get_singleton()->has_setting(p_name))
+    if (!ProjectSettings::get_singleton()->has_setting(p_name))
     {
-        ProjectSettings::get_singleton()->add_property_info(setting);
-        return;
+        ProjectSettings::get_singleton()->set_setting(p_name, p_default_value);
     }
 
-    ProjectSettings::get_singleton()->set_setting(p_name, p_default_value);
     ProjectSettings::get_singleton()->add_property_info(setting);
+    ProjectSettings::get_singleton()->set_as_basic(p_name, true);
+    ProjectSettings::get_singleton()->set_initial_value(p_name, p_default_value);
 }
 
 void FmodEditorPlugin::_bind_methods() {}

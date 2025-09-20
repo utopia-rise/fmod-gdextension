@@ -23,8 +23,7 @@ namespace godot {
           const Variant& p_default_value,
           Variant::Type p_type,
           PropertyHint p_hint = PROPERTY_HINT_NONE,
-          const String& p_hint_string = "",
-          int p_usage = PROPERTY_USAGE_DEFAULT
+          const String& p_hint_string = ""
         );
 
     protected:
