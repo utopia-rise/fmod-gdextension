@@ -285,10 +285,10 @@ jobs:
             -x '*/.gitignore' \
                '*.zip' \
                '.godot/*' '.godot/**' \
-               'addons/gut/*' 'addons/gut/**' 'addons/gut'\ 
+               'addons/gut/*' 'addons/gut/**' 'addons/gut' \
                '.gut*' \
                'run_tests.sh' \
-               'tests/*' 'tests/**'
+               'test/' 'test/*' 'test/**' \
 
       - name: Upload Addon Asset
         uses: actions/upload-release-asset@v1
