@@ -148,7 +148,6 @@ void FmodEditorPlugin::add_setting(
     setting["type"] = p_type;
     setting["hint"] = p_hint;
     setting["hint_string"] = p_hint_string;
-    setting["usage"] = p_usage;
 
     if (ProjectSettings::get_singleton()->has_setting(p_name))
     {

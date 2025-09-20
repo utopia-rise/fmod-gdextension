@@ -5,15 +5,16 @@
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
+#include "resources/fmod_plugins_settings.h"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
 #include "studio/fmod_event.h"
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 #include "templates/hash_map.hpp"
+#include "templates/local_vector.hpp"
 #include "templates/vector.hpp"
 #include "variant/string.hpp"
-#include "resources/fmod_plugins_settings.h"
 
 #include <callback/event_callbacks.h>
 #include <callback/file_callbacks.h>
@@ -94,8 +95,6 @@ namespace godot {
         FmodCache* cache;
 
         int systemListenerNumber = 1;
-        int actualListenerNumber = 0;
-        bool listenerWarning = true;
         Listener listeners[FMOD_MAX_LISTENERS];
 
         Vector<OneShot*> oneShots;
@@ -240,7 +239,7 @@ namespace godot {
 
     public:
         template<class TParameter>
-        void apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters);
+        void apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const LocalVector<TParameter>& parameters);
 
         void play_one_shot(const String& event_name);
         void play_one_shot_with_params(const String& event_name, const Dictionary& parameters);
@@ -310,10 +309,6 @@ namespace godot {
             return;
         }
 
-        if (game_obj && !NodeWrapper::is_spatial_node(game_obj)) {
-            GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
-            return;
-        }
 
         Ref<FmodEvent> ref = _create_event_instance<parameter_type>(identifier);
 
@@ -335,7 +330,7 @@ namespace godot {
     }
 
     template<class TParameter>
-    void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters) {
+    void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const LocalVector<TParameter>& parameters) {
         for (const TParameter& parameter : parameters) {
             if (parameter.should_load_by_id) {
                 if (parameter.variant_type == Variant::Type::STRING) {

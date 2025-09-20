@@ -7,12 +7,11 @@ on:
 
 # Global Settings
 env:
-  PROJECT_FOLDER: fmod-gdextension
+  GODOT_VERSION: 4.5
+  NDK_VERSION: 27.3.13750724
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.4
   FMOD_VERSION: 20306
-
 jobs:
   build:
     # EXCLUSIVE PATHS:
@@ -114,7 +113,7 @@ jobs:
             platform: android
             target: editor
             fmod-executable-suffix: android.tar.gz
-            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            flags: ndk_version=$NDK_VERSION arch=arm64
             shell: bash
 
           - name: Android Debug Compilation
@@ -122,7 +121,7 @@ jobs:
             platform: android
             target: template_debug
             fmod-executable-suffix: android.tar.gz
-            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            flags: ndk_version=$NDK_VERSION arch=arm64
             shell: bash
 
           - name: Android Release Compilation
@@ -130,7 +129,7 @@ jobs:
             platform: android
             target: template_release
             fmod-executable-suffix: android.tar.gz
-            flags: ANDROID_NDK_ROOT=$ANDROID_NDK_LATEST_HOME arch=arm64
+            flags: ndk_version=$NDK_VERSION arch=arm64
             shell: bash
 
           - name: iOS Debug Compilation

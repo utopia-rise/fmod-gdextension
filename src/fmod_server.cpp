@@ -274,14 +274,6 @@ void FmodServer::update() {
 }
 
 void FmodServer::_set_listener_attributes() {
-    if (actualListenerNumber == 0) {
-        if (listenerWarning) {
-            GODOT_LOG_WARNING("FMOD Sound System: No listeners are set!")
-            listenerWarning = false;
-        }
-        return;
-    }
-
     for (int i = 0; i < systemListenerNumber; ++i) {
         Listener* listener = &listeners[i];
         if (listener->listenerLock) { continue; }
@@ -335,7 +327,6 @@ void FmodServer::set_system_listener_number(int p_listenerNumber) {
 }
 
 void FmodServer::add_listener(int index, Node* game_obj) {
-    if (!NodeWrapper::is_spatial_node(game_obj)) { return; }
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
         listener->wrapper.set_node(game_obj);
@@ -343,12 +334,6 @@ void FmodServer::add_listener(int index, Node* game_obj) {
           system->setListenerWeight(index, listener->weight),
           vformat("Cannot set listener %d weight to %f", index, listener->weight)
         );
-        int count = 0;
-        for (int i = 0; i < systemListenerNumber; ++i) {
-            if ((&listeners[i])->wrapper.get_node() != nullptr) count++;
-        }
-        actualListenerNumber = count;
-        if (actualListenerNumber > 0) listenerWarning = true;
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -362,12 +347,6 @@ void FmodServer::remove_listener(int index, Node* game_obj) {
 
         listener->wrapper.set_node(nullptr);
         ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, 0), vformat("Cannot set listener %d weight to 0", index));
-        int count = 0;
-        for (int i = 0; i < systemListenerNumber; ++i) {
-            if ((&listeners[i])->wrapper.get_node() != nullptr) count++;
-        }
-        actualListenerNumber = count;
-        if (actualListenerNumber > 0) listenerWarning = true;
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -481,15 +460,13 @@ bool FmodServer::get_listener_lock(int index) {
     }
 }
 
-Object* FmodServer::get_object_attached_to_listener(int index) {
+Object* FmodServer::get_object_attached_to_listener(const int index) {
     if (index < 0 || index >= systemListenerNumber) {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
         return nullptr;
-    } else {
-        Object* node = listeners[index].wrapper.get_node();
-        if (!node) { GODOT_LOG_WARNING("No node was set on listener") }
-        return node;
     }
+    Object* node = listeners[index].wrapper.get_node();
+    return node;
 }
 
 void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings) {

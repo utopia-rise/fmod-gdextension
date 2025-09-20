@@ -102,12 +102,14 @@ namespace godot {
         Node* node {nullptr};
         ObjectID id;
 
-    public:
         _FORCE_INLINE_ static bool is_spatial_node(Object* p_object) {
-            return Node::cast_to<Node3D>(p_object) || Node::cast_to<CanvasItem>(p_object);
+            if (Node::cast_to<Node3D>(p_object) || Node::cast_to<CanvasItem>(p_object)) { return true; }
+            GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
+            return false;
         }
 
-        bool is_valid() {
+    public:
+        bool is_valid() const {
             if (!node || !id.is_valid() || !UtilityFunctions::is_instance_id_valid(id)) { return false; }
             return node->is_inside_tree();
         }
@@ -121,12 +123,13 @@ namespace godot {
                     id = p_node->get_instance_id();
                     return;
                 }
-                GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
             }
             node = nullptr;
+            id = ObjectID();
         }
 
         NodeWrapper() = default;
+
         explicit NodeWrapper(Node* p_node) { set_node(p_node); };
     };
 

@@ -25,6 +25,7 @@ DSP/dsp_buffer_count=4
 "3D Settings/rolloff_scale"=1.0
 General/banks_path="res://assets/Banks"
 General/should_load_by_name=false
+Plugins/path_to_plugin_configuration=""
 
 [android]
 
@@ -34,7 +35,7 @@ modules="org/godotengine/godot/FmodSingleton"
 
 config/name="Fmod Demo"
 run/main_scene="res://low_level_2D/FmodScriptTest.tscn"
-config/features=PackedStringArray("4.4")
+config/features=PackedStringArray("4.5")
 config/icon="uid://cih2yjmtjoohg"
 
 [autoload]
@@ -47,7 +48,7 @@ project/assembly_name="Fmod Demo"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/fmod/plugin.cfg", "res://addons/gut/plugin.cfg")
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
 
 [filesystem]
 

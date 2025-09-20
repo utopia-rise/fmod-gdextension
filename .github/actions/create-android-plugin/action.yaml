@@ -1,7 +1,5 @@
 name: Create Fmod native build
 description: Creates fmod native build for a specific platform
-env:
-  GODOT_VERSION: 4.4
 runs:
   using: composite
   steps:
@@ -16,22 +14,9 @@ runs:
         name: fmod-jar
         path: android-plugin/library/libraries/
 
-    - name: Download godot android aar
-      shell: bash
-      run: |
-        cd android-plugin/library/libraries/
-        wget https://github.com/godotengine/godot/releases/download/${{ env.GODOT_VERSION }}-stable/godot-lib.${{ env.GODOT_VERSION }}.stable.template_release.aar
-
     - name: Build android plugin
       uses: eskatos/gradle-command-action@v1
       with:
         wrapper-directory: android-plugin/
         build-root-directory: android-plugin/
         arguments: :library:build
-
-    - name: Copy aar plugin files
-      uses: eskatos/gradle-command-action@v1
-      with:
-        wrapper-directory: android-plugin/
-        build-root-directory: android-plugin/
-        arguments: :library:copyAarFiles

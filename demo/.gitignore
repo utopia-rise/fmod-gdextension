@@ -15,7 +15,6 @@ export_credentials.cfg
 data_*/
 mono_crash.*.json
 
-*.import
 .vscode/
 logs/
 **/*.aar

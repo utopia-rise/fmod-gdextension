@@ -1,6 +1,6 @@
 [configuration]
 entry_symbol = "fmod_library_init"
-compatibility_minimum = 4.2
+compatibility_minimum = 4.5
 
 [libraries]
 windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"
