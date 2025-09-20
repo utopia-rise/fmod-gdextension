@@ -65,13 +65,13 @@ func _add_bank_explorer_window() -> void:
 func _on_project_explorer_button_clicked() -> void:
 	bank_explorer.should_display_copy_buttons = true
 	bank_explorer.should_display_select_button = false
-	_popup_project_explorer(FmodBankExplorer.ToDisplayFlags.BANKS | FmodBankExplorer.ToDisplayFlags.BUSES | FmodBankExplorer.ToDisplayFlags.VCA | FmodBankExplorer.ToDisplayFlags.EVENTS)
+	_popup_project_explorer(FmodBankExplorer.ToDisplayFlags.BUSES | FmodBankExplorer.ToDisplayFlags.VCA | FmodBankExplorer.ToDisplayFlags.EVENTS)
 
 func open_project_explorer_events(on_select_callable: Callable) -> void:
-	_open_project_explorer(FmodBankExplorer.ToDisplayFlags.BANKS | FmodBankExplorer.ToDisplayFlags.EVENTS, on_select_callable)
+	_open_project_explorer(FmodBankExplorer.ToDisplayFlags.EVENTS, on_select_callable)
 
 func open_project_explorer_bank(on_select_callable: Callable) -> void:
-	_open_project_explorer(FmodBankExplorer.ToDisplayFlags.BANKS, on_select_callable)
+	_open_project_explorer(0, on_select_callable)
 
 func _open_project_explorer(display_flag: int, on_select_callable: Callable) -> void:
 	bank_explorer.should_display_copy_buttons = false
@@ -83,6 +83,8 @@ func _popup_project_explorer(to_display: int, callable: Callable = Callable()) -
 		bank_explorer.close_window()
 		return
 	
-	bank_explorer.regenerate_tree(to_display, callable)
+	bank_explorer.flags = to_display
+	bank_explorer.reset_search()
+	bank_explorer.regenerate_tree(callable)
 	bank_explorer.popup_centered()
 	

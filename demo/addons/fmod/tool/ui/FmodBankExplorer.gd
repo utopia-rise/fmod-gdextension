@@ -1,10 +1,9 @@
 @tool class_name FmodBankExplorer extends Window
 
 enum ToDisplayFlags {
-	BANKS = 1,
-	BUSES = 2,
-	VCA = 4,
-	EVENTS = 8
+	BUSES = 1,
+	VCA = 2,
+	EVENTS = 4
 }
 
 static var _fmod_icon = load("res://addons/fmod/icons/fmod_icon.svg")
@@ -30,6 +29,13 @@ var contrast: float
 var background_color: Color
 
 var banks: Array = Array()
+
+var flags: int = 0
+var search: String = ""
+
+func reset_search():
+	%SearchField.text = ""
+	search = ""
 
 func _ready():
 	var main_window_size = get_parent().get_window().size
@@ -60,63 +66,78 @@ func _ready():
 
 	tree = %Tree
 	tree.item_selected.connect(_on_item_selected)
-
 	tree.columns = 1
-	generate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
 
+	generate_tree()
 	%RefreshBanksButton.pressed.connect(on_refresh_banks_button_pressed)
 
 
-func regenerate_tree(to_display: int, callable: Callable = Callable()):
+func regenerate_tree(callable: Callable = Callable()):
 	tree.clear()
-	generate_tree(to_display, callable)
+	generate_tree(callable)
 
-
-func generate_tree(to_display: int, callable: Callable = Callable()):
+func generate_tree(callable: Callable = Callable()):
 	%SelectButton.visible = should_display_select_button
 	if _current_select_callable != Callable() && _current_select_callable.get_object() != null:
 		emit_path_and_guid.disconnect(_current_select_callable)
 	_current_select_callable = callable
 
-
 	var root_item := tree.create_item()
 	root_item.set_text(0, "Fmod objects")
 	root_item.set_icon(0, _fmod_icon)
 
+	var has_many_flags = (flags & (flags - 1)) != 0
+
 	for bank in FmodServer.get_all_banks():
 		var fmod_bank := bank as FmodBank
 
-		var bank_item := tree.create_item(root_item)
-		bank_item.set_text(0, fmod_bank.get_godot_res_path())
-		bank_item.set_icon(0, _bank_icon)
-		bank_item.set_metadata(0, bank)
+		var buses := fmod_bank.get_bus_list()
+		var vcas := fmod_bank.get_vca_list()
+		var events := fmod_bank.get_description_list()
 
-		if to_display & ToDisplayFlags.BUSES:
-			var buses_item := tree.create_item(bank_item)
-			buses_item.set_text(0, "Buses")
-			buses_item.set_icon(0, _bus_icon)
+		if search.is_empty():
+			var bank_item := tree.create_item(root_item)
+			bank_item.set_text(0, fmod_bank.get_godot_res_path())
+			bank_item.set_icon(0, _bank_icon)
+			bank_item.set_metadata(0, bank)
 
-			var buses := fmod_bank.get_bus_list()
-			buses.sort_custom(sort_by_path)
-			_add_elements_as_tree(buses, buses_item)
+			if flags & ToDisplayFlags.BUSES and buses.size() != 0:
+				buses.sort_custom(sort_by_path)
+				if has_many_flags:
+					var buses_item := tree.create_item(bank_item)
+					buses_item.set_text(0, "Buses")
+					buses_item.set_icon(0, _bus_icon)
+					_add_elements_as_tree(buses, buses_item)
+				else:
+					_add_elements_as_tree(buses, bank_item)
 
-		if to_display & ToDisplayFlags.VCA:
-			var vca_item := tree.create_item(bank_item)
-			vca_item.set_text(0, "VCAs")
-			vca_item.set_icon(0, _vca_icon)
+			if flags & ToDisplayFlags.VCA and vcas.size() != 0:
+				vcas.sort_custom(sort_by_path)
+				if has_many_flags:
+					var vca_item := tree.create_item(bank_item)
+					vca_item.set_text(0, "VCAs")
+					vca_item.set_icon(0, _vca_icon)
+					_add_elements_as_tree(vcas, vca_item)
+				else:
+					_add_elements_as_tree(vcas, bank_item)
 
-			var vcas := fmod_bank.get_vca_list()
-			vcas.sort_custom(sort_by_path)
-			_add_elements_as_tree(vcas, vca_item)
+			if flags & ToDisplayFlags.EVENTS and events.size() != 0:
+				events.sort_custom(sort_by_path)
+				if has_many_flags:
+					var events_item := tree.create_item(bank_item)
+					events_item.set_text(0, "Events")
+					events_item.set_icon(0, _event_icon)
+					_add_elements_as_tree(events, events_item)
+				else:
+					_add_elements_as_tree(events, bank_item)
 
-		if to_display & ToDisplayFlags.EVENTS:
-			var events_item := tree.create_item(bank_item)
-			events_item.set_text(0, "Events")
-			events_item.set_icon(0, _event_icon)
-
-			var events := fmod_bank.get_description_list()
-			events.sort_custom(sort_by_path)
-			_add_elements_as_tree(events, events_item)
+		else:
+			if flags & ToDisplayFlags.BUSES:
+				_add_elements_as_items(buses, root_item)
+			if flags & ToDisplayFlags.VCA:
+				_add_elements_as_items(vcas, root_item)
+			if flags & ToDisplayFlags.EVENTS:
+				_add_elements_as_items(events, root_item)
 
 	if copy_path_button.visible:
 		copy_path_button.visible = should_display_copy_buttons
@@ -130,45 +151,55 @@ func generate_tree(to_display: int, callable: Callable = Callable()):
 
 	%SelectButton.visible = should_display_select_button and %GuidLabel.text != ""
 
+func _add_elements_as_items(elements: Array, parent: TreeItem):
+		for element in elements:
+			var full_path: String = element.get_path()
+			if not full_path.containsn(search):
+				continue
+
+			var child := tree.create_item(parent)
+			var name := full_path.rsplit("/")[-1]
+			child.set_text(0, name)
+			child.set_metadata(0, element)
+			child.set_icon(0, _get_icon_for_fmod_path(full_path))
 
 func _add_elements_as_tree(elements: Array, parent: TreeItem):
-	var stack = Array()
+	var nodes := { "": parent }
+
 	for element in elements:
-		_add_element_to_stack(stack, parent, element)
+		var full_path: String = element.get_path()
+		var parts := full_path.split("/")
+		# Drop the “type:” prefix
+		if parts.size() > 0:
+			parts.remove_at(0)
 
+		# Walk each segment in turn, building a running “key”
+		var key := ""
+		for i in range(parts.size()):
+			var name = parts[i]
+			if full_path == "bus:/":
+				name = "Master"
+			if key == "":
+				key = name
+			else:
+				key = key + "/" + name
 
-func _add_element_to_stack(stack: Array, parent_root: TreeItem, path_element):
-	var fmod_path: String = path_element.get_path()
-	var path_parts := fmod_path.split("/")
-	if path_parts[path_parts.size() - 1] == "":
-		path_parts.remove_at(path_parts.size() - 1)
+			# If we haven’t created this node yet, do so now
+			if not nodes.has(key):
+				var root_and_name := key.rsplit("/", false, 1)
+				var parent_key: String = ""
+				if root_and_name.size() == 2:
+					parent_key = root_and_name[0]
+				var parent_item = nodes[parent_key]
+				var child := tree.create_item(parent_item)
+				child.set_text(0, name)
+				nodes[key] = child
 
-	for i in range(0, path_parts.size()):
-		var path_part = path_parts[i]
-		path_part = path_part if path_part != "bus:" else "Master"
-
-		if i >= stack.size():
-			var parent_item = parent_root if stack.is_empty() else stack[stack.size() - 1]
-			var tree_item = tree.create_item(parent_item)
-			tree_item.set_text(0, path_part)
-			if i == path_parts.size() - 1:
-				tree_item.set_metadata(0, path_element)
-				tree_item.set_icon(0, _get_icon_for_fmod_path(fmod_path))
-			stack.append(tree_item)
-			continue
-
-		if stack[i].get_text(0) != path_part:
-			for j in range(stack.size() - 1, i - 1, -1):
-				stack.remove_at(j)
-
-			var parent_item = parent_root if stack.is_empty() else stack[stack.size() - 1]
-			var tree_item = tree.create_item(parent_item)
-			tree_item.set_text(0, path_part)
-			if i == path_parts.size() - 1:
-				tree_item.set_metadata(0, path_element)
-				tree_item.set_icon(0, _get_icon_for_fmod_path(fmod_path))
-			stack.append(tree_item)
-
+			# If this is the final segment, attach the metadata & icon
+			if i == parts.size() - 1:
+				var leaf = nodes[key]
+				leaf.set_metadata(0, element)
+				leaf.set_icon(0, _get_icon_for_fmod_path(full_path))
 
 func _on_item_selected():
 	var metadata = tree.get_selected().get_metadata(0)
@@ -213,8 +244,7 @@ func on_refresh_banks_button_pressed() -> void:
 	banks.clear()
 	tree.clear()
 	FmodBankDatabase.reload_all_banks()
-	generate_tree(ToDisplayFlags.BANKS | ToDisplayFlags.BUSES | ToDisplayFlags.VCA | ToDisplayFlags.EVENTS)
-
+	generate_tree()
 
 func close_window():
 	%EventPlayControls.stop_event()
@@ -234,3 +264,8 @@ static func _get_icon_for_fmod_path(fmod_path: String) -> Texture2D:
 
 static func sort_by_path(a, b):
 	return a.get_path().casecmp_to(b.get_path()) < 0
+
+
+func _on_text_edit_text_submitted(new_text: String) -> void:
+	search = new_text
+	regenerate_tree()
