@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.incremental.createDirectory
 
 plugins {
     id("com.android.library")
@@ -67,5 +66,5 @@ tasks.named("assemble").configure {
 
 dependencies {
     implementation(files("libraries/fmod.jar"))
-    implementation("org.godotengine:godot:4.4.1.stable")
+    implementation("org.godotengine:godot:4.5.0.stable")
 }
