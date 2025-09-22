@@ -43,6 +43,11 @@ sources = [
     Glob('src/plugins/*.cpp')
     ]
 
+# Add documentation data for editor and debug builds
+if env["target"] in ["editor", "template_debug"]:
+    doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("doc_classes/*.xml"))
+    sources.append(doc_data)
+
 lfix = ""
 debug = False
 if env["target"] == "template_debug" or env["target"] == "editor":
@@ -203,26 +208,5 @@ def copy_fmod_libraries(self, arg, env, executor = None):
 
 copy_fmod_libraries_action = Action('', copy_fmod_libraries)
 AddPostAction(library, copy_fmod_libraries_action)
-
-
-def copy_documentation(self, arg, env, executor=None):
-    """Copy documentation files from root doc_classes to the addon directory."""
-    source_doc_dir = "doc_classes/"
-    # target_path is "demo/addons/fmod/libs/" so we want "demo/addons/fmod/doc_classes/"
-    addon_base_dir = os.path.dirname(os.path.dirname(target_path))  # Remove "libs/" from path
-    target_doc_dir = os.path.join(addon_base_dir, "doc_classes")
-    
-    if os.path.exists(source_doc_dir):
-        # Create target directory if it doesn't exist
-        os.makedirs(target_doc_dir, exist_ok=True)
-        
-        # Copy all XML files
-        doc_files = env.Glob(os.path.join(source_doc_dir, '*.xml'))
-        for doc_file in doc_files:
-            shutil.copy(str(doc_file), target_doc_dir)
-
-
-copy_documentation_action = Action('', copy_documentation)
-AddPostAction(library, copy_documentation_action)
 
 Default(library)
