@@ -20,7 +20,7 @@ Android exports require a Godot Android plugin.
 Download android build template from project menu:  
 ![install-android-build-template]  
 
-You should also make sure `Use Gradle Build` and `Fmod Plugin` extension options are activated in android export:  
+Make sure the `Use Gradle Build` option is activated in your Android export:  
 ![android-extension-export-enable]
 
 !!! warning
