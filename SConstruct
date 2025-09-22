@@ -204,4 +204,23 @@ def copy_fmod_libraries(self, arg, env, executor = None):
 copy_fmod_libraries_action = Action('', copy_fmod_libraries)
 AddPostAction(library, copy_fmod_libraries_action)
 
+
+def copy_documentation(self, arg, env, executor=None):
+    """Copy documentation files from root doc_classes to the addon directory."""
+    source_doc_dir = "doc_classes/"
+    target_doc_dir = os.path.dirname(target_path) + "/doc_classes/"
+    
+    if os.path.exists(source_doc_dir):
+        # Create target directory if it doesn't exist
+        os.makedirs(target_doc_dir, exist_ok=True)
+        
+        # Copy all XML files
+        doc_files = env.Glob(os.path.join(source_doc_dir, '*.xml'))
+        for doc_file in doc_files:
+            shutil.copy(str(doc_file), target_doc_dir)
+
+
+copy_documentation_action = Action('', copy_documentation)
+AddPostAction(library, copy_documentation_action)
+
 Default(library)
