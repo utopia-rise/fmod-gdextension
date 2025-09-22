@@ -6,7 +6,7 @@ The FMOD GDExtension provides a comprehensive set of classes and nodes for integ
 
 ### FmodServer
 
-The main singleton class that manages the FMOD Studio API integration. Access it with `FmodServer.get_singleton()`.
+The main singleton class that manages the FMOD Studio API integration. Access it directly as `FmodServer` since it's registered as a singleton.
 
 **Key Methods:**
 - `init(p_settings: FmodGeneralSettings)` - Initialize the FMOD system
@@ -191,14 +191,11 @@ Describes the properties and constraints of an FMOD Studio event parameter.
 ### Basic Event Playback
 
 ```gdscript
-# Get the FMOD server singleton
-var fmod_server = FmodServer.get_singleton()
-
-# Play a simple one-shot event
-fmod_server.play_one_shot("event:/UI/ButtonClick")
+# Play a simple one-shot event directly
+FmodServer.play_one_shot("event:/UI/ButtonClick")
 
 # Create and control an event instance
-var music_event = fmod_server.create_event_instance("event:/Music/Level1")
+var music_event = FmodServer.create_event_instance("event:/Music/Level1")
 music_event.start()
 music_event.set_parameter_by_name("Intensity", 0.8)
 ```
@@ -221,14 +218,14 @@ emitter.set_parameter("TimeOfDay", 0.5)
 
 ```gdscript
 # Load a bank
-var bank = fmod_server.load_bank("res://audio/Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+var bank = FmodServer.load_bank("res://audio/Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
 
 # Wait for async loading
 while bank.get_loading_state() == FMOD_STUDIO_LOADING_STATE_LOADING:
     await get_tree().process_frame
 
 # Use events from the bank
-var event_desc = fmod_server.get_event("event:/Music/MainTheme")
+var event_desc = FmodServer.get_event("event:/Music/MainTheme")
 var event = event_desc.create_instance()
 ```
 
@@ -236,11 +233,11 @@ var event = event_desc.create_instance()
 
 ```gdscript
 # Control bus volume
-var music_bus = fmod_server.get_bus("bus:/Music")
+var music_bus = FmodServer.get_bus("bus:/Music")
 music_bus.set_volume(0.5)
 
 # Control VCA
-var master_vca = fmod_server.get_vca("vca:/Master")
+var master_vca = FmodServer.get_vca("vca:/Master")
 master_vca.set_volume(0.8)
 ```
 
