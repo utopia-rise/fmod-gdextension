@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodBankLoader" inherits="Node" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A node for automatically loading FMOD Studio banks when entering the scene tree.
+	</brief_description>
+	<description>
+		FmodBankLoader is a utility node that automatically loads FMOD Studio bank files when it enters the scene tree. This provides a convenient way to ensure that required audio content is loaded before it's needed.
+
+		Banks contain the audio content and metadata for FMOD Studio events, including:
+		- Event definitions and parameters
+		- Audio samples (if not streamed)
+		- Bus and VCA configurations
+		- Mixing and effect settings
+
+		The node accepts an array of bank file paths and loads them all when _enter_tree() is called. Banks are loaded with the default loading mode, which is typically asynchronous to avoid blocking the main thread.
+
+		This is particularly useful for loading banks at the start of a level or scene, ensuring all required audio content is available when events are played.
+
+		Note: Banks must be available in the project's resources or file system at the specified paths.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bank_paths">
+			<return type="Array" />
+			<description>
+				Returns the array of bank file paths that will be loaded by this node.
+			</description>
+		</method>
+		<method name="set_bank_paths">
+			<return type="void" />
+			<param index="0" name="p_paths" type="Array" />
+			<description>
+				Sets the array of bank file paths to load. Each path should be a string pointing to a .bank file. The banks will be loaded when the node enters the scene tree.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="bank_paths" type="Array" setter="set_bank_paths" getter="get_bank_paths" default="[]">
+			An array of file paths to FMOD Studio bank files (.bank) that should be loaded when this node enters the scene tree. Paths should be relative to the project or absolute file paths.
+		</member>
+	</members>
+</class>

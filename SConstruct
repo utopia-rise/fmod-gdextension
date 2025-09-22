@@ -208,7 +208,9 @@ AddPostAction(library, copy_fmod_libraries_action)
 def copy_documentation(self, arg, env, executor=None):
     """Copy documentation files from root doc_classes to the addon directory."""
     source_doc_dir = "doc_classes/"
-    target_doc_dir = os.path.dirname(target_path) + "/doc_classes/"
+    # target_path is "demo/addons/fmod/libs/" so we want "demo/addons/fmod/doc_classes/"
+    addon_base_dir = os.path.dirname(os.path.dirname(target_path))  # Remove "libs/" from path
+    target_doc_dir = os.path.join(addon_base_dir, "doc_classes")
     
     if os.path.exists(source_doc_dir):
         # Create target directory if it doesn't exist

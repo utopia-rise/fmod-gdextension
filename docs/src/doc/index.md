@@ -11,4 +11,8 @@ This GDExtension exposes most of the Studio API functions to Godot's GDScript an
 performing common functions like attaching Studio events to Godot nodes and playing 3D/positional audio. Feel free to
 tweak/extend it based on your project's needs.
 
+## Documentation
+
+This documentation provides tutorials and guides for using the FMOD GDExtension. For detailed API reference, the extension includes comprehensive **in-engine documentation** that appears directly in Godot's Help system when the extension is enabled. See the [API Reference](api-reference.md) section for more information on accessing this built-in documentation.
+
 [fmod-gdextension-image]: ./assets/fmod-gdextension-logo.png
