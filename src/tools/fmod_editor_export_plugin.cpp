@@ -11,10 +11,11 @@ using namespace godot;
 
 constexpr const char* FMOD_FILE_EXTENSIONS[4] {".bank", ".ogg", ".mp3", ".wav"};
 constexpr const char* ANDROID_BUILD_DIRS[2] = { "res://android/build", "res:///android/build" };
+constexpr const char* FMOD_AUTO_EXPORT_BANKS_SETTINGS_KEY = "fmod/auto_export_banks";
 
 void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bool is_debug, const String& path, uint32_t flags) {
 
-    if (get_option("fmod/auto_export_banks") != Variant(false)) {
+    if (get_option(FMOD_AUTO_EXPORT_BANKS_SETTINGS_KEY) != Variant(false)) {
 
         PackedStringArray excluded_folders;
         for (const char* dir : ANDROID_BUILD_DIRS) {
@@ -188,7 +189,7 @@ TypedArray<Dictionary> FmodEditorExportPlugin::_get_export_options(const Ref<Edi
     {
         Dictionary option_dict;
         Dictionary option;
-        option["name"] = "fmod/auto_export_banks";
+        option["name"] = FMOD_AUTO_EXPORT_BANKS_SETTINGS_KEY;
         option["type"] = Variant::BOOL;
         
         option_dict["option"] = option;
