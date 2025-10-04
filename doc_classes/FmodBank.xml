@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodBank" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Represents a loaded FMOD Studio bank containing audio content and metadata.
+	</brief_description>
+	<description>
+		FmodBank represents a loaded FMOD Studio bank file. Banks are containers that hold audio content including event definitions, audio samples, bus configurations, and VCA settings.
+
+		Banks are created by FMOD Studio and contain:
+		- Event descriptions that define how audio events behave
+		- Audio samples (unless streamed from separate files)
+		- Bus hierarchy for mixing and effects
+		- VCA (Volume Control Automation) configurations
+		- String tables for event/bus/VCA names
+
+		Banks can be loaded synchronously or asynchronously. Use [method FmodServer.load_bank] to load banks and [method get_loading_state] to check if an asynchronous load has completed.
+
+		Banks must be loaded before their contained events, buses, or VCAs can be used. Typically, you'll load a "Master" bank first (which contains bus/VCA definitions) followed by content banks containing specific events.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_bus_count">
+			<return type="int" />
+			<description>
+				Returns the number of buses defined in this bank.
+			</description>
+		</method>
+		<method name="get_bus_list">
+			<return type="Array" />
+			<description>
+				Returns an array of all [FmodBus] objects defined in this bank.
+			</description>
+		</method>
+		<method name="get_description_list">
+			<return type="Array" />
+			<description>
+				Returns an array of all [FmodEventDescription] objects defined in this bank.
+			</description>
+		</method>
+		<method name="get_event_description_count">
+			<return type="int" />
+			<description>
+				Returns the number of event descriptions defined in this bank.
+			</description>
+		</method>
+		<method name="get_loading_state">
+			<return type="int" />
+			<description>
+				Returns the loading state of the bank. See FMOD_STUDIO_LOADING_STATE enum for possible values:
+				- FMOD_STUDIO_LOADING_STATE_UNLOADING: Bank is being unloaded
+				- FMOD_STUDIO_LOADING_STATE_UNLOADED: Bank is not loaded
+				- FMOD_STUDIO_LOADING_STATE_LOADING: Bank is currently loading
+				- FMOD_STUDIO_LOADING_STATE_LOADED: Bank is fully loaded and ready
+				- FMOD_STUDIO_LOADING_STATE_ERROR: An error occurred during loading
+			</description>
+		</method>
+		<method name="get_string_count">
+			<return type="int" />
+			<description>
+				Returns the number of strings in the bank's string table. This includes names for events, buses, VCAs, and parameters.
+			</description>
+		</method>
+		<method name="get_vca_count">
+			<return type="int" />
+			<description>
+				Returns the number of VCAs (Volume Control Automation) defined in this bank.
+			</description>
+		</method>
+		<method name="get_vca_list">
+			<return type="Array" />
+			<description>
+				Returns an array of all [FmodVCA] objects defined in this bank.
+			</description>
+		</method>
+		<method name="update_bank_data">
+			<return type="void" />
+			<description>
+				Forces an update of the bank's cached data including event descriptions, buses, and VCAs. This is typically called automatically but can be useful if the bank content changes at runtime.
+			</description>
+		</method>
+	</methods>
+</class>
