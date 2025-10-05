@@ -811,6 +811,10 @@ namespace godot {
     FmodEventEmitter<Derived, NodeType>::_get_parameter_description(const FmodEventEmitter::Parameter& parameter) const {
         _load_event_description_if_needed();
 
+        if (_event_description.is_null() || !_event_description->is_valid()) {
+            return {};
+        }
+
         return parameter.should_load_by_id
                ? _event_description->get_parameter_by_id(parameter.id)
                : _event_description->get_parameter_by_name(parameter.name);
