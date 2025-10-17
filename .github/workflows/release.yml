@@ -6,7 +6,7 @@ on:
 
 # Global Settings
 env:
-  GODOT_VERSION: 4.5
+  GODOT_VERSION: 4.4
   NDK_VERSION: 27.3.13750724
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
