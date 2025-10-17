@@ -13,7 +13,8 @@ env:
   TARGET_NAME: libGodotFmod
   FMOD_VERSION: 20306
 jobs:
-  build:
+  gate:
+    runs-on: ubuntu-latest
     # EXCLUSIVE PATHS:
     # - In-repo PRs use pull_request
     # - External PRs use pull_request_target, so secrets are available, but only after the run is approved
@@ -26,7 +27,12 @@ jobs:
         github.event.pull_request.head.repo.full_name != github.repository
       )
     environment: ${{ github.event_name == 'pull_request_target' && 'external-pr' || '' }}
+    steps:
+      - run: echo "Run Approved"
+
+  build:
     name: ${{ matrix.name }}
+    needs: gate
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
