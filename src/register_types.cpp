@@ -12,6 +12,8 @@
 #include "studio/fmod_event.h"
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
+#include "fmod_string_names.h"
+#include "resources/fmod_logging_settings.h"
 
 #ifdef TOOLS_ENABLED
 #include <tools//fmod_editor_export_plugin.h>
@@ -41,6 +43,8 @@ void initialize_fmod_with_settings() {
     FmodServer::get_singleton()->init(general_settings);
     FmodServer::get_singleton()->set_sound_3d_settings(three_d_settings);
     FmodServer::get_singleton()->set_system_listener_number(general_settings->get_default_listener_count());
+
+    FmodServer::get_singleton()->load_all_plugins(FmodPluginsSettings::get_from_project_settings());
 }
 
 void initialize_fmod() {
@@ -64,6 +68,7 @@ void initialize_fmod() {
 void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
         // initialise filerunner singleton by calling it.
+        FmodStringNames::create();
         Callbacks::GodotFileRunner::get_singleton();
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
@@ -95,6 +100,9 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodSoftwareFormatSettings>();
         ClassDB::register_class<FmodDspSettings>();
         ClassDB::register_class<FmodSound3DSettings>();
+        ClassDB::register_class<FmodStaticPluginMethod>();
+        ClassDB::register_class<FmodPluginsSettings>();
+        ClassDB::register_class<FmodLoggingSettings>();
 
         // Server
         ClassDB::register_class<FmodServer>();
@@ -112,7 +120,10 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 }
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
-    if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) { Callbacks::GodotFileRunner::get_singleton()->finish(); }
+    if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
+        Callbacks::GodotFileRunner::get_singleton()->finish();
+        FmodStringNames::free();
+    }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         fmod_singleton->shutdown();
 

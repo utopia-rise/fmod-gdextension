@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://hy04frgfhtgu"]
 
-[ext_resource type="Script" path="res://addons/fmod/tool/property_editors/FmodGuidAndPathPropertyEditorUi.gd" id="1_eao7t"]
-[ext_resource type="Texture2D" uid="uid://dca7c6jnnpl0f" path="res://addons/fmod/icons/event_icon.svg" id="1_kuu6i"]
+[ext_resource type="Script" uid="uid://3xn18ci172v4" path="res://addons/fmod/tool/property_editors/FmodGuidAndPathPropertyEditorUi.gd" id="1_eao7t"]
+[ext_resource type="Texture2D" uid="uid://cmpgmbn3y4svl" path="res://addons/fmod/icons/event_icon.svg" id="1_kuu6i"]
 
 [node name="FmodGuidAndPathPropertyEditorUi" type="HBoxContainer"]
 offset_right = 1152.0

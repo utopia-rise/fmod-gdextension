@@ -39,7 +39,8 @@ sources = [
     Glob('src/helpers/*.cpp'),
     Glob('src/nodes/*.cpp'),
     Glob('src/resources/*.cpp'),
-    Glob('src/studio/*.cpp')
+    Glob('src/studio/*.cpp'),
+    Glob('src/plugins/*.cpp')
     ]
 
 lfix = ""
@@ -61,6 +62,7 @@ if env["platform"] == "macos":
             "-framework",
             "Cocoa",
             "-Wl,-undefined,dynamic_lookup",
+            "-rpath", "@loader_path/.."
         ]
     )
 
@@ -102,7 +104,7 @@ elif env["platform"] == "ios":
     env.Append(LIBS=[libfmod, libfmodstudio])
 
     env.Append(LINKFLAGS=[
-        '-Wl,-undefined,dynamic_lookup',
+        '-Wl,-undefined,dynamic_lookup', "-miphoneos-version-min=" + env["ios_min_version"]
     ])
 
 elif env["platform"] == "android":
@@ -151,28 +153,30 @@ else:
 
 library = env.SharedLibrary(target=target, source=sources)
 
-#Necessary so the extension library can find the Fmod libraries
-if env["platform"] == "macos":
-    def sys_exec(args):
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
-        (out, err) = proc.communicate()
-        return out.rstrip("\r\n").lstrip()
 
-    
-    lib_name = "{}.{}.{}".format(
-        target,
+def sys_exec(args):
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    (out, err) = proc.communicate()
+    return out.rstrip("\r\n").lstrip()
+
+
+if env["platform"] == "ios":
+    xcframework_path = "{}{}/{}.{}.{}.xcframework".format(
+        target_path,
+        env["platform"],
         target_name,
         env["platform"],
         env["target"]
     )
 
-    def change_id(self, arg, env, executor = None):
-        sys_exec(["install_name_tool", "-id", "@rpath/%s" % lib_name , target])
-        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmodstudio, "@loader_path/../%s" % libfmodstudio, target])
-        sys_exec(["install_name_tool", "-change", "@rpath/%s" % libfmod, "@loader_path/../%s" % libfmod, target])
-    change_id_action = Action('', change_id)
+    def create_xcframework(self, arg, env, executor = None):
+        sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
+        sys_exec(["rm", target])
+        sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
 
-    AddPostAction(library, change_id_action)
+    create_xcframework_action = Action('', create_xcframework)
+
+    AddPostAction(library, create_xcframework_action)
 
 
 def copy_fmod_libraries(self, arg, env, executor = None):

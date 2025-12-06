@@ -24,7 +24,7 @@ namespace godot {
         void set_listener_weight(const float p_weight);
         float get_listener_weight() const;
 
-        static StringName& get_class_static();
+        static const StringName& get_class_static();
 
         FmodListener();
         ~FmodListener() = default;
@@ -67,6 +67,7 @@ namespace godot {
 
         FmodServer::get_singleton()->add_listener(_listener_index, this);
         FmodServer::get_singleton()->set_listener_lock(_listener_index, _is_locked);
+        FmodServer::get_singleton()->set_system_listener_weight(_listener_index, _weight);
 
         _is_added = true;
     }
@@ -78,7 +79,7 @@ namespace godot {
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
 
-        FmodServer::get_singleton()->remove_listener(_listener_index);
+        FmodServer::get_singleton()->remove_listener(_listener_index, this);
         _is_added = false;
     }
 
@@ -155,7 +156,7 @@ namespace godot {
             "listener_index",
             PROPERTY_HINT_NONE,
             "",
-            PROPERTY_USAGE_EDITOR
+            PROPERTY_USAGE_DEFAULT
           ),
           "set_listener_index",
           "get_listener_index"
@@ -185,7 +186,7 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    StringName& FmodListener<Derived, NodeType>::get_class_static() {
+    const StringName& FmodListener<Derived, NodeType>::get_class_static() {
         return Derived::get_class_static();
     }
 }// namespace godot

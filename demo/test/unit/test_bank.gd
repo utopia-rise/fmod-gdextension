@@ -5,6 +5,7 @@ class TestBank:
 	
 	var sprite: Sprite2D = Sprite2D.new()
 	
+	var master_strings_bank: FmodBank
 	var masterBank: FmodBank
 	var musicBank: FmodBank
 	var vehicleBank: FmodBank
@@ -12,7 +13,7 @@ class TestBank:
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
-		FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		master_strings_bank = FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
 		masterBank = FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
 		# warning-ignore:return_value_discarded
@@ -26,12 +27,7 @@ class TestBank:
 		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		FmodServer.remove_listener(0)
-		FmodServer.unload_bank("res://assets/Banks/Master.strings.bank")
-		FmodServer.unload_bank("res://assets/Banks/Master.bank")
-		FmodServer.unload_bank("res://assets/Banks/Music.bank")
-		FmodServer.unload_bank("res://assets/Banks/Vehicles.bank")
-		assert_true(vehicleBank.get_loading_state() == 0 or vehicleBank.get_loading_state() == 1, "Loading state should be -1")
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_bank_bus_count():
 		var desiredValue: int = 0

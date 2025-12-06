@@ -1,17 +1,10 @@
 name: Create Fmod native build
 description: Creates fmod native build for a specific platform
-env:
-  TARGET_PATH: demo/addons/fmod/libs/
-  TARGET_NAME: libGodotFmod
-  GODOT_VERSION: 4.2
-  FMOD_VERSION: 20212
 inputs:
   platform:
     description: The platform to build for.
   target:
     description: The target to build.
-  artifact-extension:
-    description: Extension of the compiled artifact
   additional-python-packages:
     description: Additional python package to install.
   flags:
@@ -32,16 +25,17 @@ runs:
       uses: actions/setup-python@v4
       with:
         # Semantic version range syntax or exact version of a Python version
-        python-version: '3.x'
+        python-version: "3.x"
         # Optional - x64 or x86 architecture, defaults to x64
-        architecture: 'x64'
+        architecture: "x64"
 
     # Setup scons, print python version and scons version info, so if anything is broken it won't run the build.
+    #TODO: remove hardcoded scons version when https://github.com/godotengine/godot-cpp/pull/1526 is released
     - name: Configuring Python packages
       shell: ${{ inputs.shell }}
       run: |
         python -c "import sys; print(sys.version)"
-        python -m pip install scons requests ${{ inputs.additional-python-packages }}
+        python -m pip install scons==4.7.0 requests ${{ inputs.additional-python-packages }}
         python --version
         scons --version
 
@@ -54,6 +48,7 @@ runs:
         New-Item -ItemType directory -Path fmod; cd fmod
         python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
         7z x fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        ls
         mv api/ windows
         cd ../../
 
@@ -83,7 +78,7 @@ runs:
         cd ../../
 
     - name: create android fmod artifact
-      if: inputs.platform == 'android'
+      if: inputs.platform == 'android' && inputs.target == 'template_release'
       shell: ${{ inputs.shell }}
       run: |
         mkdir android-fmod-artifact
@@ -91,8 +86,8 @@ runs:
         cp android-plugin/library/src/main/resources/fmod-android-license.txt android-fmod-artifact/
 
     - name: Upload fmod jar
-      if: inputs.platform == 'android'
-      uses: actions/upload-artifact@v3
+      if: inputs.platform == 'android' && inputs.target == 'template_release'
+      uses: actions/upload-artifact@v4
       with:
         name: fmod-jar
         path: android-fmod-artifact
@@ -109,8 +104,8 @@ runs:
         scons platform=${{ inputs.platform }} generate_bindings=yes target=${{ inputs.target }} target_path=${{ env.TARGET_PATH }} target_name=${{ env.TARGET_NAME }} -j${{ steps.cpu-cores.outputs.count }} ${{ inputs.flags }}
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.platform }}
+        name: ${{ inputs.platform }}-${{ inputs.target }}
         path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.*
         if-no-files-found: error

@@ -4,6 +4,7 @@
 #define GODOTFMOD_FMOD_EDITOR_PLUGIN_H
 
 #include "fmod_editor_export_plugin.h"
+#include "studio/fmod_bank.h"
 
 #include <classes/editor_plugin.hpp>
 
@@ -22,8 +23,7 @@ namespace godot {
           const Variant& p_default_value,
           Variant::Type p_type,
           PropertyHint p_hint = PROPERTY_HINT_NONE,
-          const String& p_hint_string = "",
-          int p_usage = PROPERTY_USAGE_DEFAULT
+          const String& p_hint_string = ""
         );
 
     protected:

@@ -7,10 +7,12 @@
 using namespace godot;
 
 void FmodEvent::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameterName"), &FmodEvent::get_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameterName", "value"), &FmodEvent::set_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "long_id"), &FmodEvent::get_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "long_id", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameter_name"), &FmodEvent::get_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameter_name", "value"), &FmodEvent::set_parameter_by_name);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name_with_label", "parameter_name", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_name_with_label);
+    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "parameter_id"), &FmodEvent::get_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id", "parameter_id", "value"), &FmodEvent::set_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id_with_label", "parameter_id", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_id_with_label);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
     ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
@@ -34,6 +36,8 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
     ClassDB::bind_method(D_METHOD("set_node_attributes", "transform"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
+    ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &FmodEvent::set_programmer_callback);
+    ClassDB::bind_method(D_METHOD("get_programmer_callback_sound_key"), &FmodEvent::get_programmers_callback_sound_key);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
 
@@ -44,16 +48,30 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_listener_mask", "get_listener_mask");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_node_attributes", "get_3d_attributes");
+
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_PLAYING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_SUSTAINING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPED);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_FORCEINT);
 }
 
-float FmodEvent::get_parameter_by_name(const String& parameterName) const {
+float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
     float p = -1;
-    ERROR_CHECK(_wrapped->getParameterByName(parameterName.utf8().get_data(), &p));
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p),
+                            vformat("Cannot get parameter %s", parameter_name));
     return p;
 }
 
-void FmodEvent::set_parameter_by_name(const String& parameterName, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByName(parameterName.utf8().get_data(), value));
+void FmodEvent::set_parameter_by_name(const String& parameter_name, float value) const {
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value),
+                            vformat("Cannot set parameter %s to value %f", parameter_name, value));
+}
+
+void FmodEvent::set_parameter_by_name_with_label(const String& parameter_name, const String& label, bool ignoreseekspeed) const {
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByNameWithLabel(parameter_name.utf8().get_data(), label.utf8().get_data(), ignoreseekspeed),
+                            vformat("Cannot set parameter %s value to %s", parameter_name, label));
 }
 
 float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
@@ -62,7 +80,8 @@ float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
 
 float FmodEvent::get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const {
     float value = -1.0f;
-    ERROR_CHECK(_wrapped->getParameterByID(parameter_id, &value));
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, &value),
+                            vformat("Cannot get parameter with id: %d", fmod_parameter_id_to_ulong(parameter_id)));
     return value;
 }
 
@@ -71,11 +90,20 @@ void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {
 }
 
 void FmodEvent::set_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id, float value) const {
-    ERROR_CHECK(_wrapped->setParameterByID(parameter_id, value));
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByID(parameter_id, value),
+                            vformat("Cannot set parameter with id %d to value %f", fmod_parameter_id_to_ulong(parameter_id), value));
+}
+
+void FmodEvent::set_parameter_by_fmod_id_with_label(const FMOD_STUDIO_PARAMETER_ID& parameter_id, const String& label, bool ignoreseekspeed) const {
+    ERROR_CHECK_WITH_REASON(_wrapped->setParameterByIDWithLabel(parameter_id, label.utf8().get_data(), ignoreseekspeed),
+                            vformat("Cannot set parameter to id %d to value %s", fmod_parameter_id_to_ulong(parameter_id), label));
+}
+
+void FmodEvent::set_parameter_by_id_with_label(uint64_t parameter_id, const String& label, bool ignoreseekspeed) const {
+    set_parameter_by_fmod_id_with_label(ulong_to_fmod_parameter_id(parameter_id), label, ignoreseekspeed);
 }
 
 void FmodEvent::release() const {
-    _wrapped->setUserData(nullptr);
     ERROR_CHECK(_wrapped->release());
 }
 
@@ -91,10 +119,10 @@ void FmodEvent::event_key_off() const {
     ERROR_CHECK(_wrapped->keyOff());
 }
 
-int FmodEvent::get_playback_state() const {
-    int s = -1;
-    ERROR_CHECK(_wrapped->getPlaybackState((FMOD_STUDIO_PLAYBACK_STATE*) &s));
-    return s;
+FMOD_STUDIO_PLAYBACK_STATE FmodEvent::get_playback_state() const {
+    FMOD_STUDIO_PLAYBACK_STATE playback_state;
+    ERROR_CHECK(_wrapped->getPlaybackState(&playback_state));
+    return playback_state;
 }
 
 bool FmodEvent::get_paused() const {
@@ -190,7 +218,7 @@ Transform3D FmodEvent::get_3d_attributes() const {
 }
 
 void FmodEvent::set_node_attributes(Node* node) const {
-    if (is_fmod_valid(node) && Object::cast_to<Node>(node)->is_inside_tree()) {
+    if (node->is_inside_tree()) {
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
             FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
             ERROR_CHECK(_wrapped->set3DAttributes(&attr));
@@ -202,17 +230,34 @@ void FmodEvent::set_node_attributes(Node* node) const {
             return;
         }
     }
+    GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
 }
 
-void FmodEvent::set_callback(const Callable& callback, int callbackMask) {
+void FmodEvent::set_callback(const Callable& callback, uint32_t p_callback_mask) {
     eventCallback = callback;
-    ERROR_CHECK(_wrapped->setCallback(Callbacks::eventCallback, callbackMask));
+    callback_mask = p_callback_mask;
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, p_callback_mask));
+}
+
+void FmodEvent::set_programmer_callback(const String& p_programmers_callback_sound_key) {
+    programmers_callback_sound_key = p_programmers_callback_sound_key;
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, callback_mask | FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND | FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND));
 }
 
 const Callable& FmodEvent::get_callback() const {
     return eventCallback;
 }
 
+const String& FmodEvent::get_programmers_callback_sound_key() const {
+    return programmers_callback_sound_key;
+}
+
 void FmodEvent::set_distance_scale(float scale){
     distanceScale = scale;
+}
+
+FmodEvent::~FmodEvent() {
+    if (is_valid()) {
+        _wrapped->setUserData(nullptr);
+    }
 }

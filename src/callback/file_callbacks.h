@@ -47,18 +47,17 @@ namespace Callbacks {
 
     public:
         void queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority);
-        void cancelReadRequest(FMOD_ASYNCREADINFO* request);
+        FMOD_RESULT cancelReadRequest(FMOD_ASYNCREADINFO* request);
         void start();
         void finish();
     };
+    FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata);
 
-    FMOD_RESULT F_CALLBACK godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata);
+    FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata);
 
-    FMOD_RESULT F_CALLBACK godotFileClose(void* handle, void* userdata);
+    FMOD_RESULT F_CALL godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata);
 
-    FMOD_RESULT F_CALLBACK godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata);
-
-    FMOD_RESULT F_CALLBACK godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata);
+    FMOD_RESULT F_CALL godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata);
 }// namespace Callbacks
 
 #endif// GODOTFMOD_FILE_CALLBACKS_H

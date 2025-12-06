@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cujo3xq0erren"]
 
-[ext_resource type="Script" path="res://addons/fmod/tool/property_editors/FmodPathEditorProperty.gd" id="1_4e4vx"]
+[ext_resource type="Script" uid="uid://qshng8csi2fr" path="res://addons/fmod/tool/property_editors/FmodPathEditorProperty.gd" id="1_4e4vx"]
 [ext_resource type="PackedScene" uid="uid://hy04frgfhtgu" path="res://addons/fmod/tool/property_editors/FmodGuidAndPathPropertyEditorUi.tscn" id="2_nvtqg"]
 
 [node name="FmodPathEditorProperty" type="EditorProperty"]

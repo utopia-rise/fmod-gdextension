@@ -21,10 +21,10 @@ func _init(open_project_explorer_callable: Callable):
 	manual_add_button.pressed.connect(_on_manual_add_button)
 	
 	var up_button: Button = ui.get_node("%UpButton")
-	up_button.pressed.connect(_on_up_button)
+	up_button.pressed.connect(_on_move_button.bind(false))
 	
 	var down_button: Button = ui.get_node("%DownButton")
-	down_button.pressed.connect(_on_down_button)
+	down_button.pressed.connect(_on_move_button.bind(true))
 
 func _update_property():
 	var bank_list: ItemList = ui.get_node("%BankList")
@@ -39,7 +39,6 @@ func _update_property():
 	last_selected_index = -1
 
 func _set_path_and_guid(path: String, _cancel: String):
-	var bank_list: ItemList = ui.get_node("%BankList")
 	var current_bank_paths: Array = get_edited_object()[path_property_name]
 	
 	if current_bank_paths.has(path):
@@ -69,12 +68,6 @@ func _on_manual_add_button():
 		return
 	_set_path_and_guid(to_add, "")
 	manual_add_line_edit.text = ""
-
-func _on_up_button():
-	_on_move_button(false)
-
-func _on_down_button():
-	_on_move_button(true)
 
 func _on_move_button(is_down: bool):
 	var bank_list: ItemList = ui.get_node("%BankList")

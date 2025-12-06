@@ -2,7 +2,6 @@
 
 [ext_resource type="Material" path="res://high_level_3D/environment/wall_material.tres" id="2"]
 
-
 [sub_resource type="BoxMesh" id="9"]
 material = ExtResource("2")
 size = Vector3(20, 5, 5)

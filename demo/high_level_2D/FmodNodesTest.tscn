@@ -1,13 +1,15 @@
-[gd_scene load_steps=12 format=3 uid="uid://dl6g18ybwc83t"]
+[gd_scene load_steps=14 format=3 uid="uid://dl6g18ybwc83t"]
 
-[ext_resource type="Script" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
-[ext_resource type="Script" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
-[ext_resource type="Texture2D" uid="uid://d4blkybu5ojj6" path="res://icon.png" id="2_llv2n"]
-[ext_resource type="Script" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
-[ext_resource type="Script" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
-[ext_resource type="Script" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
+[ext_resource type="Script" uid="uid://dbw46rru0a7ab" path="res://high_level_2D/sin_move.gd" id="1_2lkrj"]
+[ext_resource type="Script" uid="uid://d2j35xjdrcpu0" path="res://high_level_2D/Emitter.gd" id="2_5cntr"]
+[ext_resource type="Texture2D" uid="uid://qqnlquxquycf" path="res://icon.png" id="2_llv2n"]
+[ext_resource type="Script" uid="uid://bgrknjkxmlwqw" path="res://high_level_2D/Kinematic.gd" id="3_dlbku"]
+[ext_resource type="Script" uid="uid://ddkyglwgd83qf" path="res://high_level_2D/ChangeColor.gd" id="5_5p5kb"]
+[ext_resource type="Script" uid="uid://dae10jufdshyv" path="res://low_level_2D/EnterAndLeave.gd" id="5_jxvuy"]
 [ext_resource type="PackedScene" uid="uid://glfbseq2tmgg" path="res://high_level_2D/footstep.tscn" id="5_usogy"]
-[ext_resource type="Script" path="res://low_level_2D/EnterandLeave2.gd" id="7_c28gt"]
+[ext_resource type="Script" uid="uid://rxnfus6cxfle" path="res://low_level_2D/EnterandLeave2.gd" id="7_c28gt"]
+[ext_resource type="Script" uid="uid://dlu46ug37ojmx" path="res://high_level_2D/ChooseLanguageButton.gd" id="9_syqwk"]
+[ext_resource type="Script" uid="uid://bvjoomad02ag2" path="res://high_level_2D/SayWelcomeButton.gd" id="10_gwsas"]
 
 [sub_resource type="RectangleShape2D" id="1"]
 size = Vector2(87.7038, 82.621)
@@ -33,16 +35,12 @@ event_name = "event:/Vehicles/Car Engine"
 event_guid = "{0c8363b4-23af-4f9c-af4b-0951bfd37d84}"
 autoplay = true
 volume = 2.0
-event_parameter/RPM/id = 5864137074015534804
-event_parameter/RPM/value = 600.0
-event_parameter/RPM/min_value = 0.0
-event_parameter/RPM/max_value = 10000.0
-event_parameter/RPM/default_value = 0.0
-event_parameter/Load/id = -1795603775021193717
-event_parameter/Load/value = -1.0
-event_parameter/Load/min_value = -1.0
-event_parameter/Load/max_value = 1.0
-event_parameter/Load/default_value = -1.0
+fmod_parameters/RPM/id = 5864137074015534804
+fmod_parameters/RPM = 600.0
+fmod_parameters/RPM/variant_type = 3
+fmod_parameters/Load/id = -1795603775021193717
+fmod_parameters/Load = -1.0
+fmod_parameters/Load/variant_type = 3
 self_modulate = Color(0.988235, 0, 0, 1)
 position = Vector2(-3.05176e-05, 0)
 script = ExtResource("2_5cntr")
@@ -158,4 +156,26 @@ Start when entering
 Stop when exiting
 Only one instance of that music can be played "
 
-[connection signal="timeline_beat" from="FmodBankLoader/SoundArea2/FmodEventEmitter2D" to="FmodBankLoader/SoundArea2" method="change_color"]
+[node name="ChooseLanguageButton" type="OptionButton" parent="." node_paths=PackedStringArray("root_node")]
+offset_left = 918.0
+offset_top = 615.0
+offset_right = 986.0
+offset_bottom = 646.0
+item_count = 3
+popup/item_0/text = "CN"
+popup/item_0/id = 0
+popup/item_1/text = "EN"
+popup/item_1/id = 1
+popup/item_2/text = "JP"
+popup/item_2/id = 2
+script = ExtResource("9_syqwk")
+root_node = NodePath("..")
+
+[node name="SayWelcomeButton" type="Button" parent="." node_paths=PackedStringArray("welcome_option_button")]
+offset_left = 987.0
+offset_top = 615.0
+offset_right = 1100.0
+offset_bottom = 646.0
+text = "Say welcome"
+script = ExtResource("10_gwsas")
+welcome_option_button = NodePath("../ChooseLanguageButton")

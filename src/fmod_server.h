@@ -5,12 +5,14 @@
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
+#include "resources/fmod_plugins_settings.h"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
 #include "studio/fmod_event.h"
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 #include "templates/hash_map.hpp"
+#include "templates/local_vector.hpp"
 #include "templates/vector.hpp"
 #include "variant/string.hpp"
 
@@ -35,12 +37,12 @@
 namespace godot {
 
     struct OneShot {
-        Node* gameObj = nullptr;
+        NodeWrapper wrapper;
         Ref<FmodEvent> instance;
     };
 
     struct Listener {
-        Object* gameObj = nullptr;
+        NodeWrapper wrapper;
         bool listenerLock = false;
         float weight = 1.0;
     };
@@ -76,7 +78,8 @@ namespace godot {
 
         struct ParameterValue {
             ParameterIdentifier identifier;
-            float value;
+            Variant value;
+            Variant::Type variant_type;
             bool should_load_by_id;
         };
 
@@ -92,8 +95,6 @@ namespace godot {
         FmodCache* cache;
 
         int systemListenerNumber = 1;
-        int actualListenerNumber = 0;
-        bool listenerWarning = true;
         Listener listeners[FMOD_MAX_LISTENERS];
 
         Vector<OneShot*> oneShots;
@@ -152,6 +153,10 @@ namespace godot {
         Ref<FmodEventDescription> get_event_from_guid(const String& guid);
         Ref<FmodEventDescription> get_event_from_guid_internal(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
+        FMOD_GUID get_event_guid_internal(const String& event_path);
+        String get_event_guid(const String& event_path);
+        String get_event_path_internal(const FMOD_GUID& guid);
+        String get_event_path(const String& guid);
         Array get_all_vca();
         Array get_all_buses();
         Array get_all_event_descriptions();
@@ -164,18 +169,20 @@ namespace godot {
         Ref<FmodPerformanceData> get_performance_data();
 
         // GLOBAL PARAMETERS
-        void set_global_parameter_by_name(const String& parameterName, float value);
-        float get_global_parameter_by_name(const String& parameterName);
-        void set_global_parameter_by_id(const Array& idPair, float value);
-        float get_global_parameter_by_id(const Array& idPair);
-        Dictionary get_global_parameter_desc_by_name(const String& parameterName);
-        Dictionary get_global_parameter_desc_by_id(const Array& idPair);
+        void set_global_parameter_by_name(const String& parameter_name, float value);
+        void set_global_parameter_by_name_with_label(const String& parameter_name, const String& label);
+        float get_global_parameter_by_name(const String& parameter_name);
+        void set_global_parameter_by_id(uint64_t parameter_id, float value);
+        void set_global_parameter_by_id_with_label(uint64_t parameter_id, const String& label);
+        float get_global_parameter_by_id(uint64_t parameter_id);
+        Dictionary get_global_parameter_desc_by_name(const String& parameter_name);
+        Dictionary get_global_parameter_desc_by_id(uint64_t parameter_id);
         int get_global_parameter_desc_count();
         Array get_global_parameter_desc_list();
 
         // LISTENERS
-        void add_listener(int index, Object* gameObj);
-        void remove_listener(int index);
+        void add_listener(int index, Node* game_obj);
+        void remove_listener(int index, Node* game_obj);
         void set_system_listener_number(int listenerNumber);
         int get_system_listener_number() const;
         float get_system_listener_weight(int index);
@@ -195,6 +202,12 @@ namespace godot {
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
 
+        // PLUGINS
+        void load_all_plugins(const Ref<FmodPluginsSettings>& p_settings);
+        uint32_t load_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+        void unload_plugin(uint32_t p_plugin_handle);
+        bool is_plugin_loaded(uint32_t p_plugin_handle);
+
         // EVENTS
     private:
         template<EventIdentifierType parameter_type>
@@ -210,6 +223,8 @@ namespace godot {
         Ref<FmodFile> load_file_as_music(const String& path);
         void unload_file(const String& path);
         Ref<FmodSound> create_sound_instance(const String& path);
+        FMOD_STUDIO_SOUND_INFO get_sound_info(const String& sound_key) const;
+        FMOD::Sound* create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_MODE mode) const;
 
         //CALLBACKS
         void add_callback(const Callback& callback);
@@ -224,7 +239,7 @@ namespace godot {
 
     public:
         template<class TParameter>
-        void apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters);
+        void apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const LocalVector<TParameter>& parameters);
 
         void play_one_shot(const String& event_name);
         void play_one_shot_with_params(const String& event_name, const Dictionary& parameters);
@@ -294,9 +309,6 @@ namespace godot {
             return;
         }
 
-        if (game_obj && !is_fmod_valid(game_obj)) {
-            return;
-        }
 
         Ref<FmodEvent> ref = _create_event_instance<parameter_type>(identifier);
 
@@ -308,9 +320,7 @@ namespace godot {
         }
 
         if(game_obj){
-            auto* oneShot = new OneShot();
-            oneShot->gameObj = game_obj;
-            oneShot->instance = ref;
+            auto* oneShot = new OneShot {NodeWrapper {game_obj}, ref};
             ref->set_node_attributes(game_obj);
             oneShots.push_back(oneShot);
         }
@@ -320,13 +330,21 @@ namespace godot {
     }
 
     template<class TParameter>
-    void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const List<TParameter>& parameters) {
+    void FmodServer::apply_parameter_list_to_event(const Ref<FmodEvent>& p_event, const LocalVector<TParameter>& parameters) {
         for (const TParameter& parameter : parameters) {
             if (parameter.should_load_by_id) {
+                if (parameter.variant_type == Variant::Type::STRING) {
+                    p_event->set_parameter_by_id_with_label(parameter.identifier.id, parameter.value);
+                    continue;
+                }
                 p_event->set_parameter_by_id(parameter.identifier.id, parameter.value);
                 continue;
             }
 
+            if (parameter.variant_type == Variant::Type::STRING) {
+                p_event->set_parameter_by_name_with_label(*parameter.identifier.name, parameter.value);
+                continue;
+            }
             p_event->set_parameter_by_name(*parameter.identifier.name, parameter.value);
         }
     }

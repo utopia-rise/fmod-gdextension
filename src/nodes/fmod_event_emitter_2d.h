@@ -12,7 +12,7 @@ namespace godot {
         GDCLASS(FmodEventEmitter2D, Node2D)
 
     private:
-        void set_space_attribute_impl() const;
+        void set_space_attribute_impl(const Ref<FmodEvent>& p_event) const;
         void free_impl();
 
     public:

@@ -4,10 +4,10 @@
 #include "classes/canvas_item.hpp"
 #include "classes/node3d.hpp"
 #include "fmod_common.h"
-#include <fmod_studio_common.h>
 #include "variant/utility_functions.hpp"
 
 #include <fmod_errors.h>
+#include <fmod_studio_common.h>
 #include <helpers/current_function.h>
 
 #include <godot.hpp>
@@ -16,25 +16,15 @@
 #define MAX_PATH_SIZE 512
 #define MAX_DRIVER_NAME_SIZE 256
 
-#define MAX_VCA_COUNT 64
-#define MAX_BUS_COUNT 64
-#define MAX_EVENT_DESCRIPTION_COUNT 256
-#define MAX_EVENT_INSTANCE_COUNT 128
-
 #define GODOT_LOG_INFO(message) UtilityFunctions::print(message);
 #define GODOT_LOG_VERBOSE(message) UtilityFunctions::print_verbose(message);
 #define GODOT_LOG_WARNING(message) UtilityFunctions::push_warning(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 #define GODOT_LOG_ERROR(message) UtilityFunctions::push_error(message, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__);
 
-#define CHECK_SIZE(maxSize, actualSize, type)                                                                          \
-    if ((actualSize) > (maxSize)) {                                                                                    \
-        String message = "FMOD Sound System: type maximum size is " + String::num(maxSize) + " but the bank contains " \
-                       + String::num(actualSize) + " entries";                                                         \
-        GODOT_LOG_ERROR(message)                                                                                          \
-        (actualSize) = maxSize;                                                                                        \
-    }
+#define ERROR_CHECK_WITH_REASON(_result, _reason) \
+(((_result) != FMOD_OK) ? (godot::UtilityFunctions::push_error(_reason, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__), false) : true)
 
-#define ERROR_CHECK(_result) checkErrors(_result, BOOST_CURRENT_FUNCTION, __FILE__, __LINE__)
+#define ERROR_CHECK(_result) ((_result) == FMOD_OK)
 
 #define FMODCLASS(m_class, m_inherits, m_owned)               \
     GDCLASS(m_class, m_inherits)                              \
@@ -107,30 +97,41 @@ public:                                                                  \
 private:
 
 namespace godot {
-    static bool checkErrors(FMOD_RESULT result, const char* function, const char* file, int line) {
-        if (result != FMOD_OK) {
-            UtilityFunctions::push_error(FMOD_ErrorString(result), function, file, line);
+
+    class NodeWrapper {
+        Node* node {nullptr};
+        ObjectID id;
+
+        _FORCE_INLINE_ static bool is_spatial_node(Object* p_object) {
+            if (Node::cast_to<Node3D>(p_object) || Node::cast_to<CanvasItem>(p_object)) { return true; }
+            GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
             return false;
         }
-        return true;
-    }
 
-    static bool is_dead(Object* node) {
-        if (!node || !UtilityFunctions::is_instance_valid(node)) {
-            return true;
+    public:
+        bool is_valid() const {
+            if (!node || !id.is_valid() || !UtilityFunctions::is_instance_id_valid(id)) { return false; }
+            return node->is_inside_tree();
         }
-        return !Object::cast_to<Node>(node)->is_inside_tree();
-    }
 
-    static bool is_fmod_valid(Object* node) {
-        if (node) {
-            bool ret = Node::cast_to<Node3D>(node) || Node::cast_to<CanvasItem>(node);
-            if (!ret) { GODOT_LOG_ERROR("Invalid Object. A listener has to be either a Node3D or CanvasItem.") }
-            return ret;
+        Node* get_node() { return node; }
+
+        void set_node(Node* p_node) {
+            if (p_node) {
+                if (is_spatial_node(p_node)) {
+                    node = p_node;
+                    id = p_node->get_instance_id();
+                    return;
+                }
+            }
+            node = nullptr;
+            id = ObjectID();
         }
-        GODOT_LOG_ERROR("Object is null")
-        return false;
-    }
+
+        NodeWrapper() = default;
+
+        explicit NodeWrapper(Node* p_node) { set_node(p_node); };
+    };
 
     template<class T>
     static inline Ref<T> create_ref() {
@@ -168,6 +169,20 @@ namespace godot {
         paramId.data2 = static_cast<unsigned int>(converted & 0xFFFFFFFF);
         paramId.data1 = static_cast<unsigned int>((converted >> 32) & 0xFFFFFFFF);
         return paramId;
+    }
+
+    static inline bool equals(const FMOD_GUID& first, const FMOD_GUID& second) {
+        return first.Data1 == second.Data1
+        && first.Data2 == second.Data2
+        && first.Data3 == second.Data3
+        && first.Data4[0] == second.Data4[0]
+        && first.Data4[1] == second.Data4[1]
+        && first.Data4[2] == second.Data4[2]
+        && first.Data4[3] == second.Data4[3]
+        && first.Data4[4] == second.Data4[4]
+        && first.Data4[5] == second.Data4[5]
+        && first.Data4[6] == second.Data4[6]
+        && first.Data4[7] == second.Data4[7];
     }
 }// namespace godot
 

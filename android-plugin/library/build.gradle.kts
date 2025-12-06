@@ -1,17 +1,24 @@
-import org.jetbrains.kotlin.incremental.createDirectory
 
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
 }
 
+val pluginName = "fmod"
+val pluginPackageName = "com.utopiarise.godot.fmod.android.plugin"
+
 android {
-    namespace = "com.utopiarise.godot.fmod.android.plugin"
+    namespace = pluginPackageName
     compileSdk = 33
 
     defaultConfig {
         minSdk = 24
         targetSdk = 33
+
+        manifestPlaceholders["godotPluginName"] = pluginName
+        manifestPlaceholders["godotPluginPackageName"] = pluginPackageName
+        buildConfigField("String", "GODOT_PLUGIN_NAME", "\"${pluginName}\"")
+        setProperty("archivesBaseName", pluginName)
     }
 
     buildFeatures {
@@ -29,39 +36,35 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
-val copyAarFiles = tasks.create("copyAarFiles") {
-    val aarOutputDir = project
-        .buildDir
-        .resolve("outputs/aar/")
-
-    aarOutputDir.createDirectory()
-    
-    val aarFiles = aarOutputDir
-        .listFiles()
-        .filter { it.extension == "aar" }
-    for (aarFile in aarFiles) {
-        aarFile
-            .copyTo(
-                project.projectDir.resolve("../../demo/android/plugins/${aarFile.name}"),
-                overwrite = true
-            )
-    }
+val copyDebugAARToDemoAddons by tasks.registering(Copy::class) {
+    description = "Copies the generated debug AAR binary to the plugin's addons directory"
+    from("build/outputs/aar")
+    include("$pluginName-debug.aar")
+    into("../../demo/addons/$pluginName/libs/android")
 }
 
-tasks.build {
-    finalizedBy(copyAarFiles)
+val copyReleaseAARToDemoAddons by tasks.registering(Copy::class) {
+    description = "Copies the generated release AAR binary to the plugin's addons directory"
+    from("build/outputs/aar")
+    include("$pluginName-release.aar")
+    into("../../demo/addons/$pluginName/libs/android")
+}
+
+
+tasks.named("assemble").configure {
+    finalizedBy(copyDebugAARToDemoAddons)
+    finalizedBy(copyReleaseAARToDemoAddons)
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.10.1")
     implementation(files("libraries/fmod.jar"))
-    compileOnly(files("libraries/godot-lib.4.2.stable.template_release.aar"))
+    implementation("org.godotengine:godot:4.5.0.stable")
 }

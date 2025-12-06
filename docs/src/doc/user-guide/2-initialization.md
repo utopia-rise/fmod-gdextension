@@ -26,10 +26,10 @@ Implies FMOD_INIT_MEMORY_TRACKING.
 
 - "Sample Rate": Sample rate of the mixer. Range: [8000, 192000] Units: Hertz Default: 48000
 - "Speaker Mode": Speaker setup of the mixer.
-[FMOD_SPEAKERMODE](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_speakermode)
+[FMOD_SPEAKERMODE](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_speakermode)
 - "Raw Speaker Count": Number of speakers for
-[FMOD_SPEAKERMODE_RAW](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_speakermode_raw) mode.
-Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.02/api/core-api-common.html#fmod_max_channel_width)]
+[FMOD_SPEAKERMODE_RAW](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_speakermode_raw) mode.
+Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_max_channel_width)]
 
 ![software-format-tab]
 
@@ -44,7 +44,10 @@ Range: [0, [FMOD_MAX_CHANNEL_WIDTH](https://www.fmod.com/docs/2.02/api/core-api-
 ## 3d Settings
 
 - "Doppler Scale": A scaling factor for doppler shift. Default 1.
-- "Distance Factor": A factor for converting game distance units to FMOD distance units. Default 1.
+- "Distance Factor": A factor for converting game distance units to FMOD distance units. Default 1.  
+  !!! warning
+  In 2D this value represents pixels, so you should set it to the number of pixel for your world meter (If your world
+  meter is 64px, set it to 64). In 3D this represents meter, so we recommend to set it to 1.
 - "Rolloff Scale": A scaling factor for distance attenuation. When a sound uses a roll-off mode other than
 FMOD_3D_CUSTOMROLLOFF and the distance is greater than the sound's minimum distance, the distance is scaled by the
 roll-off scale.

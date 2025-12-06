@@ -30,11 +30,13 @@ namespace godot {
         friend class FmodServer;
 
         FMOD::Studio::System* system;
+        FMOD::System* core_system;
 
         List<Ref<FmodBank>> loading_banks;
 
         HashMap<String, Ref<FmodFile>> files;
-        HashMap<String, Ref<FmodBank>> banks;
+        HashMap<String, FmodBank*> banks;
+        Vector<uint32_t> plugin_handles;
 
         HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> event_descriptions;
         HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer> buses;
@@ -43,19 +45,27 @@ namespace godot {
         HashMap<String, FMOD_GUID> strings_to_guid;
 
         void _get_bank_data(Ref<FmodBank> bank);
-        void _remove_bank_data(Ref<FmodBank> bank);
+        void _remove_bank_data(FmodBank* bank);
 
     public:
         FmodCache() = delete;
         FmodCache(const FmodCache& other) = delete;
-        explicit FmodCache(FMOD::Studio::System* p_system);
+        FmodCache(FMOD::Studio::System* p_system, FMOD::System* p_core_system);
 
         ~FmodCache();
 
-        Ref<FmodBank> add_bank(const String& bankPath, unsigned int flag);
+        Ref<FmodBank> add_bank(const String& bank_path, unsigned int flag);
         bool has_bank(const String& bankPath);
         Ref<FmodBank> get_bank(const String& bankPath);
-        void remove_bank(const String& bankPath);
+        void remove_bank(const String& bank_path);
+
+#ifndef IOS_ENABLED
+        uint32_t add_plugin(const String& p_plugin_path, uint32_t p_priority = 0);
+#else
+        void add_plugin(uint32_t p_plugin_handle);
+#endif
+        bool has_plugin(uint32_t p_plugin_handle) const;
+        void remove_plugin(uint32_t p_plugin_handle);
 
         Ref<FmodFile> add_file(const String& filePath, unsigned int flag);
         bool has_file(const String& filePath);
@@ -77,11 +87,13 @@ namespace godot {
         bool has_event_path(const String& eventPath);
 
         Ref<FmodVCA> get_vca(const FMOD_GUID& guid);
-        Ref<FmodVCA> get_vca(const String& vcaPath);
+        Ref<FmodVCA> get_vca(const String& vca_path);
         Ref<FmodBus> get_bus(const FMOD_GUID& guid);
-        Ref<FmodBus> get_bus(const String& busPath);
+        Ref<FmodBus> get_bus(const String& bus_path);
         Ref<FmodEventDescription> get_event(const FMOD_GUID& guid);
         Ref<FmodEventDescription> get_event(const String& eventPath);
+        FMOD_GUID get_event_guid(const String& event_path);
+        String get_event_path(const FMOD_GUID& guid);
     };
 }// namespace godot
 

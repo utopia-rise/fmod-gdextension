@@ -5,26 +5,32 @@ class TestListener:
 	
 	var sprite: Sprite2D = Sprite2D.new()
 	
+	var banks := Array()
+	
 	func before_all():
 		# load banks
 		# warning-ignore:return_value_discarded
-		FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		banks.append(
+			FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		)
 		# warning-ignore:return_value_discarded
-		FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		banks.append(
+			FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		)
 		# warning-ignore:return_value_discarded
-		FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		banks.append(
+			FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		)
 		# warning-ignore:return_value_discarded
-		FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		banks.append(
+			FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		)
 		FmodServer.set_listener_number(1)
 		get_tree().get_root().add_child(sprite)
 		FmodServer.add_listener(0, sprite)
 	
 	func after_all():
-		FmodServer.remove_listener(0)
-		FmodServer.unload_bank("res://assets/Banks/Master.strings.bank")
-		FmodServer.unload_bank("res://assets/Banks/Master.bank")
-		FmodServer.unload_bank("res://assets/Banks/Music.bank")
-		FmodServer.unload_bank("res://assets/Banks/Vehicles.bank")
+		FmodServer.remove_listener(0, sprite)
 	
 	func test_assert_should_set_listener_num():
 		var desiredValue: int = 1
@@ -49,7 +55,7 @@ class TestListener:
 		FmodServer.add_listener(1, sprite)
 		FmodServer.set_listener_weight(1, desiredValue)
 		assert_listener_weight(1, desiredValue)
-		FmodServer.remove_listener(1)
+		FmodServer.remove_listener(1, sprite)
 		FmodServer.set_listener_number(1)
 	
 	func test_assert_attach_object_to_listener():
@@ -61,9 +67,29 @@ class TestListener:
 		assert_no_object_attached_to_listener(desired_listener)
 		FmodServer.add_listener(desired_listener, sprite)
 		assert_true(FmodServer.get_object_attached_to_listener(desired_listener) == node_instance, "Both listeners should be attached to same object")
-		FmodServer.remove_listener(1)
+		FmodServer.remove_listener(1, sprite)
 		assert_no_object_attached_to_listener(desired_listener)
 		FmodServer.set_listener_number(1)
+	
+	func test_attach_two_object_to_listeners():
+		var desired_listener := 1
+		FmodServer.set_listener_number(2);
+		FmodServer.add_listener(desired_listener, sprite)
+		
+		assert_eq(FmodServer.get_object_attached_to_listener(desired_listener), sprite)
+		
+		var node := Node2D.new()
+		
+		FmodServer.add_listener(desired_listener, node)
+		assert_eq(FmodServer.get_object_attached_to_listener(desired_listener), node)
+		FmodServer.remove_listener(desired_listener, sprite)
+		assert_eq(FmodServer.get_object_attached_to_listener(desired_listener), node)
+		FmodServer.remove_listener(desired_listener, node)
+		assert_no_object_attached_to_listener(desired_listener)
+		
+		node.free()
+		
+		FmodServer.set_listener_number(1);
 	
 	func assert_listener_num(desiredValue: int):
 		assert_eq(FmodServer.get_listener_number(), desiredValue, "There should be " + str(desiredValue) + " listeners.")
