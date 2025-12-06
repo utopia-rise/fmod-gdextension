@@ -9,6 +9,12 @@ target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
 fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
 
+# Although FMOD's WebAssembly libraries are built with pthreads / shared memory support, Godot doesn't yet like it.
+# For web builds, default to single-threaded godot-cpp (unless the user explicitly overrides it).
+platform_arg = ARGUMENTS.get("platform")
+if platform_arg == "web" and "threads" not in ARGUMENTS:
+    ARGUMENTS["threads"] = "no"
+
 env = SConscript("godot-cpp/SConstruct")
 
 # Add those directory manually, so we can skip the godot_cpp directory when including headers in C++ files
@@ -123,12 +129,19 @@ elif env["platform"] == "android":
     env.Append(LIBS=[libfmod, libfmodstudio])
 
 elif env["platform"] == "web":
-    libfmodstudio = os.path.join(fmod_lib_dir, 'web/studio/lib/fastcomp/bitcode/', 'fmodstudio%s.bc' % lfix)
+    html_lib = os.path.join(fmod_lib_dir, 'api/studio/lib/upstream/w32/')
+    html_inc = os.path.join(fmod_lib_dir, 'api/studio/inc/')
 
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc/', env['fmod_lib_dir'] + 'web/studio/inc/'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'web/core/lib/fastcomp/bitcode/', env['fmod_lib_dir'] + 'web/studio/lib/fastcomp/bitcode/'])
-    # Instead of LIBS, directly add to LINKFLAGS for explicit paths
-    env.Append(LINKFLAGS=[libfmodstudio])
+    html_core_lib = os.path.join(fmod_lib_dir, 'api/core/lib/upstream/w32/')
+    html_core_inc = os.path.join(fmod_lib_dir, 'api/core/inc/')
+
+    libfmodstudio_path = os.path.join(html_lib, 'fmodstudio%s_wasm.a' % lfix)
+
+    env.Append(CPPPATH=[html_inc, html_core_inc])
+    env.Append(LIBPATH=[html_lib])
+    # env.Append(LIBS=[libfmodstudio])  # ← REMOVE or comment this out
+    env.Append(LINKFLAGS=[libfmodstudio_path])
+    env.Append(LINKFLAGS=["-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,setValue,getValue"])
 
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
