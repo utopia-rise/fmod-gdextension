@@ -6,9 +6,13 @@
 
 #include <classes/file_access.hpp>
 #include <classes/ref.hpp>
-#include <condition_variable>
 #include <cstring>// This include is required for both Linux and MacOS targets as they don't include the necessary headers for 'memcpy' by default
+
+#if !defined(WEB_ENABLED)
+#include <condition_variable>
 #include <thread>
+#include <mutex>
+#endif
 
 namespace Callbacks {
     struct GodotFileHandle {
@@ -27,6 +31,7 @@ namespace Callbacks {
         ~GodotFileRunner() = default;
 
     private:
+#if !defined(WEB_ENABLED)
         std::thread fileThread;
 
         std::condition_variable read_cv;
@@ -42,9 +47,8 @@ namespace Callbacks {
         GodotFileRunner() = default;
         GodotFileRunner(const GodotFileRunner&) = delete;
         GodotFileRunner& operator=(const GodotFileRunner&) = delete;
-
         void run();
-
+#endif
     public:
         void queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority);
         FMOD_RESULT cancelReadRequest(FMOD_ASYNCREADINFO* request);
@@ -54,6 +58,10 @@ namespace Callbacks {
     FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata);
 
     FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata);
+
+    FMOD_RESULT F_CALL godotFileRead(void* handle, void* buffer, unsigned int sizebytes, unsigned int* bytesread, void* userdata);
+
+    FMOD_RESULT F_CALL godotFileSeek(void* handle, unsigned int pos, void* userdata);
 
     FMOD_RESULT F_CALL godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata);
 

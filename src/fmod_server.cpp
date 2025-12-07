@@ -148,7 +148,9 @@ FmodServer::FmodServer() :
     singleton = this;
     callback_mutex.instantiate();
     performanceData = create_ref<FmodPerformanceData>();
+#if !defined(WEB_ENABLED)
     Callbacks::GodotFileRunner::get_singleton()->start();
+#endif
 }
 
 FmodServer::~FmodServer() {
@@ -212,11 +214,33 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         }
     }
 
+#if defined(WEB_ENABLED)
     if (ERROR_CHECK(
-          coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
+          coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            &Callbacks::godotFileRead,
+            &Callbacks::godotFileSeek,
+            nullptr,
+            nullptr,
+            -1)
+        )) {
+        GODOT_LOG_VERBOSE("Custom File System enabled (sync, Web).")
+    }
+#else
+    if (ERROR_CHECK(
+          coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            nullptr,
+            nullptr,
+            &Callbacks::godotSyncRead,
+            &Callbacks::godotSyncCancel,
+            -1)
         )) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
+#endif
     cache = new FmodCache(system, coreSystem);
 }
 
