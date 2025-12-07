@@ -353,6 +353,8 @@ void FmodServer::set_system_listener_number(int p_listenerNumber) {
 void FmodServer::add_listener(int index, Node* game_obj) {
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
+        if (listener->weight < 0.0f) { listener->weight = 0.0f; }
+        if (listener->weight > 1.0f) { listener->weight = 1.0f; }
         listener->wrapper.set_node(game_obj);
         ERROR_CHECK_WITH_REASON(
           system->setListenerWeight(index, listener->weight),
@@ -394,6 +396,8 @@ float FmodServer::get_system_listener_weight(const int index) {
 
 void FmodServer::set_system_listener_weight(const int index, float weight) {
     if (index >= 0 && index < systemListenerNumber) {
+        if (weight < 0.0f) { weight = 0.0f; }
+        if (weight > 1.0f) { weight = 1.0f; }
         listeners[index].weight = weight;
         ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, weight), vformat("Cannot set listener %d weight to %f", index, weight));
     } else {
