@@ -30,6 +30,10 @@ elif platform == 'ios':
     # iOS...
     filename = f'fmodstudioapi{fmod_version}ios.dmg'
     downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/iOS/&filename=fmodstudioapi{fmod_version}ios-installer.dmg&user=$1'
+elif platform == 'html5':
+    # HTML5
+    filename = f'fmodstudioapi{fmod_version}html5.zip'
+    downloadlink = f'https://www.fmod.com/api-get-download-link?path=files/fmodstudio/api/HTML5/&filename=fmodstudioapi{fmod_version}html5.zip&user='
 
 downloadlink += user
 

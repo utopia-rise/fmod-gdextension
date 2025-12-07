@@ -156,14 +156,14 @@ jobs:
             os: "ubuntu-22.04"
             platform: web
             target: template_debug
-            fmod-executable-suffix: linux.tar.gz
+            fmod-executable-suffix: html5.zip
             shell: bash
 
           - name: Web Release Compilation
             os: "ubuntu-22.04"
             platform: web
             target: template_release
-            fmod-executable-suffix: linux.tar.gz
+            fmod-executable-suffix: html5.zip
             shell: bash
 
     steps:
