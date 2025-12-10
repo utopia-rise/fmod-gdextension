@@ -9,6 +9,7 @@
 #include <fmod_errors.h>
 #include <fmod_studio_common.h>
 #include <helpers/current_function.h>
+#include <cstdio>
 
 #include <godot.hpp>
 #include <variant/utility_functions.hpp>
