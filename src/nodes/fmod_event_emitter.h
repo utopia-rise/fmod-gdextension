@@ -727,7 +727,9 @@ namespace godot {
         if (!parameter) { return false; }
 
         if (parts.size() == 1) {
-            r_property = _get_parameter_description(*parameter)->get_default_value();
+            Ref<FmodParameterDescription> desc {_get_parameter_description(*parameter)};
+            if (desc.is_null()) { return false; }
+            r_property = desc->get_default_value();
             return true;
         }
 
@@ -750,6 +752,10 @@ namespace godot {
             const String& parameter_name {parameter.name};
 
             Ref<FmodParameterDescription> parameter_description{_get_parameter_description(parameter) };
+            if (parameter_description.is_null()) {
+                // Skip parameters that cannot be resolved (e.g., missing or stale IDs)
+                continue;
+            }
 
             const float parameter_min_value {parameter_description->get_minimum()};
             const float parameter_max_value {parameter_description->get_maximum()};
