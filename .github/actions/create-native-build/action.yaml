@@ -52,16 +52,32 @@ runs:
         mv api/ windows
         cd ../../
 
-    - name: Installing FMOD on Linux & Android
+    - name: Installing FMOD on Linux, Android & Web
       if: runner.os == 'Linux'
       shell: ${{ inputs.shell }}
       run: |
         cd ..
         mkdir libs && cd libs
         mkdir fmod && cd fmod
-        python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} ${{inputs.platform}} ${{env.FMOD_VERSION}}
-        tar -xvf fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
-        mv fmodstudioapi${{env.FMOD_VERSION}}${{inputs.platform}}/api ${{inputs.platform}}
+        PLATFORM_FOR_FMOD=${{ inputs.platform }}
+        if [ "$PLATFORM_FOR_FMOD" = "web" ]; then
+          PLATFORM_FOR_FMOD="html5"
+        fi
+        python ../../fmod-gdextension/get_fmod.py ${{inputs.fmod-user}} ${{inputs.fmod-password}} $PLATFORM_FOR_FMOD ${{env.FMOD_VERSION}}
+        if [ "$PLATFORM_FOR_FMOD" = "html5" ]; then
+          unzip fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        else
+          tar -xvf fmodstudioapi${{env.FMOD_VERSION}}${{inputs.fmod-executable-suffix}}
+        fi
+        FMOD_EXTRACT_DIR=$(find . -maxdepth 3 -type d -name "fmodstudioapi${{env.FMOD_VERSION}}${PLATFORM_FOR_FMOD}" | head -n 1)
+        if [ -z "$FMOD_EXTRACT_DIR" ]; then
+          echo "FMOD archive directory not found" && exit 1
+        fi
+        if [ "${{ inputs.platform }}" = "web" ]; then
+          mv "$FMOD_EXTRACT_DIR/api" .
+        else
+          mv "$FMOD_EXTRACT_DIR/api" ${{inputs.platform}}
+        fi
         cd ../../
 
     - name: Installing FMOD on MacOS & iOS

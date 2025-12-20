@@ -47,7 +47,11 @@ bool FmodCache::is_loading() {
 
 Ref<FmodBank> FmodCache::add_bank(const String& bank_path, unsigned int flag) {
     FMOD::Studio::Bank* bank = nullptr;
-    ERROR_CHECK_WITH_REASON(system->loadBankFile(bank_path.utf8().get_data(), flag, &bank), vformat("Cannot load bank %s", bank_path));
+    ERROR_CHECK_WITH_REASON(
+      system->loadBankFile(bank_path.utf8().get_data(), flag, &bank),
+      vformat("Cannot load bank %s", bank_path)
+    );
+
     if (!bank) { return {}; }
     Ref<FmodBank> ref = FmodBank::create_ref(bank, bank_path);
     GODOT_LOG_VERBOSE("FMOD Sound System: LOADING BANK " + String(bank_path))

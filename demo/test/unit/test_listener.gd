@@ -45,13 +45,13 @@ class TestListener:
 	func test_assert_should_have_proper_weight():
 		var desiredValue: float = 1.0
 		assert_listener_weight(0, desiredValue)
-		desiredValue = 2.0
+		desiredValue = 0.5
 		FmodServer.set_listener_weight(0, desiredValue)
 		assert_listener_weight(0, desiredValue)
 		desiredValue = 1.0
 		FmodServer.set_listener_weight(0, desiredValue)
 		FmodServer.set_listener_number(2)
-		desiredValue = 2.0
+		desiredValue = 0.5
 		FmodServer.add_listener(1, sprite)
 		FmodServer.set_listener_weight(1, desiredValue)
 		assert_listener_weight(1, desiredValue)

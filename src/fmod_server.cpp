@@ -148,7 +148,9 @@ FmodServer::FmodServer() :
     singleton = this;
     callback_mutex.instantiate();
     performanceData = create_ref<FmodPerformanceData>();
+#if !defined(WEB_ENABLED)
     Callbacks::GodotFileRunner::get_singleton()->start();
+#endif
 }
 
 FmodServer::~FmodServer() {
@@ -212,11 +214,33 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         }
     }
 
+#if defined(WEB_ENABLED)
     if (ERROR_CHECK(
-          coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
+          coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            &Callbacks::godotFileRead,
+            &Callbacks::godotFileSeek,
+            nullptr,
+            nullptr,
+            -1)
+        )) {
+        GODOT_LOG_VERBOSE("Custom File System enabled (sync, Web).")
+    }
+#else
+    if (ERROR_CHECK(
+          coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            nullptr,
+            nullptr,
+            &Callbacks::godotSyncRead,
+            &Callbacks::godotSyncCancel,
+            -1)
         )) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
+#endif
     cache = new FmodCache(system, coreSystem);
 }
 
@@ -329,6 +353,8 @@ void FmodServer::set_system_listener_number(int p_listenerNumber) {
 void FmodServer::add_listener(int index, Node* game_obj) {
     if (index >= 0 && index < systemListenerNumber) {
         Listener* listener = &listeners[index];
+        if (listener->weight < 0.0f) { listener->weight = 0.0f; }
+        if (listener->weight > 1.0f) { listener->weight = 1.0f; }
         listener->wrapper.set_node(game_obj);
         ERROR_CHECK_WITH_REASON(
           system->setListenerWeight(index, listener->weight),
@@ -370,6 +396,8 @@ float FmodServer::get_system_listener_weight(const int index) {
 
 void FmodServer::set_system_listener_weight(const int index, float weight) {
     if (index >= 0 && index < systemListenerNumber) {
+        if (weight < 0.0f) { weight = 0.0f; }
+        if (weight > 1.0f) { weight = 1.0f; }
         listeners[index].weight = weight;
         ERROR_CHECK_WITH_REASON(system->setListenerWeight(index, weight), vformat("Cannot set listener %d weight to %f", index, weight));
     } else {
