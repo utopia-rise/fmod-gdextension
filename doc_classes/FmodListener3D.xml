@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodListener3D" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A 3D audio listener node for FMOD spatial audio.
+	</brief_description>
+	<description>
+		FmodListener3D represents a 3D audio listener for FMOD's spatial audio system. It defines where the "ears" are located in 3D space, affecting how positioned audio from [FmodEventEmitter3D] nodes is heard.
+
+		FMOD supports up to 8 simultaneous listeners, which can be useful for split-screen games or complex audio scenarios. Each listener has an index (0-7) and a weight that determines how much influence it has on the final audio mix.
+
+		The listener automatically tracks its node's position, rotation, and velocity, providing realistic 3D audio spatialization including:
+		- Distance attenuation
+		- Directional audio based on orientation
+		- Doppler effects from velocity
+		- Occlusion and obstruction (when configured in FMOD Studio)
+
+		When the node is removed from the scene tree, it automatically unregisters itself from the FMOD system.
+
+		Key features:
+		- Automatic 3D position, rotation, and velocity tracking
+		- Support for multiple listeners with weighted mixing
+		- Listener locking to prevent position updates
+		- Integration with FMOD's 3D spatialization system
+		- Doppler effect support through velocity calculation
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_listener_index">
+			<return type="int" />
+			<description>
+				Returns the index of this listener (0-7). Each listener must have a unique index.
+			</description>
+		</method>
+		<method name="get_listener_weight">
+			<return type="float" />
+			<description>
+				Returns the weight of this listener. Higher weights give the listener more influence on the audio mix when multiple listeners are active.
+			</description>
+		</method>
+		<method name="get_locked">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the listener is locked and won't update its position automatically.
+			</description>
+		</method>
+		<method name="set_listener_index">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Sets the index of this listener (0-7). Each listener must have a unique index. Changing the index will unregister the old listener and register a new one.
+			</description>
+		</method>
+		<method name="set_listener_weight">
+			<return type="void" />
+			<param index="0" name="p_weight" type="float" />
+			<description>
+				Sets the weight of this listener. Higher weights give the listener more influence on the audio mix. Typical values are between 0.0 and 1.0.
+			</description>
+		</method>
+		<method name="set_locked">
+			<return type="void" />
+			<param index="0" name="locked" type="bool" />
+			<description>
+				Locks or unlocks the listener. When locked, the listener's position won't be updated automatically, allowing manual control through [FmodServer].
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="listener_index" type="int" setter="set_listener_index" getter="get_listener_index" default="0">
+			The index of this listener (0-7). Each listener in the scene must have a unique index. Multiple listeners can be used for split-screen games or complex audio scenarios.
+		</member>
+		<member name="listener_weight" type="float" setter="set_listener_weight" getter="get_listener_weight" default="1.0">
+			The weight of this listener when multiple listeners are active. Higher weights give more influence to this listener's position in the final audio mix.
+		</member>
+		<member name="locked" type="bool" setter="set_locked" getter="get_locked" default="false">
+			If [code]true[/code], the listener's position is locked and won't be automatically updated from the node's transform. Use this when you want manual control over listener positioning.
+		</member>
+	</members>
+</class>
