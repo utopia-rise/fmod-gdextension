@@ -8,7 +8,7 @@ on:
 # Global Settings
 env:
   GODOT_VERSION: 4.5
-  NDK_VERSION: 27.3.13750724
+  NDK_VERSION: 28.2.13676358
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
   FMOD_VERSION: 20306
@@ -115,7 +115,7 @@ jobs:
             shell: bash
 
           - name: Android Editor Compilation
-            os: "ubuntu-22.04"
+            os: "ubuntu-latest"
             platform: android
             target: editor
             fmod-executable-suffix: android.tar.gz
@@ -123,7 +123,7 @@ jobs:
             shell: bash
 
           - name: Android Debug Compilation
-            os: "ubuntu-22.04"
+            os: "ubuntu-latest"
             platform: android
             target: template_debug
             fmod-executable-suffix: android.tar.gz
@@ -131,7 +131,7 @@ jobs:
             shell: bash
 
           - name: Android Release Compilation
-            os: "ubuntu-22.04"
+            os: "ubuntu-latest"
             platform: android
             target: template_release
             fmod-executable-suffix: android.tar.gz
