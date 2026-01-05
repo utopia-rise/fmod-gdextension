@@ -39,7 +39,7 @@ Ref<FmodPluginsSettings> FmodPluginsSettings::get_from_project_settings() {
         return settings;
     }
 
-    if (!FileAccess::file_exists(resource_path)) {
+    if (!ResourceLoader::get_singleton()->exists(resource_path)) {
         GODOT_LOG_WARNING(vformat("Cannot find FmodPluginsSettings at %s", resource_path));
 
         Ref<FmodPluginsSettings> settings;

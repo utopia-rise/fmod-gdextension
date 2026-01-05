@@ -108,8 +108,8 @@ elif env["platform"] == "ios":
     ])
 
 elif env["platform"] == "android":
-    libfmod = 'libfmod%s.so' % lfix
-    libfmodstudio = 'libfmodstudio%s.so' % lfix
+    libfmod = 'libfmod%s' % lfix
+    libfmodstudio = 'libfmodstudio%s' % lfix
     fmod_info_table = {
         "armv7": "armeabi-v7a",
         "arm64": "arm64-v8a",
