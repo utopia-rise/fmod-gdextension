@@ -125,6 +125,9 @@ namespace godot {
 
         static FmodServer* get_singleton();
 
+        Vector<Callable> event_creation_callbacks = {};
+        Vector<Callable> event_removal_callbacks = {};
+
         // LIFECYCLE
         void init(const Ref<FmodGeneralSettings>& p_settings);
         void update();
@@ -228,6 +231,9 @@ namespace godot {
 
         //CALLBACKS
         void add_callback(const Callback& callback);
+
+        void add_event_created_callback(const Callable& p_callable);
+        void add_event_removed_callback(const Callable& p_callable);
 
         /* Helper methods */
     private:

@@ -61,6 +61,20 @@ namespace Callbacks {
                         }
                 );
             }
+
+            if (type == FMOD_STUDIO_EVENT_CALLBACK_CREATED) {
+                for (const godot::Callable& callable : godot::FmodServer::get_singleton()->event_creation_callbacks) {
+                    if (!callable.is_null() && callable.is_valid()) {
+                        callable.callv({godot::Ref<godot::FmodEvent>(event_instance)});
+                    }
+                }
+            } else if (type == FMOD_STUDIO_EVENT_CALLBACK_DESTROYED) {
+                for (const godot::Callable& callable : godot::FmodServer::get_singleton()->event_removal_callbacks) {
+                    if (!callable.is_null() && callable.is_valid()) {
+                        callable.callv({godot::Ref<godot::FmodEvent>(event_instance)});
+                    }
+                }
+            }
         }
 
         return FMOD_OK;
