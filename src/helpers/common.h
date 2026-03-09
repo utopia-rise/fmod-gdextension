@@ -67,7 +67,7 @@ public:                                                                  \
             ref.instantiate();                                           \
             ref->_wrapped = wrapped;                                     \
             char path[MAX_PATH_SIZE];                                    \
-            ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr)); \
+            ERROR_CHECK_WITH_REASON(wrapped->getPath(path, MAX_PATH_SIZE, nullptr), "Could not find path. It is likely that .strings.bank has not been loaded."); \
             ERROR_CHECK(wrapped->getID(&ref->_guid));                    \
             ref->_path = String(path);                                   \
         }                                                                \
