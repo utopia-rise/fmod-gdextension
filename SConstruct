@@ -96,8 +96,9 @@ elif env["platform"] == "windows":
         env.Append(CCFLAGS=["/FS", "/Zi"])
 
 elif env["platform"] == "ios":
-    libfmod = 'libfmod%s_iphoneos.a' % lfix
-    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
+    ios_platform = "iphonesimulator" if env["ios_simulator"] else "iphoneos"
+    libfmod = 'libfmod%s_%s.a' % (lfix, ios_platform)
+    libfmodstudio = 'libfmodstudio%s_%s.a' % (lfix, ios_platform)
 
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])

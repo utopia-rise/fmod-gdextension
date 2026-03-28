@@ -70,8 +70,13 @@ void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bo
             dir_access->copy(library_path, target_dir.path_join(file_access->get_path().get_file()));
         }
     } else if (is_ios_export) {
+        bool is_simulator = features.has("simulator");
         PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, "ios", ".a");
         for (const String& library_path : plugins_libraries_path) {
+            bool is_library_simulator = library_path.to_lower().contains("simulator");
+            if (is_simulator != is_library_simulator) {
+                continue;
+            }
             add_ios_project_static_lib(library_path);
         }
 
