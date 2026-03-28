@@ -207,6 +207,10 @@ void FmodEditorExportPlugin::_bind_methods() {}
 PackedStringArray FmodEditorExportPlugin::_get_libraries_to_export(const Ref<FmodPluginsSettings>& settings, const String& p_os_name, const String& p_extension, const String& p_arch) {
     PackedStringArray result;
 
+    if (settings.is_null() || settings->get_plugins_base_path().is_empty()) {
+        return result;
+    }
+
     String plugins_libraries_path = get_plugins_os_directory(settings, p_os_name, p_arch);
     list_files_in_folder(result, plugins_libraries_path, p_extension);
 
