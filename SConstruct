@@ -163,6 +163,8 @@ if env["platform"] == "ios":
     )
 
     def create_xcframework(self, arg, env, executor = None):
+        if os.path.exists(xcframework_path):
+            shutil.rmtree(xcframework_path)
         sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
         sys_exec(["rm", target])
         sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
