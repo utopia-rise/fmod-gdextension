@@ -222,14 +222,14 @@ jobs:
           name: ios-${{ matrix.target }}-sim-arm64
           path: ios-sim-arm64
 
-      - name: Merge Simulator Binaries
+      - name: Merge Simulator Binaries (Dynamic)
         run: |
           mkdir -p ios-sim-universal
           SIM_X64=$(find ios-sim-x64 -name "*.dylib" | head -n 1)
           SIM_ARM64=$(find ios-sim-arm64 -name "*.dylib" | head -n 1)
           lipo -create "$SIM_X64" "$SIM_ARM64" -output ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib
 
-      - name: Create Universal XCFramework
+      - name: Create Universal XCFramework (Bridge)
         run: |
           DEVICE_LIB=$(find ios-device -name "*.dylib" | head -n 1)
           xcodebuild -create-xcframework \
@@ -237,11 +237,28 @@ jobs:
             -library ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib \
             -output ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
 
-      - name: Upload Merged Artifact
+      - name: Merge FMOD Static Libraries (Lipo)
+        run: |
+          mkdir -p ios-merged-libs
+          # Iterate through all device .a files
+          find ios-device -name "*_iphoneos.a" | while read DEVICE_A; do
+            LIB_NAME=$(basename "$DEVICE_A" "_iphoneos.a")
+            # Find matching simulator archives
+            SIM_X64=$(find ios-sim-x64 -name "${LIB_NAME}_iphonesimulator.a" | head -n 1)
+            SIM_ARM64=$(find ios-sim-arm64 -name "${LIB_NAME}_iphonesimulator.a" | head -n 1)
+            
+            # Create a universal fat binary (Device + Simulator x64 + Simulator arm64)
+            lipo -create "$DEVICE_A" "$SIM_X64" "$SIM_ARM64" -output "ios-merged-libs/${LIB_NAME}_ios.a"
+            echo "Merged ${LIB_NAME} into ios-merged-libs/${LIB_NAME}_ios.a"
+          done
+
+      - name: Upload Merged Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ios-merged-${{ matrix.target }}
-          path: ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
+          path: |
+            ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
+            ios-merged-libs/*.a
 
   package-godot-addon:
     needs: [build, merge-ios-xcframework]
