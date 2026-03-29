@@ -99,7 +99,8 @@ namespace godot {
         template<bool is_one_shot> void _play(bool should_start_event);
         void set_space_attribute(const Ref<FmodEvent>& p_event) const;
         void _set_parameter_value(Parameter* parameter, const Variant& p_property);
-        void apply_parameters();
+        void _apply_parameters(const Ref<FmodEvent>& p_event);
+        void _apply_parameters();
         void free();
         void _load_event_description_if_needed() const;
         void _load_event();
@@ -253,7 +254,7 @@ namespace godot {
         }
 
         event->set_volume(_volume);
-        apply_parameters();
+        _apply_parameters(event);
 
         set_space_attribute(event);
         if (!_programmer_callback_sound_key.is_empty()) {
@@ -414,16 +415,21 @@ namespace godot {
 #ifdef TOOLS_ENABLED
         if (!Engine::get_singleton()->is_editor_hint()) {
 #endif
-            apply_parameters();
+            _apply_parameters();
 #ifdef TOOLS_ENABLED
         }
 #endif
     }
 
     template<class Derived, class NodeType>
-    void FmodEventEmitter<Derived, NodeType>::apply_parameters() {
-        if (_event.is_null() || !_event->is_valid()) { return; }
-        FmodServer::get_singleton()->apply_parameter_list_to_event(_event, _parameters);
+    void FmodEventEmitter<Derived, NodeType>::_apply_parameters(const Ref<FmodEvent>& p_event) {
+        if (p_event.is_null() || !p_event->is_valid()) { return; }
+        FmodServer::get_singleton()->apply_parameter_list_to_event(p_event, _parameters);
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::_apply_parameters() {
+        _apply_parameters(_event);
     }
 
     template<class Derived, class NodeType>
