@@ -16,7 +16,7 @@ typedef struct {
 } FMOD_IOS_INTERFACE;
 
 extern "C" {
-    uint32_t* load_all_fmod_plugins(FMOD_IOS_INTERFACE* ios_interface, uint32_t* r_count);
+    __attribute__((weak_import)) uint32_t* load_all_fmod_plugins(FMOD_IOS_INTERFACE* ios_interface, uint32_t* r_count);
 };
 #endif
 

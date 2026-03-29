@@ -540,12 +540,16 @@ void FmodServer::load_all_plugins(const Ref<FmodPluginsSettings>& p_settings) {
       .register_output_method = &register_ios_output
     };
 
-    uint32_t plugin_count;
-    uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
-    for (uint32_t i = 0; i < plugin_count; ++i) {
-        cache->add_plugin(plugin_handles[i]);
+    uint32_t plugin_count = 0;
+    if (load_all_fmod_plugins != nullptr) {
+        uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
+        for (uint32_t i = 0; i < plugin_count; ++i) {
+            cache->add_plugin(plugin_handles[i]);
+        }
+        std::free(plugin_handles);
+    } else {
+        GODOT_LOG_WARNING("FMOD: load_all_fmod_plugins not found. Static plugins will not be loaded.")
     }
-    std::free(plugin_handles);
 #endif
 }
 
