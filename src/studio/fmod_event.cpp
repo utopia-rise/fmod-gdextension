@@ -40,6 +40,7 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_programmer_callback_sound_key"), &FmodEvent::get_programmers_callback_sound_key);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
+    ClassDB::bind_method(D_METHOD("get_channel_group"), &FmodEvent::get_channel_group);
 
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "get_paused");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_pitch", "get_pitch");
@@ -254,6 +255,18 @@ const String& FmodEvent::get_programmers_callback_sound_key() const {
 
 void FmodEvent::set_distance_scale(float scale){
     distanceScale = scale;
+}
+
+Ref<FmodChannelGroup> FmodEvent::get_channel_group() const {
+    FMOD::ChannelGroup* channel_group = nullptr;
+    ERROR_CHECK_WITH_REASON(_wrapped->getChannelGroup(&channel_group), vformat("Cannot get ChannelGroup"));
+
+    if (channel_group) {
+        Ref<FmodChannelGroup> ref = FmodChannelGroup::create_ref(channel_group);
+        return ref;
+    }
+
+    return {};
 }
 
 FmodEvent::~FmodEvent() {
