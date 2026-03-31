@@ -1,0 +1,52 @@
+name: 🧪 Test Export (Headless)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+env:
+  GODOT_VERSION: 4.5
+  GODOT_SILENCE_ROOT_WARNING: 1
+
+jobs:
+  export-windows:
+    name: Export demo (Windows)
+    runs-on: ubuntu-22.04
+    container:
+      image: barichello/godot-ci:4.5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Setup Godot export templates
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mkdir -v -p ~/.config/
+          # Copy config if it exists and is different location
+          if [ -d /root/.config/godot ] && [ ! -d ~/.config/godot ]; then
+            cp -r /root/.config/godot ~/.config/
+          fi
+          # Copy export templates if they exist and are different location
+          if [ -d /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ] && [ ! -d ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable ]; then
+            cp -r /root/.local/share/godot/export_templates/${GODOT_VERSION}.stable ~/.local/share/godot/export_templates/
+          fi
+          echo "Listing installed export templates:"
+          ls -la ~/.local/share/godot/export_templates/${GODOT_VERSION}.stable || true
+
+      - name: Run initial Godot import
+        continue-on-error: true
+        run: timeout 2m godot --headless --verbose --import
+
+      - name: Export demo (Windows preset)
+        run: |
+          mkdir -p build/windows
+          export EXPORT_DIR=$(readlink -f build/windows)
+          cd demo
+          godot --headless --verbose --export-release "Windows Desktop" "$EXPORT_DIR/demo.exe"
+
