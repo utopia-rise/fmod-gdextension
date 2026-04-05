@@ -1,6 +1,6 @@
 [configuration]
 entry_symbol = "fmod_library_init"
-compatibility_minimum = 4.5
+compatibility_minimum = 4.1
 
 [libraries]
 windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"
@@ -92,10 +92,10 @@ android.release.arm64 = {
 "libs/android/arm64/libfmodstudio.so": "",
 }
 ios.debug  = {
-"libs/ios/libfmodL_iphoneos.a": "",
-"libs/ios/libfmodstudioL_iphoneos.a": ""
+"libs/ios/fmodL.xcframework": "",
+"libs/ios/fmodstudioL.xcframework": ""
 }
 ios.release = {
-"libs/ios/libfmod_iphoneos.a": "",
-"libs/ios/libfmodstudio_iphoneos.a": ""
+"libs/ios/fmod.xcframework": "",
+"libs/ios/fmodstudio.xcframework": ""
 }
