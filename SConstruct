@@ -148,7 +148,7 @@ if env["platform"] == "macos":
     )
 else:
     ios_sim_suffix = ".simulator" if env["platform"] == "ios" and env.get("ios_simulator", False) else ""
-    target = "{}{}{}{}".format(
+    target = "{}.{}{}{}".format(
         target,
         env["arch"],
         ios_sim_suffix,
