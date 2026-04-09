@@ -148,19 +148,25 @@ if env["platform"] == "macos":
     )
 else:
     ios_sim_suffix = ".simulator" if env["platform"] == "ios" and env.get("ios_simulator", False) else ""
-    target = "{}.{}{}{}".format(
+    target = "{}{}{}".format(
         target,
         env["arch"],
-        ios_sim_suffix,
-        env["SHLIBSUFFIX"]
+        ios_sim_suffix
     )
+    # The actual output from SharedLibrary will have the suffix appended by SCons
+    target_out = target + env["SHLIBSUFFIX"]
 
 library = env.SharedLibrary(target=target, source=sources)
 
 
 def sys_exec(args):
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    print("Running command: " + " ".join(args))
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     (out, err) = proc.communicate()
+    if proc.returncode != 0:
+        print("Error executing command: " + " ".join(args))
+        print("Error output: " + err)
+        Exit(proc.returncode)
     return out.rstrip("\r\n").lstrip()
 
 
@@ -176,9 +182,54 @@ if env["platform"] == "ios":
     def create_xcframework(self, arg, env, executor = None):
         if os.path.exists(xcframework_path):
             shutil.rmtree(xcframework_path)
-        sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
-        # sys_exec(["rm", target])
-        sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
+        
+        # Base target path without architecture or simulator suffix
+        base_target = "{}{}/{}.{}.{}".format(
+            target_path, env["platform"], target_name, env["platform"], env["target"]
+        )
+        
+        # We want to find the device and simulator libraries for this target
+        # e.g. for ios: .arm64.dylib and .simulator.dylib
+        libs = []
+        
+        # Device library (try .arm64.dylib, then fall back to .universal.dylib if found)
+        device_lib_arm64 = "{}.arm64{}".format(base_target, env["SHLIBSUFFIX"])
+        device_lib_universal = "{}.universal{}".format(base_target, env["SHLIBSUFFIX"])
+        
+        if os.path.exists(device_lib_arm64):
+            libs.append(device_lib_arm64)
+        elif os.path.exists(device_lib_universal):
+            libs.append(device_lib_universal)
+        
+        # Simulator library (prefer universal simulator if it exists)
+        sim_universal = "{}.simulator{}".format(base_target, env["SHLIBSUFFIX"])
+        sim_universal_alt = "{}.universal.simulator{}".format(base_target, env["SHLIBSUFFIX"])
+        
+        if os.path.exists(sim_universal):
+            libs.append(sim_universal)
+        elif os.path.exists(sim_universal_alt):
+            libs.append(sim_universal_alt)
+        else:
+            # Fallback to arch-specific simulator build if universal doesn't exist
+            sim_arch = "{}.{}.simulator{}".format(base_target, env["arch"], env["SHLIBSUFFIX"])
+            if os.path.exists(sim_arch):
+                libs.append(sim_arch)
+        
+        if not libs:
+            print("No libraries found to create xcframework for target: " + base_target)
+            return
+
+        cmd = ["xcodebuild", "-create-xcframework"]
+        for lib in libs:
+            cmd.extend(["-library", lib])
+        cmd.extend(["-output", xcframework_path])
+        
+        print("Creating xcframework with libraries: " + ", ".join(libs))
+        sys_exec(cmd)
+        
+        # Add MinimumOSVersion to Info.plist
+        plutil_cmd = ["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)]
+        sys_exec(plutil_cmd)
 
     create_xcframework_action = Action('', create_xcframework)
 
