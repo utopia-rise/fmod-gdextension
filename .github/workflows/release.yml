@@ -225,13 +225,16 @@ jobs:
       - name: Merge Simulator Binaries (Dynamic)
         run: |
           mkdir -p ios-sim-universal
-          SIM_X64=$(find ios-sim-x64 -name "*.dylib" | head -n 1)
-          SIM_ARM64=$(find ios-sim-arm64 -name "*.dylib" | head -n 1)
+          SIM_X64=$(find ios-sim-x64 -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.x86_64.simulator.dylib" | head -n 1)
+          SIM_ARM64=$(find ios-sim-arm64 -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.arm64.simulator.dylib" | head -n 1)
+          echo "SIM_X64: $SIM_X64"
+          echo "SIM_ARM64: $SIM_ARM64"
           lipo -create "$SIM_X64" "$SIM_ARM64" -output ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib
 
       - name: Create Universal XCFramework (Bridge)
         run: |
-          DEVICE_LIB=$(find ios-device -name "*.dylib" | head -n 1)
+          DEVICE_LIB=$(find ios-device -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.arm64.dylib" | head -n 1)
+          echo "DEVICE_LIB: $DEVICE_LIB"
           xcodebuild -create-xcframework \
             -library "$DEVICE_LIB" \
             -library ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib \

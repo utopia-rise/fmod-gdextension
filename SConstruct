@@ -233,7 +233,10 @@ if env["platform"] == "ios":
 
     create_xcframework_action = Action('', create_xcframework)
 
-    AddPostAction(library, create_xcframework_action)
+    # Only create xcframework on device builds; simulator builds produce
+    # individual dylibs that the CI merge-ios-xcframework job combines.
+    if not env.get("ios_simulator", False):
+        AddPostAction(library, create_xcframework_action)
 
 
 def copy_fmod_libraries(self, arg, env, executor = None):
