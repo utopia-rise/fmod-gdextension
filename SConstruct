@@ -153,7 +153,11 @@ else:
         env["arch"],
         ios_sim_suffix
     )
-    # The actual output from SharedLibrary will have the suffix appended by SCons
+    # On Windows, SCons rejects target names whose suffix doesn't match SHLIBSUFFIX (.dll).
+    # Appending the suffix explicitly and clearing SHLIBSUFFIX prevents the double-suffix error.
+    if env["platform"] == "windows":
+        target = target + env["SHLIBSUFFIX"]
+        env["SHLIBSUFFIX"] = ""
     target_out = target + env["SHLIBSUFFIX"]
 
 library = env.SharedLibrary(target=target, source=sources)
