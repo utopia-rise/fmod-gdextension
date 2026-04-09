@@ -148,17 +148,13 @@ if env["platform"] == "macos":
     )
 else:
     ios_sim_suffix = ".simulator" if env["platform"] == "ios" and env.get("ios_simulator", False) else ""
-    target = "{}{}{}".format(
+    target = "{}{}{}{}".format(
         target,
         env["arch"],
-        ios_sim_suffix
+        ios_sim_suffix,
+        env["SHLIBSUFFIX"]
     )
-    # On Windows, SCons rejects target names whose suffix doesn't match SHLIBSUFFIX (.dll).
-    # Appending the suffix explicitly and clearing SHLIBSUFFIX prevents the double-suffix error.
-    if env["platform"] == "windows":
-        target = target + env["SHLIBSUFFIX"]
-        env["SHLIBSUFFIX"] = ""
-    target_out = target + env["SHLIBSUFFIX"]
+    target_out = target
 
 library = env.SharedLibrary(target=target, source=sources)
 
