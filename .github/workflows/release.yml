@@ -242,20 +242,9 @@ jobs:
             -library ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib \
             -output ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
 
-      - name: Merge FMOD Static Libraries (Lipo)
+      - name: Copy FMOD XCFrameworks
         run: |
-          mkdir -p ios-merged-libs
-          # Iterate through all device .a files
-          find ios-device -name "*_iphoneos.a" | while read DEVICE_A; do
-            LIB_NAME=$(basename "$DEVICE_A" "_iphoneos.a")
-            # Find matching simulator archives
-            SIM_X64=$(find ios-sim-x64 -name "${LIB_NAME}_iphonesimulator.a" | head -n 1)
-            SIM_ARM64=$(find ios-sim-arm64 -name "${LIB_NAME}_iphonesimulator.a" | head -n 1)
-            
-            # Create a universal fat binary (Device + Simulator x64 + Simulator arm64)
-            lipo -create "$DEVICE_A" "$SIM_X64" "$SIM_ARM64" -output "ios-merged-libs/${LIB_NAME}_ios.a"
-            echo "Merged ${LIB_NAME} into ios-merged-libs/${LIB_NAME}_ios.a"
-          done
+          cp -R ios-device/fmod*.xcframework .
 
       - name: Upload Merged Artifacts
         uses: actions/upload-artifact@v4
@@ -263,7 +252,7 @@ jobs:
           name: ios-merged-${{ matrix.target }}
           path: |
             ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
-            ios-merged-libs/*.a
+            fmod*.xcframework
 
   package-godot-addon:
     needs: [build, merge-ios-xcframework]
