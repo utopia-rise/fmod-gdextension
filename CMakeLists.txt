@@ -1,5 +1,5 @@
-project(GodotFmod)
 cmake_minimum_required(VERSION 3.6)
+project(GodotFmod)
 
 set(GODOT_GDEXTENSION_DIR godot-cpp/gdextension/ CACHE STRING "Path to GDExtension interface header directory")
 set(CPP_BINDINGS_PATH godot-cpp/ CACHE STRING "Path to C++ bindings")
