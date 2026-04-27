@@ -123,6 +123,7 @@ jobs:
             os: "macos-14"
             platform: ios
             target: template_debug
+            flags: arch=arm64
             fmod-executable-suffix: ios.dmg
             shell: bash
 
@@ -130,7 +131,44 @@ jobs:
             os: "macos-14"
             platform: ios
             target: template_release
+            flags: arch=arm64
             fmod-executable-suffix: ios.dmg
+            shell: bash
+
+          - name: iOS Simulator x86_64 Debug Compilation
+            os: "macos-14"
+            platform: ios
+            target: template_debug
+            flags: ios_simulator=yes arch=x86_64
+            fmod-executable-suffix: ios.dmg
+            artifact-suffix: "-sim-x64"
+            shell: bash
+
+          - name: iOS Simulator x86_64 Release Compilation
+            os: "macos-14"
+            platform: ios
+            target: template_release
+            flags: ios_simulator=yes arch=x86_64
+            fmod-executable-suffix: ios.dmg
+            artifact-suffix: "-sim-x64"
+            shell: bash
+
+          - name: iOS Simulator arm64 Debug Compilation
+            os: "macos-14"
+            platform: ios
+            target: template_debug
+            flags: ios_simulator=yes arch=arm64
+            fmod-executable-suffix: ios.dmg
+            artifact-suffix: "-sim-arm64"
+            shell: bash
+
+          - name: iOS Simulator arm64 Release Compilation
+            os: "macos-14"
+            platform: ios
+            target: template_release
+            flags: ios_simulator=yes arch=arm64
+            fmod-executable-suffix: ios.dmg
+            artifact-suffix: "-sim-arm64"
             shell: bash
 
     steps:
@@ -158,9 +196,66 @@ jobs:
           fmod-user: ${{ secrets.FMODUSER }}
           fmod-password: ${{ secrets.FMODPASS }}
           shell: ${{ matrix.shell }}
+          artifact-suffix: ${{ matrix.artifact-suffix }}
+
+  merge-ios-xcframework:
+    name: Merge iOS XCFrameworks (${{ matrix.target }})
+    needs: [build]
+    runs-on: "macos-14"
+    strategy:
+      matrix:
+        target: [template_debug, template_release]
+    steps:
+      - name: Download iOS Device
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-${{ matrix.target }}
+          path: ios-device
+
+      - name: Download iOS Simulator x64
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-${{ matrix.target }}-sim-x64
+          path: ios-sim-x64
+
+      - name: Download iOS Simulator arm64
+        uses: actions/download-artifact@v4
+        with:
+          name: ios-${{ matrix.target }}-sim-arm64
+          path: ios-sim-arm64
+
+      - name: Merge Simulator Binaries (Dynamic)
+        run: |
+          mkdir -p ios-sim-universal
+          SIM_X64=$(find ios-sim-x64 -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.x86_64.simulator.dylib" | head -n 1)
+          SIM_ARM64=$(find ios-sim-arm64 -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.arm64.simulator.dylib" | head -n 1)
+          echo "SIM_X64: $SIM_X64"
+          echo "SIM_ARM64: $SIM_ARM64"
+          lipo -create "$SIM_X64" "$SIM_ARM64" -output ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib
+
+      - name: Create Universal XCFramework (Bridge)
+        run: |
+          DEVICE_LIB=$(find ios-device -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.arm64.dylib" | head -n 1)
+          echo "DEVICE_LIB: $DEVICE_LIB"
+          xcodebuild -create-xcframework \
+            -library "$DEVICE_LIB" \
+            -library ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib \
+            -output ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
+
+      - name: Copy FMOD XCFrameworks
+        run: |
+          cp -R ios-device/fmod*.xcframework .
+
+      - name: Upload Merged Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-merged-${{ matrix.target }}
+          path: |
+            ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
+            fmod*.xcframework
 
   package-godot-addon:
-    needs: [build]
+    needs: [build, merge-ios-xcframework]
     strategy:
       matrix:
         include:
@@ -235,14 +330,14 @@ jobs:
       - name: Download iOS template_debug libraries
         uses: actions/download-artifact@v4
         with:
-          name: ios-template_debug
-          path: demo/addons/fmod/libs/iOS/
+          name: ios-merged-template_debug
+          path: demo/addons/fmod/libs/ios/
 
       - name: Download iOS template_release libraries
         uses: actions/download-artifact@v4
         with:
-          name: ios-template_release
-          path: demo/addons/fmod/libs/iOS/
+          name: ios-merged-template_release
+          path: demo/addons/fmod/libs/ios/
 
       - name: Download android editor libraries
         uses: actions/download-artifact@v4

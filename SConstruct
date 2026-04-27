@@ -13,6 +13,8 @@ env = SConscript("godot-cpp/SConstruct")
 
 # Add those directory manually, so we can skip the godot_cpp directory when including headers in C++ files
 source_path = [
+    os.path.join("godot-cpp", "include"),
+    os.path.join("godot-cpp", "gen", "include"),
     os.path.join("godot-cpp", "include","godot_cpp"),
     os.path.join("godot-cpp", "gen", "include","godot_cpp")
 ]
@@ -96,16 +98,24 @@ elif env["platform"] == "windows":
         env.Append(CCFLAGS=["/FS", "/Zi"])
 
 elif env["platform"] == "ios":
-    libfmod = 'libfmod%s_iphoneos.a' % lfix
-    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
+    ios_platform = "iphonesimulator" if env["ios_simulator"] else "iphoneos"
+    libfmod = 'libfmod%s_%s.a' % (lfix, ios_platform)
+    libfmodstudio = 'libfmodstudio%s_%s.a' % (lfix, ios_platform)
 
-    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
+    # Use the local libs/ios folder which should exist via symlink
+    fmod_ios_inc = 'libs/ios/'
+    if not os.path.exists(fmod_ios_inc):
+        # Fallback to the provided prefix if symlink doesn't exist
+        fmod_ios_inc = env['fmod_lib_dir'] + 'ios/'
+
+    env.Append(CPPPATH=[fmod_ios_inc + 'core/inc/', fmod_ios_inc + 'studio/inc/'])
+    env.Append(LIBPATH=[fmod_ios_inc + 'core/lib/', fmod_ios_inc + 'studio/lib/'])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
-    env.Append(LINKFLAGS=[
-        '-Wl,-undefined,dynamic_lookup', "-miphoneos-version-min=" + env["ios_min_version"]
-    ])
+    ios_link_flags = ['-Wl,-undefined,dynamic_lookup']
+    if not env["ios_simulator"]:
+        ios_link_flags.append("-miphoneos-version-min=" + env["ios_min_version"])
+    env.Append(LINKFLAGS=ios_link_flags)
 
 elif env["platform"] == "android":
     libfmod = 'libfmod%s.so' % lfix
@@ -137,18 +147,26 @@ if env["platform"] == "macos":
         env["target"]
     )
 else:
-    target = "{}.{}{}".format(
+    ios_sim_suffix = ".simulator" if env["platform"] == "ios" and env.get("ios_simulator", False) else ""
+    target = "{}.{}{}{}".format(
         target,
         env["arch"],
+        ios_sim_suffix,
         env["SHLIBSUFFIX"]
     )
+    target_out = target
 
 library = env.SharedLibrary(target=target, source=sources)
 
 
 def sys_exec(args):
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
+    print("Running command: " + " ".join(args))
+    proc = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     (out, err) = proc.communicate()
+    if proc.returncode != 0:
+        print("Error executing command: " + " ".join(args))
+        print("Error output: " + err)
+        Exit(proc.returncode)
     return out.rstrip("\r\n").lstrip()
 
 
@@ -162,13 +180,63 @@ if env["platform"] == "ios":
     )
 
     def create_xcframework(self, arg, env, executor = None):
-        sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
-        sys_exec(["rm", target])
-        sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
+        if os.path.exists(xcframework_path):
+            shutil.rmtree(xcframework_path)
+        
+        # Base target path without architecture or simulator suffix
+        base_target = "{}{}/{}.{}.{}".format(
+            target_path, env["platform"], target_name, env["platform"], env["target"]
+        )
+        
+        # We want to find the device and simulator libraries for this target
+        # e.g. for ios: .arm64.dylib and .simulator.dylib
+        libs = []
+        
+        # Device library (try .arm64.dylib, then fall back to .universal.dylib if found)
+        device_lib_arm64 = "{}.arm64{}".format(base_target, env["SHLIBSUFFIX"])
+        device_lib_universal = "{}.universal{}".format(base_target, env["SHLIBSUFFIX"])
+        
+        if os.path.exists(device_lib_arm64):
+            libs.append(device_lib_arm64)
+        elif os.path.exists(device_lib_universal):
+            libs.append(device_lib_universal)
+        
+        # Simulator library (prefer universal simulator if it exists)
+        sim_universal = "{}.simulator{}".format(base_target, env["SHLIBSUFFIX"])
+        sim_universal_alt = "{}.universal.simulator{}".format(base_target, env["SHLIBSUFFIX"])
+        
+        if os.path.exists(sim_universal):
+            libs.append(sim_universal)
+        elif os.path.exists(sim_universal_alt):
+            libs.append(sim_universal_alt)
+        else:
+            # Fallback to arch-specific simulator build if universal doesn't exist
+            sim_arch = "{}.{}.simulator{}".format(base_target, env["arch"], env["SHLIBSUFFIX"])
+            if os.path.exists(sim_arch):
+                libs.append(sim_arch)
+        
+        if not libs:
+            print("No libraries found to create xcframework for target: " + base_target)
+            return
+
+        cmd = ["xcodebuild", "-create-xcframework"]
+        for lib in libs:
+            cmd.extend(["-library", lib])
+        cmd.extend(["-output", xcframework_path])
+        
+        print("Creating xcframework with libraries: " + ", ".join(libs))
+        sys_exec(cmd)
+        
+        # Add MinimumOSVersion to Info.plist
+        plutil_cmd = ["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)]
+        sys_exec(plutil_cmd)
 
     create_xcframework_action = Action('', create_xcframework)
 
-    AddPostAction(library, create_xcframework_action)
+    # Only create xcframework on device builds; simulator builds produce
+    # individual dylibs that the CI merge-ios-xcframework job combines.
+    if not env.get("ios_simulator", False):
+        AddPostAction(library, create_xcframework_action)
 
 
 def copy_fmod_libraries(self, arg, env, executor = None):
