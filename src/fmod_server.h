@@ -260,6 +260,8 @@ namespace godot {
         void unpause_all_events();
         void mute_all_events();
         void unmute_all_events();
+        void mixer_suspend();
+        void mixer_resume();
         void wait_for_all_loads();
 
     protected:

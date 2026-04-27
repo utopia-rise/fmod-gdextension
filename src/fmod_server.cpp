@@ -132,6 +132,8 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("unpause_all_events"), &FmodServer::unpause_all_events);
     ClassDB::bind_method(D_METHOD("mute_all_events"), &FmodServer::mute_all_events);
     ClassDB::bind_method(D_METHOD("unmute_all_events"), &FmodServer::unmute_all_events);
+    ClassDB::bind_method(D_METHOD("mixer_suspend"), &FmodServer::mixer_suspend);
+    ClassDB::bind_method(D_METHOD("mixer_resume"), &FmodServer::mixer_resume);
 
     ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
     REGISTER_ALL_CONSTANTS
@@ -840,6 +842,14 @@ void FmodServer::unmute_all_events() {
         FMOD::Studio::Bus* masterBus = nullptr;
         if (ERROR_CHECK(system->getBus("bus:/", &masterBus))) { masterBus->setMute(false); }
     }
+}
+
+void FmodServer::mixer_suspend() {
+    ERROR_CHECK(coreSystem->mixerSuspend());
+}
+
+void FmodServer::mixer_resume() {
+    ERROR_CHECK(coreSystem->mixerResume());
 }
 
 Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
