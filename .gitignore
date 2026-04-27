@@ -141,4 +141,4 @@ config.log
 demo/addons/fmod/libs/android/aar/
 
 *.pdb
-.vs
+.vs__pycache__/

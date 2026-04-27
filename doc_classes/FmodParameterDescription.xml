@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodParameterDescription" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Describes the properties and constraints of an FMOD Studio event parameter.
+	</brief_description>
+	<description>
+		FmodParameterDescription contains metadata about an FMOD Studio event parameter, including its name, ID, value range, and behavioral properties. This information is used to properly set and validate parameter values.
+
+		Parameters in FMOD Studio can be:
+		- Continuous (float values within a range)
+		- Discrete (specific labeled values)
+		- Automatic (controlled by FMOD, like distance or direction)
+		- Global (shared across all event instances)
+
+		Parameter descriptions are obtained from [FmodEventDescription] objects and provide the information needed to:
+		- Set parameter values correctly within their valid range
+		- Display appropriate UI controls (sliders vs dropdowns)
+		- Validate parameter values before setting them
+		- Understand parameter behavior and constraints
+
+		This class is primarily used for editor tools and debugging, but can also be helpful for runtime parameter validation.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_default_value">
+			<return type="float" />
+			<description>
+				Returns the default value of the parameter as set in FMOD Studio.
+			</description>
+		</method>
+		<method name="get_id">
+			<return type="int" />
+			<description>
+				Returns the unique numerical ID of the parameter. This ID can be used for faster parameter access compared to using the name.
+			</description>
+		</method>
+		<method name="get_maximum">
+			<return type="float" />
+			<description>
+				Returns the maximum valid value for the parameter.
+			</description>
+		</method>
+		<method name="get_minimum">
+			<return type="float" />
+			<description>
+				Returns the minimum valid value for the parameter.
+			</description>
+		</method>
+		<method name="get_name">
+			<return type="String" />
+			<description>
+				Returns the name of the parameter as defined in FMOD Studio.
+			</description>
+		</method>
+		<method name="is_automatic">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the parameter is automatic (controlled by FMOD based on distance, direction, etc.) and cannot be set manually.
+			</description>
+		</method>
+		<method name="is_discrete">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the parameter is discrete, meaning it only accepts specific values rather than a continuous range.
+			</description>
+		</method>
+		<method name="is_global">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the parameter is global, meaning it's shared across all instances of the event rather than being per-instance.
+			</description>
+		</method>
+		<method name="is_labeled">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the parameter has labeled values (like an enum). Use [method FmodEventDescription.get_parameter_labels_by_name] to get the labels.
+			</description>
+		</method>
+		<method name="is_read_only">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the parameter is read-only and cannot be modified at runtime.
+			</description>
+		</method>
+	</methods>
+</class>
