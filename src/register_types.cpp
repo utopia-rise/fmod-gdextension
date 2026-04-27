@@ -78,6 +78,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         // Core
         ClassDB::register_class<FmodSound>();
         ClassDB::register_class<FmodFile>();
+        ClassDB::register_class<FmodChannelGroup>();
 
         // Studio
         ClassDB::register_class<FmodBank>();
