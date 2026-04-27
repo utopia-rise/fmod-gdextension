@@ -11,7 +11,7 @@ env:
   NDK_VERSION: 27.3.13750724
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  FMOD_VERSION: 20306
+  FMOD_VERSION: 20311
 jobs:
   gate:
     runs-on: ubuntu-latest
@@ -152,6 +152,20 @@ jobs:
             fmod-executable-suffix: ios.dmg
             shell: bash
 
+          - name: Web Debug Compilation
+            os: "ubuntu-22.04"
+            platform: web
+            target: template_debug
+            fmod-executable-suffix: html5.zip
+            shell: bash
+
+          - name: Web Release Compilation
+            os: "ubuntu-22.04"
+            platform: web
+            target: template_release
+            fmod-executable-suffix: html5.zip
+            shell: bash
+
     steps:
       - name: Checkout (in-repo PR)
         if: github.event_name == 'pull_request'
@@ -175,6 +189,13 @@ jobs:
         with:
           ndk-version: r23c
           link-to-sdk: true
+
+      - name: Install Emscripten SDK
+        if: matrix.platform == 'web'
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.56
+          actions-cache-key: emsdk-cache
 
       - name: Compile native plugin
         uses: ./.github/actions/create-native-build

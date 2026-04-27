@@ -142,3 +142,5 @@ demo/addons/fmod/libs/android/aar/
 
 *.pdb
 .vs
+
+*.wasm

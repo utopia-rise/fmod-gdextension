@@ -10,7 +10,7 @@ env:
   NDK_VERSION: 27.3.13750724
   TARGET_PATH: demo/addons/fmod/libs/
   TARGET_NAME: libGodotFmod
-  FMOD_VERSION: 20306
+  FMOD_VERSION: 20311
 jobs:
   build:
     name: ${{ matrix.name }}

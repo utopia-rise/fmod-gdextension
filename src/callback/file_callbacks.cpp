@@ -8,6 +8,7 @@ namespace Callbacks {
     }
 
     void GodotFileRunner::queueReadRequest(FMOD_ASYNCREADINFO* request, ReadPriority priority) {
+#if !defined(WEB_ENABLED)
         // High-priority requests have to be processed first.
         if (priority == ReadPriority::HIGH) {
             // lock so we can't add and remove elements from the queue at the same time.
@@ -19,9 +20,16 @@ namespace Callbacks {
             requests.push_back(request);
         }
         read_cv.notify_one();
+#else
+        // On Web, threaded async IO is disabled. These callbacks should not be
+        // used because we don't register a custom file system in that build.
+        (void)request;
+        (void)priority;
+#endif
     }
 
     FMOD_RESULT GodotFileRunner::cancelReadRequest(FMOD_ASYNCREADINFO* request) {
+#if !defined(WEB_ENABLED)
         // lock so we can't add and remove elements from the queue at the same time.
         {
             std::lock_guard<std::mutex> lk(read_mut);
@@ -40,8 +48,14 @@ namespace Callbacks {
         }
 
         return FMOD_RESULT::FMOD_OK;
+#else
+        (void)request;
+        return FMOD_RESULT::FMOD_OK;
+#endif
     }
 
+// The worker thread entry point exists only on non-web platforms.
+#if !defined(WEB_ENABLED)
     void GodotFileRunner::run() {
         while (!stop) {
             // waiting for the container to have one request
@@ -88,17 +102,23 @@ namespace Callbacks {
             }
         }
     }
-
+#endif
     void GodotFileRunner::start() {
+#if !defined(WEB_ENABLED)
         stop = false;
         fileThread = std::thread(&GodotFileRunner::run, this);
+#endif
     }
 
     void GodotFileRunner::finish() {
+#if !defined(WEB_ENABLED)
         stop = true;
         // we need to notify the loop one last time, otherwise it will stay stuck in the wait method.
         read_cv.notify_one();
-        fileThread.join();
+        if (fileThread.joinable()) {
+            fileThread.join();
+        }
+#endif
     }
 
     FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata) {
@@ -116,6 +136,41 @@ namespace Callbacks {
     FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata) {
         godot::Ref<godot::FileAccess> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
         delete reinterpret_cast<GodotFileHandle*>(handle);
+        return FMOD_RESULT::FMOD_OK;
+    }
+
+    FMOD_RESULT F_CALL godotFileRead(void* handle, void* buffer, unsigned int sizebytes, unsigned int* bytesread, void* userdata) {
+        GodotFileHandle* fileHandle {reinterpret_cast<GodotFileHandle*>(handle)};
+        godot::Ref<godot::FileAccess> file {fileHandle->file};
+
+        godot::PackedByteArray data = file->get_buffer(sizebytes);
+        const int read_size = static_cast<int>(data.size());
+
+        if (read_size > 0) {
+            memcpy(buffer, data.ptr(), read_size);
+        }
+
+        if (bytesread) {
+            *bytesread = static_cast<unsigned int>(read_size);
+        }
+
+        if (read_size < static_cast<int>(sizebytes)) {
+            return FMOD_RESULT::FMOD_ERR_FILE_EOF;
+        }
+
+        return FMOD_RESULT::FMOD_OK;
+    }
+
+    FMOD_RESULT F_CALL godotFileSeek(void* handle, unsigned int pos, void* userdata) {
+        GodotFileHandle* fileHandle {reinterpret_cast<GodotFileHandle*>(handle)};
+        godot::Ref<godot::FileAccess> file {fileHandle->file};
+
+        file->seek(pos);
+
+        if (file->get_position() != pos) {
+            return FMOD_RESULT::FMOD_ERR_FILE_COULDNOTSEEK;
+        }
+
         return FMOD_RESULT::FMOD_OK;
     }
 
