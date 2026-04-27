@@ -40,6 +40,7 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_programmer_callback_sound_key"), &FmodEvent::get_programmers_callback_sound_key);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
+    ClassDB::bind_method(D_METHOD("get_event_pointer"), &FmodEvent::get_event_pointer);
 
     ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "get_paused");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_pitch", "get_pitch");
@@ -254,6 +255,19 @@ const String& FmodEvent::get_programmers_callback_sound_key() const {
 
 void FmodEvent::set_distance_scale(float scale){
     distanceScale = scale;
+}
+
+PackedByteArray FmodEvent::get_event_pointer() {
+    PackedByteArray array;
+
+    std::intptr_t pointer = reinterpret_cast<std::intptr_t>(_wrapped);
+    array.resize(sizeof(std::intptr_t));
+    
+    for (int i = 0; i < sizeof(std::intptr_t); i++) {
+        array[i] = static_cast<uint8_t>((pointer >> (i * 8)) & 0xFF);
+    }
+
+    return array;
 }
 
 FmodEvent::~FmodEvent() {
