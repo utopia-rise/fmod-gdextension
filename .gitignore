@@ -119,6 +119,11 @@ _deps
 # External projects
 *-prefix/
 
+### Visual Studio Generated Files ###
+*.vcxproj
+*.vcxproj.filters
+*.sln
+
 ### SCons ###
 # for projects that use SCons for building: http://http://www.scons.org/
 .sconsign.dblite
