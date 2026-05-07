@@ -231,10 +231,6 @@ if env["platform"] == "ios":
         print("Creating xcframework with libraries: " + ", ".join(libs))
         sys_exec(cmd)
         
-        # Cleanup
-        for dsym_path in dsym_paths:
-            sys_exec(["rm", "-rf", dsym_path])
-
         # Add MinimumOSVersion to Info.plist
         plutil_cmd = ["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)]
         sys_exec(plutil_cmd)
