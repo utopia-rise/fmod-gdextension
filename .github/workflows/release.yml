@@ -236,10 +236,17 @@ jobs:
       - name: Create Universal XCFramework (Bridge)
         run: |
           DEVICE_LIB=$(find ios-device -name "${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.arm64.dylib" | head -n 1)
+          SIM_LIB=ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib
           echo "DEVICE_LIB: $DEVICE_LIB"
+          echo "SIM_LIB: $SIM_LIB"
+          
+          # Generate dSYMs for both libraries
+          dsymutil "$DEVICE_LIB" -o "${DEVICE_LIB}.dSYM"
+          dsymutil "$SIM_LIB" -o "${SIM_LIB}.dSYM"
+          
           xcodebuild -create-xcframework \
-            -library "$DEVICE_LIB" \
-            -library ios-sim-universal/libGodotFmod.ios.${{ matrix.target }}.simulator.dylib \
+            -library "$DEVICE_LIB" -debug-symbols "$(pwd)/${DEVICE_LIB}.dSYM" \
+            -library "$SIM_LIB" -debug-symbols "$(pwd)/${SIM_LIB}.dSYM" \
             -output ${{ env.TARGET_NAME }}.ios.${{ matrix.target }}.xcframework
 
       - name: Copy FMOD XCFrameworks

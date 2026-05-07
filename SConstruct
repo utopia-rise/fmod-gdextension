@@ -224,23 +224,18 @@ if env["platform"] == "ios":
         for lib in libs:
             dsym_path = os.path.abspath(lib + ".dSYM")
             abs_lib = os.path.abspath(lib)
-            print("Generating dSYM for {} at {}".format(abs_lib, dsym_path))
             sys_exec(["dsymutil", abs_lib, "-o", dsym_path])
             if os.path.exists(dsym_path):
-                print("dSYM generated successfully.")
                 cmd.extend(["-library", abs_lib, "-debug-symbols", dsym_path])
             else:
-                print("FAILED to generate dSYM.")
                 cmd.extend(["-library", abs_lib])
             dsym_paths.append(dsym_path)
         
         cmd.extend(["-output", xcframework_path])
-        print("Creating xcframework: " + " ".join(cmd))
         sys_exec(cmd)
         
         # Add MinimumOSVersion to Info.plist
         plutil_cmd = ["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)]
-        print("Adding MinimumOSVersion: " + " ".join(plutil_cmd))
         sys_exec(plutil_cmd)
 
     create_xcframework_action = Action('', create_xcframework)
