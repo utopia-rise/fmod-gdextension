@@ -508,7 +508,6 @@ void FmodServer::unload_bank(const String& pathToBank) {
 bool FmodServer::banks_still_loading() {
     return cache->is_loading();
 }
-
 #ifdef IOS_ENABLED
 uint32_t register_ios_dsp(FMOD_SYSTEM_PTR system, FMOD_DSP_DESCRIPTION* description, uint32_t* handle) {
     return reinterpret_cast<FMOD::System*>(system)->registerDSP(description, handle);
@@ -520,6 +519,17 @@ uint32_t register_ios_codec(FMOD_SYSTEM_PTR system, FMOD_CODEC_DESCRIPTION* desc
 
 uint32_t register_ios_output(FMOD_SYSTEM_PTR system, FMOD_OUTPUT_DESCRIPTION* description, uint32_t* handle) {
     return reinterpret_cast<FMOD::System*>(system)->registerOutput(description, handle);
+}
+
+extern "C" {
+// Re-declare with weak attribute to ensure the linker finds a version of this symbol
+// even if the export plugin hasn't generated the real one yet.
+__attribute__((weak)) uint32_t* load_all_fmod_plugins(FMOD_IOS_INTERFACE* p_interface, uint32_t* r_count) {
+    if (r_count) {
+        *r_count = 0;
+    }
+    return nullptr;
+}
 }
 #endif
 
@@ -540,12 +550,16 @@ void FmodServer::load_all_plugins(const Ref<FmodPluginsSettings>& p_settings) {
       .register_output_method = &register_ios_output
     };
 
-    uint32_t plugin_count;
-    uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
-    for (uint32_t i = 0; i < plugin_count; ++i) {
-        cache->add_plugin(plugin_handles[i]);
+    uint32_t plugin_count = 0;
+    if (load_all_fmod_plugins != nullptr) {
+        uint32_t* plugin_handles = load_all_fmod_plugins(&interface, &plugin_count);
+        for (uint32_t i = 0; i < plugin_count; ++i) {
+            cache->add_plugin(plugin_handles[i]);
+        }
+        std::free(plugin_handles);
+    } else {
+        GODOT_LOG_WARNING("FMOD: load_all_fmod_plugins not found. Static plugins will not be loaded.")
     }
-    std::free(plugin_handles);
 #endif
 }
 

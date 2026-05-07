@@ -17,6 +17,9 @@ inputs:
     description: The password for fmod account used to download fmod binaries.
   shell:
     description: The shell used by the runner.
+  artifact-suffix:
+    description: Optional suffix for the artifact name.
+    default: ""
 runs:
   using: composite
   steps:
@@ -106,6 +109,6 @@ runs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{ inputs.platform }}-${{ inputs.target }}
+        name: ${{ inputs.platform }}-${{ inputs.target }}${{ inputs.artifact-suffix }}
         path: ${{ env.TARGET_PATH }}${{ inputs.platform }}/**/*.*
         if-no-files-found: error

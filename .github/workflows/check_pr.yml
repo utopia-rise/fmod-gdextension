@@ -142,6 +142,7 @@ jobs:
             os: "macos-14"
             platform: ios
             target: template_debug
+            flags: arch=arm64
             fmod-executable-suffix: ios.dmg
             shell: bash
 
@@ -149,6 +150,7 @@ jobs:
             os: "macos-14"
             platform: ios
             target: template_release
+            flags: arch=arm64
             fmod-executable-suffix: ios.dmg
             shell: bash
 
