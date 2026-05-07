@@ -220,13 +220,21 @@ if env["platform"] == "ios":
             return
 
         cmd = ["xcodebuild", "-create-xcframework"]
+        dsym_paths = []
         for lib in libs:
-            cmd.extend(["-library", lib])
+            dsym_path = lib + ".dSYM"
+            sys_exec(["dsymutil", lib, "-o", dsym_path])
+            cmd.extend(["-library", os.path.abspath(lib), "-debug-symbols", os.path.abspath(dsym_path)])
+            dsym_paths.append(dsym_path)
         cmd.extend(["-output", xcframework_path])
         
         print("Creating xcframework with libraries: " + ", ".join(libs))
         sys_exec(cmd)
         
+        # Cleanup
+        for dsym_path in dsym_paths:
+            sys_exec(["rm", "-rf", dsym_path])
+
         # Add MinimumOSVersion to Info.plist
         plutil_cmd = ["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)]
         sys_exec(plutil_cmd)
