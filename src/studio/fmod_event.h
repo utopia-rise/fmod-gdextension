@@ -4,6 +4,7 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
+#include "core/fmod_channel_group.h"
 
 namespace godot {
     class FmodEvent : public RefCounted {
@@ -55,6 +56,7 @@ namespace godot {
         void set_programmer_callback(const String& p_programmers_callback_sound_key);
         const String& get_programmers_callback_sound_key() const;
         void set_distance_scale(float scale);
+        Ref<FmodChannelGroup> get_channel_group() const;
 
     protected:
         static void _bind_methods();

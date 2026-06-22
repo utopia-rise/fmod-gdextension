@@ -1,6 +1,6 @@
 # Compiling from sources
 
-Clone project with `--recurse_submodules`.
+Clone project with `--recurse-submodules`.
 
 ## Typical Project structure
 
