@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodVCA" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Represents an FMOD Studio VCA (Volume Control Automation) for centralized volume control.
+	</brief_description>
+	<description>
+		FmodVCA represents an FMOD Studio VCA (Volume Control Automation), which provides centralized volume control across multiple buses and events. VCAs act as volume multipliers that can affect multiple parts of the audio mix simultaneously.
+
+		VCAs are particularly useful for:
+		- Master volume controls (e.g., "Master Volume", "Music Volume", "SFX Volume")
+		- Player preferences and accessibility options
+		- Dynamic mixing scenarios where multiple buses need synchronized control
+		- Automation and scripted volume changes
+
+		Unlike buses, VCAs only control volume and don't process audio directly. They're connected to buses in FMOD Studio and provide an additional layer of volume control on top of bus volumes.
+
+		VCAs are defined in FMOD Studio and loaded as part of bank files. Use [method FmodServer.get_vca] to obtain VCA references from loaded banks.
+
+		Changes to VCA volumes are applied immediately and affect all connected buses and events.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_volume">
+			<return type="float" />
+			<description>
+				Returns the current volume level of the VCA. This is a multiplier where 1.0 represents the original volume, 0.0 is silent, and values greater than 1.0 amplify the volume.
+			</description>
+		</method>
+		<method name="set_volume">
+			<return type="void" />
+			<param index="0" name="volume" type="float" />
+			<description>
+				Sets the volume level of the VCA. This is a multiplier where 1.0 represents the original volume, 0.0 is silent, and values greater than 1.0 amplify the volume. The change affects all buses and events connected to this VCA.
+			</description>
+		</method>
+	</methods>
+</class>

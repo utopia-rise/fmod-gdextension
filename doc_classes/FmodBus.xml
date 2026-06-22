@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodBus" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Represents an FMOD Studio bus for audio mixing and effects processing.
+	</brief_description>
+	<description>
+		FmodBus represents an FMOD Studio bus, which is a mixing channel in the audio pipeline. Buses are used to group audio signals together for collective processing, volume control, and effects application.
+
+		Buses form a hierarchy where audio from events flows through buses and their parent buses until reaching the master bus. This allows for:
+		- Grouped volume control (e.g., "Music", "SFX", "Voice" buses)
+		- Collective effects processing (e.g., reverb on all music)
+		- Ducking and sidechaining between bus groups
+		- Centralized mixing control
+
+		Buses are defined in FMOD Studio and loaded as part of bank files. Use [method FmodServer.get_bus] to obtain bus references from loaded banks.
+
+		Operations on buses affect all events and child buses routing through them, making buses powerful tools for dynamic mixing control.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_mute">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the bus is currently muted.
+			</description>
+		</method>
+		<method name="get_paused">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the bus is currently paused.
+			</description>
+		</method>
+		<method name="get_volume">
+			<return type="float" />
+			<description>
+				Returns the current volume level of the bus. This is a multiplier where 1.0 is the original volume set in FMOD Studio.
+			</description>
+		</method>
+		<method name="set_mute">
+			<return type="void" />
+			<param index="0" name="mute" type="bool" />
+			<description>
+				Mutes or unmutes the bus. When muted, no audio will pass through this bus or its child buses.
+			</description>
+		</method>
+		<method name="set_paused">
+			<return type="void" />
+			<param index="0" name="paused" type="bool" />
+			<description>
+				Pauses or unpauses the bus. When paused, all audio processing through this bus is suspended, but events continue running.
+			</description>
+		</method>
+		<method name="set_volume">
+			<return type="void" />
+			<param index="0" name="volume" type="float" />
+			<description>
+				Sets the volume level of the bus. This is a multiplier where 1.0 is the original volume set in FMOD Studio. Values greater than 1.0 will amplify the audio.
+			</description>
+		</method>
+		<method name="stop_all_events">
+			<return type="void" />
+			<param index="0" name="stopMode" type="int" />
+			<description>
+				Stops all events currently routing through this bus. The stopMode parameter controls how the events are stopped:
+				- FMOD_STUDIO_STOP_ALLOWFADEOUT: Allow events to fade out naturally
+				- FMOD_STUDIO_STOP_IMMEDIATE: Stop events immediately
+			</description>
+		</method>
+	</methods>
+</class>

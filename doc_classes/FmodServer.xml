@@ -1,0 +1,481 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodServer" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Main FMOD integration singleton providing audio system management.
+	</brief_description>
+	<description>
+		FmodServer is the core singleton class that manages the FMOD Studio API integration. It provides access to the FMOD audio system, manages banks, events, buses, and listeners. This class handles the initialization and configuration of the FMOD audio engine within Godot.
+
+		Use [code]FmodServer.get_singleton()[/code] to access the instance from GDScript.
+
+		The server manages:
+		- Audio event creation and playback
+		- Bank loading and management  
+		- 3D audio listener configuration
+		- Global audio parameters
+		- Performance monitoring
+		- Plugin loading
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="add_listener">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="game_obj" type="Node" />
+			<description>
+				Adds a listener at the specified index attached to the given node. FMOD supports up to 8 listeners for 3D audio positioning.
+			</description>
+		</method>
+		<method name="banks_still_loading">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if there are still banks being loaded asynchronously.
+			</description>
+		</method>
+		<method name="check_bus_guid">
+			<return type="bool" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Checks if a bus with the specified GUID exists in the loaded banks.
+			</description>
+		</method>
+		<method name="check_bus_path">
+			<return type="bool" />
+			<param index="0" name="busPath" type="String" />
+			<description>
+				Checks if a bus with the specified path exists in the loaded banks.
+			</description>
+		</method>
+		<method name="check_event_guid">
+			<return type="bool" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Checks if an event with the specified GUID exists in the loaded banks.
+			</description>
+		</method>
+		<method name="check_event_path">
+			<return type="bool" />
+			<param index="0" name="eventPath" type="String" />
+			<description>
+				Checks if an event with the specified path exists in the loaded banks.
+			</description>
+		</method>
+		<method name="check_vca_guid">
+			<return type="bool" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Checks if a VCA (Volume Control Automation) with the specified GUID exists in the loaded banks.
+			</description>
+		</method>
+		<method name="check_vca_path">
+			<return type="bool" />
+			<param index="0" name="vcaPath" type="String" />
+			<description>
+				Checks if a VCA with the specified path exists in the loaded banks.
+			</description>
+		</method>
+		<method name="create_event_instance">
+			<return type="FmodEvent" />
+			<param index="0" name="eventPath" type="String" />
+			<description>
+				Creates a new instance of the specified FMOD event. The event path should be in the format "event:/path/to/event".
+			</description>
+		</method>
+		<method name="create_event_instance_from_description">
+			<return type="FmodEvent" />
+			<param index="0" name="event_description" type="FmodEventDescription" />
+			<description>
+				Creates a new event instance from an existing [FmodEventDescription].
+			</description>
+		</method>
+		<method name="create_event_instance_with_guid">
+			<return type="FmodEvent" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Creates a new instance of the FMOD event identified by its GUID.
+			</description>
+		</method>
+		<method name="create_sound_instance">
+			<return type="FmodSound" />
+			<param index="0" name="path" type="String" />
+			<description>
+				Creates an instance of a loaded sound file for playback.
+			</description>
+		</method>
+		<method name="get_all_banks">
+			<return type="Array" />
+			<description>
+				Returns an array of all loaded [FmodBank] objects.
+			</description>
+		</method>
+		<method name="get_all_buses">
+			<return type="Array" />
+			<description>
+				Returns an array of all available [FmodBus] objects from loaded banks.
+			</description>
+		</method>
+		<method name="get_all_event_descriptions">
+			<return type="Array" />
+			<description>
+				Returns an array of all available [FmodEventDescription] objects from loaded banks.
+			</description>
+		</method>
+		<method name="get_all_vca">
+			<return type="Array" />
+			<description>
+				Returns an array of all available [FmodVCA] objects from loaded banks.
+			</description>
+		</method>
+		<method name="get_available_drivers">
+			<return type="Array" />
+			<description>
+				Returns an array of available audio drivers on the system.
+			</description>
+		</method>
+		<method name="get_bus">
+			<return type="FmodBus" />
+			<param index="0" name="busPath" type="String" />
+			<description>
+				Gets the bus at the specified path. Bus paths follow the format "bus:/path/to/bus".
+			</description>
+		</method>
+		<method name="get_bus_from_guid">
+			<return type="FmodBus" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Gets the bus with the specified GUID.
+			</description>
+		</method>
+		<method name="get_driver">
+			<return type="int" />
+			<description>
+				Returns the index of the currently selected audio driver.
+			</description>
+		</method>
+		<method name="get_event">
+			<return type="FmodEventDescription" />
+			<param index="0" name="eventPath" type="String" />
+			<description>
+				Gets the event description at the specified path. Event paths follow the format "event:/path/to/event".
+			</description>
+		</method>
+		<method name="get_event_from_guid">
+			<return type="FmodEventDescription" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Gets the event description with the specified GUID.
+			</description>
+		</method>
+		<method name="get_event_guid">
+			<return type="String" />
+			<param index="0" name="event_path" type="String" />
+			<description>
+				Returns the GUID for the event at the specified path.
+			</description>
+		</method>
+		<method name="get_event_path">
+			<return type="String" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Returns the path for the event with the specified GUID.
+			</description>
+		</method>
+		<method name="get_global_parameter_by_id">
+			<return type="float" />
+			<param index="0" name="parameter_id" type="int" />
+			<description>
+				Gets the value of a global parameter by its ID.
+			</description>
+		</method>
+		<method name="get_global_parameter_by_name">
+			<return type="float" />
+			<param index="0" name="parameter_name" type="String" />
+			<description>
+				Gets the value of a global parameter by its name.
+			</description>
+		</method>
+		<method name="get_global_parameter_desc_by_id">
+			<return type="Dictionary" />
+			<param index="0" name="parameter_id" type="int" />
+			<description>
+				Gets the description dictionary for a global parameter by its ID.
+			</description>
+		</method>
+		<method name="get_global_parameter_desc_by_name">
+			<return type="Dictionary" />
+			<param index="0" name="parameter_name" type="String" />
+			<description>
+				Gets the description dictionary for a global parameter by its name.
+			</description>
+		</method>
+		<method name="get_global_parameter_desc_count">
+			<return type="int" />
+			<description>
+				Returns the number of global parameters available.
+			</description>
+		</method>
+		<method name="get_global_parameter_desc_list">
+			<return type="Array" />
+			<description>
+				Returns an array of all global parameter descriptions.
+			</description>
+		</method>
+		<method name="get_listener_lock">
+			<return type="bool" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Returns whether the listener at the specified index is locked (position won't be updated automatically).
+			</description>
+		</method>
+		<method name="get_listener_transform2d">
+			<return type="Transform2D" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets the 2D transform of the listener at the specified index.
+			</description>
+		</method>
+		<method name="get_listener_transform3d">
+			<return type="Transform3D" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets the 3D transform of the listener at the specified index.
+			</description>
+		</method>
+		<method name="get_performance_data">
+			<return type="FmodPerformanceData" />
+			<description>
+				Returns performance data for the FMOD system including CPU and memory usage.
+			</description>
+		</method>
+		<method name="get_singleton" qualifiers="static">
+			<return type="FmodServer" />
+			<description>
+				Returns the singleton instance of FmodServer.
+			</description>
+		</method>
+		<method name="get_system_listener_number">
+			<return type="int" />
+			<description>
+				Returns the number of listeners currently configured in the system.
+			</description>
+		</method>
+		<method name="get_system_listener_weight">
+			<return type="float" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets the weight of the listener at the specified index. Higher weights give more influence to that listener's position.
+			</description>
+		</method>
+		<method name="get_vca">
+			<return type="FmodVCA" />
+			<param index="0" name="vcaPath" type="String" />
+			<description>
+				Gets the VCA at the specified path. VCA paths follow the format "vca:/path/to/vca".
+			</description>
+		</method>
+		<method name="get_vca_from_guid">
+			<return type="FmodVCA" />
+			<param index="0" name="guid" type="String" />
+			<description>
+				Gets the VCA with the specified GUID.
+			</description>
+		</method>
+		<method name="init">
+			<return type="void" />
+			<param index="0" name="p_settings" type="FmodGeneralSettings" />
+			<description>
+				Initializes the FMOD system with the specified settings. This must be called before using any FMOD functionality.
+			</description>
+		</method>
+		<method name="load_bank">
+			<return type="FmodBank" />
+			<param index="0" name="pathToBank" type="String" />
+			<param index="1" name="flag" type="int" />
+			<description>
+				Loads an FMOD bank file from the specified path. The flag parameter controls loading behavior (synchronous, asynchronous, etc.).
+			</description>
+		</method>
+		<method name="load_file_as_music">
+			<return type="FmodFile" />
+			<param index="0" name="path" type="String" />
+			<description>
+				Loads an audio file for music playback with streaming optimizations.
+			</description>
+		</method>
+		<method name="load_file_as_sound">
+			<return type="FmodFile" />
+			<param index="0" name="path" type="String" />
+			<description>
+				Loads an audio file as a sound effect with full loading into memory.
+			</description>
+		</method>
+		<method name="mute_all_events">
+			<return type="void" />
+			<description>
+				Mutes all currently playing events.
+			</description>
+		</method>
+		<method name="pause_all_events">
+			<return type="void" />
+			<description>
+				Pauses all currently playing events.
+			</description>
+		</method>
+		<method name="play_one_shot">
+			<return type="void" />
+			<param index="0" name="event_name" type="String" />
+			<description>
+				Plays a one-shot event with no position attachment. The event must be marked as one-shot in FMOD Studio.
+			</description>
+		</method>
+		<method name="play_one_shot_attached">
+			<return type="void" />
+			<param index="0" name="event_name" type="String" />
+			<param index="1" name="game_obj" type="Node" />
+			<description>
+				Plays a one-shot event attached to a specific node for 3D positioning.
+			</description>
+		</method>
+		<method name="play_one_shot_attached_with_params">
+			<return type="void" />
+			<param index="0" name="event_name" type="String" />
+			<param index="1" name="game_obj" type="Node" />
+			<param index="2" name="parameters" type="Dictionary" />
+			<description>
+				Plays a one-shot event attached to a node with initial parameter values.
+			</description>
+		</method>
+		<method name="play_one_shot_with_params">
+			<return type="void" />
+			<param index="0" name="event_name" type="String" />
+			<param index="1" name="parameters" type="Dictionary" />
+			<description>
+				Plays a one-shot event with initial parameter values.
+			</description>
+		</method>
+		<method name="remove_listener">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="game_obj" type="Node" />
+			<description>
+				Removes the listener at the specified index that was attached to the given node.
+			</description>
+		</method>
+		<method name="set_driver">
+			<return type="void" />
+			<param index="0" name="id" type="int" />
+			<description>
+				Sets the audio driver to use by its index.
+			</description>
+		</method>
+		<method name="set_global_parameter_by_id">
+			<return type="void" />
+			<param index="0" name="parameter_id" type="int" />
+			<param index="1" name="value" type="float" />
+			<description>
+				Sets the value of a global parameter by its ID.
+			</description>
+		</method>
+		<method name="set_global_parameter_by_id_with_label">
+			<return type="void" />
+			<param index="0" name="parameter_id" type="int" />
+			<param index="1" name="label" type="String" />
+			<description>
+				Sets a global parameter by its ID using a labeled value (for enum parameters).
+			</description>
+		</method>
+		<method name="set_global_parameter_by_name">
+			<return type="void" />
+			<param index="0" name="parameter_name" type="String" />
+			<param index="1" name="value" type="float" />
+			<description>
+				Sets the value of a global parameter by its name.
+			</description>
+		</method>
+		<method name="set_global_parameter_by_name_with_label">
+			<return type="void" />
+			<param index="0" name="parameter_name" type="String" />
+			<param index="1" name="label" type="String" />
+			<description>
+				Sets a global parameter by its name using a labeled value (for enum parameters).
+			</description>
+		</method>
+		<method name="set_listener_lock">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="isLocked" type="bool" />
+			<description>
+				Sets whether the listener at the specified index is locked (position won't be updated automatically).
+			</description>
+		</method>
+		<method name="set_listener_transform2d">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="transform" type="Transform2D" />
+			<description>
+				Sets the 2D transform of the listener at the specified index.
+			</description>
+		</method>
+		<method name="set_listener_transform3d">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="transform" type="Transform3D" />
+			<description>
+				Sets the 3D transform of the listener at the specified index.
+			</description>
+		</method>
+		<method name="set_system_listener_number">
+			<return type="void" />
+			<param index="0" name="listenerNumber" type="int" />
+			<description>
+				Sets the number of listeners to use in the system (1-8).
+			</description>
+		</method>
+		<method name="set_system_listener_weight">
+			<return type="void" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="weight" type="float" />
+			<description>
+				Sets the weight of the listener at the specified index.
+			</description>
+		</method>
+		<method name="shutdown">
+			<return type="void" />
+			<description>
+				Shuts down the FMOD system and releases all resources.
+			</description>
+		</method>
+		<method name="unload_bank">
+			<return type="void" />
+			<param index="0" name="pathToBank" type="String" />
+			<description>
+				Unloads the bank at the specified path and releases its resources.
+			</description>
+		</method>
+		<method name="unmute_all_events">
+			<return type="void" />
+			<description>
+				Unmutes all currently muted events.
+			</description>
+		</method>
+		<method name="unpause_all_events">
+			<return type="void" />
+			<description>
+				Unpauses all currently paused events.
+			</description>
+		</method>
+		<method name="update">
+			<return type="void" />
+			<description>
+				Updates the FMOD system. This should be called every frame, typically in _process().
+			</description>
+		</method>
+		<method name="wait_for_all_loads">
+			<return type="void" />
+			<description>
+				Blocks until all pending asynchronous operations have completed.
+			</description>
+		</method>
+	</methods>
+</class>

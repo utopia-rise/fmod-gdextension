@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodEventEmitter3D" inherits="Node3D" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A 3D node for playing FMOD Studio events with automatic position tracking and 3D spatialization.
+	</brief_description>
+	<description>
+		FmodEventEmitter3D is a specialized node for playing FMOD Studio events in 3D scenes. It automatically updates the event's 3D position, rotation, and velocity based on the node's transform, providing realistic 3D audio spatialization.
+
+		Key features:
+		- Automatic 3D position and rotation tracking for spatial audio
+		- Velocity calculation for Doppler effects
+		- Support for autoplay and looping events
+		- Parameter control and callbacks
+		- Integration with Godot's pause system
+		- Preloading options for performance optimization
+
+		The node can be configured to play events automatically when entering the scene tree, or controlled manually through script. It works best with events marked as 3D in FMOD Studio, but can also play 2D events positioned in 3D space.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_event">
+			<return type="FmodEvent" />
+			<description>
+				Returns the currently active [FmodEvent] instance, or null if no event is loaded.
+			</description>
+		</method>
+		<method name="get_parameter">
+			<return type="Variant" />
+			<param index="0" name="p_name" type="String" />
+			<description>
+				Gets the current value of the specified event parameter by name.
+			</description>
+		</method>
+		<method name="get_parameter_by_id">
+			<return type="Variant" />
+			<param index="0" name="p_id" type="int" />
+			<description>
+				Gets the current value of the specified event parameter by its numerical ID.
+			</description>
+		</method>
+		<method name="is_paused">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event is currently paused.
+			</description>
+		</method>
+		<method name="play">
+			<return type="void" />
+			<param index="0" name="restart_if_playing" type="bool" default="true" />
+			<description>
+				Starts playing the event. If restart_if_playing is true and the event is already playing, it will restart from the beginning.
+			</description>
+		</method>
+		<method name="play_one_shot">
+			<return type="void" />
+			<description>
+				Plays the event as a one-shot. Creates a new event instance that will automatically clean up when finished. The event must be marked as one-shot in FMOD Studio.
+			</description>
+		</method>
+		<method name="set_parameter">
+			<return type="void" />
+			<param index="0" name="p_name" type="String" />
+			<param index="1" name="p_property" type="Variant" />
+			<description>
+				Sets the value of the specified event parameter by name. The parameter will be applied immediately if the event is playing.
+			</description>
+		</method>
+		<method name="set_parameter_by_id">
+			<return type="void" />
+			<param index="0" name="p_id" type="int" />
+			<param index="1" name="p_property" type="Variant" />
+			<description>
+				Sets the value of the specified event parameter by its numerical ID. The parameter will be applied immediately if the event is playing.
+			</description>
+		</method>
+		<method name="set_paused">
+			<return type="void" />
+			<param index="0" name="p_is_paused" type="bool" />
+			<description>
+				Pauses or unpauses the event.
+			</description>
+		</method>
+		<method name="set_programmer_callback">
+			<return type="void" />
+			<param index="0" name="p_programmers_callback_sound_key" type="String" />
+			<description>
+				Sets the sound key for programmer instrument callbacks. Used with programmer instruments in FMOD Studio.
+			</description>
+		</method>
+		<method name="stop">
+			<return type="void" />
+			<description>
+				Stops the currently playing event. Respects the allow_fadeout setting for smooth stopping.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="allow_fadeout" type="bool" setter="set_allow_fadeout" getter="is_allow_fadeout" default="true">
+			If [code]true[/code], allows the event to fade out naturally when stopped. If [code]false[/code], stops the event immediately.
+		</member>
+		<member name="attached" type="bool" setter="set_attached" getter="is_attached" default="true">
+			If [code]true[/code], the event's 3D position, rotation, and velocity will be automatically updated based on this node's global_transform.
+		</member>
+		<member name="auto_release" type="bool" setter="set_auto_release" getter="is_auto_release" default="false">
+			If [code]true[/code], the event will be automatically released and cleaned up when it finishes playing.
+		</member>
+		<member name="autoplay" type="bool" setter="set_autoplay" getter="is_autoplay" default="false">
+			If [code]true[/code], the event will automatically start playing when the node enters the scene tree.
+		</member>
+		<member name="event_guid" type="String" setter="set_event_guid" getter="get_event_guid" default="&quot;&quot;">
+			The GUID of the FMOD Studio event to play. This is set automatically when event_name is changed and provides a stable reference to events.
+		</member>
+		<member name="event_name" type="String" setter="set_event_name" getter="get_event_name" default="&quot;&quot;">
+			The path of the FMOD Studio event to play. Should be in the format "event:/path/to/event". The event must exist in a loaded bank and ideally should be marked as 3D in FMOD Studio.
+		</member>
+		<member name="preload_event" type="bool" setter="set_preload_event" getter="is_preload_event" default="true">
+			If [code]true[/code], the event instance will be created and loaded when the node enters the scene tree, even if autoplay is disabled. This can improve performance when the event needs to be played quickly.
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume" default="1.0">
+			The volume multiplier for the event. 1.0 is the normal volume set in FMOD Studio.
+		</member>
+	</members>
+	<signals>
+		<signal name="restarted">
+			<description>
+				Emitted when the event is restarted.
+			</description>
+		</signal>
+		<signal name="start_failed">
+			<description>
+				Emitted when the event fails to start playing.
+			</description>
+		</signal>
+		<signal name="started">
+			<description>
+				Emitted when the event starts playing.
+			</description>
+		</signal>
+		<signal name="stopped">
+			<description>
+				Emitted when the event stops playing.
+			</description>
+		</signal>
+		<signal name="timeline_beat">
+			<param index="0" name="params" type="Dictionary" />
+			<description>
+				Emitted when the event reaches a timeline beat marker. The params dictionary contains beat information.
+			</description>
+		</signal>
+		<signal name="timeline_marker">
+			<param index="0" name="params" type="Dictionary" />
+			<description>
+				Emitted when the event reaches a timeline marker. The params dictionary contains marker information.
+			</description>
+		</signal>
+	</signals>
+</class>

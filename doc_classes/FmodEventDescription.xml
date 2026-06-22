@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodEventDescription" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Metadata and factory for FMOD Studio events.
+	</brief_description>
+	<description>
+		FmodEventDescription represents the metadata and properties of an FMOD Studio event. It acts as a factory for creating [FmodEvent] instances and provides information about the event's properties, parameters, and capabilities.
+
+		Event descriptions are obtained from [FmodServer] using event paths or GUIDs. They contain information such as:
+		- Whether the event is 3D, one-shot, or streaming
+		- Parameter definitions and labels
+		- User properties set in FMOD Studio
+		- Min/max distance for 3D events
+
+		Use [method FmodServer.get_event] to obtain event descriptions from loaded banks.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="get_instance_count">
+			<return type="int" />
+			<description>
+				Returns the number of instances of this event that are currently active.
+			</description>
+		</method>
+		<method name="get_instance_list">
+			<return type="Array" />
+			<description>
+				Returns an array of all active [FmodEvent] instances created from this description.
+			</description>
+		</method>
+		<method name="get_length">
+			<return type="int" />
+			<description>
+				Returns the length of the event in milliseconds. Returns -1 if the event has no defined length.
+			</description>
+		</method>
+		<method name="get_min_max_distance">
+			<return type="Array" />
+			<description>
+				Returns an array containing the minimum and maximum distance values for 3D attenuation. Only valid for 3D events.
+			</description>
+		</method>
+		<method name="get_parameter_by_id">
+			<return type="FmodParameterDescription" />
+			<param index="0" name="id" type="int" />
+			<description>
+				Gets the parameter description by its numerical ID.
+			</description>
+		</method>
+		<method name="get_parameter_by_index">
+			<return type="FmodParameterDescription" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets the parameter description at the specified index.
+			</description>
+		</method>
+		<method name="get_parameter_by_name">
+			<return type="FmodParameterDescription" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Gets the parameter description by its name.
+			</description>
+		</method>
+		<method name="get_parameter_count">
+			<return type="int" />
+			<description>
+				Returns the number of parameters this event has.
+			</description>
+		</method>
+		<method name="get_parameter_label_by_id">
+			<return type="String" />
+			<param index="0" name="id" type="int" />
+			<param index="1" name="label_index" type="int" />
+			<description>
+				Gets the label at the specified index for the parameter with the given ID. Used for enum parameters.
+			</description>
+		</method>
+		<method name="get_parameter_label_by_index">
+			<return type="String" />
+			<param index="0" name="index" type="int" />
+			<param index="1" name="label_index" type="int" />
+			<description>
+				Gets the label at the specified label_index for the parameter at the given parameter index.
+			</description>
+		</method>
+		<method name="get_parameter_label_by_name">
+			<return type="String" />
+			<param index="0" name="parameter_name" type="String" />
+			<param index="1" name="label_index" type="int" />
+			<description>
+				Gets the label at the specified index for the parameter with the given name. Used for enum parameters.
+			</description>
+		</method>
+		<method name="get_parameter_labels_by_id">
+			<return type="PackedStringArray" />
+			<param index="0" name="id" type="int" />
+			<description>
+				Gets all labels for the parameter with the given ID. Returns an empty array for non-enum parameters.
+			</description>
+		</method>
+		<method name="get_parameter_labels_by_index">
+			<return type="PackedStringArray" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets all labels for the parameter at the specified index. Returns an empty array for non-enum parameters.
+			</description>
+		</method>
+		<method name="get_parameter_labels_by_name">
+			<return type="PackedStringArray" />
+			<param index="0" name="parameter_name" type="String" />
+			<description>
+				Gets all labels for the parameter with the given name. Returns an empty array for non-enum parameters.
+			</description>
+		</method>
+		<method name="get_parameters">
+			<return type="Array" />
+			<description>
+				Returns an array of all [FmodParameterDescription] objects for this event.
+			</description>
+		</method>
+		<method name="get_sample_loading_state">
+			<return type="int" />
+			<description>
+				Returns the loading state of sample data for this event. See FMOD_STUDIO_LOADING_STATE enum for possible values.
+			</description>
+		</method>
+		<method name="get_sound_size">
+			<return type="float" />
+			<description>
+				Returns the sound size used for 3D occlusion calculations. Only valid for 3D events.
+			</description>
+		</method>
+		<method name="get_user_property">
+			<return type="Dictionary" />
+			<param index="0" name="name" type="String" />
+			<description>
+				Gets a user property by name that was set in FMOD Studio. Returns a dictionary with the property data.
+			</description>
+		</method>
+		<method name="get_user_property_count">
+			<return type="int" />
+			<description>
+				Returns the number of user properties this event has.
+			</description>
+		</method>
+		<method name="has_sustain_point">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event has sustain points that require triggering key off.
+			</description>
+		</method>
+		<method name="is_3d">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event is designed for 3D spatialization.
+			</description>
+		</method>
+		<method name="is_one_shot">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event is a one-shot event that stops automatically.
+			</description>
+		</method>
+		<method name="is_snapshot">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event is a snapshot (global mix state).
+			</description>
+		</method>
+		<method name="is_stream">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] if the event streams its audio data rather than loading it all into memory.
+			</description>
+		</method>
+		<method name="load_sample_data">
+			<return type="void" />
+			<description>
+				Loads sample data for this event into memory. This can improve performance but uses more memory.
+			</description>
+		</method>
+		<method name="release_all_instances">
+			<return type="void" />
+			<description>
+				Releases all active instances of this event, allowing them to be cleaned up when they stop.
+			</description>
+		</method>
+		<method name="unload_sample_data">
+			<return type="void" />
+			<description>
+				Unloads sample data for this event from memory to free up resources.
+			</description>
+		</method>
+		<method name="user_property_by_index">
+			<return type="Dictionary" />
+			<param index="0" name="index" type="int" />
+			<description>
+				Gets a user property by its index. Returns a dictionary with the property data.
+			</description>
+		</method>
+	</methods>
+</class>

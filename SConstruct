@@ -43,6 +43,11 @@ sources = [
     Glob('src/plugins/*.cpp')
     ]
 
+# Add documentation data for editor and debug builds
+if env["target"] in ["editor", "template_debug"]:
+    doc_data = env.GodotCPPDocData("src/gen/doc_data.gen.cpp", source=Glob("doc_classes/*.xml"))
+    sources.append(doc_data)
+
 lfix = ""
 debug = False
 if env["target"] == "template_debug" or env["target"] == "editor":
