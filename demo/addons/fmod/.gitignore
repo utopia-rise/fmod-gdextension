@@ -5,3 +5,8 @@
 *.so.*
 *.xcframework
 !libs/
+!libs/**/*.a
+!libs/**/*.dylib
+!libs/**/*.xcframework
+!libs/**/*.dll
+!libs/**/*.so
