@@ -448,6 +448,10 @@ namespace godot {
         _event_name = name;
         _event_guid = event_guid;
 
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) { return; }
+#endif
+
         _stop_and_restart_if_autoplay();
     }
 
@@ -466,6 +470,10 @@ namespace godot {
 
         _event_guid = event_guid;
         _event_name = FmodServer::get_singleton()->get_event_path_internal(_event_guid);
+
+#ifdef TOOLS_ENABLED
+        if (Engine::get_singleton()->is_editor_hint()) { return; }
+#endif
 
         _stop_and_restart_if_autoplay();
     }
