@@ -68,9 +68,16 @@ public:                                                                  \
             ref.instantiate();                                           \
             ref->_wrapped = wrapped;                                     \
             char path[MAX_PATH_SIZE];                                    \
-            ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr)); \
+            /*  FMOD_ERR_EVENT_NOTFOUND is returned for any getPath: https://www.fmod.com/docs/2.03/api/core-api-common.html#fmod_err_event_notfound */ \
+            FMOD_RESULT res = wrapped->getPath(path, MAX_PATH_SIZE, nullptr);\
+            if (res == FMOD_ERR_EVENT_NOTFOUND) {                        \
+                ref->_path = String();                                   \
+            } else {                                                     \
+                /* Handle other error cases */                           \
+                ERROR_CHECK(res);                                        \
+                ref->_path = String(path);                               \
+            }                                                            \
             ERROR_CHECK(wrapped->getID(&ref->_guid));                    \
-            ref->_path = String(path);                                   \
         }                                                                \
         return ref;                                                      \
     }                                                                    \
