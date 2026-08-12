@@ -1007,11 +1007,12 @@ void FmodServer::set_global_parameter_by_name_with_label(const String& parameter
 
 float FmodServer::get_global_parameter_by_name(const String& parameter_name) {
     float value = 0.f;
+    float final_value = 0.f;
     ERROR_CHECK_WITH_REASON(
-      system->getParameterByName(parameter_name.utf8().get_data(), &value),
-      vformat("Cannot get global parameter %s", parameter_name, value)
+      system->getParameterByName(parameter_name.utf8().get_data(), &value, &final_value),
+      vformat("Cannot get global parameter %s", parameter_name)
     );
-    return value;
+    return final_value;
 }
 
 void FmodServer::set_global_parameter_by_id(uint64_t parameter_id, const float value) {
@@ -1030,11 +1031,14 @@ void FmodServer::set_global_parameter_by_id_with_label(uint64_t parameter_id, co
 
 float FmodServer::get_global_parameter_by_id(uint64_t parameter_id) {
     float value = -1.f;
+    // Return the final value so automation and command instruments are reflected,
+    // matching the FMOD profiler. The first out param is only the requested value.
+    float final_value = 0.f;
     ERROR_CHECK_WITH_REASON(
-      system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &value),
-      vformat("Cannot set global parameter %d", parameter_id, value)
+      system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &value, &final_value),
+      vformat("Cannot get global parameter %d", parameter_id)
     );
-    return value;
+    return final_value;
 }
 
 Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameter_name) {

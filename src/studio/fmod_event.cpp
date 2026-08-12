@@ -60,10 +60,15 @@ void FmodEvent::_bind_methods() {
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
     float p = -1;
-    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p),
+    // Read the final value: it accounts for automation, modulation, seek speed and
+    // command instruments, so it matches what the FMOD profiler shows. The first
+    // out param only reports the value last requested through set_parameter_*.
+    float final_value = -1;
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p, &final_value),
                             vformat("Cannot get parameter %s", parameter_name));
-    return p;
+    return final_value;
 }
+
 
 void FmodEvent::set_parameter_by_name(const String& parameter_name, float value) const {
     ERROR_CHECK_WITH_REASON(_wrapped->setParameterByName(parameter_name.utf8().get_data(), value),
@@ -81,9 +86,10 @@ float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
 
 float FmodEvent::get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const {
     float value = -1.0f;
-    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, &value),
+    float final_value = -1;
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, &value, &final_value),
                             vformat("Cannot get parameter with id: %d", fmod_parameter_id_to_ulong(parameter_id)));
-    return value;
+    return final_value;
 }
 
 void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {
