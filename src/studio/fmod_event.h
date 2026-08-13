@@ -56,6 +56,7 @@ namespace godot {
         void set_programmer_callback(const String& p_programmers_callback_sound_key);
         const String& get_programmers_callback_sound_key() const;
         void set_distance_scale(float scale);
+        PackedByteArray get_event_pointer();
         Ref<FmodChannelGroup> get_channel_group() const;
 
     protected:
