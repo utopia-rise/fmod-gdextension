@@ -1,0 +1,134 @@
+name: 🐧🍎 Build Linux/macOS Templates
+on:
+  workflow_dispatch:
+    inputs:
+      fmod_version:
+        description: FMOD version to build against (e.g. 20306)
+        required: false
+        default: "20306"
+
+# Global Settings
+env:
+  TARGET_PATH: demo/addons/fmod/libs/
+  TARGET_NAME: libGodotFmod
+  FMOD_VERSION: ${{ github.event.inputs.fmod_version || '20306' }}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux Editor Compilation
+            os: "ubuntu-22.04"
+            platform: linux
+            target: editor
+            fmod-executable-suffix: linux.tar.gz
+
+          - name: Linux Debug Compilation
+            os: "ubuntu-22.04"
+            platform: linux
+            target: template_debug
+            fmod-executable-suffix: linux.tar.gz
+
+          - name: Linux Release Compilation
+            os: "ubuntu-22.04"
+            platform: linux
+            target: template_release
+            fmod-executable-suffix: linux.tar.gz
+
+          - name: macOS Editor Compilation
+            os: "macos-14"
+            platform: macos
+            target: editor
+            fmod-executable-suffix: osx.dmg
+
+          - name: macOS Debug Compilation
+            os: "macos-14"
+            platform: macos
+            target: template_debug
+            fmod-executable-suffix: osx.dmg
+
+          - name: macOS Release Compilation
+            os: "macos-14"
+            platform: macos
+            target: template_release
+            fmod-executable-suffix: osx.dmg
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Compile native plugin
+        uses: ./.github/actions/create-native-build
+        with:
+          platform: ${{ matrix.platform }}
+          target: ${{ matrix.target }}
+          fmod-executable-suffix: ${{ matrix.fmod-executable-suffix }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+          shell: bash
+
+  package:
+    name: Package Linux/macOS addon libs
+    needs: [build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: recursive
+
+      - name: Download linux editor libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-editor
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download linux template_debug libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-template_debug
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download linux template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-template_release
+          path: demo/addons/fmod/libs/linux/
+
+      - name: Download macos editor libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-editor
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download macos template_debug libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-template_debug
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Download macos template_release libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: macos-template_release
+          path: demo/addons/fmod/libs/macos/
+
+      - name: Zip fmod addon (linux + macos libs only)
+        run: |
+          cd demo/addons/fmod
+          zip -r ../../../fmod-addon-linux-macos.zip libs/linux libs/macos -x '*/.gitignore'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fmod-addon-linux-macos
+          path: fmod-addon-linux-macos.zip
+          if-no-files-found: error
