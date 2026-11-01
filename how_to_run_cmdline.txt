@@ -1,7 +1,0 @@
-CMD LINE BUILD
-
-scons platform=windows arch=x86_64 target=editor fmod_lib_dir=libs/
-
-scons platform=windows arch=x86_64 target=template_debug fmod_lib_dir=libs/
-
-scons platform=windows arch=x86_64 target=template_release fmod_lib_dir=libs/
