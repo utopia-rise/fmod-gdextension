@@ -1,0 +1,43 @@
+name: 🐒 Editor Monkey
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  editor-monkey:
+    runs-on: ubuntu-22.04
+    name: linux editor monkey
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: linux
+          destination: ${{ runner.temp }}/godot
+
+      - name: Download editor library
+        uses: actions/download-artifact@v7
+        with:
+          name: editor_linux
+          path: demo/addons/fmod/libs/linux
+
+      - name: Run editor monkey
+        timeout-minutes: 20
+        run: |
+          godot="$(find "$RUNNER_TEMP/godot" -maxdepth 1 -name 'godot.*' | head -n 1)"
+          "$godot" --headless --path demo --import || "$godot" --headless --path demo --editor --quit
+          bash demo/editor_monkey/run.sh "$godot"
+
+      - name: Upload monkey log
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: editor_monkey_log
+          path: demo/editor_monkey/monkey.log

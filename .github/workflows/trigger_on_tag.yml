@@ -76,9 +76,16 @@ jobs:
     with:
       godot-version: *godot_version
 
+  test-editor-monkey:
+    name: 🐒 Editor monkey
+    needs: build-linux
+    uses: ./.github/workflows/test_editor_monkey.yml
+    with:
+      godot-version: *godot_version
+
   assemble-addon:
     name: 📦 Assemble addon
-    needs: [assemble-android, test-desktop, test-ios]
+    needs: [assemble-android, test-desktop, test-ios, test-editor-monkey]
     uses: ./.github/workflows/assemble_addon.yml
 
   release:
@@ -100,7 +107,7 @@ jobs:
       # The demo project with the released addon, without the tests and their tooling.
       - name: Zip demo project
         run: |
-          rm -rf demo/addons/fmod demo/addons/gdUnit4 demo/test demo/test_runner demo/run_tests.sh
+          rm -rf demo/addons/fmod demo/addons/gdUnit4 demo/test demo/test_runner demo/editor_monkey demo/run_tests.sh
           cp -R package/addons/fmod demo/addons/fmod
           sed -i 's|, "res://addons/gdUnit4/plugin.cfg"||' demo/project.godot
           cd demo
