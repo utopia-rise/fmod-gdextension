@@ -98,10 +98,7 @@ func generate_tree():
 		var events := fmod_bank.get_description_list()
 
 		if search.is_empty():
-			var bank_item := tree.create_item(root_item)
-			bank_item.set_text(0, fmod_bank.get_godot_res_path())
-			bank_item.set_icon(0, _bank_icon)
-			bank_item.set_metadata(0, bank)
+			var bank_item := _add_bank_item(fmod_bank, root_item)
 
 			if flags & ToDisplayFlags.BUSES and buses.size() != 0:
 				buses.sort_custom(sort_by_path)
@@ -134,6 +131,8 @@ func generate_tree():
 					_add_elements_as_tree(events, bank_item)
 
 		else:
+			if flags == 0 and fmod_bank.get_godot_res_path().containsn(search):
+				_add_bank_item(fmod_bank, root_item)
 			if flags & ToDisplayFlags.BUSES:
 				_add_elements_as_items(buses, root_item)
 			if flags & ToDisplayFlags.VCA:
@@ -148,6 +147,13 @@ func generate_tree():
 		copy_guid_button.visible = should_display_copy_buttons
 
 	%SelectButton.visible = should_display_select_button and %GuidLabel.text != ""
+
+func _add_bank_item(bank: FmodBank, parent: TreeItem) -> TreeItem:
+	var bank_item := tree.create_item(parent)
+	bank_item.set_text(0, bank.get_godot_res_path())
+	bank_item.set_icon(0, _bank_icon)
+	bank_item.set_metadata(0, bank)
+	return bank_item
 
 func _add_elements_as_items(elements: Array, parent: TreeItem):
 		for element in elements:
