@@ -3,26 +3,21 @@
 
 static var EVENT_PARAMETER_PREFIX_FOR_PROPERTIES = "fmod_parameters"
 
-var former_event_description: FmodEventDescription
+var former_event_guid := ""
 
 func _update_property():
 	super()
 	if get_edited_object().event_name == "":
 		return
 	_update_parameters()
-	var event_description: FmodEventDescription = FmodServer.get_event_from_guid(get_edited_object().event_guid)
-	
-	if event_description == null:
-		event_description = FmodServer.get_event(get_edited_object().event_name)
-	
-	former_event_description = event_description
+	former_event_guid = get_edited_object().event_guid
 
 func _set_path_and_guid(path: String, guid: String):
 	super(path, guid)
 	if get_edited_object().event_name == "":
 		return
 	_update_parameters()
-	former_event_description = FmodServer.get_event_from_guid(get_edited_object().event_guid)
+	former_event_guid = get_edited_object().event_guid
 
 func _update_parameters():
 	var event_description: FmodEventDescription = FmodServer.get_event_from_guid(get_edited_object().event_guid)
@@ -30,7 +25,8 @@ func _update_parameters():
 	if event_description == null:
 		return
 	
-	if former_event_description != null and event_description != former_event_description:
+	# A bank refresh gives the same event a new description: the event changed only if its GUID did.
+	if former_event_guid != "" and get_edited_object().event_guid != former_event_guid:
 		get_edited_object().tool_remove_all_parameters()
 	
 	var map_to_property_name = func map_to_property_name(dict: Dictionary):
