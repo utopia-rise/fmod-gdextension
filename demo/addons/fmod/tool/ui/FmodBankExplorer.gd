@@ -216,8 +216,8 @@ func _on_item_selected():
 	if should_display_copy_buttons:
 		copy_path_button.visible = true
 		copy_guid_button.visible = true
-	if should_display_select_button:
-		%SelectButton.visible = true
+	# Banks are picked with no flags, buses, VCAs and events with theirs.
+	%SelectButton.visible = should_display_select_button and (metadata is FmodBank) == (flags == 0)
 
 	if metadata is FmodEventDescription:
 		%EventPlayControls.set_fmod_event(metadata)
