@@ -55,8 +55,7 @@ func _on_remove_button():
 	var selected_items_indexes: PackedInt32Array = bank_list.get_selected_items()
 	if selected_items_indexes.is_empty():
 		return
-	var item = bank_list.get_item_text(selected_items_indexes[0])
-	var in_list_index = bank_paths.find(item)
+	var in_list_index = selected_items_indexes[0]
 	bank_paths.remove_at(in_list_index)
 	last_selected_index = in_list_index if in_list_index < bank_paths.size() else in_list_index - 1
 	emit_changed(path_property_name, bank_paths)
@@ -76,8 +75,8 @@ func _on_move_button(is_down: bool):
 	var selected_items_indexes: PackedInt32Array = bank_list.get_selected_items()
 	if selected_items_indexes.is_empty():
 		return
-	var item = bank_list.get_item_text(selected_items_indexes[0])
-	var in_list_index = bank_paths.find(item)
+	var in_list_index = selected_items_indexes[0]
+	var item = bank_paths[in_list_index]
 	var boundary = current_bank_paths.size() - 1 if is_down else 0
 	if in_list_index == boundary:
 		return
