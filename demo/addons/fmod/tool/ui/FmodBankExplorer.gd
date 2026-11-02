@@ -203,6 +203,7 @@ func _on_item_selected():
 	var metadata = tree.get_selected().get_metadata(0)
 	if metadata == null or !metadata.get_guid():
 		%PathsBG.hide()
+		%EventPlayControls.stop_and_release_instance()
 		%EventPlayControls.hide()
 		copy_path_button.visible = false
 		copy_guid_button.visible = false
@@ -225,6 +226,7 @@ func _on_item_selected():
 		%ParametersLabel.visible = _show_parameter_controls
 		%ParametersContainer.visible = _show_parameter_controls
 		return
+	%EventPlayControls.stop_and_release_instance()
 	%EventPlayControls.hide()
 	%EventParametersDisplay.hide()
 	%ParametersLabel.visible = false
