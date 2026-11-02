@@ -147,6 +147,7 @@ float FmodEventDescription::get_sound_size() {
 }
 
 Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const String& name) const {
+    if (!is_valid()) { return {}; }
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
     if (ERROR_CHECK_WITH_REASON(_wrapped->getParameterDescriptionByName(name.utf8().get_data(), &fmod_desc),
@@ -157,6 +158,7 @@ Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_name(const 
 }
 
 Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t id) const {
+    if (!is_valid()) { return {}; }
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_ID param_id { ulong_to_fmod_parameter_id(id) };
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
@@ -168,6 +170,7 @@ Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_id(uint64_t
 }
 
 int FmodEventDescription::get_parameter_count() const {
+    if (!is_valid()) { return 0; }
     int count = 0;
     ERROR_CHECK_WITH_REASON(_wrapped->getParameterDescriptionCount(&count),
                             vformat("Cannot get parameter count for event %s with guid %s", get_path(), get_guid_as_string()));
@@ -175,6 +178,7 @@ int FmodEventDescription::get_parameter_count() const {
 }
 
 Ref<FmodParameterDescription> FmodEventDescription::get_parameter_by_index(int index) const {
+    if (!is_valid()) { return {}; }
     Ref<FmodParameterDescription> param_desc;
     FMOD_STUDIO_PARAMETER_DESCRIPTION fmod_desc;
     if (ERROR_CHECK_WITH_REASON(_wrapped->getParameterDescriptionByIndex(index, &fmod_desc),
@@ -193,6 +197,7 @@ Array FmodEventDescription::get_parameters() const {
 }
 
 String FmodEventDescription::get_parameter_label_by_id(uint64_t id, int label_index) const {
+    if (!is_valid()) { return {}; }
     char label[PARAMETER_LABEL_BUFFER_SIZE];
     int retrieved;
     _wrapped->getParameterLabelByID(
@@ -206,6 +211,7 @@ String FmodEventDescription::get_parameter_label_by_id(uint64_t id, int label_in
 }
 
 String FmodEventDescription::get_parameter_label_by_name(const String& parameter_name, int label_index) const {
+    if (!is_valid()) { return {}; }
     char label[PARAMETER_LABEL_BUFFER_SIZE];
     int retrieved;
     _wrapped->getParameterLabelByName(
@@ -219,6 +225,7 @@ String FmodEventDescription::get_parameter_label_by_name(const String& parameter
 }
 
 String FmodEventDescription::get_parameter_label_by_index(int index, int label_index) const {
+    if (!is_valid()) { return {}; }
     char label[PARAMETER_LABEL_BUFFER_SIZE];
     int retrieved;
     _wrapped->getParameterLabelByIndex(
@@ -233,6 +240,7 @@ String FmodEventDescription::get_parameter_label_by_index(int index, int label_i
 
 PackedStringArray FmodEventDescription::get_parameter_labels_by_id(uint64_t id) const {
     PackedStringArray labels;
+    if (!is_valid()) { return labels; }
 
     Ref<FmodParameterDescription> parameter {get_parameter_by_id(id)};
     if (!parameter->is_labeled()) {
@@ -248,6 +256,7 @@ PackedStringArray FmodEventDescription::get_parameter_labels_by_id(uint64_t id) 
 
 PackedStringArray FmodEventDescription::get_parameter_labels_by_name(const String& parameter_name) const {
     PackedStringArray labels;
+    if (!is_valid()) { return labels; }
 
     Ref<FmodParameterDescription> parameter {get_parameter_by_name(parameter_name)};
     if (!parameter->is_labeled()) {
@@ -263,6 +272,7 @@ PackedStringArray FmodEventDescription::get_parameter_labels_by_name(const Strin
 
 PackedStringArray FmodEventDescription::get_parameter_labels_by_index(int index) const {
     PackedStringArray labels;
+    if (!is_valid()) { return labels; }
 
     Ref<FmodParameterDescription> parameter {get_parameter_by_index(index)};
     if (!parameter->is_labeled()) {
