@@ -240,7 +240,10 @@ func _on_copy_guid_button():
 
 
 func on_refresh_banks_button_pressed() -> void:
-	# unload banks
+	# The auditioned event's bank is about to be unloaded: FMOD destroys the released instance on its next update.
+	%EventPlayControls.stop_and_release_instance()
+	%EventPlayControls.hide()
+	await get_tree().process_frame
 	banks.clear()
 	tree.clear()
 	FmodBankDatabase.reload_all_banks()

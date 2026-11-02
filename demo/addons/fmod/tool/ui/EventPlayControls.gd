@@ -40,8 +40,9 @@ func _exit_tree() -> void:
 	
 func stop_and_release_instance() -> void:
 	if event_instance:
-		event_instance.stop(0)
+		event_instance.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
 		event_instance.release()
+		event_instance = null
 
 
 func on_play_button_pressed() -> void:
