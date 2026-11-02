@@ -8,7 +8,7 @@ var regex := RegEx.new()
 var default_line_edit_modulate: Color
 
 func initialize(open_project_explorer_callable: Callable, path_prop: String, guid_prop: String):
-	regex.compile("{\\w{8}-\\w{4}-\\w{4}-\\w{4}-\\w{12}}")
+	regex.compile("^{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}$")
 	guid_property = guid_prop
 	path_property = path_prop
 	var guid_and_path_ui: FmodGuidAndPathPropertyEditorUi = %FmodGuidAndPathPropertyEditorUi
