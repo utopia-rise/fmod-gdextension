@@ -1,6 +1,10 @@
 [configuration]
+author = "Utopia Rise - Pierre-Thomas Meisels (piiertho), Tristan Grespinet (CedNaru)"
 entry_symbol = "fmod_library_init"
-compatibility_minimum = 4.5
+compatibility_minimum = 4.6
+compatibility_maximum = "4"
+reloadable = false
+android_aar_plugin = true
 
 [libraries]
 windows.editor.x86_64 = "res://addons/fmod/libs/windows/libGodotFmod.windows.editor.x86_64.dll"
@@ -16,8 +20,8 @@ android.debug.x86_64 = "res://addons/fmod/libs/android/x86_64/libGodotFmod.andro
 android.release.x86_64 = "res://addons/fmod/libs/android/x86_64/libGodotFmod.android.template_release.x86_64.so"
 android.debug.arm64 = "res://addons/fmod/libs/android/arm64/libGodotFmod.android.template_debug.arm64.so"
 android.release.arm64 = "res://addons/fmod/libs/android/arm64/libGodotFmod.android.template_release.arm64.so"
-ios.debug  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_debug.xcframework"
-ios.release  = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_release.xcframework"
+ios.debug = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_debug.a"
+ios.release = "res://addons/fmod/libs/ios/libGodotFmod.ios.template_release.a"
 
 [icons]
 FmodEventEmitter2D = "res://addons/fmod/icons/fmod_icon.svg"
@@ -41,27 +45,27 @@ windows.release.x86_64 = {
 }
 linux.editor.x86_64  = {
 "libs/linux/libfmodL.so": "",
-"libs/linux/libfmodL.so.14": "",
-"libs/linux/libfmodL.so.14.6": "",
+"libs/linux/libfmodL.so.15": "",
+"libs/linux/libfmodL.so.15.0": "",
 "libs/linux/libfmodstudioL.so": "",
-"libs/linux/libfmodstudioL.so.14": "",
-"libs/linux/libfmodstudioL.so.14.6": ""
+"libs/linux/libfmodstudioL.so.15": "",
+"libs/linux/libfmodstudioL.so.15.0": ""
 }
 linux.debug.x86_64  = {
 "libs/linux/libfmodL.so": "",
-"libs/linux/libfmodL.so.14": "",
-"libs/linux/libfmodL.so.14.6": "",
+"libs/linux/libfmodL.so.15": "",
+"libs/linux/libfmodL.so.15.0": "",
 "libs/linux/libfmodstudioL.so": "",
-"libs/linux/libfmodstudioL.so.14": "",
-"libs/linux/libfmodstudioL.so.14.6": ""
+"libs/linux/libfmodstudioL.so.15": "",
+"libs/linux/libfmodstudioL.so.15.0": ""
 }
 linux.release.x86_64 = {
 "libs/linux/libfmod.so": "",
-"libs/linux/libfmod.so.14": "",
-"libs/linux/libfmod.so.14.6": "",
+"libs/linux/libfmod.so.15": "",
+"libs/linux/libfmod.so.15.0": "",
 "libs/linux/libfmodstudio.so": "",
-"libs/linux/libfmodstudio.so.14": "",
-"libs/linux/libfmodstudio.so.14.6": ""
+"libs/linux/libfmodstudio.so.15": "",
+"libs/linux/libfmodstudio.so.15.0": ""
 }
 macos.editor  = {
 "libs/macos/libfmodL.dylib": "",
@@ -74,22 +78,6 @@ macos.debug  = {
 macos.release = {
 "libs/macos/libfmod.dylib": "",
 "libs/macos/libfmodstudio.dylib": ""
-}
-android.debug.x86_64 = {
-"libs/android/x86_64/libfmodL.so": "",
-"libs/android/x86_64/libfmodstudioL.so": "",
-}
-android.release.x86_64 = {
-"libs/android/x86_64/libfmod.so": "",
-"libs/android/x86_64/libfmodstudio.so": "",
-}
-android.debug.arm64 = {
-"libs/android/arm64/libfmodL.so": "",
-"libs/android/arm64/libfmodstudioL.so": "",
-}
-android.release.arm64 = {
-"libs/android/arm64/libfmod.so": "",
-"libs/android/arm64/libfmodstudio.so": "",
 }
 ios.debug  = {
 "libs/ios/libfmodL_iphoneos.a": "",

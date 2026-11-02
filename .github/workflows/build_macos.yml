@@ -1,0 +1,54 @@
+name: 🍎 macOS Builds
+on:
+  workflow_call:
+    inputs:
+      fmod-version:
+        type: string
+        required: true
+
+jobs:
+  build-macos:
+    runs-on: macos-15
+    name: ${{ matrix.target }}
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [editor, template_debug, template_release]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/scons-cache
+        with:
+          mode: restore
+          name: macos-${{ matrix.target }}
+      - uses: ./.github/actions/gdextension-build
+        with:
+          platform: macos
+          target: ${{ matrix.target }}
+          scons-flags: arch=universal
+          fmod-version: ${{ inputs.fmod-version }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+      - uses: ./.github/actions/scons-cache
+        if: always()
+        with:
+          mode: save
+          name: macos-${{ matrix.target }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}_macos
+          path: |
+            demo/addons/fmod/libs/macos
+            !demo/addons/fmod/libs/macos/CopyPast_Fmod_Libs_Here.txt
+          if-no-files-found: error

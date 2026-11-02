@@ -1,22 +1,25 @@
-
-# Godot 4+ specific ignores
+# Godot 4
 .godot/
-
-# Godot-specific ignores
-.import/
+/android/
 export.cfg
 export_credentials.cfg
-
-# Imported translations (automatically generated from CSV files)
 *.translation
+*.tmp
 
-# Mono-specific ignores
+# Godot .NET
 .mono/
 data_*/
 mono_crash.*.json
 
+# Export output of the presets
+/export/
+
+# gdUnit4 test reports
+/reports/
+
+# Android plugin AARs, built by android-plugin/
+*.aar
+
+# Editors and logs
 .vscode/
 logs/
-**/*.aar
-android/build
-android/

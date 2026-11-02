@@ -2,6 +2,8 @@
 #define GODOTFMOD_FMOD_PARAMETER_DESCRIPTION_H
 
 #include "fmod_studio_common.h"
+
+#include <classes/ref.hpp>
 #include <classes/ref_counted.hpp>
 
 namespace godot {

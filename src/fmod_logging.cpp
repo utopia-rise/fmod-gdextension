@@ -39,7 +39,7 @@ namespace godot {
                     file_path = ProjectSettings::get_singleton()->globalize_path(file_path);
                     file_path_utf8 = file_path.utf8();
 
-                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_FILE, nullptr, file_path_utf8);
+                    FMOD::Debug_Initialize(debug_flags, FMOD_DEBUG_MODE_FILE, nullptr, file_path_utf8.get_data());
                     break;
                 }
 

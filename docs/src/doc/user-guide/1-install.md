@@ -4,8 +4,8 @@
 
 We provide releases in github repository. 
 
-You can download `addon.zip` from this [page](https://github.com/utopia-rise/fmod-gdextension/releases), then unzip it 
-and copy its content to the `addons` directory of your Godot project.
+You can download `addons.zip` from this [page](https://github.com/utopia-rise/fmod-gdextension/releases), then unzip it
+at the root of your Godot project: it contains the `addons/fmod` folder.
 
 ## 2 - Activate the plugin in Godot
 
@@ -15,7 +15,8 @@ After this, you should be able to create Fmod nodes, use the bank explorer and w
 
 ## 3 - Android specific
 
-Android exports require a Godot Android plugin.  
+Android exports require a Godot Android plugin. The addon ships it, for debug and release exports, and adds it to the
+export by itself.  
 
 Download android build template from project menu:  
 ![install-android-build-template]  
@@ -23,9 +24,7 @@ Download android build template from project menu:
 Make sure the `Use Gradle Build` option is activated in your Android export:  
 ![android-extension-export-enable]
 
-!!! warning
-    We curently only support armv8 architecture for android export.  
-    In order to get support for x86, you should build plugin on your own. 
+Android exports support the `arm64-v8a` and `x86_64` architectures.
 
 [android-extension-export-enable]: ./assets/android-export-enable-extension.png
 [install-android-build-template]: ./assets/install-android-build-template.png

@@ -115,9 +115,9 @@ target_include_directories(${PROJECT_NAME} SYSTEM
         ${GODOT_GDEXTENSION_DIR}
         )
 
-link_directories("../libs/fmod/${OS}/core/lib/")
-link_directories("../libs/fmod/${OS}/studio/lib/")
-include_directories(../libs/fmod/${OS}/core/inc ../libs/fmod/${OS}/studio/inc)
+link_directories("libs/${OS}/core/lib/")
+link_directories("libs/${OS}/studio/lib/")
+include_directories(libs/${OS}/core/inc libs/${OS}/studio/inc)
 
 # Create the correct name (godot.os.build_type.system_bits)
 # Synchronized with godot-cpp's CMakeLists.txt

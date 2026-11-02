@@ -437,7 +437,7 @@
 			<param index="0" name="index" type="int" />
 			<param index="1" name="weight" type="float" />
 			<description>
-				Sets the weight of the listener at the specified index.
+				Sets the weight of the listener at the specified index, between 0.0 and 1.0.
 			</description>
 		</method>
 		<method name="shutdown">

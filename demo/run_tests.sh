@@ -1,9 +1,13 @@
+# Usage: run_tests.sh <Godot editor binary> [editor|export-release|export-debug]
+# editor (the default) runs the gdUnit4 suites in the editor; export-release and export-debug export the tests_<host>
+# preset with that template and run the suites in the exported game (test_runner/), which exits with 0 or 100.
 if [ -z "$1" ]; then
   echo "ERROR: Please provide the path to the Godot executable as the first argument."
   exit 1
 fi
 
 GODOT_BIN="$1"
+MODE="${2:-editor}"
 PROJECT_PATH="$PWD"
 DELAY_SEC=5
 MAX_ATTEMPTS=3
@@ -33,42 +37,35 @@ if ! retry_import; then
   fi
 fi
 
+if [ "$MODE" = "editor" ]; then
+  # --remote-debug to a port nothing listens on keeps a script error from dropping into Godot's interactive debugger.
+  # GdUnit exits with 0 on success, 100 on failures or errors and 101 when tests leave orphan nodes.
+  exec "$GODOT_BIN" --headless --path "$PROJECT_PATH" -s -d --remote-debug tcp://127.0.0.1:0 \
+    res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://test -c --ignoreHeadlessMode
+fi
 
-"$GODOT_BIN" -s --headless --path "$PROJECT_PATH" addons/gut/gut_cmdln.gd | (
-    tests=0
-    passing=0
+case "$(uname -s)" in
+  Linux*) PLATFORM=linux; EXPORT_FILE=tests.x86_64; EXECUTABLE=tests.x86_64 ;;
+  Darwin*) PLATFORM=macos; EXPORT_FILE=tests.zip ;;
+  MINGW*|MSYS*|CYGWIN*) PLATFORM=windows; EXPORT_FILE=tests.exe; EXECUTABLE=tests.console.exe ;;
+  *) echo "ERROR: Unsupported host $(uname -s)."; exit 1 ;;
+esac
 
-    while read -r line
-    do
-        echo "$line"
+EXPORT_DIR="$PROJECT_PATH/export/tests"
+rm -rf "$EXPORT_DIR"
+mkdir -p "$EXPORT_DIR"
+"$GODOT_BIN" --headless --path "$PROJECT_PATH" "--$MODE" "tests_$PLATFORM" "$EXPORT_DIR/$EXPORT_FILE" || exit 1
 
-        # Match line that starts with "Tests"
-        if echo "$line" | grep -q "^Tests"; then
-            tests=$(echo "$line" | awk '{print $NF}')
-        fi
+if [ "$PLATFORM" = "macos" ]; then
+  unzip -q "$EXPORT_DIR/$EXPORT_FILE" -d "$EXPORT_DIR"
+  EXECUTABLE="$(find "$EXPORT_DIR"/*.app/Contents/MacOS -type f -perm -u+x | head -n 1)"
+  EXECUTABLE="${EXECUTABLE#"$EXPORT_DIR/"}"
+fi
 
-        # Match line that starts with "Passing Tests"
-        if echo "$line" | grep -q "^Passing Tests"; then
-            passing=$(echo "$line" | awk '{print $NF}')
-        fi
-    done
+if [ ! -f "$EXPORT_DIR/$EXECUTABLE" ]; then
+  echo "ERROR: The export produced no $EXECUTABLE:"
+  ls -R "$EXPORT_DIR"
+  exit 1
+fi
+exec "$EXPORT_DIR/$EXECUTABLE" --headless
 
-    echo "Retrieved values: tests=$tests passing=$passing"
-
-    if [[ "$tests" -eq 0 ]]; then
-       echo "ERROR: No tests were found."
-       exit 1
-    fi
-
-    if [[ "$tests" -eq "$passing" ]]; then
-        exit 0
-    else
-        echo "ERROR: Some assertions failed!"
-        exit 1
-    fi
-)
-
-result=$?
-
-# Exit with the result of the subshell
-exit $result

@@ -1,0 +1,23 @@
+{
+  "enabled_classes": [
+    "Object",
+    "RefCounted",
+    "Resource",
+
+    "Node",
+    "CanvasItem",
+    "Node2D",
+    "Node3D",
+
+    "Engine",
+    "OS",
+    "ProjectSettings",
+    "FileAccess",
+    "DirAccess",
+    "ResourceLoader",
+
+    "EditorPlugin",
+    "EditorExportPlugin",
+    "EditorExportPlatform"
+  ]
+}

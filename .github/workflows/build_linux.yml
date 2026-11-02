@@ -1,0 +1,54 @@
+name: 🐧 Linux Builds
+on:
+  workflow_call:
+    inputs:
+      fmod-version:
+        type: string
+        required: true
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.target }}
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [editor, template_debug, template_release]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/scons-cache
+        with:
+          mode: restore
+          name: linux-${{ matrix.target }}
+      - uses: ./.github/actions/gdextension-build
+        with:
+          platform: linux
+          target: ${{ matrix.target }}
+          scons-flags: arch=x86_64
+          fmod-version: ${{ inputs.fmod-version }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+      - uses: ./.github/actions/scons-cache
+        if: always()
+        with:
+          mode: save
+          name: linux-${{ matrix.target }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}_linux
+          path: |
+            demo/addons/fmod/libs/linux
+            !demo/addons/fmod/libs/linux/CopyPast_Fmod_Libs_Here.txt
+          if-no-files-found: error

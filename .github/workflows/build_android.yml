@@ -1,0 +1,67 @@
+name: 🤖 Android Builds
+on:
+  workflow_call:
+    inputs:
+      fmod-version:
+        type: string
+        required: true
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.target }} ${{ matrix.arch }}
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release]
+        arch: [arm64, x86_64]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      # The NDK godot-cpp builds with by default (ndk_version in godot-cpp/tools/android.py).
+      - name: Install Android NDK
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager "ndk;28.1.13356709"
+      - uses: ./.github/actions/scons-cache
+        with:
+          mode: restore
+          name: android-${{ matrix.target }}-${{ matrix.arch }}
+      - uses: ./.github/actions/gdextension-build
+        with:
+          platform: android
+          target: ${{ matrix.target }}
+          scons-flags: arch=${{ matrix.arch }}
+          fmod-version: ${{ inputs.fmod-version }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+      - uses: ./.github/actions/scons-cache
+        if: always()
+        with:
+          mode: save
+          name: android-${{ matrix.target }}-${{ matrix.arch }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}_android_${{ matrix.arch }}
+          path: |
+            demo/addons/fmod/libs/android
+            !demo/addons/fmod/libs/android/**/CopyPast_Fmod_Libs_Here.txt
+          if-no-files-found: error
+      # The Android plugin compiles against FMOD's Java side, which only the FMOD Android SDK carries.
+      - uses: actions/upload-artifact@v7
+        if: matrix.target == 'template_release' && matrix.arch == 'arm64'
+        with:
+          name: fmod_android_jar
+          path: libs/android/core/lib/fmod.jar
+          if-no-files-found: error

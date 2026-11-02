@@ -1,0 +1,68 @@
+name: 🧪 Desktop Tests
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.platform }} ${{ matrix.mode }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [linux, macos, windows]
+        mode: [editor, export-release]
+        include:
+          - platform: linux
+            os: ubuntu-22.04
+          - platform: macos
+            os: macos-15
+          - platform: windows
+            os: windows-2022
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: ${{ matrix.platform }}
+          destination: ${{ runner.temp }}/godot
+
+      - name: Install release export template
+        if: matrix.mode == 'export-release'
+        uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: ${{ matrix.platform }}
+          destination: ${{ runner.temp }}/godot
+          template: release
+
+      - name: Download editor library
+        uses: actions/download-artifact@v7
+        with:
+          name: editor_${{ matrix.platform }}
+          path: demo/addons/fmod/libs/${{ matrix.platform }}
+
+      - name: Download release library
+        if: matrix.mode == 'export-release'
+        uses: actions/download-artifact@v7
+        with:
+          name: template_release_${{ matrix.platform }}
+          path: demo/addons/fmod/libs/${{ matrix.platform }}
+
+      - name: Run tests
+        timeout-minutes: 20
+        run: |
+          godot="$(find "$RUNNER_TEMP/godot" -maxdepth 1 -name 'godot.*.console.exe' | head -n 1)"
+          [ -n "$godot" ] || godot="$(find "$RUNNER_TEMP/godot" -maxdepth 1 -name 'godot.*' | head -n 1)"
+          cd demo
+          ./run_tests.sh "$godot" ${{ matrix.mode }}
