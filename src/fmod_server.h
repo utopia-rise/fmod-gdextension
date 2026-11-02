@@ -115,6 +115,7 @@ namespace godot {
 
         Ref<FmodEventDescription> _get_event_description(const String& event_name);
         Ref<FmodEventDescription> _get_event_description(const FMOD_GUID& guid);
+        static bool _is_usable(const Ref<FmodEventDescription>& desc);
 
         void _update_performance_data();
 
@@ -288,8 +289,11 @@ namespace godot {
 
     template<FmodServer::EventIdentifierType parameter_type>
     Ref<FmodEvent> FmodServer::_create_event_instance(const EventIdentifier& identifier) {
+        Ref<FmodEventDescription> desc = fetch_event_description<parameter_type>(identifier);
+        if (!_is_usable(desc)) { return {}; }
+
         FMOD::Studio::EventInstance* eventInstance = nullptr;
-        ERROR_CHECK(fetch_event_description<parameter_type>(identifier)->get_wrapped()->createInstance(&eventInstance));
+        ERROR_CHECK(desc->get_wrapped()->createInstance(&eventInstance));
 
         Ref<FmodEvent> ref = FmodEvent::create_ref(eventInstance);
         if (ref.is_null() || !ref->is_valid()) {
@@ -306,6 +310,7 @@ namespace godot {
     template<FmodServer::EventIdentifierType parameter_type>
     void FmodServer::_play_one_shot(const FmodServer::EventIdentifier& identifier, Node* game_obj, const Dictionary& parameters) {
         Ref<FmodEventDescription> desc =  fetch_event_description<parameter_type>(identifier);
+        if (!_is_usable(desc)) { return; }
         if (!desc->is_one_shot()){
             GODOT_LOG_WARNING(desc->get_path() + " is not a OneShot event.")
             return;

@@ -711,6 +711,12 @@ Ref<FmodEventDescription> FmodServer::_get_event_description(const FMOD_GUID& gu
     return cache->get_event(guid);
 }
 
+bool FmodServer::_is_usable(const Ref<FmodEventDescription>& desc) {
+    if (desc.is_valid() && desc->is_valid()) { return true; }
+    GODOT_LOG_ERROR("Cannot use the event: its description is missing or its bank is unloaded.")
+    return false;
+}
+
 void FmodServer::play_one_shot_using_guid(const String& guid) {
     EventIdentifier parameter {};
     parameter.guid = string_to_fmod_guid(guid.utf8().get_data());
