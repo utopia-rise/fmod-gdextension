@@ -13,6 +13,7 @@
 #include "studio/fmod_vca.h"
 #include "templates/hash_map.hpp"
 #include "templates/local_vector.hpp"
+#include "templates/mutex.hpp"
 #include "templates/vector.hpp"
 #include "variant/string.hpp"
 
@@ -26,7 +27,6 @@
 
 #include <classes/canvas_item.hpp>
 #include <classes/global_constants.hpp>
-#include <classes/mutex.hpp>
 #include <classes/object.hpp>
 #include <core/object.hpp>
 #include <fmod.hpp>
@@ -107,7 +107,7 @@ namespace godot {
         // call_deferred is not implemented in godot-cpp.
         // Would have prefered a SpinLock but does not seems to exist in godot-cpp.
         // TODO: Change when https://github.com/godotengine/godot-cpp/pull/1091 is merged.
-        Ref<Mutex> callback_mutex;
+        Mutex callback_mutex;
         List<Callback> callbacks_to_process;
 
 

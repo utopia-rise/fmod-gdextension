@@ -1,11 +1,12 @@
-*.iml
-.gradle
-/local.properties
-/.idea/
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+.gradle/
+/build/
+/library/build/
+# FMOD's Java side, copied from the FMOD Android SDK: android-plugin/library/libraries/fmod.jar
+/library/libraries/
 local.properties
-library/libraries/
+/captures/
+.externalNativeBuild/
+.cxx/
+.idea/
+*.iml
+.DS_Store

@@ -1,7 +1,14 @@
-*.dll
-*.a
-*.dylib
-*.so
-*.so.*
-*.xcframework
-!libs/
+# Libraries built by SCons and FMOD libraries it copies next to them; the released addon gets them from CI.
+libs/**/*.dll
+libs/**/*.lib
+libs/**/*.exp
+libs/**/*.pdb
+libs/**/*.so
+libs/**/*.so.*
+libs/**/*.dylib
+libs/**/*.a
+libs/**/*.aar
+libs/**/*.xcframework/
+# A macOS framework's binary has no extension: only its Info.plist is tracked.
+libs/macos/*.framework/*
+!libs/macos/*.framework/Info.plist

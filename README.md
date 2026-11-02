@@ -1,6 +1,6 @@
 ![logo](docs/src/doc/assets/fmod-gdextension-logo.png)
 
-[![🌈 Build](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/release.yml/badge.svg)](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/release.yml) 
+[![🌈 CI](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/trigger_ci.yml/badge.svg)](https://github.com/utopia-rise/fmod-gdextension/actions/workflows/trigger_ci.yml) 
 [![](https://img.shields.io/discord/1012326818365325352.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.com/invite/u2NM2vTGMn)
 ---
 
@@ -58,8 +58,8 @@ work to GDNative.
 
 # Tested Versions
 
-- **Godot Version:** 4.4 stable
-- **FMOD Version:** 2.03
+- **Godot Version:** 4.6 and later 4.x
+- **FMOD Version:** 2.04.00
 
 [fmodsingleton]: .README/fmodsingleton.png
 [usecustombuild]: .README/usecustombuild.png

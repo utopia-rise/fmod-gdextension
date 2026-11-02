@@ -148,7 +148,6 @@ FmodServer::FmodServer() :
   cache(nullptr) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
-    callback_mutex.instantiate();
     performanceData = create_ref<FmodPerformanceData>();
     Callbacks::GodotFileRunner::get_singleton()->start();
 }
@@ -234,16 +233,17 @@ void FmodServer::update() {
     // Check if bank are loaded, load buses, vca and event descriptions.
     cache->update_pending();
 
-    callback_mutex->lock();
-    for (const Callback& callback : callbacks_to_process) {
-        if (!callback.callable.is_valid()) { continue; }// Don't run the callback if the object has been killed
-        godot::Array args = godot::Array();
-        args.append(callback.fmod_callback_properties);
-        args.append(callback.type);
-        callback.callable.callv(args);
+    {
+        MutexLock lock(callback_mutex);
+        for (const Callback& callback : callbacks_to_process) {
+            if (!callback.callable.is_valid()) { continue; }// Don't run the callback if the object has been killed
+            godot::Array args = godot::Array();
+            args.append(callback.fmod_callback_properties);
+            args.append(callback.type);
+            callback.callable.callv(args);
+        }
+        callbacks_to_process.clear();
     }
-    callbacks_to_process.clear();
-    callback_mutex->unlock();
 
     Vector<OneShot*> one_shots_copy = oneShots;
     for (OneShot* oneShot : one_shots_copy) {
@@ -1101,9 +1101,8 @@ Array FmodServer::get_global_parameter_desc_list() {
 }
 
 void FmodServer::add_callback(const Callback& callback) {
-    callback_mutex->lock();
+    MutexLock lock(callback_mutex);
     callbacks_to_process.push_back(callback);
-    callback_mutex->unlock();
 }
 
 void FmodServer::_apply_parameter_dict_to_event(const Ref<FmodEvent>& p_event, const Dictionary& parameters) {

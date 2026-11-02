@@ -1,15 +1,19 @@
 #!/usr/bin/env python
 import os
 import shutil
-import subprocess
 
 from SCons.Script import SConscript, ARGUMENTS, Action, Copy
 
+# godot-cpp reads its "build_profile" option from the global ARGUMENTS dict; setdefault() keeps a command line value
+# authoritative. build_profile.json is an allowlist of the engine classes we use, so godot-cpp only generates and
+# compiles those.
+ARGUMENTS.setdefault("build_profile", "build_profile.json")
+
 target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
-fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "../libs/fmod/")
+fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "libs/")
 
-env = SConscript("godot-cpp/SConstruct")
+env = SConscript("godot-cpp/SConstruct", {"api_version": "4.6"})
 
 # Add those directory manually, so we can skip the godot_cpp directory when including headers in C++ files
 source_path = [
@@ -101,20 +105,12 @@ elif env["platform"] == "windows":
         env.Append(CCFLAGS=["/FS", "/Zi"])
 
 elif env["platform"] == "ios":
-    libfmod = 'libfmod%s_iphoneos.a' % lfix
-    libfmodstudio = 'libfmodstudio%s_iphoneos.a' % lfix
-
+    # A static library, linked into the app with the FMOD static libraries fmod.gdextension lists as dependencies.
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'ios/core/inc/', env['fmod_lib_dir'] + 'ios/studio/inc/'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'ios/core/lib/', env['fmod_lib_dir'] + 'ios/studio/lib/'])
-    env.Append(LIBS=[libfmod, libfmodstudio])
-
-    env.Append(LINKFLAGS=[
-        '-Wl,-undefined,dynamic_lookup', "-miphoneos-version-min=" + env["ios_min_version"]
-    ])
 
 elif env["platform"] == "android":
-    libfmod = 'libfmod%s.so' % lfix
-    libfmodstudio = 'libfmodstudio%s.so' % lfix
+    libfmod = 'fmod%s' % lfix
+    libfmodstudio = 'fmodstudio%s' % lfix
     fmod_info_table = {
         "armv7": "armeabi-v7a",
         "arm64": "arm64-v8a",
@@ -141,39 +137,20 @@ if env["platform"] == "macos":
         env["platform"],
         env["target"]
     )
+    library = env.SharedLibrary(target=target, source=sources)
+elif env["platform"] == "ios":
+    # Godot's iOS export embeds a dynamic library as a framework and signs it with an identifier derived from the file
+    # name, which App Store Connect rejects (ITMS-90334). A static library, godot-cpp included, is linked into the app.
+    objects = env.StaticLibrary(target="bin/{}.objects.a".format(os.path.basename(target)), source=sources)
+    godot_cpp_library = env.File("godot-cpp/bin/libgodot-cpp{}{}".format(env["suffix"], env["LIBSUFFIX"]))
+    library = env.Command("{}.a".format(target), [objects, godot_cpp_library], "libtool -static -o $TARGET $SOURCES")
 else:
     target = "{}.{}{}".format(
         target,
         env["arch"],
         env["SHLIBSUFFIX"]
     )
-
-library = env.SharedLibrary(target=target, source=sources)
-
-
-def sys_exec(args):
-    proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True)
-    (out, err) = proc.communicate()
-    return out.rstrip("\r\n").lstrip()
-
-
-if env["platform"] == "ios":
-    xcframework_path = "{}{}/{}.{}.{}.xcframework".format(
-        target_path,
-        env["platform"],
-        target_name,
-        env["platform"],
-        env["target"]
-    )
-
-    def create_xcframework(self, arg, env, executor = None):
-        sys_exec(["xcodebuild", "-create-xcframework", "-library", target, "-output", xcframework_path])
-        sys_exec(["rm", target])
-        sys_exec(["/usr/libexec/PlistBuddy", "-c", "Add :MinimumOSVersion string " + env["ios_min_version"], "{}/Info.plist".format(xcframework_path)])
-
-    create_xcframework_action = Action('', create_xcframework)
-
-    AddPostAction(library, create_xcframework_action)
+    library = env.SharedLibrary(target=target, source=sources)
 
 
 def copy_fmod_libraries(self, arg, env, executor = None):

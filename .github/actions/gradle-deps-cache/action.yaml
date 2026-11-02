@@ -1,0 +1,19 @@
+name: Gradle dependencies cache
+description: >
+  Downloaded dependency jars and Gradle's instrumented plugin jars of the Android plugin build. Master-only writes, see
+  master-cache.
+inputs:
+  mode:
+    description: "'restore' or 'save'."
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/actions/master-cache
+      with:
+        mode: ${{ inputs.mode }}
+        key: gradle-deps
+        path: |
+          ~/.gradle/caches/modules-2
+          ~/.gradle/caches/jars-*

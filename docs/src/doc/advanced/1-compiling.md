@@ -5,22 +5,27 @@ Clone project with `--recurse-submodules`.
 ## Typical Project structure
 
 ```
-└── Project root
+└── fmod-gdextension (this repo)
+    ├── CMakeLists.txt (Here for CLion)
+    ├── SConstruct
+    ├── godot-cpp (gdextension bindings, submodule)
     ├── libs
-    |   └── fmod
-    |       └── {platform}
-    |           └── specific platform fmod api goes here
-    └── fmod-gdextension (this repo, consider using it as a submodule of you GDExtensions repo)
-        ├── CMakeLists.txt (Here for CLion)
-        ├── LICENSE
-        ├── README.md
-        ├── SConstruct (here to build on Windows, Linux, OSX and IOS
-        ├── godot-cpp (gdextension bindings, submodule)
-        └── src
+    |   └── {platform}
+    |       ├── core
+    |       └── studio
+    └── src
 ```
 
-You are supposed to put fmod libraries under `libs/fmod/{platform}`, according to the platforms you want to support.  
-`libs` folder should be a brother to plugin repo in hierarchy.
+Put the FMOD Studio API of each platform you build under `libs/{platform}`, where `{platform}` is `windows`, `linux`,
+`osx`, `ios` or `android`. The FMOD Studio API needs an FMOD account to download, so it is never committed. `get_fmod.py`
+downloads one platform's API with your account and installs it there:
+
+```
+python get_fmod.py <FMOD account> <FMOD password> <windows|linux|macos|ios|android> 20400
+```
+
+Unpacking the Windows installer needs [7-Zip](https://www.7-zip.org/), and the macOS and iOS disk images need macOS.
+You can also copy the `api` folder of an FMOD installation to `libs/{platform}` yourself.
 
 `CMakeLists` is here for CLion ide, as we are used to JetBrains tools. Unfortunately, CLion does not currently support
 Sconstruct.
@@ -44,9 +49,9 @@ Example:
 scons platform=windows arch=x86_64 target=editor
 ```
 
-You can also specify the FMOD directory as an argument, so you don't need to place the `libs` outside the project root.
+You can also take the FMOD Studio API from another directory with `fmod_lib_dir` (keep the trailing `/`).
 
 Example:
 ```
-scons platform=windows arch=x86_64 target=editor fmod_lib_dir=libs/
+scons platform=windows arch=x86_64 target=editor fmod_lib_dir=../my-fmod-sdks/
 ```

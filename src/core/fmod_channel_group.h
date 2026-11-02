@@ -1,6 +1,7 @@
 #ifndef GODOTFMOD_FMOD_CHANNEL_GROUP_H
 #define GODOTFMOD_FMOD_CHANNEL_GROUP_H
 
+#include "classes/ref.hpp"
 #include "classes/ref_counted.hpp"
 #include "fmod.hpp"
 

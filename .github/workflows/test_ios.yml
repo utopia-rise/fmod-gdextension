@@ -1,0 +1,84 @@
+name: 🍏 iOS Tests
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  # App Store Connect rejects an extension Godot embeds as a framework (issue #438): the iOS library must be static and
+  # end up linked into the app binary. This exports the tests_ios Xcode project, builds it unsigned and checks that.
+  test-ios:
+    runs-on: macos-15
+    name: Xcode build
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: macos
+          destination: ${{ runner.temp }}/godot
+
+      - name: Install iOS export template
+        uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: ios
+          destination: ${{ runner.temp }}/godot
+          template: release
+
+      # The editor library carries the export plugin that adds the FMOD iOS libraries to the Xcode project.
+      - name: Download macOS editor library
+        uses: actions/download-artifact@v7
+        with:
+          name: editor_macos
+          path: demo/addons/fmod/libs/macos
+
+      - name: Download iOS release library
+        uses: actions/download-artifact@v7
+        with:
+          name: template_release_ios
+          path: demo/addons/fmod/libs/ios
+
+      - name: Export Xcode project
+        timeout-minutes: 15
+        run: |
+          godot="$RUNNER_TEMP/godot/godot.macos.editor.universal"
+          cd demo
+          "$godot" --headless --path . --import
+          mkdir -p export/tests_ios
+          "$godot" --headless --path . --export-release tests_ios export/tests_ios/tests.ipa
+
+      - name: Build Xcode project
+        timeout-minutes: 30
+        run: |
+          cd demo/export/tests_ios
+          xcodebuild -project tests.xcodeproj -scheme tests -configuration Release -sdk iphoneos \
+            -destination generic/platform=iOS -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+
+      - name: Check the extension is linked, not embedded
+        run: |
+          app="$(find demo/export/tests_ios/build/Build/Products -maxdepth 2 -name '*.app' -type d | head -n 1)"
+          embedded="$(find "$app" -iname '*GodotFmod*')"
+          if [[ -n "$embedded" ]]; then
+            echo "The FMOD extension is embedded in the app, App Store Connect rejects it:" >&2
+            echo "$embedded" >&2
+            exit 1
+          fi
+          binary="$app/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")"
+          # grep -q stops reading at the first match, which fails nm with a broken pipe under pipefail.
+          symbols="$(nm "$binary")"
+          if ! grep -q ' T _fmod_library_init$' <<< "$symbols"; then
+            echo "fmod_library_init is not linked into $binary" >&2
+            exit 1
+          fi
+          echo "The FMOD extension is linked into $binary."

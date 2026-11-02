@@ -1,41 +1,37 @@
-extends "res://addons/gut/test.gd"
+extends GdUnitTestSuite
 
-class TestSound:
-	extends "res://addons/gut/test.gd"
-	
-	var sound: FmodSound
-	var music: FmodSound
-	var sound_file = "res://assets/Sounds/doorOpen_1.ogg"
-	var music_file = "res://assets/Music/jingles_SAX07.ogg"
-	
-	func before_all():
-		FmodServer.load_file_as_sound(sound_file)
-		FmodServer.load_file_as_music(music_file)
-		sound = FmodServer.create_sound_instance(sound_file)
-		music = FmodServer.create_sound_instance(music_file)
-	
-	func after_all():
-		sound.release()
-		music.release()
-		FmodServer.unload_file(sound_file)
-		FmodServer.unload_file(music_file)
-	
-	func test_assert_set_volume():
-		var desired_value: float = 2.0
-		sound.volume = desired_value
-		assert_eq(sound.volume, desired_value, "Sound volume should be 2")
-		music.volume = desired_value
-		assert_eq(music.volume, desired_value, "Sound volume should be 2")
-	
-	func test_assert_set_pitch():
-		var desired_value: float = 0.75
-		sound.pitch = desired_value
-		assert_eq(sound.pitch, desired_value, "Sound pitch should be 0.75")
-		music.pitch = desired_value
-		assert_eq(music.pitch, desired_value, "Sound pitch should be 0.75")	
-	
-	func test_assert_playing():
-		sound.play()
-		assert_true(sound.is_playing(), "Sound should be playing")
-		music.play()
-		assert_true(music.is_playing(), "Sound should be playing")
+const SOUND_FILE = "res://assets/Sounds/doorOpen_1.ogg"
+const MUSIC_FILE = "res://assets/Music/jingles_SAX07.ogg"
+
+var sound: FmodSound
+var music: FmodSound
+
+func before():
+	FmodServer.load_file_as_sound(SOUND_FILE)
+	FmodServer.load_file_as_music(MUSIC_FILE)
+	sound = FmodServer.create_sound_instance(SOUND_FILE)
+	music = FmodServer.create_sound_instance(MUSIC_FILE)
+
+func after():
+	sound.release()
+	music.release()
+	FmodServer.unload_file(SOUND_FILE)
+	FmodServer.unload_file(MUSIC_FILE)
+
+func test_assert_set_volume():
+	sound.volume = 2.0
+	assert_float(sound.volume).is_equal(2.0)
+	music.volume = 2.0
+	assert_float(music.volume).is_equal(2.0)
+
+func test_assert_set_pitch():
+	sound.pitch = 0.75
+	assert_float(sound.pitch).is_equal(0.75)
+	music.pitch = 0.75
+	assert_float(music.pitch).is_equal(0.75)
+
+func test_assert_playing():
+	sound.play()
+	assert_bool(sound.is_playing()).is_true()
+	music.play()
+	assert_bool(music.is_playing()).is_true()

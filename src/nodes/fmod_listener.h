@@ -176,8 +176,8 @@ namespace godot {
           PropertyInfo(
             Variant::FLOAT,
             "weight",
-            PROPERTY_HINT_NONE,
-            "",
+            PROPERTY_HINT_RANGE,
+            "0,1,0.01",
             PROPERTY_USAGE_DEFAULT
           ),
           "set_listener_weight",

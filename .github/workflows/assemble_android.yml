@@ -1,0 +1,66 @@
+name: 🤖 Assemble Android
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  assemble-android:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_android_*'
+          path: native
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
+          name: fmod_android_jar
+          path: android-plugin/library/libraries
+      - uses: ./.github/actions/gradle-deps-cache
+        with:
+          mode: restore
+      - name: Build Android plugin AARs
+        run: |
+          set -euo pipefail
+          godot_maven_version="${{ inputs.godot-version }}"
+          grep -q "org.godotengine:godot:${godot_maven_version/-/.}\"" android-plugin/library/build.gradle.kts || {
+            echo "android-plugin/library/build.gradle.kts must depend on org.godotengine:godot:${godot_maven_version/-/.}" >&2
+            exit 1
+          }
+          cd android-plugin
+          ./gradlew :library:assemble -PnativeLibrariesDir="$GITHUB_WORKSPACE/native"
+          # Godot loads the extension from the AAR of the export's variant (android_aar_plugin), so the Android
+          # package carries the two AARs and nothing else.
+          mkdir -p ../package/android
+          cp library/build/outputs/aar/fmod-debug.aar library/build/outputs/aar/fmod-release.aar ../package/android/
+          unexpected="$(find ../package -type f ! -name 'fmod-debug.aar' ! -name 'fmod-release.aar')"
+          if [[ -n "$unexpected" ]]; then
+            echo "Unexpected files in the Android package:" >&2
+            echo "$unexpected" >&2
+            exit 1
+          fi
+      - uses: ./.github/actions/gradle-deps-cache
+        if: always()
+        with:
+          mode: save
+      # Upload the raw folder rather than a pre-made zip: actions/upload-artifact always wraps what it is given in its
+      # own zip, so a zip here would end up nested in another one once downloaded.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fmod-gdextension-android
+          path: package
+          if-no-files-found: error

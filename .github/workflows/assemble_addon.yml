@@ -1,0 +1,75 @@
+name: 📦 Assemble addon
+on:
+  workflow_call:
+
+jobs:
+  assemble-addon:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - name: Copy addon sources
+        run: |
+          mkdir -p package/addons
+          cp -R demo/addons/fmod package/addons/fmod
+          rm -rf package/addons/fmod/libs package/addons/fmod/.gitignore
+          cp README.md LICENSE package/addons/fmod/
+
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_linux'
+          path: package/addons/fmod/libs/linux
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_windows'
+          path: package/addons/fmod/libs/windows
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_macos'
+          path: package/addons/fmod/libs/macos
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_ios'
+          path: package/addons/fmod/libs/ios
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
+          name: fmod-gdextension-android
+          path: package/addons/fmod/libs
+
+      # Every library and dependency fmod.gdextension names must ship, except Android's, which the AARs carry.
+      - name: Check addon structure
+        shell: python
+        run: |
+          import configparser, pathlib, sys
+          addon = pathlib.Path("package/addons/fmod")
+          config = configparser.ConfigParser(strict=False)
+          config.optionxform = str
+          config.read_string((addon / "fmod.gdextension").read_text().replace("{", "").replace("}", ""))
+          expected = [addon / "libs/android/fmod-debug.aar", addon / "libs/android/fmod-release.aar"]
+          for key, value in config["libraries"].items():
+              if not key.startswith("android."):
+                  expected.append(addon / value.strip('"').removeprefix("res://addons/fmod/"))
+          for line in (addon / "fmod.gdextension").read_text().split("[dependencies]")[1].splitlines():
+              if line.startswith('"libs/'):
+                  expected.append(addon / line.split('"')[1])
+          missing = [str(path) for path in expected if not path.exists()]
+          unexpected = [str(path) for path in addon.glob("libs/android/**/*.so")]
+          if missing or unexpected:
+              print("Missing:", *missing, "Unexpected:", *unexpected, sep="\n  ")
+              sys.exit(1)
+          print(f"All {len(expected)} libraries are in place.")
+
+      # Upload the raw folder rather than a pre-made zip: actions/upload-artifact always wraps what it is given in its
+      # own zip, so a zip here would end up nested in another one once downloaded.
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fmod-addon
+          path: package
+          if-no-files-found: error

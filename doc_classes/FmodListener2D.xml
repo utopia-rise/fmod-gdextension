@@ -48,7 +48,7 @@
 			<return type="void" />
 			<param index="0" name="p_weight" type="float" />
 			<description>
-				Sets the weight of this listener. Higher weights give the listener more influence on the audio mix. Typical values are between 0.0 and 1.0.
+				Sets the weight of this listener, between 0.0 and 1.0. Higher weights give the listener more influence on the audio mix.
 			</description>
 		</method>
 		<method name="set_locked">

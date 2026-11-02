@@ -10,7 +10,6 @@
     BIND_CONSTANT(FMOD_INIT_CHANNEL_DISTANCEFILTER)                    \
     BIND_CONSTANT(FMOD_INIT_CHANNEL_LOWPASS)                           \
     BIND_CONSTANT(FMOD_INIT_GEOMETRY_USECLOSEST)                       \
-    BIND_CONSTANT(FMOD_INIT_MIX_FROM_UPDATE)                           \
     BIND_CONSTANT(FMOD_INIT_NORMAL)                                    \
     BIND_CONSTANT(FMOD_INIT_PREFER_DOLBY_DOWNMIX)                      \
     BIND_CONSTANT(FMOD_INIT_PROFILE_ENABLE)                            \
