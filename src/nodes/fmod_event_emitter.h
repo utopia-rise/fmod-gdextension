@@ -328,9 +328,11 @@ namespace godot {
 
     template<class Derived, class NodeType>
     void FmodEventEmitter<Derived, NodeType>::_load_event_description_if_needed() const {
-        if (!_event_description.is_null()) {
+        // A description goes invalid when its bank is unloaded, as the editor's bank refresh does.
+        if (_event_description.is_valid() && _event_description->is_valid()) {
             return;
         }
+        _event_description.unref();
 
         const FMOD_GUID no_event_guid = {};
         if (_event_name.is_empty() && equals(_event_guid, no_event_guid)) {
