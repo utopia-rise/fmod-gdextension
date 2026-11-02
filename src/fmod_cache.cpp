@@ -1,15 +1,15 @@
 
 #include "fmod_cache.h"
 
-#include "helpers/common.h"
 #include "classes/project_settings.hpp"
+#include "helpers/common.h"
+#include "variant/char_string.hpp"
 
 using namespace godot;
 
 FmodCache::FmodCache(FMOD::Studio::System* p_system, FMOD::System* p_core_system) :
-    system(p_system), core_system(p_core_system) {
-
-}
+  system(p_system),
+  core_system(p_core_system) {}
 
 FmodCache::~FmodCache() {
     system = nullptr;
@@ -78,13 +78,15 @@ Ref<FmodBank> FmodCache::get_bank(const String& bankPath) {
 #ifndef IOS_ENABLED
 
 uint32_t FmodCache::add_plugin(const String& p_plugin_path, uint32_t p_priority) {
-    uint32_t handle;
+    uint32_t handle = 0xFFFFFFFF;
 #if defined(ANDROID_ENABLED) && !defined(TOOLS_ENABLED)
-    const char* plugin_path = p_plugin_path.utf8().get_data();
+    CharString plugin_path = p_plugin_path.utf8();
 #else
-    const char* plugin_path = ProjectSettings::get_singleton()->globalize_path(p_plugin_path).utf8().get_data();
+    CharString plugin_path = ProjectSettings::get_singleton()->globalize_path(p_plugin_path).utf8();
 #endif
-    ERROR_CHECK(core_system->loadPlugin(plugin_path, &handle, p_priority));
+    if (!ERROR_CHECK_WITH_REASON(core_system->loadPlugin(plugin_path.get_data(), &handle, p_priority), vformat("Cannot load plugin %s", p_plugin_path))) {
+        return 0xFFFFFFFF;
+    }
     plugin_handles.append(handle);
     return handle;
 }
@@ -110,7 +112,6 @@ void FmodCache::remove_plugin(uint32_t p_plugin_handle) {
     ERROR_CHECK(core_system->unloadPlugin(p_plugin_handle));
     plugin_handles.erase(p_plugin_handle);
 }
-
 
 Ref<FmodFile> FmodCache::add_file(const String& file_path, unsigned int flag) {
     FMOD::System* core = nullptr;
@@ -168,11 +169,7 @@ bool FmodCache::has_event_path(const String& eventPath) {
 }
 
 Ref<FmodVCA> FmodCache::get_vca(const FMOD_GUID& guid) {
-    if (
-            HashMap<FMOD_GUID, Ref<FmodVCA>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
-                    vcas.find(guid)
-            }
-    ) {
+    if (HashMap<FMOD_GUID, Ref<FmodVCA>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator {vcas.find(guid)}) {
         return iterator->value;
     }
 
@@ -196,11 +193,7 @@ Ref<FmodVCA> FmodCache::get_vca(const String& vca_path) {
 }
 
 Ref<FmodBus> FmodCache::get_bus(const FMOD_GUID& guid) {
-    if (
-            HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
-                    buses.find(guid)
-            }
-    ) {
+    if (HashMap<FMOD_GUID, Ref<FmodBus>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator {buses.find(guid)}) {
         return iterator->value;
     }
 
@@ -226,7 +219,7 @@ Ref<FmodBus> FmodCache::get_bus(const String& bus_path) {
 Ref<FmodEventDescription> FmodCache::get_event(const FMOD_GUID& guid) {
     if (
       HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator {
-          event_descriptions.find(guid)
+        event_descriptions.find(guid)
       }
     ) {
         return iterator->value;
@@ -252,19 +245,17 @@ Ref<FmodEventDescription> FmodCache::get_event(const String& eventPath) {
 }
 
 FMOD_GUID FmodCache::get_event_guid(const String& event_path) {
-    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(event_path)}) {
-        return iterator->value;
-    }
+    if (HashMap<String, FMOD_GUID>::Iterator iterator {strings_to_guid.find(event_path)}) { return iterator->value; }
 
     return {};
 }
 
 String FmodCache::get_event_path(const FMOD_GUID& guid) {
     if (
-            HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator{
-                    event_descriptions.find(guid)
-            }
-            ) {
+      HashMap<FMOD_GUID, Ref<FmodEventDescription>, FmodGuidHashMapHasher, FmodGuidHashMapComparer>::Iterator iterator {
+        event_descriptions.find(guid)
+      }
+    ) {
         return iterator->value->get_path();
     }
 
