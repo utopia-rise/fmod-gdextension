@@ -17,7 +17,7 @@ Choosing the event and editing parameters in the Inspector is E.2; finding event
 - **C.1.8**: An emitter pauses its event when the scene tree pauses it and resumes it when it is unpaused.
 
 ## Rules
-- **C.1.R1**: Changing an emitter's event stops and releases the previous one and clears its parameter values.
+- **C.1.R1**: Changing an emitter's event stops and releases the previous one and clears its parameter values: the node no longer exposes the previous event's parameters. In the editor the node keeps their values, so undoing the change gives them back.
 - **C.1.R2**: An emitter leaving the tree stops and releases its event.
 
 ## Non-goals
