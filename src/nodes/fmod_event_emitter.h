@@ -490,6 +490,14 @@ namespace godot {
 
         _unload_event();
 
+#ifdef TOOLS_ENABLED
+        // Emitters play nothing in the editor: neither the preloading nor the autoplay of a changed event applies there.
+        if (Engine::get_singleton()->is_editor_hint()) {
+            _parameters.clear();
+            return;
+        }
+#endif
+
         if (_preload_event) {
             _load_event();
         }
