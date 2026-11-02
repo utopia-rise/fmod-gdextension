@@ -826,9 +826,16 @@ namespace godot {
             return {};
         }
 
-        return parameter.should_load_by_id
-               ? _event_description->get_parameter_by_id(parameter.id)
-               : _event_description->get_parameter_by_name(parameter.name);
+        // The parameters of a previous event stay on the emitter until the Inspector removes them: they are looked up
+        // in the event's own list, since FmodEventDescription reports an error for a parameter the event does not have.
+        const Array descriptions = _event_description->get_parameters();
+        for (const Variant& item : descriptions) {
+            Ref<FmodParameterDescription> description(item);
+            if (parameter.should_load_by_id ? description->get_id() == parameter.id : description->get_name() == parameter.name) {
+                return description;
+            }
+        }
+        return {};
     }
 
 #ifdef TOOLS_ENABLED
