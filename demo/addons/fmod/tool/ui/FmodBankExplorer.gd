@@ -73,14 +73,16 @@ func _ready():
 
 
 func regenerate_tree(callable: Callable = Callable()):
-	tree.clear()
-	generate_tree(callable)
-
-func generate_tree(callable: Callable = Callable()):
-	%SelectButton.visible = should_display_select_button
 	if _current_select_callable != Callable() && _current_select_callable.get_object() != null:
 		emit_path_and_guid.disconnect(_current_select_callable)
 	_current_select_callable = callable
+	if _current_select_callable != Callable():
+		emit_path_and_guid.connect(_current_select_callable)
+	tree.clear()
+	generate_tree()
+
+func generate_tree():
+	%SelectButton.visible = should_display_select_button
 
 	var root_item := tree.create_item()
 	root_item.set_text(0, "Fmod objects")
@@ -144,10 +146,6 @@ func generate_tree(callable: Callable = Callable()):
 
 	if copy_guid_button.visible:
 		copy_guid_button.visible = should_display_copy_buttons
-
-	if _current_select_callable != Callable():
-		print(_current_select_callable)
-		emit_path_and_guid.connect(_current_select_callable)
 
 	%SelectButton.visible = should_display_select_button and %GuidLabel.text != ""
 
@@ -271,4 +269,5 @@ static func sort_by_path(a, b):
 
 func _on_text_edit_text_submitted(new_text: String) -> void:
 	search = new_text
-	regenerate_tree()
+	tree.clear()
+	generate_tree()
