@@ -112,7 +112,14 @@ jobs:
     with:
       godot-version: *godot_version
 
+  test-editor-monkey:
+    name: 🐒 Editor monkey
+    needs: build-linux
+    uses: ./.github/workflows/test_editor_monkey.yml
+    with:
+      godot-version: *godot_version
+
   assemble-addon:
     name: 📦 Assemble addon
-    needs: [assemble-android, test-desktop, test-ios]
+    needs: [assemble-android, test-desktop, test-ios, test-editor-monkey]
     uses: ./.github/workflows/assemble_addon.yml
