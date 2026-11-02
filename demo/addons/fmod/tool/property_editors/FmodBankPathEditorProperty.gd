@@ -44,14 +44,14 @@ func _set_path_and_guid(path: String, _cancel: String):
 	if current_bank_paths.has(path):
 		return
 	
-	var bank_paths := Array(current_bank_paths)
+	var bank_paths := current_bank_paths.duplicate()
 	bank_paths.append(path)
 	emit_changed(path_property_name, bank_paths)
 
 func _on_remove_button():
 	var bank_list: ItemList = ui.get_node("%BankList")
 	var current_bank_paths: Array = get_edited_object()[path_property_name]
-	var bank_paths := Array(current_bank_paths)
+	var bank_paths := current_bank_paths.duplicate()
 	var selected_items_indexes: PackedInt32Array = bank_list.get_selected_items()
 	if selected_items_indexes.is_empty():
 		return
@@ -72,7 +72,7 @@ func _on_manual_add_button():
 func _on_move_button(is_down: bool):
 	var bank_list: ItemList = ui.get_node("%BankList")
 	var current_bank_paths: Array = get_edited_object()[path_property_name]
-	var bank_paths := Array(current_bank_paths)
+	var bank_paths := current_bank_paths.duplicate()
 	var selected_items_indexes: PackedInt32Array = bank_list.get_selected_items()
 	if selected_items_indexes.is_empty():
 		return
