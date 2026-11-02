@@ -332,6 +332,11 @@ namespace godot {
             return;
         }
 
+        const FMOD_GUID no_event_guid = {};
+        if (_event_name.is_empty() && equals(_event_guid, no_event_guid)) {
+            return;
+        }
+
         if (_should_load_by_event_name()) {
 #ifdef DEBUG_ENABLED
             if (FmodServer::get_singleton()->check_event_path(_event_name)) {
