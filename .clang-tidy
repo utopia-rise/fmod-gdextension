@@ -1,0 +1,31 @@
+# FMOD GDExtension clang-tidy configuration.
+#
+# Initialization style: `=` for scalars and same-type expressions, direct `()` for constructed
+# objects, `{}` only for aggregates, `()` in member initializer lists and `=` in default member initializers.
+# Checks that would push toward `{}` (modernize-return-braced-init-list, modernize-use-designated-initializers)
+# or `auto` (modernize-use-auto) are deliberately not enabled. `-*` first, then only the checks listed below.
+---
+Checks: >
+  -*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  cppcoreguidelines-prefer-member-initializer,
+  cppcoreguidelines-pro-type-member-init,
+  modernize-redundant-void-arg,
+  modernize-use-bool-literals,
+  modernize-use-default-member-init,
+  modernize-use-nullptr,
+  readability-braces-around-statements,
+  readability-redundant-member-init
+WarningsAsErrors: ''
+HeaderFilterRegex: '[\\/]src[\\/]'
+FormatStyle: file
+CheckOptions:
+  cppcoreguidelines-pro-type-member-init.IgnoreArrays: true
+  cppcoreguidelines-pro-type-member-init.UseAssignment: true
+  modernize-use-bool-literals.IgnoreMacros: false
+  modernize-use-default-member-init.IgnoreMacros: false
+  modernize-use-default-member-init.UseAssignment: true
+  modernize-use-nullptr.NullMacros: 'NULL'
+  readability-braces-around-statements.ShortStatementLines: 0
+...
