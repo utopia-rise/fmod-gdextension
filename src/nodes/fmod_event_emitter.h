@@ -9,6 +9,7 @@
 
 #include <classes/engine.hpp>
 #include <classes/project_settings.hpp>
+#include <variant/utility_functions.hpp>
 
 static constexpr const char* BEAT_SIGNAL_STRING = "timeline_beat";
 static constexpr const char* MARKER_SIGNAL_STRING = "timeline_marker";
@@ -740,7 +741,14 @@ namespace godot {
         if (parts.size() == 1) {
             Ref<FmodParameterDescription> desc {_get_parameter_description(*parameter)};
             if (desc.is_null()) { return false; }
-            r_property = desc->get_default_value();
+            const float default_value = desc->get_default_value();
+            if (parameter->labels.is_empty()) {
+                r_property = UtilityFunctions::type_convert(default_value, parameter->variant_type);
+                return true;
+            }
+            const int label_index = static_cast<int>(default_value);
+            if (label_index < 0 || label_index >= parameter->labels.size()) { return false; }
+            r_property = parameter->labels[label_index];
             return true;
         }
 
