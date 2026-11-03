@@ -176,6 +176,8 @@ namespace godot {
         void set_global_parameter_by_id(uint64_t parameter_id, float value);
         void set_global_parameter_by_id_with_label(uint64_t parameter_id, const String& label);
         float get_global_parameter_by_id(uint64_t parameter_id);
+        float get_global_parameter_user_value_by_name(const String& parameter_name);
+        float get_global_parameter_user_value_by_id(uint64_t parameter_id);
         Dictionary get_global_parameter_desc_by_name(const String& parameter_name);
         Dictionary get_global_parameter_desc_by_id(uint64_t parameter_id);
         int get_global_parameter_desc_count();
