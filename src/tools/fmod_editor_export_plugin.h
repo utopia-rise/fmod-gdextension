@@ -15,6 +15,8 @@ namespace godot {
         void _export_begin(const PackedStringArray &features, bool is_debug, const String &path, uint32_t flags) override;
         String _get_name() const override;
         virtual TypedArray<Dictionary> _get_export_options(const Ref<EditorExportPlatform>& platform) const override;
+        String _get_export_option_warning(const Ref<EditorExportPlatform>& platform, const String& option) const override;
+        bool _supports_platform(const Ref<EditorExportPlatform>& platform) const override;
 
         static void _bind_methods();
 

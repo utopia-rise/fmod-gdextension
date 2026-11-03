@@ -6,15 +6,18 @@
 
 #include <classes/file_access.hpp>
 #include <classes/ref.hpp>
+#ifndef WEB_ENABLED
 #include <condition_variable>
 #include <cstring>// This include is required for both Linux and MacOS targets as they don't include the necessary headers for 'memcpy' by default
 #include <thread>
+#endif
 
 namespace Callbacks {
     struct GodotFileHandle {
         godot::Ref<godot::FileAccess> file;
     };
 
+#ifndef WEB_ENABLED
     class GodotFileRunner {
     public:
         static GodotFileRunner* get_singleton();
@@ -51,13 +54,21 @@ namespace Callbacks {
         void start();
         void finish();
     };
+#endif
+
     FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata);
 
     FMOD_RESULT F_CALL godotFileClose(void* handle, void* userdata);
 
+#ifdef WEB_ENABLED
+    FMOD_RESULT F_CALL godotFileRead(void* handle, void* buffer, unsigned int sizebytes, unsigned int* bytesread, void* userdata);
+
+    FMOD_RESULT F_CALL godotFileSeek(void* handle, unsigned int pos, void* userdata);
+#else
     FMOD_RESULT F_CALL godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata);
 
     FMOD_RESULT F_CALL godotSyncCancel(FMOD_ASYNCREADINFO* info, void* userdata);
+#endif
 }// namespace Callbacks
 
 #endif// GODOTFMOD_FILE_CALLBACKS_H

@@ -1,6 +1,6 @@
 """Downloads the FMOD Studio API of one platform and installs it into libs/<sdk platform>/, where SConstruct reads it.
 
-Usage: python get_fmod.py <FMOD account> <FMOD password> <windows|linux|macos|ios|android> <version, e.g. 20400>
+Usage: python get_fmod.py <FMOD account> <FMOD password> <windows|linux|macos|ios|android|web> <version, e.g. 20400>
 
 Unpacking needs 7-Zip for the Windows installer and macOS (hdiutil) for the macOS and iOS disk images.
 """
@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import zipfile
 from pathlib import Path
 
 import requests
@@ -23,6 +24,7 @@ PLATFORMS = {
     "macos": ("Mac", "mac-installer.dmg", "osx.dmg", "osx"),
     "ios": ("iOS", "ios-installer.dmg", "ios.dmg", "ios"),
     "android": ("Android", "android.tar.gz", "android.tar.gz", "android"),
+    "web": ("HTML5", "html5.zip", "html5.zip", "web"),
 }
 
 
@@ -57,6 +59,10 @@ def extract_api(platform: str, version: str, archive: Path, work_dir: Path) -> P
             sys.exit(f"7-Zip is needed to unpack {archive.name}: install it, or run the installer and copy its api folder to libs/windows.")
         subprocess.run([seven_zip, "x", "-y", f"-o{work_dir}", str(archive)], check=True, stdout=subprocess.DEVNULL)
         return work_dir / "api"
+    if platform == "web":
+        with zipfile.ZipFile(archive) as zip_file:
+            zip_file.extractall(work_dir)
+        return next(work_dir.glob("*/api"))
     if platform in ("linux", "android"):
         with tarfile.open(archive) as tar:
             tar.extractall(work_dir, filter="data")

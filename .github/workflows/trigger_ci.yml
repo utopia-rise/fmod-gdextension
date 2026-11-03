@@ -17,6 +17,8 @@ env:
   # Mirrored by the jobs' inputs below through YAML anchors, since a reusable workflow call cannot read env.
   GODOT_VERSION: &godot_version 4.6.3-stable
   FMOD_VERSION: &fmod_version '20400'
+  # The version that built the Godot web export templates: a side module built with another one can fail to load.
+  EMSCRIPTEN_VERSION: &emscripten_version 4.0.20
 
 jobs:
   # The FMOD SDK download needs the FMODUSER and FMODPASS secrets, which pull_request runs from forks do not get.
@@ -91,6 +93,15 @@ jobs:
     with:
       fmod-version: *fmod_version
 
+  build-web:
+    name: 🌐 Build Web
+    needs: gate
+    uses: ./.github/workflows/build_web.yml
+    secrets: inherit
+    with:
+      fmod-version: *fmod_version
+      emscripten-version: *emscripten_version
+
   assemble-android:
     name: 🤖 Assemble Android
     needs: build-android
@@ -119,7 +130,14 @@ jobs:
     with:
       godot-version: *godot_version
 
+  test-web:
+    name: 🌐 Test Web
+    needs: [build-linux, build-web]
+    uses: ./.github/workflows/test_web.yml
+    with:
+      godot-version: *godot_version
+
   assemble-addon:
     name: 📦 Assemble addon
-    needs: [assemble-android, test-desktop, test-ios, test-editor-monkey]
+    needs: [assemble-android, test-desktop, test-ios, test-editor-monkey, test-web]
     uses: ./.github/workflows/assemble_addon.yml

@@ -12,6 +12,11 @@ using namespace godot;
 constexpr const char* FMOD_FILE_EXTENSIONS[4] {".bank", ".ogg", ".mp3", ".wav"};
 constexpr const char* ANDROID_BUILD_DIRS[2] = { "res://android/build", "res:///android/build" };
 constexpr const char* FMOD_AUTO_EXPORT_BANKS_SETTINGS_KEY = "fmod/auto_export_banks";
+constexpr const char* SUPPORTED_EXPORT_PLATFORMS[6] {"Windows", "Linux", "macOS", "Android", "iOS", "Web"};
+constexpr const char* WEB_THREAD_SUPPORT_OPTION = "variant/thread_support";
+constexpr const char* WEB_THREAD_POOL_SIZE_OPTION = "threads/emscripten_pool_size";
+constexpr int GODOT_DEFAULT_WEB_THREAD_POOL_SIZE = 8;
+constexpr int FMOD_STUDIO_WEB_THREAD_COUNT = 9;
 
 void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bool is_debug, const String& path, uint32_t flags) {
 
@@ -200,6 +205,25 @@ TypedArray<Dictionary> FmodEditorExportPlugin::_get_export_options(const Ref<Edi
     }
     
     return options;
+}
+
+// A threaded web export starts every thread from a pool of web workers created up front. FMOD's threads start while
+// System::initialize waits for them, so they need workers on top of Godot's: past the pool, the page deadlocks.
+String FmodEditorExportPlugin::_get_export_option_warning(const Ref<EditorExportPlatform>& platform, const String& option) const {
+    if (option != WEB_THREAD_POOL_SIZE_OPTION || platform->get_os_name() != "Web" || !get_option(WEB_THREAD_SUPPORT_OPTION)) {
+        return {};
+    }
+    int required_pool_size = GODOT_DEFAULT_WEB_THREAD_POOL_SIZE + FMOD_STUDIO_WEB_THREAD_COUNT;
+    if (static_cast<int>(get_option(WEB_THREAD_POOL_SIZE_OPTION)) >= required_pool_size) { return {}; }
+    return vformat("FMOD starts %d threads of its own: set at least %d, or the game freezes when FMOD starts.", FMOD_STUDIO_WEB_THREAD_COUNT, required_pool_size);
+}
+
+bool FmodEditorExportPlugin::_supports_platform(const Ref<EditorExportPlatform>& platform) const {
+    String os_name = platform->get_os_name();
+    for (const char* supported : SUPPORTED_EXPORT_PLATFORMS) {
+        if (os_name == supported) { return true; }
+    }
+    return false;
 }
 
 void FmodEditorExportPlugin::_bind_methods() {}

@@ -69,7 +69,9 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
         // initialise filerunner singleton by calling it.
         FmodStringNames::create();
+#ifndef WEB_ENABLED
         Callbacks::GodotFileRunner::get_singleton();
+#endif
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         // Data
@@ -122,7 +124,9 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
 
 void uninitialize_fmod_module(ModuleInitializationLevel p_level) {
     if (p_level == MODULE_INITIALIZATION_LEVEL_CORE) {
+#ifndef WEB_ENABLED
         Callbacks::GodotFileRunner::get_singleton()->finish();
+#endif
         FmodStringNames::free();
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {

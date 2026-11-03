@@ -49,6 +49,12 @@ Here is what the configuration looks like for this example:
 Then you have to set the path of this resource in project's settings, in the `Fmod/Plugins` section:  
 ![plugins-project-settings]
 
+## Web
+
+FMOD plugins are not available in web exports: FMOD's web runtime cannot load plugin libraries. A web export reports
+an error for each plugin declared in the `Dynamic Plugin List`, and banks whose events use a plugin fail to load, so
+keep plugin effects out of the banks of a game that ships on the web.
+
 
 [plugins-create-settings-resource]: ./assets/plugins-create-settings-resource.png
 [fmod-plugins-settings-resource]: ./assets/fmod-plugins-settings-resource.png

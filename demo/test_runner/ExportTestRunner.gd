@@ -64,6 +64,8 @@ func quit(code: int) -> void:
 	GdUnitSingleton.dispose()
 	GdUnitSignals.dispose()
 	await super(code)
+	# A web export has no process exit code: run_in_browser.py reads this line instead.
+	print("Export tests exit code: %d" % code)
 	get_tree().quit(code)
 
 
