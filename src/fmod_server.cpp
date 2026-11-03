@@ -14,6 +14,10 @@
 #include <classes/node3d.hpp>
 #include <classes/project_settings.hpp>
 
+#ifdef WEB_ENABLED
+#include <emscripten.h>
+#endif
+
 using namespace godot;
 
 FmodServer* FmodServer::singleton = nullptr;
@@ -149,7 +153,9 @@ FmodServer::FmodServer() :
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
     performanceData = create_ref<FmodPerformanceData>();
+#ifndef WEB_ENABLED
     Callbacks::GodotFileRunner::get_singleton()->start();
+#endif
 }
 
 FmodServer::~FmodServer() {
@@ -200,6 +206,22 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 
     FMOD_INITFLAGS init_flags = FMOD_INIT_3D_RIGHTHANDED;
 
+#ifdef WEB_ENABLED
+    // FMOD's audio worklet looks its mixer up with Module.cwrap, which only finds the main module's exports. This
+    // library is a side module, whose exports Emscripten's dynamic linker keeps in wasmImports.
+    // FMOD starts that worklet on the page's first click or touch only: a key press, the other user gesture browsers
+    // accept to start audio, starts it too.
+    EM_ASM({
+        Module['_FMOD_JS_MixerFastpathFunction'] = wasmImports['FMOD_JS_MixerFastpathFunction'];
+        Module['_FMOD_JS_MixerSlowpathFunction'] = wasmImports['FMOD_JS_MixerSlowpathFunction'];
+        window.addEventListener('keydown', () => Module['OutputAudioWorklet_resumeAudio'] && Module['OutputAudioWorklet_resumeAudio']());
+    });
+#endif
+#if defined(WEB_ENABLED) && defined(THREADS_ENABLED)
+    // The default AUDIOWORKLETP output needs Emscripten's Wasm Audio Worklets, which Godot's web runtime does not have.
+    ERROR_CHECK_WITH_REASON(coreSystem->setOutput(FMOD_OUTPUTTYPE_AUDIOWORKLET), "Cannot select the audio worklet output");
+#endif
+
     if (ERROR_CHECK(system->initialize(p_settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
@@ -213,9 +235,13 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         }
     }
 
+#ifdef WEB_ENABLED
+    if (ERROR_CHECK(coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, &Callbacks::godotFileRead, &Callbacks::godotFileSeek, nullptr, nullptr, -1))) {
+#else
     if (ERROR_CHECK(
           coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
         )) {
+#endif
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
     cache = new FmodCache(system, coreSystem);
@@ -893,6 +919,17 @@ Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
     FMOD::Channel* channel = nullptr;
     ERROR_CHECK_WITH_REASON(coreSystem->playSound(file->get_wrapped(), nullptr, true, &channel), vformat("Cannot play sound %s", path));
     if (channel) {
+#ifdef WEB_ENABLED
+        // Once a Studio event has been stopped, FMOD 2.04.00's web libraries mix a stereo sound's channel as a mono one
+        // (interleaved samples on one speaker) unless its mix matrix is set: set FMOD's default one, explicitly.
+        // TODO: remove once a FMOD release fixes it.
+        int sound_channels = 0;
+        ERROR_CHECK(file->get_wrapped()->getFormat(nullptr, nullptr, &sound_channels, nullptr));
+        if (sound_channels == 2) {
+            float stereo_matrix[] {1, 0, 0, 1};
+            ERROR_CHECK_WITH_REASON(channel->setMixMatrix(stereo_matrix, 2, 2), vformat("Cannot set the mix matrix of sound %s", path));
+        }
+#endif
         Ref<FmodSound> ref = FmodSound::create_ref(channel);
         return ref;
     }

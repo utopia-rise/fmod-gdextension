@@ -1,8 +1,8 @@
 # F.1: Platforms
 
-The addon runs the same game on the desktop and mobile platforms Godot exports to, from the editor and from debug and release exports.
+The addon runs the same game on the desktop, mobile and web platforms Godot exports to, from the editor and from debug and release exports.
 
-Each platform needs its native library for the editor (desktop only) and for both export templates, with the matching FMOD runtime, and mobile platforms need their own packaging: an Android plugin bringing FMOD's Java side, a static xcframework on iOS. The addon ships all of it (§4), and every feature works on each of them (§3).
+Each platform needs its native library for the editor (desktop only) and for both export templates, with the matching FMOD runtime, and mobile platforms need their own packaging: an Android plugin bringing FMOD's Java side, a static xcframework on iOS. The web needs two libraries with FMOD linked in, one for exports with threads and one for exports without. The addon ships all of it (§4), and every feature works on each of them (§3).
 
 Exporting the game's audio content is F.2.
 

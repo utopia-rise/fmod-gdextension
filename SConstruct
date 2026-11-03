@@ -13,6 +13,10 @@ target_path = ARGUMENTS.pop("target_path", "demo/addons/fmod/libs/")
 target_name = ARGUMENTS.pop("target_name", "libGodotFmod")
 fmod_lib_dir = ARGUMENTS.pop("fmod_lib_dir", "libs/")
 
+# Godot's default web export runs without threads, and a web library must match the export's threading.
+if ARGUMENTS.get("platform") == "web":
+    ARGUMENTS.setdefault("threads", "no")
+
 env = SConscript("godot-cpp/SConstruct", {"api_version": "4.6"})
 
 # Add those directory manually, so we can skip the godot_cpp directory when including headers in C++ files
@@ -123,6 +127,14 @@ elif env["platform"] == "android":
     env.Append(LIBPATH=[env['fmod_lib_dir'] + 'android/core/lib/' + arch_dir, env['fmod_lib_dir'] + 'android/studio/lib/' + arch_dir])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
+elif env["platform"] == "web":
+    # The Studio library contains the Core one. A threaded side module needs FMOD's pthread build: the single-threaded
+    # objects are compiled without the atomics a shared memory requires.
+    threading = "pthreads" if env["threads"] else "single_threaded"
+    libfmodstudio = "fmodstudio{}{}.a".format("P" if env["threads"] else "", lfix)
+    env.Append(CPPPATH=[env['fmod_lib_dir'] + 'web/core/inc/', env['fmod_lib_dir'] + 'web/studio/inc/'])
+    env.Append(LINKFLAGS=[env.File(env['fmod_lib_dir'] + 'web/studio/lib/browser/{}/c_cpp/{}'.format(threading, libfmodstudio))])
+
 #Output is placed in the addons directory of the demo project directly
 target = "{}{}/{}.{}.{}".format(
     target_path, env["platform"], target_name, env["platform"], env["target"]
@@ -145,9 +157,10 @@ elif env["platform"] == "ios":
     godot_cpp_library = env.File("godot-cpp/bin/libgodot-cpp{}{}".format(env["suffix"], env["LIBSUFFIX"]))
     library = env.Command("{}.a".format(target), [objects, godot_cpp_library], "libtool -static -o $TARGET $SOURCES")
 else:
-    target = "{}.{}{}".format(
+    target = "{}.{}{}{}".format(
         target,
         env["arch"],
+        ".nothreads" if env["platform"] == "web" and not env["threads"] else "",
         env["SHLIBSUFFIX"]
     )
     library = env.SharedLibrary(target=target, source=sources)
@@ -183,7 +196,9 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     [[shutil.copy(str(file), addon_fmod_libs_output) for file in files] for files in source_files]
 
 
-copy_fmod_libraries_action = Action('', copy_fmod_libraries)
-AddPostAction(library, copy_fmod_libraries_action)
+# FMOD is linked into the web library itself.
+if env["platform"] != "web":
+    copy_fmod_libraries_action = Action('', copy_fmod_libraries)
+    AddPostAction(library, copy_fmod_libraries_action)
 
 Default(library)

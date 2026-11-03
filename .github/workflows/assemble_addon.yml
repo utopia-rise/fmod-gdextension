@@ -40,6 +40,11 @@ jobs:
           merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
+          pattern: '*_web*'
+          path: package/addons/fmod/libs/web
+          merge-multiple: true
+      - uses: actions/download-artifact@v7
+        with:
           name: fmod-gdextension-android
           path: package/addons/fmod/libs
 

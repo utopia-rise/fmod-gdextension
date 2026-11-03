@@ -12,7 +12,7 @@ Global rules of FMOD GDExtension. No spec may contradict an article. An implemen
 
 ## §3: The same game everywhere
 - A game has the same audio features in the editor, in a debug export and in a release export, on every supported platform.
-  - Except: debugging aids (live update, profiling, verbose FMOD logging); a mechanism imposed by a platform, such as static FMOD plugins on iOS.
+  - Except: debugging aids (live update, profiling, verbose FMOD logging); a mechanism imposed by a platform, such as static FMOD plugins on iOS; a feature FMOD's runtime does not offer on a platform, such as FMOD plugins on the web.
   - Why: What a sound designer hears while developing must be what players hear once the game ships, wherever it ships.
 
 ## §4: Users never touch the native side

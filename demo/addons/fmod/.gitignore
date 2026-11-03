@@ -9,6 +9,7 @@ libs/**/*.dylib
 libs/**/*.a
 libs/**/*.aar
 libs/**/*.xcframework/
+libs/**/*.wasm
 # A macOS framework's binary has no extension: only its Info.plist is tracked.
 libs/macos/*.framework/*
 !libs/macos/*.framework/Info.plist

@@ -25,8 +25,14 @@ namespace Callbacks {
             if (type == FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND) {
                 const godot::String& sound_key {event_instance->get_programmers_callback_sound_key()};
                 FMOD_STUDIO_SOUND_INFO sound_info {godot::FmodServer::get_singleton()->get_sound_info(sound_key)};
+#if defined(WEB_ENABLED) && !defined(THREADS_ENABLED)
+                // FMOD's single-threaded web build has no thread to load a sound without blocking.
+                FMOD_MODE loading = FMOD_DEFAULT;
+#else
+                FMOD_MODE loading = FMOD_NONBLOCKING;
+#endif
                 FMOD::Sound* sound {
-                  godot::FmodServer::get_singleton()->create_sound(sound_info, FMOD_LOOP_NORMAL | FMOD_CREATECOMPRESSEDSAMPLE | FMOD_NONBLOCKING)
+                  godot::FmodServer::get_singleton()->create_sound(sound_info, FMOD_LOOP_NORMAL | FMOD_CREATECOMPRESSEDSAMPLE | loading)
                 };
 
                 auto* props {reinterpret_cast<FMOD_STUDIO_PROGRAMMER_SOUND_PROPERTIES*>(parameters)};

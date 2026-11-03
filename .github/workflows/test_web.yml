@@ -1,0 +1,70 @@
+name: 🌐 Web Tests
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.browser }} ${{ matrix.threading }}
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [google-chrome, firefox]
+        threading: [nothreads, threads]
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+
+      - uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: linux
+          destination: ${{ runner.temp }}/godot
+
+      - name: Install web export templates
+        uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: web
+          destination: ${{ runner.temp }}/godot
+          template: release
+
+      # The editor library runs the export plugin, which packs the banks.
+      - name: Download editor library
+        uses: actions/download-artifact@v7
+        with:
+          name: editor_linux
+          path: demo/addons/fmod/libs/linux
+
+      - name: Download web libraries
+        uses: actions/download-artifact@v7
+        with:
+          pattern: template_release_web*
+          path: demo/addons/fmod/libs/web
+          merge-multiple: true
+
+      # Runners have no sound card: browsers then report no output channel, and setting up audio throws before the tests
+      # start. A PulseAudio null sink gives them a stereo output.
+      - name: Start a virtual audio output
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq pulseaudio
+          pulseaudio -D --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=virtual_output
+          pactl set-default-sink virtual_output
+
+      # A display rather than headless browsers, whose WebGL support varies.
+      - name: Run tests
+        timeout-minutes: 20
+        run: |
+          cd demo
+          xvfb-run --auto-servernum ./run_tests.sh "$RUNNER_TEMP/godot/godot.linuxbsd.editor.x86_64" web-release "$(command -v ${{ matrix.browser }})" ${{ matrix.threading }} window

@@ -1,6 +1,6 @@
 # F.3: FMOD plugins
 
-Games use third-party FMOD plugins, such as Steam Audio or Resonance, configured from a Godot resource and loaded and exported on every platform.
+Games use third-party FMOD plugins, such as Steam Audio or Resonance, configured from a Godot resource and loaded and exported on every platform whose FMOD runtime loads plugins: all but the web (§3 Except).
 
 FMOD plugins add DSP effects, codecs and outputs that FMOD Studio projects depend on. Their libraries are the only native files a user supplies (§4 Except); the addon loads them at startup and packs them with each export, in the form each platform requires: dynamic libraries on desktop and Android, static libraries registered through generated code on iOS.
 

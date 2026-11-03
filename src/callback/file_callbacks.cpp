@@ -2,6 +2,7 @@
 
 namespace Callbacks {
 
+#ifndef WEB_ENABLED
     GodotFileRunner* GodotFileRunner::get_singleton() {
         static GodotFileRunner singleton;
         return &singleton;
@@ -100,6 +101,7 @@ namespace Callbacks {
         read_cv.notify_one();
         fileThread.join();
     }
+#endif
 
     FMOD_RESULT F_CALL godotFileOpen(const char* name, unsigned int* filesize, void** handle, void* userdata) {
         godot::Ref<godot::FileAccess> access = godot::FileAccess::open(name, godot::FileAccess::ModeFlags::READ);
@@ -122,6 +124,21 @@ namespace Callbacks {
         return FMOD_RESULT::FMOD_OK;
     }
 
+#ifdef WEB_ENABLED
+    // The web reads files synchronously: FMOD's HTML5 libraries only support asynchronous reads through Asyncify, which
+    // a side module cannot use, and a build without threads aborts when a thread starts.
+    FMOD_RESULT F_CALL godotFileRead(void* handle, void* buffer, unsigned int sizebytes, unsigned int* bytesread, void* userdata) {
+        godot::Ref<godot::FileAccess> file {reinterpret_cast<GodotFileHandle*>(handle)->file};
+        *bytesread = static_cast<unsigned int>(file->get_buffer(static_cast<uint8_t*>(buffer), sizebytes));
+        return *bytesread < sizebytes ? FMOD_RESULT::FMOD_ERR_FILE_EOF : FMOD_RESULT::FMOD_OK;
+    }
+
+    FMOD_RESULT F_CALL godotFileSeek(void* handle, unsigned int pos, void* userdata) {
+        reinterpret_cast<GodotFileHandle*>(handle)->file->seek(pos);
+        return FMOD_RESULT::FMOD_OK;
+    }
+
+#else
     FMOD_RESULT F_CALL godotSyncRead(FMOD_ASYNCREADINFO* info, void* userdata) {
         GodotFileRunner* runner {GodotFileRunner::get_singleton()};
         int priority {info->priority};
@@ -140,4 +157,5 @@ namespace Callbacks {
         GodotFileRunner* runner {GodotFileRunner::get_singleton()};
         return runner->cancelReadRequest(info);
     }
+#endif
 }// namespace Callbacks

@@ -1,0 +1,59 @@
+name: 🌐 Web Builds
+on:
+  workflow_call:
+    inputs:
+      fmod-version:
+        type: string
+        required: true
+      emscripten-version:
+        type: string
+        required: true
+
+jobs:
+  build-web:
+    runs-on: ubuntu-22.04
+    name: ${{ matrix.target }} threads=${{ matrix.threads }}
+    permissions:
+      contents: read
+      actions: write
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons-cache
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [template_debug, template_release]
+        threads: ['no', 'yes']
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: ${{ inputs.emscripten-version }}
+      - uses: ./.github/actions/scons-cache
+        with:
+          mode: restore
+          name: web-${{ matrix.target }}-threads-${{ matrix.threads }}
+      - uses: ./.github/actions/gdextension-build
+        with:
+          platform: web
+          target: ${{ matrix.target }}
+          scons-flags: threads=${{ matrix.threads }}
+          fmod-version: ${{ inputs.fmod-version }}
+          fmod-user: ${{ secrets.FMODUSER }}
+          fmod-password: ${{ secrets.FMODPASS }}
+      - uses: ./.github/actions/scons-cache
+        if: always()
+        with:
+          mode: save
+          name: web-${{ matrix.target }}-threads-${{ matrix.threads }}
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.target }}_web${{ matrix.threads == 'yes' && '_threads' || '' }}
+          path: demo/addons/fmod/libs/web
+          if-no-files-found: error

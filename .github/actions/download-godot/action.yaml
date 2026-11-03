@@ -41,6 +41,11 @@ runs:
               template_directory="$HOME/Library/Application Support/Godot/export_templates/$template_version"
               template="ios.zip"
               ;;
+            web)
+              # Exported from a Linux host. GDExtension needs the dlink templates, with and without threads.
+              template_directory="$HOME/.local/share/godot/export_templates/$template_version"
+              template="web_dlink_nothreads_${{ inputs.template }}.zip web_dlink_${{ inputs.template }}.zip"
+              ;;
             *)
               echo "Unsupported platform: ${{ inputs.platform }}" >&2
               exit 1

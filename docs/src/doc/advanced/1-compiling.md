@@ -17,11 +17,11 @@ Clone project with `--recurse-submodules`.
 ```
 
 Put the FMOD Studio API of each platform you build under `libs/{platform}`, where `{platform}` is `windows`, `linux`,
-`osx`, `ios` or `android`. The FMOD Studio API needs an FMOD account to download, so it is never committed. `get_fmod.py`
+`osx`, `ios`, `android` or `web`. The FMOD Studio API needs an FMOD account to download, so it is never committed. `get_fmod.py`
 downloads one platform's API with your account and installs it there:
 
 ```
-python get_fmod.py <FMOD account> <FMOD password> <windows|linux|macos|ios|android> 20400
+python get_fmod.py <FMOD account> <FMOD password> <windows|linux|macos|ios|android|web> 20400
 ```
 
 Unpacking the Windows installer needs [7-Zip](https://www.7-zip.org/), and the macOS and iOS disk images need macOS.
@@ -35,7 +35,7 @@ Sconstruct.
 In order to compile you should run `scons` command, as for all gdextension projects.
 
 ```
-scons platform=<macos|linux|windows|ios|android> target=<editor|template_debug|template_release> --jobs=<desired number of threads>
+scons platform=<macos|linux|windows|ios|android|web> target=<editor|template_debug|template_release> --jobs=<desired number of threads>
 ```
 
 If `target` is `editor` or `template_debug`, debug symbols will be generated.
@@ -55,3 +55,17 @@ Example:
 ```
 scons platform=windows arch=x86_64 target=editor fmod_lib_dir=../my-fmod-sdks/
 ```
+
+### Web
+
+Web builds need the [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html) of the version that
+built Godot's web export templates (`EMSCRIPTEN_VERSION` in `.github/workflows/trigger_ci.yml`): a library built with
+another version can fail to load. Activate it so that `emcc` is on the `PATH`, then build each target without and with
+threads, which give the two libraries `fmod.gdextension` lists for the web:
+
+```
+scons platform=web target=template_release
+scons platform=web target=template_release threads=yes
+```
+
+The web has no `editor` target.

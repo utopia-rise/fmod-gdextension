@@ -2,7 +2,7 @@ name: Install FMOD
 description: Installs the FMOD Studio API of one platform into libs/<sdk platform>/, where SConstruct reads it.
 inputs:
   platform:
-    description: The godot-cpp platform name (windows, linux, macos, ios, android).
+    description: The godot-cpp platform name (windows, linux, macos, ios, android, web).
     required: true
   fmod-version:
     required: true
