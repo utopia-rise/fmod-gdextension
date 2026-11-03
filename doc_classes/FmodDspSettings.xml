@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodDspSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="dsp_buffer_count" type="int" setter="set_dsp_buffer_count" getter="get_dsp_buffer_count" default="0">
+		</member>
+		<member name="dsp_buffer_size" type="int" setter="set_dsp_buffer_size" getter="get_dsp_buffer_size" default="0">
+		</member>
+	</members>
+</class>

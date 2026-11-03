@@ -49,13 +49,13 @@ Ref<FmodSound3DSettings> FmodSound3DSettings::get_from_project_settings() {
 }
 
 void FmodSound3DSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_doppler_scale", "p_doppler_scale"), &FmodSound3DSettings::set_doppler_scale);
+    ClassDB::bind_method(D_METHOD("set_doppler_scale", "doppler_scale"), &FmodSound3DSettings::set_doppler_scale);
     ClassDB::bind_method(D_METHOD("get_doppler_scale"), &FmodSound3DSettings::get_doppler_scale);
 
-    ClassDB::bind_method(D_METHOD("set_distance_factor", "p_distance_factor"), &FmodSound3DSettings::set_distance_factor);
+    ClassDB::bind_method(D_METHOD("set_distance_factor", "distance_factor"), &FmodSound3DSettings::set_distance_factor);
     ClassDB::bind_method(D_METHOD("get_distance_factor"), &FmodSound3DSettings::get_distance_factor);
 
-    ClassDB::bind_method(D_METHOD("set_rolloff_scale", "p_rolloff_scale"), &FmodSound3DSettings::set_rolloff_scale);
+    ClassDB::bind_method(D_METHOD("set_rolloff_scale", "rolloff_scale"), &FmodSound3DSettings::set_rolloff_scale);
     ClassDB::bind_method(D_METHOD("get_rolloff_scale"), &FmodSound3DSettings::get_rolloff_scale);
 
     ADD_PROPERTY(

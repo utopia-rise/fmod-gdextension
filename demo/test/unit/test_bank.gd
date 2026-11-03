@@ -40,6 +40,6 @@ func test_assert_bank_string_count():
 	assert_int(vehicleBank.get_string_count()).is_equal(0)
 
 func test_assert_bank_vca_count():
-	assert_int(musicBank.get_VCA_count()).is_equal(0)
-	assert_int(masterBank.get_VCA_count()).is_equal(3)
-	assert_int(vehicleBank.get_VCA_count()).is_equal(0)
+	assert_int(musicBank.get_vca_count()).is_equal(0)
+	assert_int(masterBank.get_vca_count()).is_equal(3)
+	assert_int(vehicleBank.get_vca_count()).is_equal(0)

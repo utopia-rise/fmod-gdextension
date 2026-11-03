@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodSound" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="is_playing" qualifiers="const">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="is_valid" qualifiers="const">
+			<return type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="play" qualifiers="const">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="release" qualifiers="const">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="set_paused" qualifiers="const">
+			<return type="void" />
+			<param index="0" name="paused" type="bool" />
+			<description>
+			</description>
+		</method>
+		<method name="stop" qualifiers="const">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="pitch" type="float" setter="set_pitch" getter="get_pitch">
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume">
+		</member>
+	</members>
+</class>

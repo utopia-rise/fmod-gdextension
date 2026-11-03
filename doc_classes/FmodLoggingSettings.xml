@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodLoggingSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="debug_level" type="int" setter="set_debug_level" getter="get_debug_level" default="0">
+		</member>
+		<member name="log_file_path" type="String" setter="set_log_file_path" getter="get_log_file_path" default="&quot;&quot;">
+		</member>
+		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" default="0">
+		</member>
+	</members>
+	<constants>
+		<constant name="DEBUG_NONE" value="1" enum="DebugLevel">
+		</constant>
+		<constant name="DEBUG_ERROR" value="2" enum="DebugLevel">
+		</constant>
+		<constant name="DEBUG_WARNING" value="3" enum="DebugLevel">
+		</constant>
+		<constant name="DEBUG_LOG" value="4" enum="DebugLevel">
+		</constant>
+		<constant name="DEBUG_VERBOSE" value="5" enum="DebugLevel">
+		</constant>
+	</constants>
+</class>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="FmodBank" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+<class name="FmodBank" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
 		Represents a loaded FMOD Studio bank containing audio content and metadata.
 	</brief_description>
@@ -26,13 +26,13 @@
 				Returns the number of buses defined in this bank.
 			</description>
 		</method>
-		<method name="get_bus_list">
+		<method name="get_bus_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodBus] objects defined in this bank.
 			</description>
 		</method>
-		<method name="get_description_list">
+		<method name="get_description_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodEventDescription] objects defined in this bank.
@@ -44,8 +44,18 @@
 				Returns the number of event descriptions defined in this bank.
 			</description>
 		</method>
+		<method name="get_godot_res_path" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_guid" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
 		<method name="get_loading_state">
-			<return type="int" />
+			<return type="int" enum="FmodServer.FMOD_STUDIO_LOADING_STATE" />
 			<description>
 				Returns the loading state of the bank. See FMOD_STUDIO_LOADING_STATE enum for possible values:
 				- FMOD_STUDIO_LOADING_STATE_UNLOADING: Bank is being unloaded
@@ -55,28 +65,32 @@
 				- FMOD_STUDIO_LOADING_STATE_ERROR: An error occurred during loading
 			</description>
 		</method>
-		<method name="get_string_count">
+		<method name="get_path" qualifiers="const">
+			<return type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="get_string_count" qualifiers="const">
 			<return type="int" />
 			<description>
 				Returns the number of strings in the bank's string table. This includes names for events, buses, VCAs, and parameters.
 			</description>
 		</method>
-		<method name="get_vca_count">
+		<method name="get_vca_count" qualifiers="const">
 			<return type="int" />
 			<description>
 				Returns the number of VCAs (Volume Control Automation) defined in this bank.
 			</description>
 		</method>
-		<method name="get_vca_list">
+		<method name="get_vca_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodVCA] objects defined in this bank.
 			</description>
 		</method>
-		<method name="update_bank_data">
-			<return type="void" />
+		<method name="is_valid" qualifiers="const">
+			<return type="bool" />
 			<description>
-				Forces an update of the bank's cached data including event descriptions, buses, and VCAs. This is typically called automatically but can be useful if the bank content changes at runtime.
 			</description>
 		</method>
 	</methods>

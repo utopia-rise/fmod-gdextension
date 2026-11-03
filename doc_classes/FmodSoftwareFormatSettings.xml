@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodSoftwareFormatSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="raw_speakers_count" type="int" setter="set_raw_speakers_count" getter="get_raw_speakers_count" default="-874860880">
+		</member>
+		<member name="sample_rate" type="int" setter="set_sample_rate" getter="get_sample_rate" default="0">
+		</member>
+		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" default="0">
+		</member>
+	</members>
+</class>

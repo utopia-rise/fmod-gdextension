@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="FmodServer" inherits="Object" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+<class name="FmodServer" inherits="Object" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
 		Main FMOD integration singleton providing audio system management.
 	</brief_description>
@@ -42,7 +42,7 @@
 		</method>
 		<method name="check_bus_path">
 			<return type="bool" />
-			<param index="0" name="busPath" type="String" />
+			<param index="0" name="bus_path" type="String" />
 			<description>
 				Checks if a bus with the specified path exists in the loaded banks.
 			</description>
@@ -56,7 +56,7 @@
 		</method>
 		<method name="check_event_path">
 			<return type="bool" />
-			<param index="0" name="eventPath" type="String" />
+			<param index="0" name="event_path" type="String" />
 			<description>
 				Checks if an event with the specified path exists in the loaded banks.
 			</description>
@@ -70,14 +70,14 @@
 		</method>
 		<method name="check_vca_path">
 			<return type="bool" />
-			<param index="0" name="vcaPath" type="String" />
+			<param index="0" name="vca_path" type="String" />
 			<description>
 				Checks if a VCA with the specified path exists in the loaded banks.
 			</description>
 		</method>
 		<method name="create_event_instance">
 			<return type="FmodEvent" />
-			<param index="0" name="eventPath" type="String" />
+			<param index="0" name="event_path" type="String" />
 			<description>
 				Creates a new instance of the specified FMOD event. The event path should be in the format "event:/path/to/event".
 			</description>
@@ -135,7 +135,7 @@
 		</method>
 		<method name="get_bus">
 			<return type="FmodBus" />
-			<param index="0" name="busPath" type="String" />
+			<param index="0" name="bus_path" type="String" />
 			<description>
 				Gets the bus at the specified path. Bus paths follow the format "bus:/path/to/bus".
 			</description>
@@ -155,7 +155,7 @@
 		</method>
 		<method name="get_event">
 			<return type="FmodEventDescription" />
-			<param index="0" name="eventPath" type="String" />
+			<param index="0" name="event_path" type="String" />
 			<description>
 				Gets the event description at the specified path. Event paths follow the format "event:/path/to/event".
 			</description>
@@ -221,11 +221,28 @@
 				Returns an array of all global parameter descriptions.
 			</description>
 		</method>
+		<method name="get_listener_2d_velocity">
+			<return type="Vector2" />
+			<param index="0" name="index" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_listener_3d_velocity">
+			<return type="Vector3" />
+			<param index="0" name="index" type="int" />
+			<description>
+			</description>
+		</method>
 		<method name="get_listener_lock">
 			<return type="bool" />
 			<param index="0" name="index" type="int" />
 			<description>
 				Returns whether the listener at the specified index is locked (position won't be updated automatically).
+			</description>
+		</method>
+		<method name="get_listener_number" qualifiers="const">
+			<return type="int" />
+			<description>
 			</description>
 		</method>
 		<method name="get_listener_transform2d">
@@ -242,34 +259,42 @@
 				Gets the 3D transform of the listener at the specified index.
 			</description>
 		</method>
+		<method name="get_listener_weight">
+			<return type="float" />
+			<param index="0" name="index" type="int" />
+			<description>
+			</description>
+		</method>
+		<method name="get_object_attached_to_listener">
+			<return type="Object" />
+			<param index="0" name="index" type="int" />
+			<description>
+			</description>
+		</method>
 		<method name="get_performance_data">
 			<return type="FmodPerformanceData" />
 			<description>
 				Returns performance data for the FMOD system including CPU and memory usage.
 			</description>
 		</method>
-		<method name="get_singleton" qualifiers="static">
-			<return type="FmodServer" />
-			<description>
-				Returns the singleton instance of FmodServer.
-			</description>
-		</method>
-		<method name="get_system_listener_number">
+		<method name="get_system_dsp_buffer_length">
 			<return type="int" />
 			<description>
-				Returns the number of listeners currently configured in the system.
 			</description>
 		</method>
-		<method name="get_system_listener_weight">
-			<return type="float" />
-			<param index="0" name="index" type="int" />
+		<method name="get_system_dsp_buffer_settings">
+			<return type="FmodDspSettings" />
 			<description>
-				Gets the weight of the listener at the specified index. Higher weights give more influence to that listener's position.
+			</description>
+		</method>
+		<method name="get_system_dsp_num_buffers">
+			<return type="int" />
+			<description>
 			</description>
 		</method>
 		<method name="get_vca">
 			<return type="FmodVCA" />
-			<param index="0" name="vcaPath" type="String" />
+			<param index="0" name="vca_path" type="String" />
 			<description>
 				Gets the VCA at the specified path. VCA paths follow the format "vca:/path/to/vca".
 			</description>
@@ -283,15 +308,21 @@
 		</method>
 		<method name="init">
 			<return type="void" />
-			<param index="0" name="p_settings" type="FmodGeneralSettings" />
+			<param index="0" name="settings" type="FmodGeneralSettings" />
 			<description>
 				Initializes the FMOD system with the specified settings. This must be called before using any FMOD functionality.
 			</description>
 		</method>
+		<method name="is_plugin_loaded">
+			<return type="bool" />
+			<param index="0" name="plugin_handle" type="int" />
+			<description>
+			</description>
+		</method>
 		<method name="load_bank">
 			<return type="FmodBank" />
-			<param index="0" name="pathToBank" type="String" />
-			<param index="1" name="flag" type="int" />
+			<param index="0" name="bank_path" type="String" />
+			<param index="1" name="flags" type="int" />
 			<description>
 				Loads an FMOD bank file from the specified path. The flag parameter controls loading behavior (synchronous, asynchronous, etc.).
 			</description>
@@ -308,6 +339,23 @@
 			<param index="0" name="path" type="String" />
 			<description>
 				Loads an audio file as a sound effect with full loading into memory.
+			</description>
+		</method>
+		<method name="load_plugin">
+			<return type="int" />
+			<param index="0" name="plugin_path" type="String" />
+			<param index="1" name="priority" type="int" default="0" />
+			<description>
+			</description>
+		</method>
+		<method name="mixer_resume">
+			<return type="void" />
+			<description>
+			</description>
+		</method>
+		<method name="mixer_suspend">
+			<return type="void" />
+			<description>
 			</description>
 		</method>
 		<method name="mute_all_events">
@@ -344,6 +392,62 @@
 			<param index="2" name="parameters" type="Dictionary" />
 			<description>
 				Plays a one-shot event attached to a node with initial parameter values.
+			</description>
+		</method>
+		<method name="play_one_shot_using_event_description">
+			<return type="void" />
+			<param index="0" name="event_description" type="FmodEventDescription" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_event_description_attached">
+			<return type="void" />
+			<param index="0" name="event_description" type="FmodEventDescription" />
+			<param index="1" name="game_obj" type="Node" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_event_description_attached_with_params">
+			<return type="void" />
+			<param index="0" name="event_description" type="FmodEventDescription" />
+			<param index="1" name="game_obj" type="Node" />
+			<param index="2" name="parameters" type="Dictionary" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_event_description_with_params">
+			<return type="void" />
+			<param index="0" name="event_description" type="FmodEventDescription" />
+			<param index="1" name="parameters" type="Dictionary" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_guid">
+			<return type="void" />
+			<param index="0" name="guid" type="String" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_guid_attached">
+			<return type="void" />
+			<param index="0" name="guid" type="String" />
+			<param index="1" name="game_obj" type="Node" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_guid_attached_with_params">
+			<return type="void" />
+			<param index="0" name="guid" type="String" />
+			<param index="1" name="game_obj" type="Node" />
+			<param index="2" name="parameters" type="Dictionary" />
+			<description>
+			</description>
+		</method>
+		<method name="play_one_shot_using_guid_with_params">
+			<return type="void" />
+			<param index="0" name="guid" type="String" />
+			<param index="1" name="parameters" type="Dictionary" />
+			<description>
 			</description>
 		</method>
 		<method name="play_one_shot_with_params">
@@ -404,9 +508,15 @@
 		<method name="set_listener_lock">
 			<return type="void" />
 			<param index="0" name="index" type="int" />
-			<param index="1" name="isLocked" type="bool" />
+			<param index="1" name="is_locked" type="bool" />
 			<description>
 				Sets whether the listener at the specified index is locked (position won't be updated automatically).
+			</description>
+		</method>
+		<method name="set_listener_number">
+			<return type="void" />
+			<param index="0" name="listener_number" type="int" />
+			<description>
 			</description>
 		</method>
 		<method name="set_listener_transform2d">
@@ -425,19 +535,29 @@
 				Sets the 3D transform of the listener at the specified index.
 			</description>
 		</method>
-		<method name="set_system_listener_number">
-			<return type="void" />
-			<param index="0" name="listenerNumber" type="int" />
-			<description>
-				Sets the number of listeners to use in the system (1-8).
-			</description>
-		</method>
-		<method name="set_system_listener_weight">
+		<method name="set_listener_weight">
 			<return type="void" />
 			<param index="0" name="index" type="int" />
 			<param index="1" name="weight" type="float" />
 			<description>
-				Sets the weight of the listener at the specified index, between 0.0 and 1.0.
+			</description>
+		</method>
+		<method name="set_software_format">
+			<return type="void" />
+			<param index="0" name="settings" type="FmodSoftwareFormatSettings" />
+			<description>
+			</description>
+		</method>
+		<method name="set_sound_3d_settings">
+			<return type="void" />
+			<param index="0" name="settings" type="FmodSound3DSettings" />
+			<description>
+			</description>
+		</method>
+		<method name="set_system_dsp_buffer_size">
+			<return type="void" />
+			<param index="0" name="dsp_settings" type="FmodDspSettings" />
+			<description>
 			</description>
 		</method>
 		<method name="shutdown">
@@ -446,11 +566,16 @@
 				Shuts down the FMOD system and releases all resources.
 			</description>
 		</method>
-		<method name="unload_bank">
+		<method name="unload_file">
 			<return type="void" />
-			<param index="0" name="pathToBank" type="String" />
+			<param index="0" name="path" type="String" />
 			<description>
-				Unloads the bank at the specified path and releases its resources.
+			</description>
+		</method>
+		<method name="unload_plugin">
+			<return type="void" />
+			<param index="0" name="plugin_handle" type="int" />
+			<description>
 			</description>
 		</method>
 		<method name="unmute_all_events">
@@ -478,4 +603,212 @@
 			</description>
 		</method>
 	</methods>
+	<constants>
+		<constant name="FMOD_INIT_3D_RIGHTHANDED" value="4" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_CHANNEL_DISTANCEFILTER" value="512" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_CHANNEL_LOWPASS" value="256" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_GEOMETRY_USECLOSEST" value="262144" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_NORMAL" value="0" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_PREFER_DOLBY_DOWNMIX" value="524288" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_PROFILE_ENABLE" value="65536" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_PROFILE_METER_ALL" value="2097152" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_STREAM_FROM_UPDATE" value="1" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_THREAD_UNSAFE" value="1048576" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_INIT_VOL0_BECOMES_VIRTUAL" value="131072" enum="FMOD_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_NORMAL" value="0" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_LIVEUPDATE" value="1" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS" value="2" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE" value="4" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_DEFERRED_CALLBACKS" value="8" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_INIT_LOAD_FROM_UPDATE" value="16" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_5POINT1" value="6" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_7POINT1" value="7" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_7POINT1POINT4" value="8" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_DEFAULT" value="0" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_MAX" value="9" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_MONO" value="2" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_QUAD" value="4" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_RAW" value="1" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_STEREO" value="3" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_SURROUND" value="5" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOAD_BANK_NORMAL" value="0" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_LOAD_BANK_NONBLOCKING" value="1" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES" value="2" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_2D" value="8" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D" value="16" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_CUSTOMROLLOFF" value="67108864" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_HEADRELATIVE" value="262144" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_IGNOREGEOMETRY" value="1073741824" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_INVERSEROLLOFF" value="1048576" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_INVERSETAPEREDROLLOFF" value="8388608" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_LINEARROLLOFF" value="2097152" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_LINEARSQUAREROLLOFF" value="4194304" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_3D_WORLDRELATIVE" value="524288" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_ACCURATETIME" value="16384" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_CREATECOMPRESSEDSAMPLE" value="512" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_CREATESAMPLE" value="256" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_CREATESTREAM" value="128" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_DEFAULT" value="0" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_IGNORETAGS" value="33554432" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_LOOP_BIDI" value="4" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_LOOP_NORMAL" value="2" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_LOOP_OFF" value="1" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_LOWMEM" value="134217728" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_MPEGSEARCH" value="32768" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_NONBLOCKING" value="65536" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_OPENMEMORY" value="2048" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_OPENMEMORY_POINT" value="268435456" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_OPENONLY" value="8192" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_OPENRAW" value="4096" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_OPENUSER" value="1024" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_UNIQUE" value="131072" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_VIRTUAL_PLAYFROMSTART" value="2147483648" enum="FMOD_MODE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_STOP_ALLOWFADEOUT" value="0" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_STOP_IMMEDIATE" value="1" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_STOP_FORCEINT" value="65536" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE" value="1" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_POSTUPDATE" value="2" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_BANK_UNLOAD" value="4" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_CONNECTED" value="8" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_DISCONNECTED" value="16" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATED" value="1" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROYED" value="2" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTING" value="4" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTED" value="8" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_RESTARTED" value="16" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STOPPED" value="32" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_FAILED" value="64" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND" value="128" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND" value="256" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_CREATED" value="512" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_DESTROYED" value="1024" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER" value="2048" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT" value="4096" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED" value="8192" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED" value="16384" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_REAL_TO_VIRTUAL" value="32768" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_VIRTUAL_TO_REAL" value="65536" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_EVENT_COMMAND" value="131072" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_NESTED_TIMELINE_BEAT" value="262144" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADING" value="0" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADED" value="1" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_LOADING" value="2" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_LOADED" value="3" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_ERROR" value="4" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_FORCEINT" value="65536" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_PLAYING" value="0" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_SUSTAINING" value="1" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STOPPED" value="2" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STARTING" value="3" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STOPPING" value="4" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_FORCEINT" value="65536" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_TTY" value="0" enum="FMOD_DEBUG_MODE">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_CALLBACK" value="2" enum="FMOD_DEBUG_MODE">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_FILE" value="1" enum="FMOD_DEBUG_MODE">
+		</constant>
+	</constants>
 </class>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodGeneralSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="banks_path" type="String" setter="set_banks_path" getter="get_banks_path" default="&quot;&quot;">
+		</member>
+		<member name="channel_count" type="int" setter="set_channel_count" getter="get_channel_count" default="0">
+		</member>
+		<member name="default_listener_count" type="int" setter="set_default_listener_count" getter="get_default_listener_count" default="0">
+		</member>
+		<member name="is_live_update_enabled" type="bool" setter="set_is_live_update_enabled" getter="get_is_live_update_enabled" default="false">
+		</member>
+		<member name="is_memory_tracking_enabled" type="bool" setter="set_is_memory_tracking_enabled" getter="get_is_memory_tracking_enabled" default="false">
+		</member>
+		<member name="should_load_by_name" type="bool" setter="set_should_load_by_name" getter="get_should_load_by_name" default="false">
+		</member>
+	</members>
+</class>

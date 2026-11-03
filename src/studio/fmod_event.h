@@ -4,6 +4,7 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
+#include "helpers/constants.h"
 #include "core/fmod_channel_group.h"
 
 namespace godot {
@@ -30,7 +31,7 @@ namespace godot {
         void set_parameter_by_id_with_label(uint64_t parameter_id, const String& label, bool ignoreseekspeed = false) const;
         void release() const;
         void start() const;
-        void stop(int stopMode) const;
+        void stop(FMOD_STUDIO_STOP_MODE stop_mode) const;
         void event_key_off() const;
         FMOD_STUDIO_PLAYBACK_STATE get_playback_state() const;
         bool get_paused() const;
@@ -62,7 +63,5 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
-
-VARIANT_ENUM_CAST(FMOD_STUDIO_PLAYBACK_STATE)
 
 #endif// GODOTFMOD_FMOD_EVENT_H

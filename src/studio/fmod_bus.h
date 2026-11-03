@@ -4,6 +4,7 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
+#include "helpers/constants.h"
 
 namespace godot {
     class FmodBus : public RefCounted {
@@ -19,7 +20,7 @@ namespace godot {
         void set_mute(bool mute) const;
         void set_paused(bool paused) const;
         void set_volume(float volume) const;
-        void stop_all_events(int stopMode);
+        void stop_all_events(FMOD_STUDIO_STOP_MODE stop_mode);
 
         protected:
             static void _bind_methods();

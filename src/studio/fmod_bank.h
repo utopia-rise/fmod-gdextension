@@ -7,6 +7,7 @@
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
+#include "helpers/constants.h"
 
 namespace godot {
     class FmodBank : public RefCounted {
@@ -25,7 +26,7 @@ namespace godot {
         FmodBank() = default;
         ~FmodBank() override;
 
-        int get_loading_state();
+        FMOD_STUDIO_LOADING_STATE get_loading_state();
 
         int64_t get_event_description_count();
         int64_t get_bus_count();

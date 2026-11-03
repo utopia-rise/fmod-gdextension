@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodPerformanceData" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="convolution1" type="float" setter="" getter="get_convolution1">
+		</member>
+		<member name="convolution2" type="float" setter="" getter="get_convolution2">
+		</member>
+		<member name="currently_allocated" type="int" setter="" getter="get_currently_allocated">
+		</member>
+		<member name="dsp" type="float" setter="" getter="get_dsp">
+		</member>
+		<member name="geometry" type="float" setter="" getter="get_geometry">
+		</member>
+		<member name="max_allocated" type="int" setter="" getter="get_max_allocated">
+		</member>
+		<member name="other_bytes_read" type="int" setter="" getter="get_other_bytes_read">
+		</member>
+		<member name="sample_bytes_read" type="int" setter="" getter="get_sample_bytes_read">
+		</member>
+		<member name="stream" type="float" setter="" getter="get_stream">
+		</member>
+		<member name="stream_bytes_read" type="int" setter="" getter="get_stream_bytes_read">
+		</member>
+		<member name="studio" type="float" setter="" getter="get_studio">
+		</member>
+		<member name="update" type="float" setter="" getter="get_update">
+		</member>
+	</members>
+</class>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodPluginsSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="dynamic_plugin_list" type="PackedStringArray" setter="set_dynamic_plugin_list" getter="get_dynamic_plugin_list" default="PackedStringArray()">
+		</member>
+		<member name="plugins_base_path" type="String" setter="set_plugins_base_path" getter="get_fmod_plugins_base_path" default="&quot;&quot;">
+		</member>
+		<member name="static_plugins_methods" type="FmodStaticPluginMethod[]" setter="set_static_plugins_methods" getter="get_static_plugins_methods" default="[]">
+		</member>
+	</members>
+</class>

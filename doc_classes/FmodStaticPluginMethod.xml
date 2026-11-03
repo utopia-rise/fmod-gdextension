@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodStaticPluginMethod" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+	</brief_description>
+	<description>
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="method_name" type="String" setter="set_method_name" getter="get_method_name" default="&quot;&quot;">
+		</member>
+		<member name="type" type="int" setter="set_type" getter="get_type" enum="FmodStaticPluginMethod.Type" default="0">
+		</member>
+	</members>
+	<constants>
+		<constant name="CODEC" value="0" enum="Type">
+		</constant>
+		<constant name="DSP" value="1" enum="Type">
+		</constant>
+		<constant name="OUTPUT" value="2" enum="Type">
+		</constant>
+	</constants>
+</class>

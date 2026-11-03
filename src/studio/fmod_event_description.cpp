@@ -24,23 +24,16 @@ void FmodEventDescription::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_min_max_distance"), &FmodEventDescription::get_min_max_distance);
     ClassDB::bind_method(D_METHOD("get_sound_size"), &FmodEventDescription::get_sound_size);
     ClassDB::bind_method(D_METHOD("get_parameter_by_name", "name"), &FmodEventDescription::get_parameter_by_name);
-    ClassDB::bind_method(
-      D_METHOD(
-        "get_parameter_by_id",
-        "eventPath"
-        "idPair"
-      ),
-      &FmodEventDescription::get_parameter_by_id
-    );
+    ClassDB::bind_method(D_METHOD("get_parameter_by_id", "id"), &FmodEventDescription::get_parameter_by_id);
     ClassDB::bind_method(D_METHOD("get_parameter_count"), &FmodEventDescription::get_parameter_count);
     ClassDB::bind_method(D_METHOD("get_parameter_by_index", "index"), &FmodEventDescription::get_parameter_by_index);
     ClassDB::bind_method(D_METHOD("get_parameters"), &FmodEventDescription::get_parameters);
-    ClassDB::bind_method(D_METHOD("get_parameter_label_by_id"), &FmodEventDescription::get_parameter_label_by_id);
-    ClassDB::bind_method(D_METHOD("get_parameter_label_by_name"), &FmodEventDescription::get_parameter_label_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_label_by_index"), &FmodEventDescription::get_parameter_label_by_index);
-    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_id"), &FmodEventDescription::get_parameter_labels_by_id);
-    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_name"), &FmodEventDescription::get_parameter_labels_by_name);
-    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_index"), &FmodEventDescription::get_parameter_labels_by_index);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_id", "id", "label_index"), &FmodEventDescription::get_parameter_label_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_name", "parameter_name", "label_index"), &FmodEventDescription::get_parameter_label_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_label_by_index", "index", "label_index"), &FmodEventDescription::get_parameter_label_by_index);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_id", "id"), &FmodEventDescription::get_parameter_labels_by_id);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_name", "parameter_name"), &FmodEventDescription::get_parameter_labels_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_labels_by_index", "index"), &FmodEventDescription::get_parameter_labels_by_index);
     ClassDB::bind_method(D_METHOD("get_user_property", "name"), &FmodEventDescription::get_user_property);
     ClassDB::bind_method(D_METHOD("get_user_property_count"), &FmodEventDescription::get_user_property_count);
     ClassDB::bind_method(D_METHOD("user_property_by_index", "index"), &FmodEventDescription::user_property_by_index);

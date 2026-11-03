@@ -46,7 +46,7 @@ bool FmodBankLoader::_property_get_revert(const StringName& p_property, Variant&
 }
 
 void godot::FmodBankLoader::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_bank_paths", "p_paths"), &FmodBankLoader::set_bank_paths);
+    ClassDB::bind_method(D_METHOD("set_bank_paths", "paths"), &FmodBankLoader::set_bank_paths);
     ClassDB::bind_method(D_METHOD("get_bank_paths"), &FmodBankLoader::get_bank_paths);
 
     ADD_PROPERTY(

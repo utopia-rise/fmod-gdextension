@@ -11,7 +11,7 @@ void FmodBus::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_mute", "mute"), &FmodBus::set_mute);
     ClassDB::bind_method(D_METHOD("set_paused", "paused"), &FmodBus::set_paused);
     ClassDB::bind_method(D_METHOD("set_volume", "volume"), &FmodBus::set_volume);
-    ClassDB::bind_method(D_METHOD("stop_all_events", "stopMode"), &FmodBus::stop_all_events);
+    ClassDB::bind_method(D_METHOD("stop_all_events", "stop_mode"), &FmodBus::stop_all_events);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodBus::is_valid);
 
     ClassDB::bind_method(D_METHOD("get_path"), &FmodBus::get_path);
@@ -52,7 +52,7 @@ void FmodBus::set_volume(float volume) const {
     ERROR_CHECK_WITH_REASON(_wrapped->setVolume(volume), vformat("Cannot set bus %s volume to %f", get_path(), volume));
 }
 
-void FmodBus::stop_all_events(int stopMode) {
-    ERROR_CHECK_WITH_REASON(_wrapped->stopAllEvents(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)),
+void FmodBus::stop_all_events(FMOD_STUDIO_STOP_MODE stop_mode) {
+    ERROR_CHECK_WITH_REASON(_wrapped->stopAllEvents(stop_mode),
                             vformat("Cannot stop all bus %s events", get_path()));
 }

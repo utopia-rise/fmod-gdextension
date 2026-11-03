@@ -49,13 +49,13 @@ Ref<FmodSoftwareFormatSettings> FmodSoftwareFormatSettings::get_from_project_set
 }
 
 void FmodSoftwareFormatSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_sample_rate", "p_sample_rate"), &FmodSoftwareFormatSettings::set_sample_rate);
+    ClassDB::bind_method(D_METHOD("set_sample_rate", "sample_rate"), &FmodSoftwareFormatSettings::set_sample_rate);
     ClassDB::bind_method(D_METHOD("get_sample_rate"), &FmodSoftwareFormatSettings::get_sample_rate);
 
-    ClassDB::bind_method(D_METHOD("set_speaker_mode", "p_speaker_mode"), &FmodSoftwareFormatSettings::set_speaker_mode);
+    ClassDB::bind_method(D_METHOD("set_speaker_mode", "speaker_mode"), &FmodSoftwareFormatSettings::set_speaker_mode);
     ClassDB::bind_method(D_METHOD("get_speaker_mode"), &FmodSoftwareFormatSettings::get_speaker_mode);
 
-    ClassDB::bind_method(D_METHOD("set_raw_speakers_count", "p_raw_speakers_count"), &FmodSoftwareFormatSettings::set_raw_speakers_count);
+    ClassDB::bind_method(D_METHOD("set_raw_speakers_count", "raw_speakers_count"), &FmodSoftwareFormatSettings::set_raw_speakers_count);
     ClassDB::bind_method(D_METHOD("get_raw_speakers_count"), &FmodSoftwareFormatSettings::get_raw_speakers_count);
 
     ADD_PROPERTY(

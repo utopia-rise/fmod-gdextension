@@ -869,7 +869,7 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("set_parameter_by_id", "id", "value"), &Derived::set_parameter_by_id);
         ClassDB::bind_method(D_METHOD("get_parameter_by_id", "id"), &Derived::get_parameter_by_id);
         ClassDB::bind_method(D_METHOD("is_paused"), &Derived::is_paused);
-        ClassDB::bind_method(D_METHOD("set_paused", "p_is_paused"), &Derived::set_paused);
+        ClassDB::bind_method(D_METHOD("set_paused", "paused"), &Derived::set_paused);
         ClassDB::bind_method(D_METHOD("set_event_name", "event_name"), &Derived::set_event_name);
         ClassDB::bind_method(D_METHOD("get_event_name"), &Derived::get_event_name);
         ClassDB::bind_method(D_METHOD("set_event_guid", "event_guid"), &Derived::set_event_guid);
@@ -885,8 +885,8 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("set_preload_event", "preload_event"), &Derived::set_preload_event);
         ClassDB::bind_method(D_METHOD("is_preload_event"), &Derived::is_preload_event);
         ClassDB::bind_method(D_METHOD("get_volume"), &Derived::get_volume);
-        ClassDB::bind_method(D_METHOD("set_volume", "p_volume"), &Derived::set_volume);
-        ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &Derived::set_programmer_callback);
+        ClassDB::bind_method(D_METHOD("set_volume", "volume"), &Derived::set_volume);
+        ClassDB::bind_method(D_METHOD("set_programmer_callback", "sound_key"), &Derived::set_programmer_callback);
         ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);
 
 #ifdef TOOLS_ENABLED
@@ -902,7 +902,7 @@ namespace godot {
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "allow_fadeout", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_allow_fadeout", "is_allow_fadeout");
         ADD_PROPERTY(PropertyInfo(Variant::BOOL, "preload_event", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_preload_event", "is_preload_event");
         ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_DEFAULT), "set_volume", "get_volume");
-        ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "paused", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "is_paused");
+        ADD_PROPERTY(PropertyInfo(Variant::BOOL, "paused", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_paused", "is_paused");
 
         ADD_SIGNAL(MethodInfo(BEAT_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));
         ADD_SIGNAL(MethodInfo(MARKER_SIGNAL_STRING, PropertyInfo(Variant::DICTIONARY, "params")));

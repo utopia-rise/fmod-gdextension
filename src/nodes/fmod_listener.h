@@ -147,7 +147,7 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("get_listener_index"), &Derived::get_listener_index);
         ClassDB::bind_method(D_METHOD("set_locked", "locked"), &Derived::set_locked);
         ClassDB::bind_method(D_METHOD("get_locked"), &Derived::get_locked);
-        ClassDB::bind_method(D_METHOD("set_listener_weight", "p_weight"), &Derived::set_listener_weight);
+        ClassDB::bind_method(D_METHOD("set_listener_weight", "weight"), &Derived::set_listener_weight);
         ClassDB::bind_method(D_METHOD("get_listener_weight"), &Derived::get_listener_weight);
 
         ADD_PROPERTY(
