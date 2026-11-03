@@ -69,6 +69,8 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("set_global_parameter_by_id", "parameter_id", "value"), &FmodServer::set_global_parameter_by_id);
     ClassDB::bind_method(D_METHOD("set_global_parameter_by_id_with_label", "parameter_id", "label"), &FmodServer::set_global_parameter_by_id_with_label);
     ClassDB::bind_method(D_METHOD("get_global_parameter_by_id", "parameter_id"), &FmodServer::get_global_parameter_by_id);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_user_value_by_name", "parameter_name"), &FmodServer::get_global_parameter_user_value_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_user_value_by_id", "parameter_id"), &FmodServer::get_global_parameter_user_value_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name", "parameterName"), &FmodServer::get_global_parameter_desc_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id", "parameter_id"), &FmodServer::get_global_parameter_desc_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &FmodServer::get_global_parameter_desc_count);
@@ -1051,8 +1053,8 @@ void FmodServer::set_global_parameter_by_name_with_label(const String& parameter
 float FmodServer::get_global_parameter_by_name(const String& parameter_name) {
     float value = 0.f;
     ERROR_CHECK_WITH_REASON(
-      system->getParameterByName(parameter_name.utf8().get_data(), &value),
-      vformat("Cannot get global parameter %s", parameter_name, value)
+      system->getParameterByName(parameter_name.utf8().get_data(), nullptr, &value),
+      vformat("Cannot get global parameter %s", parameter_name)
     );
     return value;
 }
@@ -1074,10 +1076,28 @@ void FmodServer::set_global_parameter_by_id_with_label(uint64_t parameter_id, co
 float FmodServer::get_global_parameter_by_id(uint64_t parameter_id) {
     float value = -1.f;
     ERROR_CHECK_WITH_REASON(
-      system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &value),
-      vformat("Cannot set global parameter %d", parameter_id, value)
+      system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), nullptr, &value),
+      vformat("Cannot get global parameter %d", parameter_id)
     );
     return value;
+}
+
+float FmodServer::get_global_parameter_user_value_by_name(const String& parameter_name) {
+    float user_value = 0.f;
+    ERROR_CHECK_WITH_REASON(
+      system->getParameterByName(parameter_name.utf8().get_data(), &user_value),
+      vformat("Cannot get user value of global parameter %s", parameter_name)
+    );
+    return user_value;
+}
+
+float FmodServer::get_global_parameter_user_value_by_id(uint64_t parameter_id) {
+    float user_value = -1.f;
+    ERROR_CHECK_WITH_REASON(
+      system->getParameterByID(ulong_to_fmod_parameter_id(parameter_id), &user_value),
+      vformat("Cannot get user value of global parameter %d", parameter_id)
+    );
+    return user_value;
 }
 
 Dictionary FmodServer::get_global_parameter_desc_by_name(const String& parameter_name) {

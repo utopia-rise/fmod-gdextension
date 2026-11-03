@@ -59,6 +59,30 @@ func test_assert_event_reverb():
 func test_assert_event_parameter_by_name():
 	assert_float(fmodEvent.get_parameter_by_name("RPM")).is_equal(600.0)
 
+func test_assert_event_parameter_reflects_automatic_value():
+	var sfx_bank := FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	var explosion := FmodServer.create_event_instance("event:/Weapons/Explosion")
+	explosion.set_2d_attributes(Transform2D(0, Vector2(500, 0)))
+	explosion.start()
+	await await_millis(200)
+	var distance := explosion.get_parameter_by_name("Distance")
+	var distance_id: int = FmodServer.get_event("event:/Weapons/Explosion").get_parameter_by_name("Distance").get_id()
+	var distance_by_id := explosion.get_parameter_by_id(distance_id)
+	explosion.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	explosion.release()
+	assert_object(sfx_bank).is_not_null()
+	assert_float(distance).is_greater(0.0)
+	assert_float(distance).is_less_equal(100.0)
+	assert_float(distance_by_id).is_equal(distance)
+
+func test_assert_event_parameter_user_value():
+	fmodEvent.set_parameter_by_name("RPM", 1200)
+	assert_float(fmodEvent.get_parameter_user_value_by_name("RPM")).is_equal(1200.0)
+	var rpm_id: int = FmodServer.get_event("event:/Vehicles/Car Engine").get_parameter_by_name("RPM").get_id()
+	assert_float(fmodEvent.get_parameter_user_value_by_id(rpm_id)).is_equal(1200.0)
+	fmodEvent.set_parameter_by_name("RPM", 600)
+	assert_float(fmodEvent.get_parameter_user_value_by_name("Load")).is_equal(-1.0)
+
 func test_assert_should_pause_all():
 	fmodEvent.paused = false
 	var fmodEvent2: FmodEvent = FmodServer.create_event_instance_with_guid("{0c8363b4-23af-4f9c-af4b-0951bfd37d84}")

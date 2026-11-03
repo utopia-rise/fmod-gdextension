@@ -185,14 +185,14 @@
 			<return type="float" />
 			<param index="0" name="parameter_id" type="int" />
 			<description>
-				Gets the value of a global parameter by its ID.
+				Gets the value FMOD uses for a global parameter, by its ID. FMOD computes it on each [method FmodServer.update] from the value set from code and what FMOD Studio applies to the parameter: automatic parameters such as distance, automation, modulation and seek speed. A value set from code shows up after the next update. [method get_global_parameter_user_value_by_id] gives the value set from code.
 			</description>
 		</method>
 		<method name="get_global_parameter_by_name">
 			<return type="float" />
 			<param index="0" name="parameter_name" type="String" />
 			<description>
-				Gets the value of a global parameter by its name.
+				Gets the value FMOD uses for a global parameter, by its name. FMOD computes it on each [method FmodServer.update] from the value set from code and what FMOD Studio applies to the parameter: automatic parameters such as distance, automation, modulation and seek speed. A value set from code shows up after the next update. [method get_global_parameter_user_value_by_name] gives the value set from code.
 			</description>
 		</method>
 		<method name="get_global_parameter_desc_by_id">
@@ -219,6 +219,20 @@
 			<return type="Array" />
 			<description>
 				Returns an array of all global parameter descriptions.
+			</description>
+		</method>
+		<method name="get_global_parameter_user_value_by_id">
+			<return type="float" />
+			<param index="0" name="parameter_id" type="int" />
+			<description>
+				Gets the value set from code for a global parameter, by its ID, or its default value when code never set one. Unlike the value FMOD uses, it ignores automatic parameters, automation, modulation and seek speed.
+			</description>
+		</method>
+		<method name="get_global_parameter_user_value_by_name">
+			<return type="float" />
+			<param index="0" name="parameter_name" type="String" />
+			<description>
+				Gets the value set from code for a global parameter, by its name, or its default value when code never set one. Unlike the value FMOD uses, it ignores automatic parameters, automation, modulation and seek speed.
 			</description>
 		</method>
 		<method name="get_listener_lock">
