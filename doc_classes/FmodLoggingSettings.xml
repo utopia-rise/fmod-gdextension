@@ -25,11 +25,11 @@
 		</constant>
 		<constant name="DEBUG_VERBOSE" value="5" enum="DebugLevel">
 		</constant>
-		<constant name="FMOD_DEBUG_MODE_TTY" value="0" enum="FMOD_DEBUG_MODE">
+		<constant name="TTY" value="0" enum="DebugMode">
 		</constant>
-		<constant name="FMOD_DEBUG_MODE_CALLBACK" value="2" enum="FMOD_DEBUG_MODE">
+		<constant name="CALLBACK" value="2" enum="DebugMode">
 		</constant>
-		<constant name="FMOD_DEBUG_MODE_FILE" value="1" enum="FMOD_DEBUG_MODE">
+		<constant name="FILE" value="1" enum="DebugMode">
 		</constant>
 	</constants>
 </class>

@@ -23,10 +23,10 @@ static func reload_all_banks():
 		return
 	
 	banks.append(
-		FmodServer.load_bank(master_strings_bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.load_bank(master_strings_bank_path, FmodBank.StudioLoadBankFlags.NORMAL)
 	)
 	banks.append(
-		FmodServer.load_bank(master_bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+		FmodServer.load_bank(master_bank_path, FmodBank.StudioLoadBankFlags.NORMAL)
 	)
 
 	var dir: DirAccess = DirAccess.open(banks_root)
@@ -38,7 +38,7 @@ static func reload_all_banks():
 				pass # the found item is a directory
 			elif file_name.ends_with(".bank") and file_name != MASTER_STRINGS_BANK_NAME and file_name != MASTER_BANK_NAME:
 				banks.append(
-					FmodServer.load_bank("%s/%s" % [banks_root, file_name], FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+					FmodServer.load_bank("%s/%s" % [banks_root, file_name], FmodBank.StudioLoadBankFlags.NORMAL)
 				)
 			file_name = dir.get_next()
 	

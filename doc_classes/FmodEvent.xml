@@ -58,7 +58,7 @@
 			</description>
 		</method>
 		<method name="get_playback_state" qualifiers="const">
-			<return type="int" enum="FmodEvent.FMOD_STUDIO_PLAYBACK_STATE" />
+			<return type="int" enum="FmodEvent.StudioPlaybackState" />
 			<description>
 				Returns the current playback state of the event. See FMOD_STUDIO_PLAYBACK_STATE enum for possible values.
 			</description>
@@ -165,7 +165,7 @@
 		</method>
 		<method name="stop" qualifiers="const">
 			<return type="void" />
-			<param index="0" name="stop_mode" type="int" enum="FmodEvent.FMOD_STUDIO_STOP_MODE" />
+			<param index="0" name="stop_mode" type="int" enum="FmodEvent.StudioStopMode" />
 			<description>
 				Stops the event with the specified stop mode. Use FMOD_STUDIO_STOP_ALLOWFADEOUT for smooth stopping or FMOD_STUDIO_STOP_IMMEDIATE for instant stopping.
 			</description>
@@ -195,63 +195,59 @@
 		</member>
 	</members>
 	<constants>
-		<constant name="FMOD_STUDIO_STOP_ALLOWFADEOUT" value="0" enum="FMOD_STUDIO_STOP_MODE">
+		<constant name="ALLOWFADEOUT" value="0" enum="StudioStopMode">
 		</constant>
-		<constant name="FMOD_STUDIO_STOP_IMMEDIATE" value="1" enum="FMOD_STUDIO_STOP_MODE">
+		<constant name="IMMEDIATE" value="1" enum="StudioStopMode">
 		</constant>
-		<constant name="FMOD_STUDIO_STOP_FORCEINT" value="65536" enum="FMOD_STUDIO_STOP_MODE">
+		<constant name="PLAYING" value="0" enum="StudioPlaybackState">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_PLAYING" value="0" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="SUSTAINING" value="1" enum="StudioPlaybackState">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_SUSTAINING" value="1" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="PLAYBACK_STOPPED" value="2" enum="StudioPlaybackState">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STOPPED" value="2" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="PLAYBACK_STARTING" value="3" enum="StudioPlaybackState">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STARTING" value="3" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="STOPPING" value="4" enum="StudioPlaybackState">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STOPPING" value="4" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="CREATED" value="1" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_FORCEINT" value="65536" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		<constant name="DESTROYED" value="2" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATED" value="1" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="CALLBACK_STARTING" value="4" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROYED" value="2" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="STARTED" value="8" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTING" value="4" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="RESTARTED" value="16" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTED" value="8" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="CALLBACK_STOPPED" value="32" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_RESTARTED" value="16" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="START_FAILED" value="64" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STOPPED" value="32" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="CREATE_PROGRAMMER_SOUND" value="128" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_FAILED" value="64" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="DESTROY_PROGRAMMER_SOUND" value="256" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND" value="128" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="PLUGIN_CREATED" value="512" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND" value="256" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="PLUGIN_DESTROYED" value="1024" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_CREATED" value="512" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="TIMELINE_MARKER" value="2048" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_DESTROYED" value="1024" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="TIMELINE_BEAT" value="4096" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER" value="2048" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="SOUND_PLAYED" value="8192" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT" value="4096" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="SOUND_STOPPED" value="16384" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED" value="8192" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="REAL_TO_VIRTUAL" value="32768" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED" value="16384" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="VIRTUAL_TO_REAL" value="65536" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_REAL_TO_VIRTUAL" value="32768" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="START_EVENT_COMMAND" value="131072" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_VIRTUAL_TO_REAL" value="65536" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="NESTED_TIMELINE_BEAT" value="262144" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_EVENT_COMMAND" value="131072" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_NESTED_TIMELINE_BEAT" value="262144" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="ALL" value="4294967295" enum="StudioEventCallbackType" is_bitfield="true">
 		</constant>
 	</constants>
 </class>

@@ -66,7 +66,7 @@ namespace godot {
     };
 }// namespace godot
 
-FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_STOP_MODE)
-FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_PLAYBACK_STATE)
+FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_STOP_MODE, StudioStopMode)
+FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_PLAYBACK_STATE, StudioPlaybackState)
 
 #endif// GODOTFMOD_FMOD_EVENT_H

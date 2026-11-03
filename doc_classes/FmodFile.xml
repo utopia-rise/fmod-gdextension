@@ -7,63 +7,63 @@
 	<tutorials>
 	</tutorials>
 	<constants>
-		<constant name="FMOD_2D" value="8" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_2D" value="8" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D" value="16" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D" value="16" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_CUSTOMROLLOFF" value="67108864" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_CUSTOMROLLOFF" value="67108864" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_HEADRELATIVE" value="262144" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_HEADRELATIVE" value="262144" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_IGNOREGEOMETRY" value="1073741824" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_IGNOREGEOMETRY" value="1073741824" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_INVERSEROLLOFF" value="1048576" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_INVERSEROLLOFF" value="1048576" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_INVERSETAPEREDROLLOFF" value="8388608" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_INVERSETAPEREDROLLOFF" value="8388608" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_LINEARROLLOFF" value="2097152" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_LINEARROLLOFF" value="2097152" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_LINEARSQUAREROLLOFF" value="4194304" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_LINEARSQUAREROLLOFF" value="4194304" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_3D_WORLDRELATIVE" value="524288" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MODE_3D_WORLDRELATIVE" value="524288" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_ACCURATETIME" value="16384" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="ACCURATETIME" value="16384" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_CREATECOMPRESSEDSAMPLE" value="512" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="CREATECOMPRESSEDSAMPLE" value="512" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_CREATESAMPLE" value="256" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="CREATESAMPLE" value="256" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_CREATESTREAM" value="128" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="CREATESTREAM" value="128" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_DEFAULT" value="0" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="DEFAULT" value="0" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_IGNORETAGS" value="33554432" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="IGNORETAGS" value="33554432" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_LOOP_BIDI" value="4" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="LOOP_BIDI" value="4" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_LOOP_NORMAL" value="2" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="LOOP_NORMAL" value="2" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_LOOP_OFF" value="1" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="LOOP_OFF" value="1" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_LOWMEM" value="134217728" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="LOWMEM" value="134217728" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_MPEGSEARCH" value="32768" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="MPEGSEARCH" value="32768" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_NONBLOCKING" value="65536" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="NONBLOCKING" value="65536" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_OPENMEMORY" value="2048" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="OPENMEMORY" value="2048" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_OPENMEMORY_POINT" value="268435456" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="OPENMEMORY_POINT" value="268435456" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_OPENONLY" value="8192" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="OPENONLY" value="8192" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_OPENRAW" value="4096" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="OPENRAW" value="4096" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_OPENUSER" value="1024" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="OPENUSER" value="1024" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_UNIQUE" value="131072" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="UNIQUE" value="131072" enum="Mode" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_VIRTUAL_PLAYFROMSTART" value="2147483648" enum="FMOD_MODE" is_bitfield="true">
+		<constant name="VIRTUAL_PLAYFROMSTART" value="2147483648" enum="Mode" is_bitfield="true">
 		</constant>
 	</constants>
 </class>

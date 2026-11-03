@@ -4,7 +4,7 @@ var banks := Array()
 
 func before():
 	for bank in ["Master", "SFX"]:
-		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
+		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodBank.StudioLoadBankFlags.NORMAL))
 
 func test_assert_event_paths_are_empty_without_strings_bank():
 	var descriptions: Array = banks[1].get_description_list()

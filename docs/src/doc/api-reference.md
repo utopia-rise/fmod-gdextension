@@ -218,10 +218,10 @@ emitter.set_parameter("TimeOfDay", 0.5)
 
 ```gdscript
 # Load a bank
-var bank = FmodServer.load_bank("res://audio/Master.bank", FMOD_STUDIO_LOAD_BANK_NORMAL)
+var bank = FmodServer.load_bank("res://audio/Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 
 # Wait for async loading
-while bank.get_loading_state() == FMOD_STUDIO_LOADING_STATE_LOADING:
+while bank.get_loading_state() == FmodBank.StudioLoadingState.LOADING:
     await get_tree().process_frame
 
 # Use events from the bank

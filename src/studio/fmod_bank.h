@@ -56,6 +56,6 @@ namespace godot {
     };
 }// namespace godot
 
-FMOD_ENUM_CAST(FmodBank, FMOD_STUDIO_LOADING_STATE)
+FMOD_ENUM_CAST(FmodBank, FMOD_STUDIO_LOADING_STATE, StudioLoadingState)
 
 #endif// GODOTFMOD_FMOD_BANK_H

@@ -7,7 +7,7 @@ var banks := Array()
 
 func before():
 	for bank in ["Master.strings", "Master", "Music", "Vehicles"]:
-		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
+		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodBank.StudioLoadBankFlags.NORMAL))
 	FmodServer.set_listener_number(1)
 	sprite = Sprite2D.new()
 	get_tree().get_root().add_child(sprite)
@@ -17,7 +17,7 @@ func before():
 	fmodEvent.start()
 
 func after():
-	fmodEvent.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmodEvent.stop(FmodEvent.StudioStopMode.IMMEDIATE)
 	fmodEvent.release()
 	FmodServer.remove_listener(0, sprite)
 	sprite.free()
@@ -60,7 +60,7 @@ func test_assert_event_parameter_by_name():
 	assert_float(fmodEvent.get_parameter_by_name("RPM")).is_equal(600.0)
 
 func test_assert_event_parameter_reflects_automatic_value():
-	var sfx_bank := FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	var sfx_bank := FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	var explosion := FmodServer.create_event_instance("event:/Weapons/Explosion")
 	explosion.set_2d_attributes(Transform2D(0, Vector2(500, 0)))
 	explosion.start()
@@ -68,7 +68,7 @@ func test_assert_event_parameter_reflects_automatic_value():
 	var distance := explosion.get_parameter_by_name("Distance")
 	var distance_id: int = FmodServer.get_event("event:/Weapons/Explosion").get_parameter_by_name("Distance").get_id()
 	var distance_by_id := explosion.get_parameter_by_id(distance_id)
-	explosion.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
+	explosion.stop(FmodEvent.StudioStopMode.IMMEDIATE)
 	explosion.release()
 	assert_object(sfx_bank).is_not_null()
 	assert_float(distance).is_greater(0.0)
@@ -90,7 +90,7 @@ func test_assert_should_pause_all():
 	FmodServer.pause_all_events()
 	assert_bool(fmodEvent.paused).is_true()
 	assert_bool(fmodEvent2.paused).is_true()
-	fmodEvent2.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmodEvent2.stop(FmodEvent.StudioStopMode.IMMEDIATE)
 	fmodEvent2.release()
 
 func test_assert_should_mute_unmute_all():

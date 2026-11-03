@@ -12,4 +12,4 @@ func _on_item_selected(index: int):
 		return
 	var bank_path := "res://assets/Banks/Dialogue_%s.bank" % get_item_text(index)
 # warning-ignore:return_value_discarded
-	lang_bank = FmodServer.load_bank(bank_path, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	lang_bank = FmodServer.load_bank(bank_path, FmodBank.StudioLoadBankFlags.NORMAL)

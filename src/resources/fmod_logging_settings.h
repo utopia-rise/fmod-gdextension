@@ -58,6 +58,6 @@ namespace godot {
 
 VARIANT_ENUM_CAST(FmodLoggingSettings::DebugLevel);
 
-FMOD_ENUM_CAST(FmodLoggingSettings, FMOD_DEBUG_MODE)
+FMOD_ENUM_CAST(FmodLoggingSettings, FMOD_DEBUG_MODE, DebugMode)
 
 #endif// GODOTFMOD_FMOD_LOGGING_SETTINGS_H

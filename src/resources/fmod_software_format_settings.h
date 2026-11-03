@@ -45,6 +45,6 @@ namespace godot {
     };
 }
 
-FMOD_ENUM_CAST(FmodSoftwareFormatSettings, FMOD_SPEAKERMODE)
+FMOD_ENUM_CAST(FmodSoftwareFormatSettings, FMOD_SPEAKERMODE, SpeakerMode)
 
 #endif// GODOTFMOD_FMOD_SOFTWARE_FORMAT_SETTINGS_H

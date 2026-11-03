@@ -4,7 +4,7 @@ var banks := Array()
 
 func before():
 	for bank in ["Master.strings", "Master", "Vehicles"]:
-		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
+		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodBank.StudioLoadBankFlags.NORMAL))
 
 func _extension_classes() -> Array[String]:
 	var classes: Array[String] = []
@@ -28,14 +28,14 @@ func test_assert_every_referenced_enum_is_declared():
 				assert_bool(_declares_enum(property["class_name"])).override_failure_message("%s.%s references undeclared enum %s" % [name, property["name"], property["class_name"]]).is_true()
 
 func test_assert_fmod_enums_belong_to_their_class():
-	assert_bool(ClassDB.class_has_enum("FmodEvent", "FMOD_STUDIO_PLAYBACK_STATE")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodEvent", "FMOD_STUDIO_STOP_MODE")).is_true()
-	assert_bool(ClassDB.is_class_enum_bitfield("FmodEvent", "FMOD_STUDIO_EVENT_CALLBACK_TYPE")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodBank", "FMOD_STUDIO_LOADING_STATE")).is_true()
-	assert_bool(ClassDB.is_class_enum_bitfield("FmodServer", "FMOD_STUDIO_LOAD_BANK_FLAGS")).is_true()
-	assert_bool(ClassDB.is_class_enum_bitfield("FmodFile", "FMOD_MODE")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodSoftwareFormatSettings", "FMOD_SPEAKERMODE")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodLoggingSettings", "FMOD_DEBUG_MODE")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodEvent", "StudioPlaybackState")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodEvent", "StudioStopMode")).is_true()
+	assert_bool(ClassDB.is_class_enum_bitfield("FmodEvent", "StudioEventCallbackType")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodBank", "StudioLoadingState")).is_true()
+	assert_bool(ClassDB.is_class_enum_bitfield("FmodBank", "StudioLoadBankFlags")).is_true()
+	assert_bool(ClassDB.is_class_enum_bitfield("FmodFile", "Mode")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodSoftwareFormatSettings", "SpeakerMode")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodLoggingSettings", "DebugMode")).is_true()
 
 func test_assert_every_constant_belongs_to_an_enum():
 	for name in _extension_classes():

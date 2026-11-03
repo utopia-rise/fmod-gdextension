@@ -10,13 +10,13 @@ var sfx_bank: FmodBank
 func _enter_tree():
 	# load banks
 # warning-ignore:return_value_discarded
-	master_string_bank = FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	master_string_bank = FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 # warning-ignore:return_value_discarded
-	master_bank = FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	master_bank = FmodServer.load_bank("res://assets/Banks/Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 # warning-ignore:return_value_discarded
-	music_bank = FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	music_bank = FmodServer.load_bank("res://assets/Banks/Music.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 # warning-ignore:return_value_discarded
-	vehicles_bank = FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	vehicles_bank = FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 # warning-ignore:return_value_discarded
-	sfx_bank = FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	sfx_bank = FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	print("Fmod initialised.")

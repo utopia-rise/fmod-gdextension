@@ -27,9 +27,9 @@ func play_event() -> void:
 	
 func stop_event() -> void:
 	if event_instance:
-		var stop_mode : int = FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE
+		var stop_mode : int = FmodEvent.StudioStopMode.IMMEDIATE
 		if fade_out_toggle.button_pressed:
-			stop_mode = FmodEvent.FMOD_STUDIO_STOP_ALLOWFADEOUT
+			stop_mode = FmodEvent.StudioStopMode.ALLOWFADEOUT
 			
 		event_instance.stop(stop_mode)
 	
@@ -40,7 +40,7 @@ func _exit_tree() -> void:
 	
 func stop_and_release_instance() -> void:
 	if event_instance:
-		event_instance.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
+		event_instance.stop(FmodEvent.StudioStopMode.IMMEDIATE)
 		event_instance.release()
 		event_instance = null
 

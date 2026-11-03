@@ -29,9 +29,9 @@ Here is an example:
 var banks := Array()
 
 func _ready():
-    banks.append(FmodServer.load_bank("res://Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
-    banks.append(FmodServer.load_bank("res://Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
-    banks.append(FmodServer.load_bank("res://Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL))
+    banks.append(FmodServer.load_bank("res://Master.bank", FmodBank.StudioLoadBankFlags.NORMAL))
+    banks.append(FmodServer.load_bank("res://Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL))
+    banks.append(FmodServer.load_bank("res://Music.bank", FmodBank.StudioLoadBankFlags.NORMAL))
 ```
 
 !!! warning

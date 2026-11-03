@@ -8,10 +8,10 @@ var musicBank: FmodBank
 var vehicleBank: FmodBank
 
 func before():
-	master_strings_bank = FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	masterBank = FmodServer.load_bank("res://assets/Banks/Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	musicBank = FmodServer.load_bank("res://assets/Banks/Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	vehicleBank = FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	master_strings_bank = FmodServer.load_bank("res://assets/Banks/Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	masterBank = FmodServer.load_bank("res://assets/Banks/Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	musicBank = FmodServer.load_bank("res://assets/Banks/Music.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	vehicleBank = FmodServer.load_bank("res://assets/Banks/Vehicles.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	FmodServer.set_listener_number(1)
 	sprite = Sprite2D.new()
 	get_tree().get_root().add_child(sprite)
@@ -22,7 +22,7 @@ func after():
 	sprite.free()
 
 func test_assert_bank_loaded():
-	assert_int(vehicleBank.get_loading_state()).is_equal(FmodBank.FMOD_STUDIO_LOADING_STATE_LOADED)
+	assert_int(vehicleBank.get_loading_state()).is_equal(FmodBank.StudioLoadingState.LOADED)
 
 func test_assert_bank_bus_count():
 	assert_int(musicBank.get_bus_count()).is_equal(0)

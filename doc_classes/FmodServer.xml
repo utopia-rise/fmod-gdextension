@@ -618,57 +618,51 @@
 		</method>
 	</methods>
 	<constants>
-		<constant name="FMOD_INIT_3D_RIGHTHANDED" value="4" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="INIT_3D_RIGHTHANDED" value="4" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_CHANNEL_DISTANCEFILTER" value="512" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="CHANNEL_DISTANCEFILTER" value="512" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_CHANNEL_LOWPASS" value="256" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="CHANNEL_LOWPASS" value="256" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_GEOMETRY_USECLOSEST" value="262144" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="GEOMETRY_USECLOSEST" value="262144" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_NORMAL" value="0" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="INIT_NORMAL" value="0" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_PREFER_DOLBY_DOWNMIX" value="524288" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="PREFER_DOLBY_DOWNMIX" value="524288" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_PROFILE_ENABLE" value="65536" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="PROFILE_ENABLE" value="65536" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_PROFILE_METER_ALL" value="2097152" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="PROFILE_METER_ALL" value="2097152" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_STREAM_FROM_UPDATE" value="1" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="STREAM_FROM_UPDATE" value="1" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_THREAD_UNSAFE" value="1048576" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="THREAD_UNSAFE" value="1048576" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_INIT_VOL0_BECOMES_VIRTUAL" value="131072" enum="FMOD_INITFLAGS" is_bitfield="true">
+		<constant name="VOL0_BECOMES_VIRTUAL" value="131072" enum="InitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_NORMAL" value="0" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="STUDIO_INIT_NORMAL" value="0" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_LIVEUPDATE" value="1" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="LIVEUPDATE" value="1" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS" value="2" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="ALLOW_MISSING_PLUGINS" value="2" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE" value="4" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="SYNCHRONOUS_UPDATE" value="4" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_DEFERRED_CALLBACKS" value="8" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="DEFERRED_CALLBACKS" value="8" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_INIT_LOAD_FROM_UPDATE" value="16" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
+		<constant name="LOAD_FROM_UPDATE" value="16" enum="StudioInitFlags" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_LOAD_BANK_NORMAL" value="0" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		<constant name="PREUPDATE" value="1" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_LOAD_BANK_NONBLOCKING" value="1" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		<constant name="POSTUPDATE" value="2" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES" value="2" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
+		<constant name="BANK_UNLOAD" value="4" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE" value="1" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="LIVEUPDATE_CONNECTED" value="8" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_POSTUPDATE" value="2" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="LIVEUPDATE_DISCONNECTED" value="16" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_BANK_UNLOAD" value="4" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_CONNECTED" value="8" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_DISCONNECTED" value="16" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
+		<constant name="ALL" value="4294967295" enum="StudioSystemCallbackType" is_bitfield="true">
 		</constant>
 	</constants>
 </class>

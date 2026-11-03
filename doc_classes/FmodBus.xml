@@ -36,7 +36,7 @@
 		</method>
 		<method name="stop_all_events">
 			<return type="void" />
-			<param index="0" name="stop_mode" type="int" enum="FmodEvent.FMOD_STUDIO_STOP_MODE" />
+			<param index="0" name="stop_mode" type="int" enum="FmodEvent.StudioStopMode" />
 			<description>
 				Stops all events currently routing through this bus. The stopMode parameter controls how the events are stopped:
 				- FMOD_STUDIO_STOP_ALLOWFADEOUT: Allow events to fade out naturally
