@@ -1,0 +1,52 @@
+name: FMOD SDK cache
+description: >
+  The FMOD Studio API of every platform, trimmed to what the build uses, one cache entry per FMOD version. The FMOD SDK
+  workflow saves it on master, so that every pull request and tag can read it without the FMOD account secrets.
+inputs:
+  mode:
+    description: >
+      'lookup' (sets cache-hit), 'check' (fails when the version is not cached), 'restore' (installs it into libs/) or
+      'save' (stores libs/).
+    required: true
+  fmod-version:
+    required: true
+outputs:
+  cache-hit:
+    value: ${{ steps.lookup.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - name: Look up FMOD ${{ inputs.fmod-version }}
+      id: lookup
+      if: inputs.mode == 'lookup' || inputs.mode == 'check'
+      uses: actions/cache/restore@v6
+      with:
+        path: libs
+        key: fmod-sdk-${{ inputs.fmod-version }}
+        enableCrossOsArchive: true
+        lookup-only: true
+
+    - name: Require FMOD ${{ inputs.fmod-version }}
+      if: inputs.mode == 'check' && steps.lookup.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        echo "::error::FMOD ${{ inputs.fmod-version }} is not cached: run the FMOD SDK workflow on master with that version."
+        exit 1
+
+    - name: Restore FMOD ${{ inputs.fmod-version }}
+      if: inputs.mode == 'restore'
+      uses: actions/cache/restore@v6
+      with:
+        path: libs
+        key: fmod-sdk-${{ inputs.fmod-version }}
+        enableCrossOsArchive: true
+        fail-on-cache-miss: true
+
+    - name: Save FMOD ${{ inputs.fmod-version }}
+      if: inputs.mode == 'save'
+      uses: actions/cache/save@v6
+      with:
+        path: libs
+        key: fmod-sdk-${{ inputs.fmod-version }}
+        enableCrossOsArchive: true

@@ -33,9 +33,6 @@ This GDExtension provides nodes such as `FmodEventEmitter2D`, `FmodEventEmitter3
 
 # Contributing
 
-In order to be able to PR this repo from a fork, you need to add `FMODUSER` and `FMODPASS` secrets to your fork repo.  
-This enables CI to download FMOD api.
-
 Feel free to raise pull requests. We hope you'll enjoy this addon!
 
 ## How this extension works

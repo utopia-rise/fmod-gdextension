@@ -1,0 +1,91 @@
+name: 🎵 FMOD SDK
+on:
+  workflow_dispatch:
+    inputs:
+      fmod-version:
+        description: The FMOD version to cache, as in FMOD_VERSION (20400 is 2.04.00).
+        required: true
+        type: string
+
+jobs:
+  cache-sdk:
+    name: 🎵 Cache FMOD ${{ inputs.fmod-version }}
+    if: github.ref == 'refs/heads/master'
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    env:
+      FMOD_VERSION: ${{ inputs.fmod-version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/fmod-sdk-cache
+        id: cached
+        with:
+          mode: lookup
+          fmod-version: ${{ inputs.fmod-version }}
+      - name: Already cached
+        if: steps.cached.outputs.cache-hit == 'true'
+        run: echo "::notice::FMOD $FMOD_VERSION is already cached."
+
+      - uses: actions/setup-python@v6
+        if: steps.cached.outputs.cache-hit != 'true'
+        with:
+          python-version: '3.12'
+      - name: Download FMOD
+        if: steps.cached.outputs.cache-hit != 'true'
+        env:
+          FMOD_USER: ${{ secrets.FMODUSER }}
+          FMOD_PASSWORD: ${{ secrets.FMODPASS }}
+        run: |
+          [[ "$FMOD_VERSION" =~ ^[0-9]{5}$ ]] || { echo "::error::'$FMOD_VERSION' is not an FMOD version like 20400."; exit 1; }
+          python -m pip install requests
+          command -v 7z || command -v 7za || command -v 7zz || brew install sevenzip
+          for platform in windows linux macos ios android web; do
+            python get_fmod.py "$FMOD_USER" "$FMOD_PASSWORD" "$platform" "$FMOD_VERSION"
+          done
+      - name: Trim to what the build uses
+        if: steps.cached.outputs.cache-hit != 'true'
+        shell: python
+        run: |
+          import shutil
+          import sys
+          from pathlib import Path
+
+          KEEP = {
+              "windows": ["core/lib/x64/*", "studio/lib/x64/*"],
+              "linux": ["core/lib/x86_64/*", "studio/lib/x86_64/*"],
+              "osx": ["core/lib/*.dylib", "studio/lib/*.dylib"],
+              "ios": ["core/lib/*_iphoneos.a", "studio/lib/*_iphoneos.a"],
+              "android": [
+                  "core/lib/fmod.jar",
+                  "core/lib/arm64-v8a/*",
+                  "core/lib/x86_64/*",
+                  "studio/lib/arm64-v8a/*",
+                  "studio/lib/x86_64/*",
+              ],
+              "web": ["studio/lib/browser/*/c_cpp/fmodstudio*.a"],
+          }
+
+          trimmed = Path("fmod-sdk")
+          for platform, patterns in KEEP.items():
+              sdk = Path("libs") / platform
+              for pattern in ["core/inc/*.h*", "studio/inc/*.h*", *patterns]:
+                  files = list(sdk.glob(pattern))
+                  if not files:
+                      sys.exit(f"Nothing in the FMOD SDK matches {sdk / pattern}.")
+                  for file in files:
+                      target = trimmed / platform / file.relative_to(sdk)
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      shutil.copy2(file, target)
+          shutil.rmtree("libs")
+          trimmed.rename("libs")
+      - name: Size
+        if: steps.cached.outputs.cache-hit != 'true'
+        run: du -sh libs/*
+      - uses: ./.github/actions/fmod-sdk-cache
+        if: steps.cached.outputs.cache-hit != 'true'
+        with:
+          mode: save
+          fmod-version: ${{ inputs.fmod-version }}

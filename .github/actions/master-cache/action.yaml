@@ -1,6 +1,6 @@
 name: Master-only cache
 description: >
-  Restores a cache entry by exact key. Only a master run (the daily scheduled one) saves it back, deleting the previous
+  Restores a cache entry by exact key. Only a master run (the weekly scheduled one) saves it back, deleting the previous
   entry first, so the repository keeps exactly one entry per key and other branches only read. Not called by workflows
   directly: the scons-cache and gradle-deps-cache actions own their paths and keys and delegate here.
 inputs:
