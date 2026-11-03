@@ -2,8 +2,6 @@ name: 🌈 CI
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-  pull_request_target:
-    types: [opened, synchronize, reopened]
   # Builds master daily: the only runs that save the caches, which every other run restores (master-cache action).
   schedule:
     - cron: '0 6 * * *'
@@ -21,32 +19,24 @@ env:
   EMSCRIPTEN_VERSION: &emscripten_version 4.0.20
 
 jobs:
-  # The FMOD SDK download needs the FMODUSER and FMODPASS secrets, which pull_request runs from forks do not get.
-  # In-repo pull requests run on pull_request; external ones run on pull_request_target, which has the secrets, only
-  # once a maintainer approves the external-pr environment. Every job below checks out the pull request's head commit.
-  gate:
-    name: 🚦 Gate
-    runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || (
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
-      ) || (
-        github.event_name == 'pull_request_target' &&
-        github.event.pull_request.head.repo.full_name != github.repository
-      )
-    environment: ${{ github.event_name == 'pull_request_target' && 'external-pr' || '' }}
-    steps:
-      - run: echo "Run approved"
-
-  check-specs:
-    name: 📜 Check specs
-    needs: gate
+  fmod-sdk:
+    name: 🎵 FMOD SDK
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: ./.github/actions/fmod-sdk-cache
+        with:
+          mode: check
+          fmod-version: *fmod_version
+
+  check-specs:
+    name: 📜 Check specs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
           persist-credentials: false
       - uses: actions/setup-python@v6
         with:
@@ -55,49 +45,43 @@ jobs:
 
   build-linux:
     name: 🐧 Build Linux
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_linux.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
 
   build-windows:
     name: 🪟 Build Windows
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_windows.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
 
   build-macos:
     name: 🍎 Build macOS
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_macos.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
 
   build-android:
     name: 🤖 Build Android
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_android.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
 
   build-ios:
     name: 🍏 Build iOS
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_ios.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
 
   build-web:
     name: 🌐 Build Web
-    needs: gate
+    needs: fmod-sdk
     uses: ./.github/workflows/build_web.yml
-    secrets: inherit
     with:
       fmod-version: *fmod_version
       emscripten-version: *emscripten_version

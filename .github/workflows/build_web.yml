@@ -30,7 +30,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: recursive
-          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - uses: mymindstorm/setup-emsdk@v14
         with:
@@ -45,8 +44,6 @@ jobs:
           target: ${{ matrix.target }}
           scons-flags: threads=${{ matrix.threads }}
           fmod-version: ${{ inputs.fmod-version }}
-          fmod-user: ${{ secrets.FMODUSER }}
-          fmod-password: ${{ secrets.FMODPASS }}
       - uses: ./.github/actions/scons-cache
         if: always()
         with:

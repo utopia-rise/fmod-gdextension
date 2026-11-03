@@ -52,7 +52,7 @@ def download(user: str, password: str, platform: str, version: str, archive: Pat
 
 def extract_api(platform: str, version: str, archive: Path, work_dir: Path) -> Path:
     if platform == "windows":
-        seven_zip = shutil.which("7z") or shutil.which("7za") or next(
+        seven_zip = shutil.which("7z") or shutil.which("7za") or shutil.which("7zz") or next(
             (path for path in ("C:/Program Files/7-Zip/7z.exe", "C:/Program Files (x86)/7-Zip/7z.exe") if Path(path).exists()), None
         )
         if seven_zip is None:
