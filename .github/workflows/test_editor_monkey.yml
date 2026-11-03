@@ -24,7 +24,7 @@ jobs:
       - name: Download editor library
         uses: actions/download-artifact@v7
         with:
-          name: editor_linux
+          name: fmod-gdextension-linux
           path: demo/addons/fmod/libs/linux
 
       - name: Run editor monkey

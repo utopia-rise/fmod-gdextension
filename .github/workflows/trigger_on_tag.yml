@@ -77,6 +77,27 @@ jobs:
       fmod-version: *fmod_version
       emscripten-version: *emscripten_version
 
+  assemble-linux:
+    name: 🐧 Assemble Linux
+    needs: build-linux
+    uses: ./.github/workflows/assemble_libraries.yml
+    with:
+      platform: linux
+
+  assemble-windows:
+    name: 🪟 Assemble Windows
+    needs: build-windows
+    uses: ./.github/workflows/assemble_libraries.yml
+    with:
+      platform: windows
+
+  assemble-macos:
+    name: 🍎 Assemble macOS
+    needs: build-macos
+    uses: ./.github/workflows/assemble_libraries.yml
+    with:
+      platform: macos
+
   assemble-android:
     name: 🤖 Assemble Android
     needs: build-android
@@ -84,37 +105,86 @@ jobs:
     with:
       godot-version: *godot_version
 
-  test-desktop:
-    name: 🧪 Test
-    needs: [build-linux, build-windows, build-macos]
+  assemble-ios:
+    name: 🍏 Assemble iOS
+    needs: build-ios
+    uses: ./.github/workflows/assemble_ios.yml
+
+  assemble-web:
+    name: 🌐 Assemble Web
+    needs: build-web
+    uses: ./.github/workflows/assemble_libraries.yml
+    with:
+      platform: web
+
+  test-linux:
+    name: 🐧 Test Linux
+    needs: assemble-linux
     uses: ./.github/workflows/test_desktop.yml
+    with:
+      godot-version: *godot_version
+      platform: linux
+
+  test-windows:
+    name: 🪟 Test Windows
+    needs: assemble-windows
+    uses: ./.github/workflows/test_desktop.yml
+    with:
+      godot-version: *godot_version
+      platform: windows
+
+  test-macos:
+    name: 🍎 Test macOS
+    needs: assemble-macos
+    uses: ./.github/workflows/test_desktop.yml
+    with:
+      godot-version: *godot_version
+      platform: macos
+
+  test-editor-monkey:
+    name: 🐒 Editor monkey
+    needs: assemble-linux
+    uses: ./.github/workflows/test_editor_monkey.yml
+    with:
+      godot-version: *godot_version
+
+  test-android:
+    name: 🤖 Test Android
+    needs: [assemble-android, assemble-linux]
+    uses: ./.github/workflows/test_android.yml
     with:
       godot-version: *godot_version
 
   test-ios:
     name: 🍏 Test iOS
-    needs: [build-ios, build-macos]
+    needs: [assemble-ios, assemble-macos]
     uses: ./.github/workflows/test_ios.yml
-    with:
-      godot-version: *godot_version
-
-  test-editor-monkey:
-    name: 🐒 Editor monkey
-    needs: build-linux
-    uses: ./.github/workflows/test_editor_monkey.yml
     with:
       godot-version: *godot_version
 
   test-web:
     name: 🌐 Test Web
-    needs: [build-linux, build-web]
+    needs: [assemble-web, assemble-linux]
     uses: ./.github/workflows/test_web.yml
     with:
       godot-version: *godot_version
 
   assemble-addon:
-    name: 📦 Assemble addon
-    needs: [assemble-android, test-desktop, test-ios, test-editor-monkey, test-web]
+    name: 📦 Package addon
+    needs:
+      - assemble-linux
+      - assemble-windows
+      - assemble-macos
+      - assemble-android
+      - assemble-ios
+      - assemble-web
+      - test-linux
+      - test-windows
+      - test-macos
+      - test-editor-monkey
+      - test-android
+      - test-ios
+      - test-web
     uses: ./.github/workflows/assemble_addon.yml
 
   release:

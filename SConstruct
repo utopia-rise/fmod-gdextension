@@ -153,6 +153,8 @@ if env["platform"] == "macos":
 elif env["platform"] == "ios":
     # Godot's iOS export embeds a dynamic library as a framework and signs it with an identifier derived from the file
     # name, which App Store Connect rejects (ITMS-90334). A static library, godot-cpp included, is linked into the app.
+    if env["ios_simulator"]:
+        target = "{}.simulator.{}".format(target, env["arch"])
     objects = env.StaticLibrary(target="bin/{}.objects.a".format(os.path.basename(target)), source=sources)
     godot_cpp_library = env.File("godot-cpp/bin/libgodot-cpp{}{}".format(env["suffix"], env["LIBSUFFIX"]))
     library = env.Command("{}.a".format(target), [objects, godot_cpp_library], "libtool -static -o $TARGET $SOURCES")

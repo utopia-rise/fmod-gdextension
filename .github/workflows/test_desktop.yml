@@ -5,23 +5,18 @@ on:
       godot-version:
         type: string
         required: true
+      platform:
+        type: string
+        required: true
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.platform }} ${{ matrix.mode }}
+    runs-on: ${{ fromJSON('{"linux":"ubuntu-22.04","macos":"macos-15","windows":"windows-2022"}')[inputs.platform] }}
+    name: ${{ matrix.mode }}
     strategy:
       fail-fast: false
       matrix:
-        platform: [linux, macos, windows]
-        mode: [editor, export-release]
-        include:
-          - platform: linux
-            os: ubuntu-22.04
-          - platform: macos
-            os: macos-15
-          - platform: windows
-            os: windows-2022
+        mode: [editor, export-release, export-debug]
     defaults:
       run:
         shell: bash
@@ -33,30 +28,23 @@ jobs:
       - uses: ./.github/actions/download-godot
         with:
           version: ${{ inputs.godot-version }}
-          platform: ${{ matrix.platform }}
+          platform: ${{ inputs.platform }}
           destination: ${{ runner.temp }}/godot
 
-      - name: Install release export template
-        if: matrix.mode == 'export-release'
+      - name: Install export template
+        if: matrix.mode != 'editor'
         uses: ./.github/actions/download-godot
         with:
           version: ${{ inputs.godot-version }}
-          platform: ${{ matrix.platform }}
+          platform: ${{ inputs.platform }}
           destination: ${{ runner.temp }}/godot
-          template: release
+          template: ${{ matrix.mode == 'export-debug' && 'debug' || 'release' }}
 
-      - name: Download editor library
+      - name: Download libraries
         uses: actions/download-artifact@v7
         with:
-          name: editor_${{ matrix.platform }}
-          path: demo/addons/fmod/libs/${{ matrix.platform }}
-
-      - name: Download release library
-        if: matrix.mode == 'export-release'
-        uses: actions/download-artifact@v7
-        with:
-          name: template_release_${{ matrix.platform }}
-          path: demo/addons/fmod/libs/${{ matrix.platform }}
+          name: fmod-gdextension-${{ inputs.platform }}
+          path: demo/addons/fmod/libs/${{ inputs.platform }}
 
       - name: Run tests
         timeout-minutes: 20

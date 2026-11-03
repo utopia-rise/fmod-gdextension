@@ -1,0 +1,116 @@
+name: 🤖 Android Tests
+on:
+  workflow_call:
+    inputs:
+      godot-version:
+        type: string
+        required: true
+
+jobs:
+  test-android:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Debug export tests
+            variant: debug
+          - name: Release export tests
+            variant: release
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+
+      - uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: linux
+          destination: ${{ runner.temp }}/godot
+
+      - name: Install Android build template
+        uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: android
+          destination: ${{ runner.temp }}/godot
+          template: ${{ matrix.variant }}
+
+      - name: Download Linux editor library
+        uses: actions/download-artifact@v7
+        with:
+          name: fmod-gdextension-linux
+          path: demo/addons/fmod/libs/linux
+
+      - name: Download Android plugin
+        uses: actions/download-artifact@v7
+        with:
+          name: fmod-gdextension-android
+          path: demo/addons/fmod/libs
+
+      - name: Create Android release test key
+        run: |
+          keytool -genkeypair \
+            -keystore "$RUNNER_TEMP/fmod-tests-release.keystore" \
+            -alias fmod-tests \
+            -storepass fmod-tests \
+            -keypass fmod-tests \
+            -dname "CN=FMOD GDExtension Tests" \
+            -keyalg RSA \
+            -validity 10000 \
+            -noprompt
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$RUNNER_TEMP/fmod-tests-release.keystore" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=fmod-tests" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=fmod-tests" >> "$GITHUB_ENV"
+
+      - name: Export Android tests
+        timeout-minutes: 30
+        run: |
+          godot="$RUNNER_TEMP/godot/godot.linuxbsd.editor.x86_64"
+          cd demo
+          "$godot" --headless --path . --import
+          mkdir -p export/tests_android
+          "$godot" --headless --path . --install-android-build-template --export-${{ matrix.variant }} tests_android export/tests_android/tests.apk
+          test -f export/tests_android/tests.apk
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run exported tests on an emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        timeout-minutes: 20
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          force-avd-creation: false
+          emulator-boot-timeout: 300
+          emulator-options: -no-snapshot-load -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: bash .github/scripts/test_android_emulator.sh
+
+      - name: Upload Android emulator logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-${{ matrix.variant }}-emulator-logs
+          path: android-emulator.log
+          if-no-files-found: ignore

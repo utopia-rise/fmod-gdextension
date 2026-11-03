@@ -1,0 +1,40 @@
+name: 🍏 Assemble iOS
+on:
+  workflow_call:
+
+jobs:
+  assemble-ios:
+    runs-on: macos-15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_ios'
+          path: libraries
+          merge-multiple: true
+
+      - name: Assemble xcframeworks
+        working-directory: libraries
+        run: |
+          for target in template_debug template_release; do
+            library=libGodotFmod.ios.$target
+            mkdir simulator
+            lipo -create $library.simulator.arm64.a $library.simulator.x86_64.a -output simulator/$library.a
+            xcodebuild -create-xcframework -library $library.a -library simulator/$library.a -output $library.xcframework
+            rm -rf simulator
+          done
+          for fmod in fmod fmodL fmodstudio fmodstudioL; do
+            lipo -info lib${fmod}_iphoneos.a lib${fmod}_iphonesimulator.a
+            xcodebuild -create-xcframework -library lib${fmod}_iphoneos.a -library lib${fmod}_iphonesimulator.a \
+              -output $fmod.xcframework
+          done
+          rm *.a
+          ls
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fmod-gdextension-ios
+          path: libraries
+          if-no-files-found: error

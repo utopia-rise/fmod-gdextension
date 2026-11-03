@@ -13,6 +13,7 @@ Exporting the game's audio content is F.2.
 - **F.1.4**: Games export with FMOD to Android x86_64.
 - **F.1.5**: Games export with FMOD to iOS.
 - **F.1.6**: Games export with FMOD to the web.
+- **F.1.7**: Games built for iOS run in the iOS simulator.
 
 ## Rules
 - **F.1.R1**: A debug export and the editor use FMOD's logging libraries, and a release export FMOD's release libraries.
