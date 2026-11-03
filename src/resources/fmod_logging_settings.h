@@ -4,6 +4,7 @@
 #include "fmod_studio.h"
 
 #include <classes/resource.hpp>
+#include <helpers/enum.h>
 
 namespace godot {
 
@@ -45,8 +46,8 @@ namespace godot {
         static constexpr const char* DEFAULT_LOG_FILE_PATH = "user://fmod.log";
 
     private:
-        int _debug_level;
-        int _log_output;
+        int _debug_level = DEFAULT_DEBUG_LEVEL;
+        int _log_output = DEFAULT_LOG_OUTPUT;
         String _log_file_path;
 
     protected:
@@ -56,5 +57,7 @@ namespace godot {
 }// namespace godot
 
 VARIANT_ENUM_CAST(FmodLoggingSettings::DebugLevel);
+
+FMOD_ENUM_CAST(FmodLoggingSettings, FMOD_DEBUG_MODE)
 
 #endif// GODOTFMOD_FMOD_LOGGING_SETTINGS_H

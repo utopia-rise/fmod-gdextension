@@ -652,95 +652,11 @@
 		</constant>
 		<constant name="FMOD_STUDIO_INIT_LOAD_FROM_UPDATE" value="16" enum="FMOD_STUDIO_INITFLAGS" is_bitfield="true">
 		</constant>
-		<constant name="FMOD_SPEAKERMODE_5POINT1" value="6" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_7POINT1" value="7" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_7POINT1POINT4" value="8" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_DEFAULT" value="0" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_MAX" value="9" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_MONO" value="2" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_QUAD" value="4" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_RAW" value="1" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_STEREO" value="3" enum="FMOD_SPEAKERMODE">
-		</constant>
-		<constant name="FMOD_SPEAKERMODE_SURROUND" value="5" enum="FMOD_SPEAKERMODE">
-		</constant>
 		<constant name="FMOD_STUDIO_LOAD_BANK_NORMAL" value="0" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
 		</constant>
 		<constant name="FMOD_STUDIO_LOAD_BANK_NONBLOCKING" value="1" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
 		</constant>
 		<constant name="FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES" value="2" enum="FMOD_STUDIO_LOAD_BANK_FLAGS" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_2D" value="8" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D" value="16" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_CUSTOMROLLOFF" value="67108864" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_HEADRELATIVE" value="262144" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_IGNOREGEOMETRY" value="1073741824" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_INVERSEROLLOFF" value="1048576" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_INVERSETAPEREDROLLOFF" value="8388608" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_LINEARROLLOFF" value="2097152" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_LINEARSQUAREROLLOFF" value="4194304" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_3D_WORLDRELATIVE" value="524288" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_ACCURATETIME" value="16384" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_CREATECOMPRESSEDSAMPLE" value="512" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_CREATESAMPLE" value="256" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_CREATESTREAM" value="128" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_DEFAULT" value="0" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_IGNORETAGS" value="33554432" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_LOOP_BIDI" value="4" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_LOOP_NORMAL" value="2" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_LOOP_OFF" value="1" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_LOWMEM" value="134217728" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_MPEGSEARCH" value="32768" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_NONBLOCKING" value="65536" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_OPENMEMORY" value="2048" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_OPENMEMORY_POINT" value="268435456" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_OPENONLY" value="8192" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_OPENRAW" value="4096" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_OPENUSER" value="1024" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_UNIQUE" value="131072" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_VIRTUAL_PLAYFROMSTART" value="2147483648" enum="FMOD_MODE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_STOP_ALLOWFADEOUT" value="0" enum="FMOD_STUDIO_STOP_MODE">
-		</constant>
-		<constant name="FMOD_STUDIO_STOP_IMMEDIATE" value="1" enum="FMOD_STUDIO_STOP_MODE">
-		</constant>
-		<constant name="FMOD_STUDIO_STOP_FORCEINT" value="65536" enum="FMOD_STUDIO_STOP_MODE">
 		</constant>
 		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE" value="1" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
 		</constant>
@@ -753,76 +669,6 @@
 		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_DISCONNECTED" value="16" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
 		</constant>
 		<constant name="FMOD_STUDIO_SYSTEM_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_SYSTEM_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATED" value="1" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROYED" value="2" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTING" value="4" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTED" value="8" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_RESTARTED" value="16" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STOPPED" value="32" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_FAILED" value="64" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND" value="128" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND" value="256" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_CREATED" value="512" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_DESTROYED" value="1024" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER" value="2048" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT" value="4096" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED" value="8192" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED" value="16384" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_REAL_TO_VIRTUAL" value="32768" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_VIRTUAL_TO_REAL" value="65536" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_EVENT_COMMAND" value="131072" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_NESTED_TIMELINE_BEAT" value="262144" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_EVENT_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADING" value="0" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADED" value="1" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_LOADING" value="2" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_LOADED" value="3" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_ERROR" value="4" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_LOADING_STATE_FORCEINT" value="65536" enum="FMOD_STUDIO_LOADING_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_PLAYING" value="0" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_SUSTAINING" value="1" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STOPPED" value="2" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STARTING" value="3" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_STOPPING" value="4" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_STUDIO_PLAYBACK_FORCEINT" value="65536" enum="FMOD_STUDIO_PLAYBACK_STATE">
-		</constant>
-		<constant name="FMOD_DEBUG_MODE_TTY" value="0" enum="FMOD_DEBUG_MODE">
-		</constant>
-		<constant name="FMOD_DEBUG_MODE_CALLBACK" value="2" enum="FMOD_DEBUG_MODE">
-		</constant>
-		<constant name="FMOD_DEBUG_MODE_FILE" value="1" enum="FMOD_DEBUG_MODE">
 		</constant>
 	</constants>
 </class>

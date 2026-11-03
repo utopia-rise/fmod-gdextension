@@ -22,7 +22,7 @@ func after():
 	sprite.free()
 
 func test_assert_bank_loaded():
-	assert_int(vehicleBank.get_loading_state()).is_equal(FmodServer.FMOD_STUDIO_LOADING_STATE_LOADED)
+	assert_int(vehicleBank.get_loading_state()).is_equal(FmodBank.FMOD_STUDIO_LOADING_STATE_LOADED)
 
 func test_assert_bank_bus_count():
 	assert_int(musicBank.get_bus_count()).is_equal(0)

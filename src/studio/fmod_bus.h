@@ -2,9 +2,9 @@
 #define GODOTFMOD_FMOD_BUS_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_event.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "helpers/constants.h"
 
 namespace godot {
     class FmodBus : public RefCounted {

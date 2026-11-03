@@ -7,11 +7,11 @@
 	<tutorials>
 	</tutorials>
 	<members>
-		<member name="distance_factor" type="float" setter="set_distance_factor" getter="get_distance_factor" default="0.0">
+		<member name="distance_factor" type="float" setter="set_distance_factor" getter="get_distance_factor" default="1.0">
 		</member>
-		<member name="doppler_scale" type="float" setter="set_doppler_scale" getter="get_doppler_scale" default="0.0">
+		<member name="doppler_scale" type="float" setter="set_doppler_scale" getter="get_doppler_scale" default="1.0">
 		</member>
-		<member name="rolloff_scale" type="float" setter="set_rolloff_scale" getter="get_rolloff_scale" default="-28663136.0">
+		<member name="rolloff_scale" type="float" setter="set_rolloff_scale" getter="get_rolloff_scale" default="1.0">
 		</member>
 	</members>
 </class>

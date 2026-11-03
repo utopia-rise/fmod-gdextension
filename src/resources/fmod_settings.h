@@ -45,12 +45,12 @@ namespace godot {
         static constexpr const bool DEFAULT_SHOULD_LOAD_BY_NAME = false;
 
     private:
-        int _channel_count;
-        int _default_listener_count;
-        bool _is_live_update_enabled;
-        bool _is_memory_tracking_enabled;
+        int _channel_count = DEFAULT_CHANNEL_COUNT;
+        int _default_listener_count = DEFAULT_DEFAULT_LISTENER_COUNT;
+        bool _is_live_update_enabled = DEFAULT_IS_LIVEUPDATE;
+        bool _is_memory_tracking_enabled = DEFAULT_IS_MEMORY_TRACKING;
         String _banks_path;
-        bool _should_load_by_name;
+        bool _should_load_by_name = DEFAULT_SHOULD_LOAD_BY_NAME;
 
     protected:
         static void _bind_methods();

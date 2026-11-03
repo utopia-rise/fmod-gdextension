@@ -55,7 +55,7 @@
 			</description>
 		</method>
 		<method name="get_loading_state">
-			<return type="int" enum="FmodServer.FMOD_STUDIO_LOADING_STATE" />
+			<return type="int" enum="FmodBank.FMOD_STUDIO_LOADING_STATE" />
 			<description>
 				Returns the loading state of the bank. See FMOD_STUDIO_LOADING_STATE enum for possible values:
 				- FMOD_STUDIO_LOADING_STATE_UNLOADING: Bank is being unloaded
@@ -94,4 +94,18 @@
 			</description>
 		</method>
 	</methods>
+	<constants>
+		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADING" value="0" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_UNLOADED" value="1" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_LOADING" value="2" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_LOADED" value="3" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_ERROR" value="4" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_LOADING_STATE_FORCEINT" value="65536" enum="FMOD_STUDIO_LOADING_STATE">
+		</constant>
+	</constants>
 </class>

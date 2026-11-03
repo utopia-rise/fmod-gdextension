@@ -28,8 +28,8 @@ namespace godot {
         static constexpr const int DEFAULT_DSP_BUFFER_COUNT = 4;
 
     private:
-        unsigned int _dsp_buffer_size;
-        int _dsp_buffer_count;
+        unsigned int _dsp_buffer_size = DEFAULT_DSP_BUFFER_SIZE;
+        int _dsp_buffer_count = DEFAULT_DSP_BUFFER_COUNT;
 
     protected:
         static void _bind_methods();

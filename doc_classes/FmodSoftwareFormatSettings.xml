@@ -7,11 +7,33 @@
 	<tutorials>
 	</tutorials>
 	<members>
-		<member name="raw_speakers_count" type="int" setter="set_raw_speakers_count" getter="get_raw_speakers_count" default="-874860880">
+		<member name="raw_speakers_count" type="int" setter="set_raw_speakers_count" getter="get_raw_speakers_count" default="0">
 		</member>
-		<member name="sample_rate" type="int" setter="set_sample_rate" getter="get_sample_rate" default="0">
+		<member name="sample_rate" type="int" setter="set_sample_rate" getter="get_sample_rate" default="48000">
 		</member>
-		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" default="0">
+		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" default="3">
 		</member>
 	</members>
+	<constants>
+		<constant name="FMOD_SPEAKERMODE_5POINT1" value="6" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_7POINT1" value="7" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_7POINT1POINT4" value="8" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_DEFAULT" value="0" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_MAX" value="9" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_MONO" value="2" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_QUAD" value="4" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_RAW" value="1" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_STEREO" value="3" enum="FMOD_SPEAKERMODE">
+		</constant>
+		<constant name="FMOD_SPEAKERMODE_SURROUND" value="5" enum="FMOD_SPEAKERMODE">
+		</constant>
+	</constants>
 </class>

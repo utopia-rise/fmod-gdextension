@@ -4,6 +4,7 @@
 #include "fmod_common.h"
 
 #include <classes/resource.hpp>
+#include <helpers/enum.h>
 
 namespace godot {
     class FmodSoftwareFormatSettings : public Resource {
@@ -35,13 +36,15 @@ namespace godot {
         static constexpr const int DEFAULT_RAW_SPEAKER_COUNT = 0;
 
     private:
-        int _sample_rate;
-        int _speaker_mode;
-        int _raw_speakers_count;
+        int _sample_rate = DEFAULT_SAMPLE_RATE;
+        int _speaker_mode = DEFAULT_SPEAKER_MODE;
+        int _raw_speakers_count = DEFAULT_RAW_SPEAKER_COUNT;
 
     protected:
         static void _bind_methods();
     };
 }
+
+FMOD_ENUM_CAST(FmodSoftwareFormatSettings, FMOD_SPEAKERMODE)
 
 #endif// GODOTFMOD_FMOD_SOFTWARE_FORMAT_SETTINGS_H

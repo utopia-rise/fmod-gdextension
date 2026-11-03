@@ -7,7 +7,7 @@
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
-#include "helpers/constants.h"
+#include "helpers/enum.h"
 
 namespace godot {
     class FmodBank : public RefCounted {
@@ -55,4 +55,7 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
+
+FMOD_ENUM_CAST(FmodBank, FMOD_STUDIO_LOADING_STATE)
+
 #endif// GODOTFMOD_FMOD_BANK_H

@@ -4,7 +4,7 @@
 #include "classes/ref_counted.hpp"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
-#include "helpers/constants.h"
+#include "helpers/enum.h"
 #include "core/fmod_channel_group.h"
 
 namespace godot {
@@ -65,5 +65,8 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
+
+FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_STOP_MODE)
+FMOD_ENUM_CAST(FmodEvent, FMOD_STUDIO_PLAYBACK_STATE)
 
 #endif// GODOTFMOD_FMOD_EVENT_H

@@ -17,7 +17,7 @@ func before():
 	fmodEvent.start()
 
 func after():
-	fmodEvent.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmodEvent.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
 	fmodEvent.release()
 	FmodServer.remove_listener(0, sprite)
 	sprite.free()
@@ -68,7 +68,7 @@ func test_assert_event_parameter_reflects_automatic_value():
 	var distance := explosion.get_parameter_by_name("Distance")
 	var distance_id: int = FmodServer.get_event("event:/Weapons/Explosion").get_parameter_by_name("Distance").get_id()
 	var distance_by_id := explosion.get_parameter_by_id(distance_id)
-	explosion.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	explosion.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
 	explosion.release()
 	assert_object(sfx_bank).is_not_null()
 	assert_float(distance).is_greater(0.0)
@@ -90,7 +90,7 @@ func test_assert_should_pause_all():
 	FmodServer.pause_all_events()
 	assert_bool(fmodEvent.paused).is_true()
 	assert_bool(fmodEvent2.paused).is_true()
-	fmodEvent2.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmodEvent2.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
 	fmodEvent2.release()
 
 func test_assert_should_mute_unmute_all():

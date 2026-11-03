@@ -11,7 +11,7 @@
 		</member>
 		<member name="log_file_path" type="String" setter="set_log_file_path" getter="get_log_file_path" default="&quot;&quot;">
 		</member>
-		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" default="0">
+		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" default="2">
 		</member>
 	</members>
 	<constants>
@@ -24,6 +24,12 @@
 		<constant name="DEBUG_LOG" value="4" enum="DebugLevel">
 		</constant>
 		<constant name="DEBUG_VERBOSE" value="5" enum="DebugLevel">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_TTY" value="0" enum="FMOD_DEBUG_MODE">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_CALLBACK" value="2" enum="FMOD_DEBUG_MODE">
+		</constant>
+		<constant name="FMOD_DEBUG_MODE_FILE" value="1" enum="FMOD_DEBUG_MODE">
 		</constant>
 	</constants>
 </class>

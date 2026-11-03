@@ -30,8 +30,8 @@ func test_assert_set_callback():
 	var fmod_event: FmodEvent = FmodServer.create_event_instance("event:/Music/Level 02")
 	fmod_event.volume = 0
 	fmod_event.start()
-	fmod_event.set_callback(on_callback, FmodServer.FMOD_STUDIO_EVENT_CALLBACK_ALL)
+	fmod_event.set_callback(on_callback, FmodEvent.FMOD_STUDIO_EVENT_CALLBACK_ALL)
 	await await_millis(2000)
 	assert_bool(callback_called).is_true()
-	fmod_event.stop(FmodServer.FMOD_STUDIO_STOP_IMMEDIATE)
+	fmod_event.stop(FmodEvent.FMOD_STUDIO_STOP_IMMEDIATE)
 	fmod_event.release()

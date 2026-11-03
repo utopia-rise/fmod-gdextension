@@ -18,6 +18,13 @@ void FmodBank::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_godot_res_path"), &FmodBank::get_godot_res_path);
     ClassDB::bind_method(D_METHOD("get_path"), &FmodBank::get_path);
     ClassDB::bind_method(D_METHOD("get_guid"), &FmodBank::get_guid_as_string);
+
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_UNLOADING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_UNLOADED);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADING);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_LOADED);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_ERROR);
+    BIND_ENUM_CONSTANT(FMOD_STUDIO_LOADING_STATE_FORCEINT);
 }
 
 FMOD_STUDIO_LOADING_STATE FmodBank::get_loading_state() {

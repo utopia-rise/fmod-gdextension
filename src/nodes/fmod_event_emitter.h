@@ -36,7 +36,7 @@ namespace godot {
         String _event_name;
         String _programmer_callback_sound_key;
         LocalVector<Parameter> _parameters;
-        FMOD_GUID _event_guid;
+        FMOD_GUID _event_guid = {};
         float _volume = 1.0;
         bool _attached = true;
         bool _autoplay = false;

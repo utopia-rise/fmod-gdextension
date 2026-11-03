@@ -43,14 +43,14 @@
 				Gets the value FMOD uses for a parameter, by its name. FMOD computes it on each [method FmodServer.update] from the value set from code and what FMOD Studio applies to the parameter: automatic parameters such as distance, automation, modulation and seek speed. A value set from code shows up after the next update. [method get_parameter_user_value_by_name] gives the value set from code.
 			</description>
 		</method>
-		<method name="get_parameter_user_value_by_id">
+		<method name="get_parameter_user_value_by_id" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="parameter_id" type="int" />
 			<description>
 				Gets the value set from code for a parameter, by its numerical ID, or its default value when code never set one. Unlike the value FMOD uses, it ignores automatic parameters, automation, modulation and seek speed.
 			</description>
 		</method>
-		<method name="get_parameter_user_value_by_name">
+		<method name="get_parameter_user_value_by_name" qualifiers="const">
 			<return type="float" />
 			<param index="0" name="parameter_name" type="String" />
 			<description>
@@ -58,7 +58,7 @@
 			</description>
 		</method>
 		<method name="get_playback_state" qualifiers="const">
-			<return type="int" enum="FmodServer.FMOD_STUDIO_PLAYBACK_STATE" />
+			<return type="int" enum="FmodEvent.FMOD_STUDIO_PLAYBACK_STATE" />
 			<description>
 				Returns the current playback state of the event. See FMOD_STUDIO_PLAYBACK_STATE enum for possible values.
 			</description>
@@ -165,7 +165,7 @@
 		</method>
 		<method name="stop" qualifiers="const">
 			<return type="void" />
-			<param index="0" name="stop_mode" type="int" enum="FmodServer.FMOD_STUDIO_STOP_MODE" />
+			<param index="0" name="stop_mode" type="int" enum="FmodEvent.FMOD_STUDIO_STOP_MODE" />
 			<description>
 				Stops the event with the specified stop mode. Use FMOD_STUDIO_STOP_ALLOWFADEOUT for smooth stopping or FMOD_STUDIO_STOP_IMMEDIATE for instant stopping.
 			</description>
@@ -194,4 +194,64 @@
 			The volume multiplier of the event. 1.0 is normal volume.
 		</member>
 	</members>
+	<constants>
+		<constant name="FMOD_STUDIO_STOP_ALLOWFADEOUT" value="0" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_STOP_IMMEDIATE" value="1" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_STOP_FORCEINT" value="65536" enum="FMOD_STUDIO_STOP_MODE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_PLAYING" value="0" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_SUSTAINING" value="1" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STOPPED" value="2" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STARTING" value="3" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_STOPPING" value="4" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_PLAYBACK_FORCEINT" value="65536" enum="FMOD_STUDIO_PLAYBACK_STATE">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATED" value="1" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROYED" value="2" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTING" value="4" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STARTED" value="8" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_RESTARTED" value="16" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_STOPPED" value="32" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_FAILED" value="64" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND" value="128" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND" value="256" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_CREATED" value="512" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_DESTROYED" value="1024" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER" value="2048" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT" value="4096" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED" value="8192" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED" value="16384" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_REAL_TO_VIRTUAL" value="32768" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_VIRTUAL_TO_REAL" value="65536" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_START_EVENT_COMMAND" value="131072" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_NESTED_TIMELINE_BEAT" value="262144" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+		<constant name="FMOD_STUDIO_EVENT_CALLBACK_ALL" value="4294967295" enum="FMOD_STUDIO_EVENT_CALLBACK_TYPE" is_bitfield="true">
+		</constant>
+	</constants>
 </class>

@@ -27,13 +27,20 @@ func test_assert_every_referenced_enum_is_declared():
 			if property["usage"] & PROPERTY_USAGE_CLASS_IS_ENUM:
 				assert_bool(_declares_enum(property["class_name"])).override_failure_message("%s.%s references undeclared enum %s" % [name, property["name"], property["class_name"]]).is_true()
 
-func test_assert_fmod_enums_belong_to_fmod_server():
-	assert_bool(ClassDB.class_has_enum("FmodServer", "FMOD_STUDIO_PLAYBACK_STATE")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodServer", "FMOD_STUDIO_STOP_MODE")).is_true()
+func test_assert_fmod_enums_belong_to_their_class():
+	assert_bool(ClassDB.class_has_enum("FmodEvent", "FMOD_STUDIO_PLAYBACK_STATE")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodEvent", "FMOD_STUDIO_STOP_MODE")).is_true()
+	assert_bool(ClassDB.is_class_enum_bitfield("FmodEvent", "FMOD_STUDIO_EVENT_CALLBACK_TYPE")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodBank", "FMOD_STUDIO_LOADING_STATE")).is_true()
 	assert_bool(ClassDB.is_class_enum_bitfield("FmodServer", "FMOD_STUDIO_LOAD_BANK_FLAGS")).is_true()
-	assert_str(ClassDB.class_get_integer_constant_enum("FmodServer", "FMOD_STUDIO_PLAYBACK_PLAYING")).is_equal("FMOD_STUDIO_PLAYBACK_STATE")
-	for constant in ClassDB.class_get_integer_constant_list("FmodServer", true):
-		assert_str(ClassDB.class_get_integer_constant_enum("FmodServer", constant)).override_failure_message("%s belongs to no enum" % constant).is_not_empty()
+	assert_bool(ClassDB.is_class_enum_bitfield("FmodFile", "FMOD_MODE")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodSoftwareFormatSettings", "FMOD_SPEAKERMODE")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodLoggingSettings", "FMOD_DEBUG_MODE")).is_true()
+
+func test_assert_every_constant_belongs_to_an_enum():
+	for name in _extension_classes():
+		for constant in ClassDB.class_get_integer_constant_list(name, true):
+			assert_str(ClassDB.class_get_integer_constant_enum(name, constant, true)).override_failure_message("%s.%s belongs to no enum" % [name, constant]).is_not_empty()
 
 func test_assert_every_bound_argument_is_named():
 	for name in _extension_classes():
@@ -53,3 +60,13 @@ func test_assert_emitter_paused_property_is_bool():
 	for property in ClassDB.class_get_property_list("FmodEventEmitter3D", true):
 		if property["name"] == "paused":
 			assert_int(property["type"]).is_equal(TYPE_BOOL)
+
+func test_assert_new_objects_start_from_their_defaults():
+	var emitter := FmodEventEmitter3D.new()
+	assert_str(emitter.event_guid).is_equal("{00000000-0000-0000-0000-000000000000}")
+	emitter.free()
+	assert_float(FmodSound3DSettings.new().rolloff_scale).is_equal(1.0)
+	assert_int(FmodSoftwareFormatSettings.new().sample_rate).is_equal(48000)
+	assert_int(FmodSoftwareFormatSettings.new().raw_speakers_count).is_equal(0)
+	assert_int(FmodDspSettings.new().dsp_buffer_size).is_equal(512)
+	assert_int(FmodGeneralSettings.new().channel_count).is_equal(1024)
