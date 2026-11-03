@@ -13,6 +13,8 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_parameter_by_id", "parameter_id"), &FmodEvent::get_parameter_by_id);
     ClassDB::bind_method(D_METHOD("set_parameter_by_id", "parameter_id", "value"), &FmodEvent::set_parameter_by_id);
     ClassDB::bind_method(D_METHOD("set_parameter_by_id_with_label", "parameter_id", "label", "ignore_seek_speed"), &FmodEvent::set_parameter_by_id_with_label, DEFVAL(false));
+    ClassDB::bind_method(D_METHOD("get_parameter_user_value_by_name", "parameter_name"), &FmodEvent::get_parameter_user_value_by_name);
+    ClassDB::bind_method(D_METHOD("get_parameter_user_value_by_id", "parameter_id"), &FmodEvent::get_parameter_user_value_by_id);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
     ClassDB::bind_method(D_METHOD("stop", "stop_mode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
@@ -54,7 +56,7 @@ void FmodEvent::_bind_methods() {
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
     float p = -1;
-    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &p),
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), nullptr, &p),
                             vformat("Cannot get parameter %s", parameter_name));
     return p;
 }
@@ -75,9 +77,23 @@ float FmodEvent::get_parameter_by_id(uint64_t long_id) const {
 
 float FmodEvent::get_parameter_by_fmod_id(const FMOD_STUDIO_PARAMETER_ID& parameter_id) const {
     float value = -1.0f;
-    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, &value),
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(parameter_id, nullptr, &value),
                             vformat("Cannot get parameter with id: %d", fmod_parameter_id_to_ulong(parameter_id)));
     return value;
+}
+
+float FmodEvent::get_parameter_user_value_by_name(const String& parameter_name) const {
+    float user_value = -1;
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByName(parameter_name.utf8().get_data(), &user_value),
+                            vformat("Cannot get user value of parameter %s", parameter_name));
+    return user_value;
+}
+
+float FmodEvent::get_parameter_user_value_by_id(uint64_t long_id) const {
+    float user_value = -1;
+    ERROR_CHECK_WITH_REASON(_wrapped->getParameterByID(ulong_to_fmod_parameter_id(long_id), &user_value),
+                            vformat("Cannot get user value of parameter with id: %d", long_id));
+    return user_value;
 }
 
 void FmodEvent::set_parameter_by_id(uint64_t long_id, float value) const {

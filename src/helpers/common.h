@@ -69,10 +69,12 @@ public:                                                                  \
         if (wrapped) {                                                   \
             ref.instantiate();                                           \
             ref->_wrapped = wrapped;                                     \
+            /* Without the strings bank, getPath fails and leaves path unset. */ \
             char path[MAX_PATH_SIZE];                                    \
-            ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr)); \
+            if (ERROR_CHECK(wrapped->getPath(path, MAX_PATH_SIZE, nullptr))) { \
+                ref->_path = String(path);                               \
+            }                                                            \
             ERROR_CHECK(wrapped->getID(&ref->_guid));                    \
-            ref->_path = String(path);                                   \
         }                                                                \
         return ref;                                                      \
     }                                                                    \
