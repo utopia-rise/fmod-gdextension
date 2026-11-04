@@ -8,10 +8,13 @@
     "CanvasItem",
     "Node2D",
     "Node3D",
+    "SceneTree",
+    "Window",
 
     "Engine",
     "OS",
     "ProjectSettings",
+    "Performance",
     "FileAccess",
     "DirAccess",
     "ResourceLoader",

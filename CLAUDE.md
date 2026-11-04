@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What This Project Is
 
-**FMOD GDExtension** integrates the FMOD Studio and FMOD Core APIs into Godot 4 as a GDExtension built against [godot-cpp](https://github.com/godotengine/godot-cpp). It is a C++ extension plus a GDScript editor addon: the native side exposes an `FmodServer` engine singleton, wrappers of FMOD Studio objects (banks, events, buses, VCAs), scene nodes (emitters, listeners, bank loader) and settings resources; the addon (`demo/addons/fmod/`) adds the bank explorer, Inspector editors, the `FmodManager` autoload and the Android export plugin.
+**FMOD GDExtension** integrates the FMOD Studio and FMOD Core APIs into Godot 4 as a GDExtension built against [godot-cpp](https://github.com/godotengine/godot-cpp). It is a C++ extension plus a GDScript editor addon: the native side exposes an `FmodServer` engine singleton, wrappers of FMOD Studio objects (banks, events, buses, VCAs), scene nodes (emitters, listeners, bank loader), the `FmodRuntime` node and settings resources; the addon (`demo/addons/fmod/`) adds the bank explorer, Inspector editors and the Android export plugin.
 
 The minimum Godot version is `compatibility_minimum` in `demo/addons/fmod/fmod.gdextension` (4.6, with `compatibility_maximum = "4"`: GDExtensions are forward compatible, so any later 4.x loads the addon), mirrored by `api_version` in `SConstruct`, `config/features` in `demo/project.godot` and the `org.godotengine:godot` dependency of `android-plugin/library/build.gradle.kts`; CI runs the latest patch of that minor version, `GODOT_VERSION` in `.github/workflows/trigger_ci.yml` and `trigger_on_tag.yml`. The FMOD version is `FMOD_VERSION` in the same two workflows, mirrored by the versioned Linux library names in `fmod.gdextension`. `EMSCRIPTEN_VERSION` there is the Emscripten that built the official web export templates of `GODOT_VERSION` (`godotengine/build-containers`, `Dockerfile.web` of that branch): web libraries are built with exactly that version. Change each set together.
 
@@ -50,7 +50,7 @@ These apply to every language in the repository (C++, GDScript, Python).
 
 ### GDExtension
 
-- **Registration** — Every `GDCLASS` (and `FMODCLASS`) must be registered in `register_types.cpp` (editor classes at the editor level, under `TOOLS_ENABLED`), declare its own `static void _bind_methods()`, even empty, and have its entry in `doc_classes/`.
+- **Registration** — Every `GDCLASS` (and `FMODCLASS`) must be registered in `register_types.cpp` (editor classes at the editor level, under `TOOLS_ENABLED`), declare its own `static void _bind_methods()`, even empty, and have its entry in `doc_classes/`, except an internal class (`register_internal_class`, such as `FmodRuntime`), which scripts cannot see or create and the class reference leaves out.
 - **FMOD enums** — An FMOD enum or flag set the API needs is declared in the class it belongs to, the godot-cpp way: a class `enum` (`: uint32_t` for flags) whose values are FMOD's constants, `VARIANT_ENUM_CAST` or `VARIANT_BITFIELD_CAST`, and `BIND_ENUM_CONSTANT` or `BIND_BITFIELD_FLAG`; `fmod_enum_cast` converts to and from FMOD's types. The enum is named in PascalCase without `Fmod` and its values without FMOD's prefix (`FmodEvent.StudioStopMode.IMMEDIATE`), keeping one more word of the prefix only where a value would clash with another enum of its class or start with a digit; FMOD's `FORCEINT` and `MAX` placeholders are never bound. It is registered only while a bound method, property, signal or value handed to scripts uses it: every change to the public API, new, modified or removed, registers the enums it starts using and unregisters those nothing uses anymore, keeping their C++ declaration.
 - **Callables** — Prefer `callable_mp(this, &Class::method)` over string-named `Callable`s; bind a method only when the engine or a script calls it by name.
 - **StringNames** — A constant `StringName` used on a hot path is built once, as a member of `FmodStringNames`, not on every call.
@@ -104,7 +104,7 @@ Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on 
 ### C++ layer (`src/`)
 
 - **`register_types.cpp`** — entry point `fmod_library_init`. Core level: `FmodStringNames` and the `GodotFileRunner`. Scene level: runtime classes, the `FmodServer` singleton, and FMOD initialization from Project Settings when `auto_initialize` is on (always in the editor). Editor level: `FmodEditorPlugin` and `FmodEditorExportPlugin`.
-- **`fmod_server.*`** — `FmodServer`: FMOD system lifecycle (`init`, `update`, `shutdown`), banks, event instances, one-shots, listeners, buses/VCAs, global parameters, files and sounds, plugins, drivers and performance data. Its `update()` runs every frame from the `FmodManager.gd` autoload.
+- **`fmod_server.*`** — `FmodServer`: FMOD system lifecycle (`init`, `update`, `shutdown`), banks, event instances, one-shots, listeners, buses/VCAs, global parameters, files and sounds, plugins, drivers and performance data. Its `update()` runs every frame from `FmodRuntime`, the node `init()` adds at the root of the scene tree and `shutdown()` frees.
 - **`fmod_cache.*`** — loaded files and banks, and the event descriptions, buses and VCAs they hold by GUID; banks loaded without blocking are finished in `update_pending()`.
 - **`studio/`** — `RefCounted` wrappers of FMOD Studio objects, declared with `FMODCLASS` / `FMODCLASSWITHPATH` (`helpers/common.h`); `FmodBank` unloads its bank when its last reference goes.
 - **`core/`** — FMOD Core wrappers: `FmodFile` (a loaded file), `FmodSound` (a playing channel), `FmodChannelGroup` (DSP clock).
@@ -117,7 +117,7 @@ Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on 
 
 ### Editor addon (`demo/addons/fmod/`)
 
-GDScript, `@tool`: `FmodPlugin.gd` (toolbar button, bank explorer window, Inspector plugins, export plugins, the `FmodManager` autoload), `FmodManager.gd` (calls `FmodServer.update()` every frame, forwards notifications, suspends the mixer on mobile focus loss, registers the performance monitors), `tool/FmodBankDatabase.gd` (loads the master banks from `Fmod/General/banks/path`), `tool/ui/` (bank explorer, event audition, parameter display), `tool/inspectors/` and `tool/property_editors/`. The released addon is this folder, `README.md` and `LICENSE`, with every desktop and iOS library and the two Android AARs in `libs/` (no bare Android library).
+GDScript, `@tool`: `FmodPlugin.gd` (toolbar button, bank explorer window, Inspector plugins, export plugins, and removing the `FmodManager` autoload older versions registered), `tool/FmodBankDatabase.gd` (loads the master banks from `Fmod/General/banks/path`), `tool/ui/` (bank explorer, event audition, parameter display), `tool/inspectors/` and `tool/property_editors/`. The released addon is this folder, `README.md` and `LICENSE`, with every desktop and iOS library and the two Android AARs in `libs/` (no bare Android library).
 
 ### Export presets (`demo/export_presets.cfg`)
 
@@ -135,7 +135,7 @@ Sound designer builds banks in FMOD Studio
   → FmodBankLoader or FmodServer.load_bank() loads them through Godot's FileAccess
   → FmodCache indexes their events, buses and VCAs by path and GUID
   → emitters / FmodServer create event instances, positioned from nodes every frame
-  → FmodManager calls FmodServer.update(): pending banks, callbacks, one-shots, listeners, FMOD update
+  → FmodRuntime calls FmodServer.update(): pending banks, callbacks, one-shots, listeners, FMOD update
   → export: FmodEditorExportPlugin packs banks, audio files and plugin libraries
 ```
 

@@ -4,6 +4,7 @@
 #include "core/binder_common.hpp"
 #include "core/fmod_file.h"
 #include "core/fmod_sound.h"
+#include "core/object_id.hpp"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
 #include "resources/fmod_plugins_settings.h"
@@ -123,6 +124,9 @@ namespace godot {
         bool isNotInitializedPrinted;
 
         float distanceScale;
+
+        ObjectID runtime;
+        void add_runtime_to_scene_tree();
 
         FmodCache* cache;
 

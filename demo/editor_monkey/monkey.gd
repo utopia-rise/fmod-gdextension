@@ -193,6 +193,10 @@ func script_named(node: Node, script_name: String) -> bool:
 	return script != null and script.get_global_name() == script_name
 
 
+func fmod_runtimes() -> Array:
+	return root.get_children().filter(func(node: Node) -> bool: return node.is_class("FmodRuntime"))
+
+
 func plugins() -> Array:
 	return find_all(root, func(node: Node) -> bool: return script_named(node, "FmodPlugin"))
 
@@ -492,7 +496,8 @@ func step_the_fmod_plugin_is_loaded() -> void:
 	expect(scene() != null and scene().name == "MonkeyScene", "the work scene is edited")
 	expect(plugin() != null, "the FMOD plugin is enabled")
 	expect(plugin().fmod_button.text == "Fmod Explorer", "the toolbar has the Fmod Explorer button")
-	expect(ProjectSettings.has_setting("autoload/FmodManager"), "enabling the plugin registers the FmodManager autoload")
+	expect(fmod_runtimes().size() == 1, "FMOD runs one FmodRuntime node at the root of the editor's scene tree")
+	expect(not ProjectSettings.has_setting("autoload/FmodManager"), "no FmodManager autoload is registered")
 	load_events()
 	expect(not events.is_empty(), "the editor loaded the master banks' events")
 	log_line("%d banks, %d events, event with parameters: %s" % [server().get_all_banks().size(), events.size(), parameter_event.get_path() if parameter_event != null else "none"])
@@ -715,12 +720,12 @@ func step_disable_and_re_enable_the_plugin() -> void:
 	EditorInterface.set_plugin_enabled("res://addons/fmod/plugin.cfg", false)
 	await pause(10)
 	expect(plugins().is_empty(), "disabling the plugin removes it")
-	expect(not ProjectSettings.has_setting("autoload/FmodManager"), "disabling the plugin removes the FmodManager autoload")
+	expect(fmod_runtimes().size() == 1, "FMOD keeps running with the plugin disabled")
 	EditorInterface.set_plugin_enabled("res://addons/fmod/plugin.cfg", true)
 	await pause(10)
 	expect(plugins().size() == 1, "enabling the plugin adds it back once")
 	load_events()
-	expect(ProjectSettings.has_setting("autoload/FmodManager"), "enabling the plugin registers the FmodManager autoload again")
+	expect(fmod_runtimes().size() == 1, "re-enabling the plugin adds no second FmodRuntime")
 	await open_explorer()
 	expect(not explorer_items().is_empty(), "the explorer works again")
 	await close_explorer()

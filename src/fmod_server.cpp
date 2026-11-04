@@ -10,9 +10,13 @@
 #include "plugins/plugins_helper.h"
 
 #include <fmod_server.h>
+#include <nodes/fmod_runtime.h>
 
 #include <classes/node3d.hpp>
 #include <classes/project_settings.hpp>
+#include <classes/scene_tree.hpp>
+#include <classes/window.hpp>
+#include <core/object.hpp>
 
 #ifdef WEB_ENABLED
 #include <emscripten.h>
@@ -242,6 +246,9 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
 
+        // FMOD starting with the engine starts before the scene tree exists.
+        callable_mp(this, &FmodServer::add_runtime_to_scene_tree).call_deferred();
+
         if ((studio_init_flags & FMOD_STUDIO_INIT_LIVEUPDATE) == FMOD_STUDIO_INIT_LIVEUPDATE) {
             GODOT_LOG_INFO("FMOD Sound System: Live update enabled!")
         }
@@ -355,6 +362,12 @@ void FmodServer::shutdown() {
 
     isInitialized = false;
     isNotInitializedPrinted = false;
+    Node* runtime_node = Object::cast_to<Node>(ObjectDB::get_instance(runtime));
+    if (runtime_node) {
+        runtime_node->set_process(false);
+        runtime_node->queue_free();
+    }
+    runtime = ObjectID();
     ERROR_CHECK(system->unloadAll());
     ERROR_CHECK(system->release());
     system = nullptr;
@@ -362,6 +375,15 @@ void FmodServer::shutdown() {
     delete cache;
     cache = nullptr;
     GODOT_LOG_INFO("FMOD Sound System: System released")
+}
+
+void FmodServer::add_runtime_to_scene_tree() {
+    SceneTree* tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+    if (!isInitialized || !tree || ObjectDB::get_instance(runtime)) { return; }
+
+    FmodRuntime* runtime_node = memnew(FmodRuntime);
+    tree->get_root()->add_child(runtime_node);
+    runtime = runtime_node->get_instance_id();
 }
 
 void FmodServer::set_system_listener_number(int p_listenerNumber) {

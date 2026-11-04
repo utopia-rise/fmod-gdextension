@@ -8,6 +8,7 @@
 #include "nodes/fmod_event_emitter_3d.h"
 #include "nodes/fmod_listener_2d.h"
 #include "nodes/fmod_listener_3d.h"
+#include "nodes/fmod_runtime.h"
 #include "resources/fmod_plugins_settings.h"
 #include "resources/fmod_settings.h"
 #include "studio/fmod_bank.h"
@@ -79,6 +80,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodEventEmitter2D>();
         ClassDB::register_class<FmodEventEmitter3D>();
         ClassDB::register_class<FmodBankLoader>();
+        ClassDB::register_internal_class<FmodRuntime>();
 
         // Resources
         ClassDB::register_class<FmodSettings>();

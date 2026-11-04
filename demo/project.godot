@@ -26,10 +26,6 @@ run/main_scene.export-tests="res://test_runner/ExportTestScene.tscn"
 config/features=PackedStringArray("4.6")
 config/icon="uid://cih2yjmtjoohg"
 
-[autoload]
-
-FmodManager="*res://addons/fmod/FmodManager.gd"
-
 [dotnet]
 
 project/assembly_name="Fmod Demo"

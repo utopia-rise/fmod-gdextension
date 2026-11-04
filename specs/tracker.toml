@@ -1,6 +1,6 @@
 # Statuses, dead IDs and file hashes; sorted; one entry per line. Format: specs/TRACKER.md.
 "§" = { hash = "d2c6f9cf2940" }
-"A.1" = { hash = "16c772cc30c7" }
+"A.1" = { hash = "6d51d0654d04" }
 "A.1.1" = { status = "done" }
 "A.1.2" = { status = "done" }
 "A.1.3" = { status = "done" }

@@ -326,7 +326,7 @@
 			<return type="void" />
 			<param index="0" name="settings" type="FmodSettings" default="null" />
 			<description>
-				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on.
+				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on. It adds an internal [code]FmodRuntime[/code] node at the root of the scene tree, which runs FMOD until [method shutdown]: every frame, before any other node, it calls [method update], even while the game is paused. It also suspends FMOD's mixer while a mobile application is in the background, and adds FMOD's CPU, memory and file monitors to [Performance].
 			</description>
 		</method>
 		<method name="is_plugin_loaded">
@@ -584,7 +584,7 @@
 		<method name="shutdown">
 			<return type="void" />
 			<description>
-				Shuts down the FMOD system and releases all resources.
+				Shuts down the FMOD system and releases all resources, freeing the [code]FmodRuntime[/code] node.
 			</description>
 		</method>
 		<method name="unload_file">
@@ -616,7 +616,7 @@
 		<method name="update">
 			<return type="void" />
 			<description>
-				Updates the FMOD system. This should be called every frame, which the [code]FmodManager[/code] autoload does. Calling it again right after a request that must be heard as soon as possible hands that request to FMOD at once instead of at the next frame.
+				Updates the FMOD system. This should be called every frame, which the [code]FmodRuntime[/code] node [method init] adds does. Calling it again right after a request that must be heard as soon as possible hands that request to FMOD at once instead of at the next frame.
 			</description>
 		</method>
 		<method name="wait_for_all_loads">
