@@ -10,8 +10,8 @@ config_version=5
 
 [Fmod]
 
-"3D Settings/distance_factor"=64.0
-General/banks_path="res://assets/Banks"
+General/banks/path="res://assets/Banks"
+Spatialization/distance_factor=64.0
 
 [android]
 

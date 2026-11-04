@@ -302,12 +302,6 @@
 				Returns the length of FMOD's DSP buffers, in samples.
 			</description>
 		</method>
-		<method name="get_system_dsp_buffer_settings">
-			<return type="FmodDspSettings" />
-			<description>
-				Returns FMOD's current DSP buffer settings.
-			</description>
-		</method>
 		<method name="get_system_dsp_num_buffers">
 			<return type="int" />
 			<description>
@@ -330,9 +324,9 @@
 		</method>
 		<method name="init">
 			<return type="void" />
-			<param index="0" name="settings" type="FmodGeneralSettings" />
+			<param index="0" name="settings" type="FmodSettings" default="null" />
 			<description>
-				Initializes the FMOD system with the specified settings. This must be called before using any FMOD functionality.
+				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on.
 			</description>
 		</method>
 		<method name="is_plugin_loaded">
@@ -578,25 +572,13 @@
 				Sets the weight of the listener at [param index], between 0 and 1: how much it contributes to the mix when there are several.
 			</description>
 		</method>
-		<method name="set_software_format">
+		<method name="set_spatialization">
 			<return type="void" />
-			<param index="0" name="settings" type="FmodSoftwareFormatSettings" />
+			<param index="0" name="doppler_scale" type="float" />
+			<param index="1" name="distance_factor" type="float" />
+			<param index="2" name="rolloff_scale" type="float" />
 			<description>
-				Applies the sample rate, speaker mode and raw speaker count of [param settings] to FMOD's mixer. It must be called before FMOD initializes, which applies the Project Settings ones.
-			</description>
-		</method>
-		<method name="set_sound_3d_settings">
-			<return type="void" />
-			<param index="0" name="settings" type="FmodSound3DSettings" />
-			<description>
-				Applies the doppler scale, distance factor and rolloff scale of [param settings] to FMOD's 3D audio.
-			</description>
-		</method>
-		<method name="set_system_dsp_buffer_size">
-			<return type="void" />
-			<param index="0" name="dsp_settings" type="FmodDspSettings" />
-			<description>
-				Applies the DSP buffer length and count of [param dsp_settings] to FMOD's mixer. FMOD applies the Project Settings ones when it initializes.
+				Changes how sounds are placed around the listeners while FMOD runs. FMOD starts with those of [member FmodSettings.doppler_scale], [member FmodSettings.distance_factor] and [member FmodSettings.rolloff_scale].
 			</description>
 		</method>
 		<method name="shutdown">
@@ -634,7 +616,7 @@
 		<method name="update">
 			<return type="void" />
 			<description>
-				Updates the FMOD system. This should be called every frame, typically in _process().
+				Updates the FMOD system. This should be called every frame, which the [code]FmodManager[/code] autoload does. Calling it again right after a request that must be heard as soon as possible hands that request to FMOD at once instead of at the next frame.
 			</description>
 		</method>
 		<method name="wait_for_all_loads">

@@ -3,6 +3,8 @@
 
 #include "fmod_common.h"
 
+#include <resources/fmod_settings.h>
+
 #include <sstream>
 #include <variant/string.hpp>
 
@@ -16,7 +18,7 @@ namespace godot {
         LOG_VERBOSE// Added for verbose logging
     };
 
-    void logging_init();
+    void logging_init(const Ref<FmodSettings>& p_settings);
 
     // Core logging function
     void log_fmod_message(FMODLogLevel level, const String& message);

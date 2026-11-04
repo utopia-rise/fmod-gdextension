@@ -33,8 +33,8 @@ func test_assert_fmod_enums_belong_to_their_class():
 	assert_bool(ClassDB.is_class_enum_bitfield("FmodEvent", "StudioEventCallbackType")).is_true()
 	assert_bool(ClassDB.class_has_enum("FmodBank", "StudioLoadingState")).is_true()
 	assert_bool(ClassDB.is_class_enum_bitfield("FmodBank", "StudioLoadBankFlags")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodSoftwareFormatSettings", "SpeakerMode")).is_true()
-	assert_bool(ClassDB.class_has_enum("FmodLoggingSettings", "DebugMode")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodSettings", "SpeakerMode")).is_true()
+	assert_bool(ClassDB.class_has_enum("FmodSettings", "LogOutput")).is_true()
 
 func test_assert_every_constant_belongs_to_an_enum():
 	for name in _extension_classes():
@@ -64,11 +64,6 @@ func test_assert_new_objects_start_from_their_defaults():
 	var emitter := FmodEventEmitter3D.new()
 	assert_str(emitter.event_guid).is_equal("{00000000-0000-0000-0000-000000000000}")
 	emitter.free()
-	assert_float(FmodSound3DSettings.new().rolloff_scale).is_equal(1.0)
-	assert_int(FmodSoftwareFormatSettings.new().sample_rate).is_equal(48000)
-	assert_int(FmodSoftwareFormatSettings.new().raw_speakers_count).is_equal(0)
-	assert_int(FmodDspSettings.new().dsp_buffer_size).is_equal(512)
-	assert_int(FmodGeneralSettings.new().channel_count).is_equal(1024)
 
 func _method(name: String, method_name: String) -> Dictionary:
 	for method in ClassDB.class_get_method_list(name, true):
@@ -92,9 +87,9 @@ func test_assert_flag_arguments_are_bitfields():
 
 func test_assert_enum_properties_label_their_values():
 	var cases := [
-		["FmodSoftwareFormatSettings", "speaker_mode", "FmodSoftwareFormatSettings.SpeakerMode", FmodSoftwareFormatSettings.SpeakerMode.STEREO, "STEREO"],
-		["FmodLoggingSettings", "log_output", "FmodLoggingSettings.DebugMode", FmodLoggingSettings.DebugMode.CALLBACK, "Godot"],
-		["FmodLoggingSettings", "debug_level", "FmodLoggingSettings.DebugLevel", FmodLoggingSettings.DebugLevel.DEBUG_VERBOSE, "Verbose"],
+		["FmodSettings", "speaker_mode", "FmodSettings.SpeakerMode", FmodSettings.SpeakerMode.STEREO, "Stereo"],
+		["FmodSettings", "log_output", "FmodSettings.LogOutput", FmodSettings.LogOutput.LOG_OUTPUT_GODOT, "Godot"],
+		["FmodSettings", "log_level", "FmodSettings.LogLevel", FmodSettings.LogLevel.LOG_LEVEL_VERBOSE, "Verbose"],
 	]
 	for case in cases:
 		var property := _property(case[0], case[1])

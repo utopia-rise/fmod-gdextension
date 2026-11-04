@@ -20,12 +20,7 @@ func test_assert_should_have_performance_data():
 	assert_object(FmodServer.get_performance_data()).is_not_null()
 
 func test_assert_should_have_dsp_buffer_length():
-	assert_int(FmodServer.get_system_dsp_buffer_length()).is_equal(512)
+	assert_int(FmodServer.get_system_dsp_buffer_length()).is_equal(FmodSettings.new().dsp_buffer_size)
 
 func test_assert_should_have_dsp_num_buffers():
-	assert_int(FmodServer.get_system_dsp_num_buffers()).is_equal(4)
-
-func test_assert_should_have_dsp_buffer_size():
-	var buffer_size: FmodDspSettings = FmodServer.get_system_dsp_buffer_settings()
-	assert_int(buffer_size.dsp_buffer_size).is_equal(512)
-	assert_int(buffer_size.dsp_buffer_count).is_equal(4)
+	assert_int(FmodServer.get_system_dsp_num_buffers()).is_equal(FmodSettings.new().dsp_buffer_count)

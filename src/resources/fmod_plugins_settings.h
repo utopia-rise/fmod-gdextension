@@ -50,9 +50,7 @@ namespace godot {
         FmodPluginsSettings() = default;
         ~FmodPluginsSettings() = default;
 
-        static constexpr const char* PLUGINS_SETTINGS_BASE_PATH = "Plugins";
-
-        static constexpr const char* RESOURCE_OPTION = "path_to_plugin_configuration";
+        static constexpr const char* RESOURCE_OPTION = "Plugins/configuration";
         static constexpr const char* DEFAULT_RESOURCE_OPTION = "";
 
     private:

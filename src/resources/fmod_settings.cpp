@@ -2,173 +2,369 @@
 
 #include <constants.h>
 
+#include <classes/os.hpp>
 #include <classes/project_settings.hpp>
 
 using namespace godot;
 
-void FmodGeneralSettings::set_channel_count(const int p_channel_count) {
-    _channel_count = p_channel_count;
+Ref<FmodSettings> FmodSettings::cached_project_settings;
+
+void FmodSettings::set_banks_path(const String& p_banks_path) {
+    _banks_path = p_banks_path;
 }
 
-int FmodGeneralSettings::get_channel_count() const {
-    return _channel_count;
-}
-
-void FmodGeneralSettings::set_is_live_update_enabled(const bool p_enable_live_update) {
-    _is_live_update_enabled = p_enable_live_update;
-}
-
-bool FmodGeneralSettings::get_is_live_update_enabled() const {
-    return _is_live_update_enabled;
-}
-
-void FmodGeneralSettings::set_is_memory_tracking_enabled(const bool p_enable_memory_tracking) {
-    _is_memory_tracking_enabled = p_enable_memory_tracking;
-}
-
-bool FmodGeneralSettings::get_is_memory_tracking_enabled() const {
-    return _is_memory_tracking_enabled;
-}
-
-void FmodGeneralSettings::set_default_listener_count(int p_listener_count) {
-    _default_listener_count = p_listener_count;
-}
-
-int FmodGeneralSettings::get_default_listener_count() const {
-    return _default_listener_count;
-}
-
-void FmodGeneralSettings::set_banks_path(const String& p_paths) {
-    _banks_path = p_paths;
-}
-
-const String& FmodGeneralSettings::get_banks_path() const {
+const String& FmodSettings::get_banks_path() const {
     return _banks_path;
 }
 
-void FmodGeneralSettings::set_should_load_by_name(const bool p_should_load_by_name) {
-    _should_load_by_name = p_should_load_by_name;
+void FmodSettings::set_load_by_name(bool p_load_by_name) {
+    _load_by_name = p_load_by_name;
 }
 
-bool FmodGeneralSettings::get_should_load_by_name() const {
-    return _should_load_by_name;
+bool FmodSettings::get_load_by_name() const {
+    return _load_by_name;
 }
 
-Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
-    Ref<FmodGeneralSettings> settings;
-    settings.instantiate();
+void FmodSettings::set_channel_count(int p_channel_count) {
+    _channel_count = p_channel_count;
+}
+
+int FmodSettings::get_channel_count() const {
+    return _channel_count;
+}
+
+void FmodSettings::set_sample_rate(int p_sample_rate) {
+    _sample_rate = p_sample_rate;
+}
+
+int FmodSettings::get_sample_rate() const {
+    return _sample_rate;
+}
+
+void FmodSettings::set_speaker_mode(SpeakerMode p_speaker_mode) {
+    _speaker_mode = p_speaker_mode;
+}
+
+FmodSettings::SpeakerMode FmodSettings::get_speaker_mode() const {
+    return _speaker_mode;
+}
+
+void FmodSettings::set_raw_speaker_count(int p_raw_speaker_count) {
+    _raw_speaker_count = p_raw_speaker_count;
+}
+
+int FmodSettings::get_raw_speaker_count() const {
+    return _raw_speaker_count;
+}
+
+void FmodSettings::set_dsp_buffer_size(int p_dsp_buffer_size) {
+    _dsp_buffer_size = p_dsp_buffer_size;
+}
+
+int FmodSettings::get_dsp_buffer_size() const {
+    return _dsp_buffer_size;
+}
+
+void FmodSettings::set_dsp_buffer_count(int p_dsp_buffer_count) {
+    _dsp_buffer_count = p_dsp_buffer_count;
+}
+
+int FmodSettings::get_dsp_buffer_count() const {
+    return _dsp_buffer_count;
+}
+
+void FmodSettings::set_listener_count(int p_listener_count) {
+    _listener_count = p_listener_count;
+}
+
+int FmodSettings::get_listener_count() const {
+    return _listener_count;
+}
+
+void FmodSettings::set_distance_factor(float p_distance_factor) {
+    _distance_factor = p_distance_factor;
+}
+
+float FmodSettings::get_distance_factor() const {
+    return _distance_factor;
+}
+
+void FmodSettings::set_rolloff_scale(float p_rolloff_scale) {
+    _rolloff_scale = p_rolloff_scale;
+}
+
+float FmodSettings::get_rolloff_scale() const {
+    return _rolloff_scale;
+}
+
+void FmodSettings::set_doppler_scale(float p_doppler_scale) {
+    _doppler_scale = p_doppler_scale;
+}
+
+float FmodSettings::get_doppler_scale() const {
+    return _doppler_scale;
+}
+
+void FmodSettings::set_live_update(bool p_live_update) {
+    _live_update = p_live_update;
+}
+
+bool FmodSettings::get_live_update() const {
+    return _live_update;
+}
+
+void FmodSettings::set_memory_tracking(bool p_memory_tracking) {
+    _memory_tracking = p_memory_tracking;
+}
+
+bool FmodSettings::get_memory_tracking() const {
+    return _memory_tracking;
+}
+
+void FmodSettings::set_log_level(LogLevel p_log_level) {
+    _log_level = p_log_level;
+}
+
+FmodSettings::LogLevel FmodSettings::get_log_level() const {
+    return _log_level;
+}
+
+void FmodSettings::set_log_output(LogOutput p_log_output) {
+    _log_output = p_log_output;
+}
+
+FmodSettings::LogOutput FmodSettings::get_log_output() const {
+    return _log_output;
+}
+
+void FmodSettings::set_log_file_path(const String& p_log_file_path) {
+    _log_file_path = p_log_file_path;
+}
+
+const String& FmodSettings::get_log_file_path() const {
+    return _log_file_path;
+}
+
+unsigned int FmodSettings::get_fmod_debug_flags() const {
+    switch (_log_level) {
+        case LOG_LEVEL_NONE:
+            return FMOD_DEBUG_LEVEL_NONE;
+        case LOG_LEVEL_ERROR:
+            return FMOD_DEBUG_LEVEL_ERROR;
+        case LOG_LEVEL_LOG:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG;
+        case LOG_LEVEL_VERBOSE:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE;
+        case LOG_LEVEL_INHERIT:
+            if (OS::get_singleton()->is_stdout_verbose()) {
+                return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING | FMOD_DEBUG_LEVEL_LOG | FMOD_DEBUG_TYPE_TRACE;
+            }
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING;
+        default:
+            return FMOD_DEBUG_LEVEL_ERROR | FMOD_DEBUG_LEVEL_WARNING;
+    }
+}
+
+void FmodSettings::set_plugins(const Ref<FmodPluginsSettings>& p_plugins) {
+    _plugins = p_plugins;
+}
+
+Ref<FmodPluginsSettings> FmodSettings::get_plugins() const {
+    return _plugins;
+}
+
+Ref<FmodSettings> FmodSettings::get_from_project_settings() {
+    if (cached_project_settings.is_valid()) { return cached_project_settings; }
 
     ProjectSettings* project_settings = ProjectSettings::get_singleton();
-
-    String channel_count_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, CHANNEL_COUNT_OPTION);
-    settings->set_channel_count(project_settings->get_setting(channel_count_setting_path, DEFAULT_CHANNEL_COUNT));
-
-    String is_liveupdate_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, IS_LIVE_UPDATE_ENABLED_OPTION);
-    settings->set_is_live_update_enabled(project_settings->get_setting(is_liveupdate_setting_path, DEFAULT_IS_LIVEUPDATE));
-
-    String is_memory_tracking_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, IS_LIVE_MEMORY_TRACKING_ENABLED_OPTION);
-    settings->set_is_memory_tracking_enabled(project_settings->get_setting(is_memory_tracking_setting_path, DEFAULT_IS_MEMORY_TRACKING));
-
-    String default_listener_count_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, DEFAULT_LISTENER_COUNT_OPTION);
-    settings->set_default_listener_count(project_settings->get_setting(default_listener_count_setting_path, DEFAULT_DEFAULT_LISTENER_COUNT));
-
-    String banks_paths_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, BANKS_PATH_OPTION);
-    settings->set_banks_path(project_settings->get_setting(banks_paths_setting_path, DEFAULT_BANKS_PATH));
-
-    String should_load_by_name_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, INITIALIZE_BASE_PATH, SHOULD_LOAD_BY_NAME);
-    settings->set_should_load_by_name(project_settings->get_setting(should_load_by_name_setting_path, DEFAULT_SHOULD_LOAD_BY_NAME));
-
+    Ref<FmodSettings> settings;
+    settings.instantiate();
+    for (const FmodProjectSetting& setting : PROJECT_SETTINGS) {
+        String path = vformat("%s/%s", FMOD_SETTINGS_BASE_PATH, setting.path);
+        if (project_settings->has_setting(path)) {
+            settings->set(setting.property, project_settings->get_setting(path));
+        }
+    }
+    settings->set_plugins(FmodPluginsSettings::get_from_project_settings());
+    cached_project_settings = settings;
     return settings;
 }
 
-void FmodGeneralSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_channel_count", "channel_count"), &FmodGeneralSettings::set_channel_count);
-    ClassDB::bind_method(D_METHOD("get_channel_count"), &FmodGeneralSettings::get_channel_count);
+void FmodSettings::free_project_settings() {
+    cached_project_settings.unref();
+}
 
-    ClassDB::bind_method(D_METHOD("set_is_live_update_enabled", "enable_live_update"), &FmodGeneralSettings::set_is_live_update_enabled);
-    ClassDB::bind_method(D_METHOD("get_is_live_update_enabled"), &FmodGeneralSettings::get_is_live_update_enabled);
+void FmodSettings::_bind_methods() {
+    // One binding per line, some wider than the column limit, to read as a list.
+    // clang-format off
+    ClassDB::bind_method(D_METHOD("set_banks_path", "banks_path"), &FmodSettings::set_banks_path);
+    ClassDB::bind_method(D_METHOD("get_banks_path"), &FmodSettings::get_banks_path);
+    ClassDB::bind_method(D_METHOD("set_load_by_name", "load_by_name"), &FmodSettings::set_load_by_name);
+    ClassDB::bind_method(D_METHOD("get_load_by_name"), &FmodSettings::get_load_by_name);
+    ClassDB::bind_method(D_METHOD("set_channel_count", "channel_count"), &FmodSettings::set_channel_count);
+    ClassDB::bind_method(D_METHOD("get_channel_count"), &FmodSettings::get_channel_count);
+    ClassDB::bind_method(D_METHOD("set_sample_rate", "sample_rate"), &FmodSettings::set_sample_rate);
+    ClassDB::bind_method(D_METHOD("get_sample_rate"), &FmodSettings::get_sample_rate);
+    ClassDB::bind_method(D_METHOD("set_speaker_mode", "speaker_mode"), &FmodSettings::set_speaker_mode);
+    ClassDB::bind_method(D_METHOD("get_speaker_mode"), &FmodSettings::get_speaker_mode);
+    ClassDB::bind_method(D_METHOD("set_raw_speaker_count", "raw_speaker_count"), &FmodSettings::set_raw_speaker_count);
+    ClassDB::bind_method(D_METHOD("get_raw_speaker_count"), &FmodSettings::get_raw_speaker_count);
+    ClassDB::bind_method(D_METHOD("set_dsp_buffer_size", "dsp_buffer_size"), &FmodSettings::set_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("get_dsp_buffer_size"), &FmodSettings::get_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("set_dsp_buffer_count", "dsp_buffer_count"), &FmodSettings::set_dsp_buffer_count);
+    ClassDB::bind_method(D_METHOD("get_dsp_buffer_count"), &FmodSettings::get_dsp_buffer_count);
+    ClassDB::bind_method(D_METHOD("set_listener_count", "listener_count"), &FmodSettings::set_listener_count);
+    ClassDB::bind_method(D_METHOD("get_listener_count"), &FmodSettings::get_listener_count);
+    ClassDB::bind_method(D_METHOD("set_distance_factor", "distance_factor"), &FmodSettings::set_distance_factor);
+    ClassDB::bind_method(D_METHOD("get_distance_factor"), &FmodSettings::get_distance_factor);
+    ClassDB::bind_method(D_METHOD("set_rolloff_scale", "rolloff_scale"), &FmodSettings::set_rolloff_scale);
+    ClassDB::bind_method(D_METHOD("get_rolloff_scale"), &FmodSettings::get_rolloff_scale);
+    ClassDB::bind_method(D_METHOD("set_doppler_scale", "doppler_scale"), &FmodSettings::set_doppler_scale);
+    ClassDB::bind_method(D_METHOD("get_doppler_scale"), &FmodSettings::get_doppler_scale);
+    ClassDB::bind_method(D_METHOD("set_live_update", "live_update"), &FmodSettings::set_live_update);
+    ClassDB::bind_method(D_METHOD("get_live_update"), &FmodSettings::get_live_update);
+    ClassDB::bind_method(D_METHOD("set_memory_tracking", "memory_tracking"), &FmodSettings::set_memory_tracking);
+    ClassDB::bind_method(D_METHOD("get_memory_tracking"), &FmodSettings::get_memory_tracking);
+    ClassDB::bind_method(D_METHOD("set_log_level", "log_level"), &FmodSettings::set_log_level);
+    ClassDB::bind_method(D_METHOD("get_log_level"), &FmodSettings::get_log_level);
+    ClassDB::bind_method(D_METHOD("set_log_output", "log_output"), &FmodSettings::set_log_output);
+    ClassDB::bind_method(D_METHOD("get_log_output"), &FmodSettings::get_log_output);
+    ClassDB::bind_method(D_METHOD("set_log_file_path", "log_file_path"), &FmodSettings::set_log_file_path);
+    ClassDB::bind_method(D_METHOD("get_log_file_path"), &FmodSettings::get_log_file_path);
+    ClassDB::bind_method(D_METHOD("set_plugins", "plugins"), &FmodSettings::set_plugins);
+    ClassDB::bind_method(D_METHOD("get_plugins"), &FmodSettings::get_plugins);
+    // clang-format on
 
-    ClassDB::bind_method(D_METHOD("set_is_memory_tracking_enabled", "enable_memory_tracking"), &FmodGeneralSettings::set_is_memory_tracking_enabled);
-    ClassDB::bind_method(D_METHOD("get_is_memory_tracking_enabled"), &FmodGeneralSettings::get_is_memory_tracking_enabled);
-
-    ClassDB::bind_method(D_METHOD("set_default_listener_count", "listener_count"), &FmodGeneralSettings::set_default_listener_count);
-    ClassDB::bind_method(D_METHOD("get_default_listener_count"), &FmodGeneralSettings::get_default_listener_count);
-
-    ClassDB::bind_method(D_METHOD("set_banks_path", "paths"), &FmodGeneralSettings::set_banks_path);
-    ClassDB::bind_method(D_METHOD("get_banks_path"), &FmodGeneralSettings::get_banks_path);
-
-    ClassDB::bind_method(D_METHOD("set_should_load_by_name", "should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
-    ClassDB::bind_method(D_METHOD("get_should_load_by_name"), &FmodGeneralSettings::get_should_load_by_name);
-
+    ADD_GROUP("Banks", "");
     ADD_PROPERTY(
-      PropertyInfo(
-        Variant::INT,
-        "channel_count",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_channel_count",
-      "get_channel_count"
+        PropertyInfo(Variant::STRING, "banks_path", PROPERTY_HINT_DIR, ""),
+        "set_banks_path",
+        "get_banks_path"
+    );
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "load_by_name"), "set_load_by_name", "get_load_by_name");
+
+    ADD_GROUP("Mixer", "");
+    ADD_SUBGROUP("Voices", "");
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "channel_count", PROPERTY_HINT_RANGE, "1,4095"),
+        "set_channel_count",
+        "get_channel_count"
+    );
+    ADD_SUBGROUP("Format", "");
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "sample_rate", PROPERTY_HINT_RANGE, "8000,192000"),
+        "set_sample_rate",
+        "get_sample_rate"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT,
+            "speaker_mode",
+            PROPERTY_HINT_ENUM,
+            "Default,Raw,Mono,Stereo,Quad,Surround,5.1,7.1,7.1.4",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.SpeakerMode"
+        ),
+        "set_speaker_mode",
+        "get_speaker_mode"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "raw_speaker_count", PROPERTY_HINT_RANGE, "0,32"),
+        "set_raw_speaker_count",
+        "get_raw_speaker_count"
+    );
+    ADD_SUBGROUP("Latency", "");
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "dsp_buffer_size", PROPERTY_HINT_RANGE, "64,8192"),
+        "set_dsp_buffer_size",
+        "get_dsp_buffer_size"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "dsp_buffer_count", PROPERTY_HINT_RANGE, "2,16"),
+        "set_dsp_buffer_count",
+        "get_dsp_buffer_count"
     );
 
+    ADD_GROUP("Spatialization", "");
     ADD_PROPERTY(
-      PropertyInfo(
-        Variant::BOOL,
-        "is_live_update_enabled",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_is_live_update_enabled",
-      "get_is_live_update_enabled"
+        PropertyInfo(Variant::INT, "listener_count", PROPERTY_HINT_RANGE, "1,8"),
+        "set_listener_count",
+        "get_listener_count"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::FLOAT, "distance_factor", PROPERTY_HINT_RANGE, "0.001,1000,or_greater"),
+        "set_distance_factor",
+        "get_distance_factor"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::FLOAT, "rolloff_scale", PROPERTY_HINT_RANGE, "0,10,or_greater"),
+        "set_rolloff_scale",
+        "get_rolloff_scale"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::FLOAT, "doppler_scale", PROPERTY_HINT_RANGE, "0,10,or_greater"),
+        "set_doppler_scale",
+        "get_doppler_scale"
     );
 
+    ADD_GROUP("Debugging", "");
+    ADD_SUBGROUP("Live Update", "");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "live_update"), "set_live_update", "get_live_update");
+    ADD_PROPERTY(PropertyInfo(Variant::BOOL, "memory_tracking"), "set_memory_tracking", "get_memory_tracking");
+    ADD_SUBGROUP("Logging", "");
     ADD_PROPERTY(
-      PropertyInfo(
-        Variant::BOOL,
-        "is_memory_tracking_enabled",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_is_memory_tracking_enabled",
-      "get_is_memory_tracking_enabled"
+        PropertyInfo(
+            Variant::INT,
+            "log_level",
+            PROPERTY_HINT_ENUM,
+            "Inherit,None,Error,Warning,Log,Verbose",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.LogLevel"
+        ),
+        "set_log_level",
+        "get_log_level"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT,
+            "log_output",
+            PROPERTY_HINT_ENUM,
+            "TTY,File,Godot",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.LogOutput"
+        ),
+        "set_log_output",
+        "get_log_output"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::STRING, "log_file_path", PROPERTY_HINT_FILE, "*.txt,*.log"),
+        "set_log_file_path",
+        "get_log_file_path"
     );
 
+    ADD_GROUP("Plugins", "");
     ADD_PROPERTY(
-      PropertyInfo(
-        Variant::INT,
-        "default_listener_count",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_default_listener_count",
-      "get_default_listener_count"
+        PropertyInfo(Variant::OBJECT, "plugins", PROPERTY_HINT_RESOURCE_TYPE, "FmodPluginsSettings"),
+        "set_plugins",
+        "get_plugins"
     );
-
-    ADD_PROPERTY(
-      PropertyInfo(
-        Variant::STRING,
-        "banks_path",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_banks_path",
-      "get_banks_path"
-    );
-
-    ADD_PROPERTY(
-      PropertyInfo(
-        Variant::BOOL,
-        "should_load_by_name",
-        PROPERTY_HINT_NONE,
-        "",
-        PROPERTY_USAGE_DEFAULT
-      ),
-      "set_should_load_by_name",
-      "get_should_load_by_name"
-    );
+    BIND_ENUM_CONSTANT(DEFAULT);
+    BIND_ENUM_CONSTANT(RAW);
+    BIND_ENUM_CONSTANT(MONO);
+    BIND_ENUM_CONSTANT(STEREO);
+    BIND_ENUM_CONSTANT(QUAD);
+    BIND_ENUM_CONSTANT(SURROUND);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_5POINT1);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1POINT4);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_INHERIT);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_NONE);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_ERROR);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_WARNING);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_LOG);
+    BIND_ENUM_CONSTANT(LOG_LEVEL_VERBOSE);
+    BIND_ENUM_CONSTANT(LOG_OUTPUT_TTY);
+    BIND_ENUM_CONSTANT(LOG_OUTPUT_FILE);
+    BIND_ENUM_CONSTANT(LOG_OUTPUT_GODOT);
+    ;
 }

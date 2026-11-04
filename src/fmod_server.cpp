@@ -24,15 +24,15 @@ FmodServer* FmodServer::singleton = nullptr;
 
 void FmodServer::_bind_methods() {
     // LIFECYCLE
-    ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init);
+    ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
     ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
 
     // SETTINGS
-    ClassDB::bind_method(D_METHOD("set_software_format", "settings"), &FmodServer::set_software_format);
-    ClassDB::bind_method(D_METHOD("set_sound_3d_settings", "settings"), &FmodServer::set_sound_3d_settings);
-    ClassDB::bind_method(D_METHOD("set_system_dsp_buffer_size", "dsp_settings"), &FmodServer::set_system_dsp_buffer_size);
-    ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_settings"), &FmodServer::get_system_dsp_buffer_settings);
+    ClassDB::bind_method(
+        D_METHOD("set_spatialization", "doppler_scale", "distance_factor", "rolloff_scale"),
+        &FmodServer::set_spatialization
+    );
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &FmodServer::get_system_dsp_buffer_length);
     ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &FmodServer::get_system_dsp_num_buffers);
 
@@ -170,19 +170,34 @@ FmodServer* FmodServer::get_singleton() {
     return singleton;
 }
 
-void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
+void FmodServer::init(const Ref<FmodSettings>& p_settings) {
     if (isInitialized) {
         GODOT_LOG_WARNING("Fmod system already initialized.")
         return;
     }
 
-    logging_init();
+    Ref<FmodSettings> settings = p_settings.is_valid() ? p_settings : FmodSettings::get_from_project_settings();
+
+    logging_init(settings);
 
     // initialize FMOD Studio and FMOD Core System with provided flags
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
+
+    ERROR_CHECK_WITH_REASON(
+        coreSystem->setSoftwareFormat(
+            settings->get_sample_rate(),
+            fmod_enum_cast<FMOD_SPEAKERMODE>(settings->get_speaker_mode()),
+            settings->get_raw_speaker_count()
+        ),
+        "Cannot set the software format"
+    );
+    ERROR_CHECK_WITH_REASON(
+        coreSystem->setDSPBufferSize(settings->get_dsp_buffer_size(), settings->get_dsp_buffer_count()),
+        "Cannot set the DSP buffer size"
+    );
 
     // editing advanced settings to set random seed before system initialization
     FMOD_ADVANCEDSETTINGS advancedSettings = {};
@@ -196,14 +211,14 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 
     if (
 #ifdef TOOLS_ENABLED
-            !Engine::get_singleton()->is_editor_hint() &&
+        !Engine::get_singleton()->is_editor_hint() &&
 #endif
-            p_settings->get_is_live_update_enabled()
-       ) {
+        settings->get_live_update()
+    ) {
         studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE;
     }
 
-    if (p_settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
+    if (settings->get_memory_tracking()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
 
     FMOD_INITFLAGS init_flags = FMOD_INIT_3D_RIGHTHANDED;
 
@@ -223,7 +238,7 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     ERROR_CHECK_WITH_REASON(coreSystem->setOutput(FMOD_OUTPUTTYPE_AUDIOWORKLET), "Cannot select the audio worklet output");
 #endif
 
-    if (ERROR_CHECK(system->initialize(p_settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
+    if (ERROR_CHECK(system->initialize(settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
 
@@ -246,6 +261,10 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
     cache = new FmodCache(system, coreSystem);
+
+    set_spatialization(settings->get_doppler_scale(), settings->get_distance_factor(), settings->get_rolloff_scale());
+    set_system_listener_number(settings->get_listener_count());
+    if (settings->get_plugins().is_valid()) { load_all_plugins(settings->get_plugins()); }
 }
 
 void FmodServer::update() {
@@ -496,18 +515,6 @@ Object* FmodServer::get_object_attached_to_listener(const int index) {
     }
     Object* node = listeners[index].wrapper.get_node();
     return node;
-}
-
-void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings) {
-    if (system == nullptr && coreSystem == nullptr) {
-        ERROR_CHECK(FMOD::Studio::System::create(&system));
-        ERROR_CHECK(system->getCoreSystem(&coreSystem));
-    }
-    ERROR_CHECK(coreSystem->setSoftwareFormat(
-      p_settings->get_sample_rate(),
-      fmod_enum_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
-      p_settings->get_raw_speakers_count()
-    ));
 }
 
 Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, BitField<FmodBank::StudioLoadBankFlags> flags) {
@@ -815,28 +822,6 @@ void FmodServer::play_one_shot_using_event_description_attached_with_params(
     return _play_one_shot<EventIdentifierType::EVENT_DESCRIPTION>(parameter, game_obj, parameters);
 }
 
-void FmodServer::set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings) {
-    unsigned int buffer_length = p_settings->get_dsp_buffer_size();
-    int num_buffers = p_settings->get_dsp_buffer_count();
-
-    if (buffer_length > 0 && num_buffers > 0 && ERROR_CHECK(coreSystem->setDSPBufferSize(buffer_length, num_buffers))) {
-        GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set DSP buffer size")
-    } else {
-        GODOT_LOG_ERROR(vformat("FMOD Sound System: Failed to set DSP buffer size: %s, with buffer count: %s", buffer_length, num_buffers))
-    }
-}
-
-Ref<FmodDspSettings> FmodServer::get_system_dsp_buffer_settings() {
-    unsigned int buffer_length;
-    int num_buffers;
-    Ref<FmodDspSettings> ret;
-    ret.instantiate();
-    ERROR_CHECK(coreSystem->getDSPBufferSize(&buffer_length, &num_buffers));
-    ret->set_dsp_buffer_size(buffer_length);
-    ret->set_dsp_buffer_count(num_buffers);
-    return ret;
-}
-
 unsigned int FmodServer::get_system_dsp_buffer_length() {
     unsigned int bufferLength;
     int numBuffers;
@@ -952,12 +937,11 @@ FMOD::Sound* FmodServer::create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_M
     return sound;
 }
 
-void FmodServer::set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_settings) {
-    float distance_factor = p_settings->get_distance_factor();
-    if (distance_factor <= 0) {
+void FmodServer::set_spatialization(float p_doppler_scale, float p_distance_factor, float p_rolloff_scale) {
+    if (p_distance_factor <= 0) {
         GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
-    } else if (ERROR_CHECK(coreSystem->set3DSettings(p_settings->get_doppler_scale(), distance_factor, p_settings->get_rolloff_scale()))) {
-        distanceScale = distance_factor;
+    } else if (ERROR_CHECK(coreSystem->set3DSettings(p_doppler_scale, p_distance_factor, p_rolloff_scale))) {
+        distanceScale = p_distance_factor;
         GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set global 3D settings")
     } else {
         GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings")

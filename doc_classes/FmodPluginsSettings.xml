@@ -4,7 +4,7 @@
 		The FMOD plugins the game uses, such as Steam Audio or Resonance.
 	</brief_description>
 	<description>
-		Saved as a resource and set in Project Settings under [code]Fmod/Plugins[/code]. FMOD loads the plugins at startup, and exports pack their libraries. Desktop and Android load dynamic libraries; iOS links static libraries registered through the methods in [member static_plugins_methods].
+		Saved as a resource and set in Project Settings under [code]Fmod/Plugins/configuration[/code]. FMOD loads the plugins at startup, and exports pack their libraries. Desktop and Android load dynamic libraries; iOS links static libraries registered through the methods in [member static_plugins_methods].
 	</description>
 	<tutorials>
 	</tutorials>

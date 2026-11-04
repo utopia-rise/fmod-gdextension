@@ -97,7 +97,7 @@ Build the four Android libraries first (`template_debug` and `template_release`,
 
 ### Debugging native code
 
-Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on Windows debug targets), then launch the Godot editor binary on `demo/` under a native debugger (Visual Studio, CLion, lldb or gdb) and break in `src/`. FMOD's own warnings and errors go to Godot's output when the logging settings select it (`Fmod/Logging` in Project Settings), and live update lets FMOD Studio connect to a running game (never to the editor).
+Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on Windows debug targets), then launch the Godot editor binary on `demo/` under a native debugger (Visual Studio, CLion, lldb or gdb) and break in `src/`. FMOD's own warnings and errors go to Godot's output when the logging settings select it (`Fmod/Debugging` in Project Settings), and live update lets FMOD Studio connect to a running game (never to the editor).
 
 ## Architecture
 
@@ -109,7 +109,7 @@ Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on 
 - **`studio/`** — `RefCounted` wrappers of FMOD Studio objects, declared with `FMODCLASS` / `FMODCLASSWITHPATH` (`helpers/common.h`); `FmodBank` unloads its bank when its last reference goes.
 - **`core/`** — FMOD Core wrappers: `FmodFile` (a loaded file), `FmodSound` (a playing channel), `FmodChannelGroup` (DSP clock).
 - **`nodes/`** — `FmodEventEmitter2D/3D` and `FmodListener2D/3D`, thin classes over the CRTP templates `FmodEventEmitter<Derived, NodeType>` and `FmodListener<Derived, NodeType>` that hold the shared logic; `FmodBankLoader`. None of them runs FMOD in the editor.
-- **`resources/`** — settings resources (`FmodGeneralSettings`, software format, DSP, 3D, logging, plugins), each read from Project Settings with `get_from_project_settings()`.
+- **`resources/`** — `FmodSettings`, every setting FMOD starts with, whose `PROJECT_SETTINGS` table maps each Project Setting to its property (the editor plugin registers, orders, migrates and documents the Project Settings from it, and `get_from_project_settings()` reads and caches them for `FmodServer::init()` when given none), with defaults that depend on the platform; and `FmodPluginsSettings`, the user's plugin list.
 - **`callback/`** — namespace `Callbacks`: FMOD event callbacks, and the file system callbacks that route FMOD's file reads through Godot's `FileAccess`, so banks load from `res://` and from exported packs alike.
 - **`tools/`** — editor only (`TOOLS_ENABLED`): `FmodEditorPlugin`; `FmodEditorExportPlugin` packs banks and audio files into exports (per-preset `fmod/auto_export_banks` option) and FMOD plugin libraries per platform, generating the static registration code on iOS.
 - **`plugins/`** — loading FMOD plugin libraries, dynamic or static (iOS).
@@ -117,11 +117,11 @@ Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on 
 
 ### Editor addon (`demo/addons/fmod/`)
 
-GDScript, `@tool`: `FmodPlugin.gd` (toolbar button, bank explorer window, Inspector plugins, export plugins, the `FmodManager` autoload), `FmodManager.gd` (calls `FmodServer.update()` every frame, forwards notifications, suspends the mixer on mobile focus loss, registers the performance monitors), `tool/FmodBankDatabase.gd` (loads the master banks from `Fmod/General/banks_path`), `tool/ui/` (bank explorer, event audition, parameter display), `tool/inspectors/` and `tool/property_editors/`. The released addon is this folder, `README.md` and `LICENSE`, with every desktop and iOS library and the two Android AARs in `libs/` (no bare Android library).
+GDScript, `@tool`: `FmodPlugin.gd` (toolbar button, bank explorer window, Inspector plugins, export plugins, the `FmodManager` autoload), `FmodManager.gd` (calls `FmodServer.update()` every frame, forwards notifications, suspends the mixer on mobile focus loss, registers the performance monitors), `tool/FmodBankDatabase.gd` (loads the master banks from `Fmod/General/banks/path`), `tool/ui/` (bank explorer, event audition, parameter display), `tool/inspectors/` and `tool/property_editors/`. The released addon is this folder, `README.md` and `LICENSE`, with every desktop and iOS library and the two Android AARs in `libs/` (no bare Android library).
 
 ### Export presets (`demo/export_presets.cfg`)
 
-One preset per platform for the demo (exports go to `demo/export/`, ignored), leaving the tests out, and `tests_linux`, `tests_macos`, `tests_windows`, `tests_web`, `tests_web_threads`, `tests_ios` (exporting the Xcode project only) and `tests_android` (a Gradle build for arm64 and x86_64, started with the Compatibility renderer, since the emulator's software Vulkan cannot present) for the export tests: `export-tests` custom feature, text scripts (gdUnit4 discovers tests from their source) and gdUnit4's editor scenes left out (packing them crashes the headless editor on shutdown, gdUnit4 #1151). Options a preset omits take Godot's defaults.
+One preset per platform for the demo (exports go to `demo/export/`, ignored), leaving the tests out, and `tests_linux`, `tests_macos`, `tests_windows`, `tests_web`, `tests_web_threads`, `tests_ios` (exporting the Xcode project only) and `tests_android` (a Gradle build for arm64 and x86_64, started with the Compatibility renderer, since the emulator's software Vulkan cannot present) for the export tests: `export-tests` custom feature, text scripts (gdUnit4 discovers tests from their source) and gdUnit4's editor scenes left out (packing them crashes the headless editor on shutdown, gdUnit4 #1151). The two web presets also leave out `test_initialization.gd`: it restarts FMOD, which fails on the web. Options a preset omits take Godot's defaults.
 
 ### Threading
 
@@ -131,7 +131,7 @@ FMOD calls its event and file callbacks from its own threads, and the scene tree
 
 ```
 Sound designer builds banks in FMOD Studio
-  → banks placed under res:// (Fmod/General/banks_path for the editor addon)
+  → banks placed under res:// (Fmod/General/banks/path for the editor addon)
   → FmodBankLoader or FmodServer.load_bank() loads them through Godot's FileAccess
   → FmodCache indexes their events, buses and VCAs by path and GUID
   → emitters / FmodServer create event instances, positioned from nodes every frame
@@ -141,7 +141,7 @@ Sound designer builds banks in FMOD Studio
 
 ## Key Gotchas
 
-- **Master banks first** — `Master.strings.bank` then `Master.bank` must be loaded before any other bank; the bank explorer reads them from `Fmod/General/banks_path`.
+- **Master banks first** — `Master.strings.bank` then `Master.bank` must be loaded before any other bank; the bank explorer reads them from `Fmod/General/banks/path`.
 - **2D distances** — 2D positions are in pixels: the `distance_factor` 3D setting must be the number of pixels per meter, or 2D attenuation is wrong.
 - **Editor resaves demo scripts** — Opening `demo/` with an editor that applies personal settings can rewrite the indentation of its scripts: run tests with a self-contained editor (an empty `._sc_` file next to its binary), or revert what a run changed under `demo/` before committing.
 - **godot-cpp after a branch switch** — A godot-cpp checked out at another commit, or bindings generated for another one, build a library the editor rejects or crashes on: `git submodule update godot-cpp`, then delete `godot-cpp/gen/`.
@@ -163,5 +163,6 @@ Structured like godot-jvm's: `trigger_ci.yml` (pull requests, manual runs, and a
 ## Documentation
 
 - User guide (MkDocs, published on readthedocs): `docs/src/doc/`; serve locally with `cd docs && ./run.sh`, build with `./build.sh`. Update the pages with the code they describe.
+- Settings reference: `docs/src/doc/settings/`, one page per Project Settings section, each setting with its path, property, default and meaning. Update it with `FmodSettings`.
 - Compiling from source: `docs/src/doc/advanced/1-compiling.md`
 - Class reference: `doc_classes/*.xml`, shown in the editor's help; update it with the bound API.

@@ -672,6 +672,40 @@ func step_edit_the_listeners() -> void:
 		expect(listener.listener_index == 1 and listener.is_locked and is_equal_approx(listener.weight, 0.5), "%s's properties change" % listener.name)
 
 
+func project_settings_dialog() -> Window:
+	return find_all(root, func(node: Node) -> bool: return node.get_class() == "ProjectSettingsEditor")[0]
+
+
+func project_settings_inspector() -> Node:
+	return find_all(project_settings_dialog(), func(node: Node) -> bool: return node.get_class() == "SectionedInspector")[0]
+
+
+func shown_settings(section: String) -> Array:
+	project_settings_inspector().update_category_list()
+	var sections: Tree = find_all(project_settings_inspector(), func(node: Node) -> bool: return node is Tree)[0]
+	var item := sections.get_root()
+	while item != null and item.get_metadata(0) != section:
+		item = item.get_next_in_tree()
+	if item == null:
+		return []
+	item.select(0)
+	await pause()
+	return find_all(project_settings_inspector(), func(node: Node) -> bool: return node is EditorProperty).map(func(property: EditorProperty) -> String: return str(property.get_edited_property()))
+
+
+func step_check_the_fmod_project_settings() -> void:
+	project_settings_dialog().popup_centered()
+	var advanced: CheckButton = find_all(project_settings_dialog(), func(node: Node) -> bool: return node is CheckButton and node.text.contains("Advanced"))[0]
+	var was_advanced := advanced.button_pressed
+	advanced.button_pressed = true
+	var shown := await shown_settings("Fmod/Mixer")
+	expect(shown.has("format/raw_speaker_count"), "Advanced Settings show the advanced settings: %s" % [shown])
+	shown = await shown_settings("Fmod/Spatialization")
+	expect(shown == ["listener_count", "distance_factor", "rolloff_scale", "doppler_scale"], "Fmod/Spatialization shows its settings in order: %s" % [shown])
+	advanced.button_pressed = was_advanced
+	project_settings_dialog().hide()
+
+
 func step_disable_and_re_enable_the_plugin() -> void:
 	var project := FileAccess.get_file_as_string("res://project.godot")
 	await select(emitter())

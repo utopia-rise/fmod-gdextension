@@ -19,11 +19,12 @@ namespace godot {
 
     private:
         static void add_setting(
-          const String& p_name,
-          const Variant& p_default_value,
-          Variant::Type p_type,
-          PropertyHint p_hint = PROPERTY_HINT_NONE,
-          const String& p_hint_string = ""
+            const String& p_name,
+            const Variant& p_default_value,
+            Variant::Type p_type,
+            PropertyHint p_hint = PROPERTY_HINT_NONE,
+            const String& p_hint_string = "",
+            bool p_basic = true
         );
 
     protected:
