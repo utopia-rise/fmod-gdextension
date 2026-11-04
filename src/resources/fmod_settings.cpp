@@ -57,6 +57,38 @@ int FmodSettings::get_raw_speaker_count() const {
     return _raw_speaker_count;
 }
 
+void FmodSettings::set_output_routing(OutputRouting p_output_routing) {
+    _output_routing = p_output_routing;
+}
+
+FmodSettings::OutputRouting FmodSettings::get_output_routing() const {
+    return _output_routing;
+}
+
+void FmodSettings::set_godot_audio_bus(const String& p_godot_audio_bus) {
+    _godot_audio_bus = p_godot_audio_bus;
+}
+
+const String& FmodSettings::get_godot_audio_bus() const {
+    return _godot_audio_bus;
+}
+
+void FmodSettings::set_godot_bus_mixing(GodotBusMixing p_godot_bus_mixing) {
+    _godot_bus_mixing = p_godot_bus_mixing;
+}
+
+FmodSettings::GodotBusMixing FmodSettings::get_godot_bus_mixing() const {
+    return _godot_bus_mixing;
+}
+
+void FmodSettings::set_sync_to_godot_mix_rate(bool p_sync_to_godot_mix_rate) {
+    _sync_to_godot_mix_rate = p_sync_to_godot_mix_rate;
+}
+
+bool FmodSettings::get_sync_to_godot_mix_rate() const {
+    return _sync_to_godot_mix_rate;
+}
+
 void FmodSettings::set_dsp_buffer_size(int p_dsp_buffer_size) {
     _dsp_buffer_size = p_dsp_buffer_size;
 }
@@ -209,6 +241,14 @@ void FmodSettings::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_speaker_mode"), &FmodSettings::get_speaker_mode);
     ClassDB::bind_method(D_METHOD("set_raw_speaker_count", "raw_speaker_count"), &FmodSettings::set_raw_speaker_count);
     ClassDB::bind_method(D_METHOD("get_raw_speaker_count"), &FmodSettings::get_raw_speaker_count);
+    ClassDB::bind_method(D_METHOD("set_output_routing", "output_routing"), &FmodSettings::set_output_routing);
+    ClassDB::bind_method(D_METHOD("get_output_routing"), &FmodSettings::get_output_routing);
+    ClassDB::bind_method(D_METHOD("set_godot_audio_bus", "godot_audio_bus"), &FmodSettings::set_godot_audio_bus);
+    ClassDB::bind_method(D_METHOD("get_godot_audio_bus"), &FmodSettings::get_godot_audio_bus);
+    ClassDB::bind_method(D_METHOD("set_godot_bus_mixing", "godot_bus_mixing"), &FmodSettings::set_godot_bus_mixing);
+    ClassDB::bind_method(D_METHOD("get_godot_bus_mixing"), &FmodSettings::get_godot_bus_mixing);
+    ClassDB::bind_method(D_METHOD("set_sync_to_godot_mix_rate", "sync_to_godot_mix_rate"), &FmodSettings::set_sync_to_godot_mix_rate);
+    ClassDB::bind_method(D_METHOD("get_sync_to_godot_mix_rate"), &FmodSettings::get_sync_to_godot_mix_rate);
     ClassDB::bind_method(D_METHOD("set_dsp_buffer_size", "dsp_buffer_size"), &FmodSettings::set_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("get_dsp_buffer_size"), &FmodSettings::get_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("set_dsp_buffer_count", "dsp_buffer_count"), &FmodSettings::set_dsp_buffer_count);
@@ -272,6 +312,37 @@ void FmodSettings::_bind_methods() {
         PropertyInfo(Variant::INT, "raw_speaker_count", PROPERTY_HINT_RANGE, "0,32"),
         "set_raw_speaker_count",
         "get_raw_speaker_count"
+    );
+    ADD_SUBGROUP("Output", "");
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT,
+            "output_routing",
+            PROPERTY_HINT_ENUM,
+            "Direct to Device,Godot Bus",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.OutputRouting"
+        ),
+        "set_output_routing",
+        "get_output_routing"
+    );
+    ADD_PROPERTY(PropertyInfo(Variant::STRING, "godot_audio_bus"), "set_godot_audio_bus", "get_godot_audio_bus");
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT,
+            "godot_bus_mixing",
+            PROPERTY_HINT_ENUM,
+            "Mix Ahead,On Demand",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.GodotBusMixing"
+        ),
+        "set_godot_bus_mixing",
+        "get_godot_bus_mixing"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::BOOL, "sync_to_godot_mix_rate"),
+        "set_sync_to_godot_mix_rate",
+        "get_sync_to_godot_mix_rate"
     );
     ADD_SUBGROUP("Latency", "");
     ADD_PROPERTY(
@@ -357,6 +428,10 @@ void FmodSettings::_bind_methods() {
     BIND_ENUM_CONSTANT(SPEAKERMODE_5POINT1);
     BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1);
     BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1POINT4);
+    BIND_ENUM_CONSTANT(DEVICE);
+    BIND_ENUM_CONSTANT(GODOT_BUS);
+    BIND_ENUM_CONSTANT(MIX_AHEAD);
+    BIND_ENUM_CONSTANT(ON_DEMAND);
     BIND_ENUM_CONSTANT(LOG_LEVEL_INHERIT);
     BIND_ENUM_CONSTANT(LOG_LEVEL_NONE);
     BIND_ENUM_CONSTANT(LOG_LEVEL_ERROR);

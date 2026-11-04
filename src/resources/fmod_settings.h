@@ -35,6 +35,16 @@ namespace godot {
             SPEAKERMODE_7POINT1POINT4 = FMOD_SPEAKERMODE_7POINT1POINT4,
         };
 
+        enum OutputRouting {
+            DEVICE,
+            GODOT_BUS,
+        };
+
+        enum GodotBusMixing {
+            MIX_AHEAD,
+            ON_DEMAND,
+        };
+
         enum LogLevel {
             LOG_LEVEL_INHERIT,
             LOG_LEVEL_NONE,
@@ -52,6 +62,10 @@ namespace godot {
 
         static constexpr const char* BANKS_PATH_OPTION = "General/banks/path";
         static constexpr const char* LOAD_BY_NAME_OPTION = "General/banks/load_by_name";
+        static constexpr const char* OUTPUT_ROUTING_OPTION = "Mixer/output/routing";
+        static constexpr const char* GODOT_AUDIO_BUS_OPTION = "Mixer/output/godot_audio_bus";
+        static constexpr const char* GODOT_BUS_MIXING_OPTION = "Mixer/output/godot_bus_mixing";
+        static constexpr const char* SYNC_TO_GODOT_MIX_RATE_OPTION = "Mixer/output/sync_to_godot_mix_rate";
 
         static constexpr FmodProjectSetting PROJECT_SETTINGS[] = {
             {BANKS_PATH_OPTION, "banks_path", true, "General/banks_path"},
@@ -60,6 +74,10 @@ namespace godot {
             {"Mixer/format/sample_rate", "sample_rate", true, "Software Format/sample_rate"},
             {"Mixer/format/speaker_mode", "speaker_mode", true, "Software Format/speaker_mode"},
             {"Mixer/format/raw_speaker_count", "raw_speaker_count", false, "Software Format/raw_speaker_count"},
+            {OUTPUT_ROUTING_OPTION, "output_routing", true, nullptr},
+            {GODOT_AUDIO_BUS_OPTION, "godot_audio_bus", true, nullptr},
+            {GODOT_BUS_MIXING_OPTION, "godot_bus_mixing", true, nullptr},
+            {SYNC_TO_GODOT_MIX_RATE_OPTION, "sync_to_godot_mix_rate", false, nullptr},
             {"Mixer/latency/buffer_size", "dsp_buffer_size", true, "DSP/dsp_buffer_size"},
             {"Mixer/latency/buffer_count", "dsp_buffer_count", true, "DSP/dsp_buffer_count"},
             {"Spatialization/listener_count", "listener_count", true, "General/default_listener_count"},
@@ -110,6 +128,14 @@ namespace godot {
         SpeakerMode get_speaker_mode() const;
         void set_raw_speaker_count(int p_raw_speaker_count);
         int get_raw_speaker_count() const;
+        void set_output_routing(OutputRouting p_output_routing);
+        OutputRouting get_output_routing() const;
+        void set_godot_audio_bus(const String& p_godot_audio_bus);
+        const String& get_godot_audio_bus() const;
+        void set_godot_bus_mixing(GodotBusMixing p_godot_bus_mixing);
+        GodotBusMixing get_godot_bus_mixing() const;
+        void set_sync_to_godot_mix_rate(bool p_sync_to_godot_mix_rate);
+        bool get_sync_to_godot_mix_rate() const;
         void set_dsp_buffer_size(int p_dsp_buffer_size);
         int get_dsp_buffer_size() const;
         void set_dsp_buffer_count(int p_dsp_buffer_count);
@@ -149,6 +175,10 @@ namespace godot {
         int _sample_rate = 48000;
         SpeakerMode _speaker_mode = STEREO;
         int _raw_speaker_count = 0;
+        OutputRouting _output_routing = DEVICE;
+        String _godot_audio_bus = "Master";
+        GodotBusMixing _godot_bus_mixing = MIX_AHEAD;
+        bool _sync_to_godot_mix_rate = false;
         int _dsp_buffer_size = DEFAULT_DSP_BUFFER_SIZE;
         int _dsp_buffer_count = DEFAULT_DSP_BUFFER_COUNT;
         int _listener_count = 1;
@@ -170,6 +200,8 @@ namespace godot {
 } // namespace godot
 
 VARIANT_ENUM_CAST(FmodSettings::SpeakerMode);
+VARIANT_ENUM_CAST(FmodSettings::OutputRouting);
+VARIANT_ENUM_CAST(FmodSettings::GodotBusMixing);
 VARIANT_ENUM_CAST(FmodSettings::LogLevel);
 VARIANT_ENUM_CAST(FmodSettings::LogOutput);
 

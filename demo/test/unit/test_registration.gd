@@ -90,6 +90,7 @@ func test_assert_enum_properties_label_their_values():
 		["FmodSettings", "speaker_mode", "FmodSettings.SpeakerMode", FmodSettings.SpeakerMode.STEREO, "Stereo"],
 		["FmodSettings", "log_output", "FmodSettings.LogOutput", FmodSettings.LogOutput.LOG_OUTPUT_GODOT, "Godot"],
 		["FmodSettings", "log_level", "FmodSettings.LogLevel", FmodSettings.LogLevel.LOG_LEVEL_VERBOSE, "Verbose"],
+		["FmodSettings", "output_routing", "FmodSettings.OutputRouting", FmodSettings.OutputRouting.GODOT_BUS, "Godot Bus"],
 	]
 	for case in cases:
 		var property := _property(case[0], case[1])

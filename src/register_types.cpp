@@ -1,3 +1,4 @@
+#include "callback/audio_callbacks.h"
 #include "constants.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
@@ -86,6 +87,8 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodSettings>();
         ClassDB::register_class<FmodStaticPluginMethod>();
         ClassDB::register_class<FmodPluginsSettings>();
+        ClassDB::register_internal_class<FmodAudioStream>();
+        ClassDB::register_internal_class<FmodAudioStreamPlayback>();
 
         // Server
         ClassDB::register_class<FmodServer>();

@@ -35,6 +35,12 @@
 		<member name="dsp_buffer_size" type="int" setter="set_dsp_buffer_size" getter="get_dsp_buffer_size">
 			The size of the blocks FMOD mixes, in samples. Larger is steadier, smaller is quicker.
 		</member>
+		<member name="godot_audio_bus" type="String" setter="set_godot_audio_bus" getter="get_godot_audio_bus" default="&quot;Master&quot;">
+			The Godot audio bus FMOD's sound plays on, with [constant GODOT_BUS] output.
+		</member>
+		<member name="godot_bus_mixing" type="int" setter="set_godot_bus_mixing" getter="get_godot_bus_mixing" enum="FmodSettings.GodotBusMixing" default="0">
+			When FMOD mixes its sound for the Godot bus.
+		</member>
 		<member name="listener_count" type="int" setter="set_listener_count" getter="get_listener_count" default="1">
 			The number of listeners FMOD starts with, from 1 to 8.
 		</member>
@@ -56,6 +62,9 @@
 		<member name="memory_tracking" type="bool" setter="set_memory_tracking" getter="get_memory_tracking" default="false">
 			If [code]true[/code], FMOD reports its memory use to FMOD Studio's profiler, at a small cost.
 		</member>
+		<member name="output_routing" type="int" setter="set_output_routing" getter="get_output_routing" enum="FmodSettings.OutputRouting" default="0">
+			Where FMOD's sound goes.
+		</member>
 		<member name="plugins" type="FmodPluginsSettings" setter="set_plugins" getter="get_plugins">
 			The FMOD plugins loaded once FMOD has started.
 		</member>
@@ -70,6 +79,9 @@
 		</member>
 		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" enum="FmodSettings.SpeakerMode" default="3">
 			The speaker layout FMOD mixes for.
+		</member>
+		<member name="sync_to_godot_mix_rate" type="bool" setter="set_sync_to_godot_mix_rate" getter="get_sync_to_godot_mix_rate" default="false">
+			If [code]true[/code], with [constant GODOT_BUS] output, FMOD mixes at Godot's mix rate instead of [member sample_rate], so Godot does not convert FMOD's sound.
 		</member>
 	</members>
 	<constants>
@@ -99,6 +111,18 @@
 		</constant>
 		<constant name="SPEAKERMODE_7POINT1POINT4" value="8" enum="SpeakerMode">
 			7.1.4 surround, with four height speakers.
+		</constant>
+		<constant name="DEVICE" value="0" enum="OutputRouting">
+			Straight to the audio device. The only choice on the web.
+		</constant>
+		<constant name="GODOT_BUS" value="1" enum="OutputRouting">
+			Onto a Godot audio bus: its effects and volume, Mute Game and Movie Maker then apply to FMOD. Not on the web.
+		</constant>
+		<constant name="MIX_AHEAD" value="0" enum="GodotBusMixing">
+			Ahead of time: protects against crackles, but delays the sound by the whole of FMOD's buffers, [member dsp_buffer_size] times [member dsp_buffer_count].
+		</constant>
+		<constant name="ON_DEMAND" value="1" enum="GodotBusMixing">
+			When Godot asks: delays the sound by at most one block of [member dsp_buffer_size], and is the one for Movie Maker. A very heavy FMOD scene can crackle.
 		</constant>
 		<constant name="LOG_LEVEL_INHERIT" value="0" enum="LogLevel">
 			Errors and warnings, and everything when Godot runs with [code]--verbose[/code].

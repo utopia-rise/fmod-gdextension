@@ -18,6 +18,8 @@ namespace godot {
         ~FmodEditorPlugin() = default;
 
     private:
+        bool godot_bus_settings_hidden = false;
+
         static void add_setting(
             const String& p_name,
             const Variant& p_default_value,
@@ -26,6 +28,7 @@ namespace godot {
             const String& p_hint_string = "",
             bool p_basic = true
         );
+        void update_godot_bus_settings_visibility();
 
     protected:
         static void _bind_methods();

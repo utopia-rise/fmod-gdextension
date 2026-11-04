@@ -125,6 +125,7 @@ namespace godot {
 
         float distanceScale;
 
+        String godotAudioBus;
         ObjectID runtime;
         void add_runtime_to_scene_tree();
 
@@ -165,6 +166,7 @@ namespace godot {
         void init(const Ref<FmodSettings>& p_settings = Ref<FmodSettings>());
         void update();
         void shutdown();
+        String get_godot_audio_bus() const;
 
         // SETTINGS
         void set_spatialization(float p_doppler_scale, float p_distance_factor, float p_rolloff_scale);

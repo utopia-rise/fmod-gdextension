@@ -698,13 +698,27 @@ func shown_settings(section: String) -> Array:
 	return find_all(project_settings_inspector(), func(node: Node) -> bool: return node is EditorProperty).map(func(property: EditorProperty) -> String: return str(property.get_edited_property()))
 
 
-func step_check_the_fmod_project_settings() -> void:
+func output_settings(shown: Array) -> Array:
+	return shown.filter(func(name: String) -> bool: return name.begins_with("output/"))
+
+
+func step_switch_the_output_routing_in_project_settings() -> void:
+	const ROUTING := "Fmod/Mixer/output/routing"
 	project_settings_dialog().popup_centered()
 	var advanced: CheckButton = find_all(project_settings_dialog(), func(node: Node) -> bool: return node is CheckButton and node.text.contains("Advanced"))[0]
 	var was_advanced := advanced.button_pressed
 	advanced.button_pressed = true
 	var shown := await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown) == ["output/routing"], "with Direct to Device, Fmod/Mixer's Output group shows only Routing: %s" % [shown])
 	expect(shown.has("format/raw_speaker_count"), "Advanced Settings show the advanced settings: %s" % [shown])
+	ProjectSettings.set_setting(ROUTING, 1)
+	await pause(5)
+	shown = await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown).has("output/godot_audio_bus") and output_settings(shown).has("output/godot_bus_mixing"), "with Godot Bus, the Output group shows the bus settings: %s" % [shown])
+	ProjectSettings.set_setting(ROUTING, 0)
+	await pause(5)
+	shown = await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown) == ["output/routing"], "back to Direct to Device, the bus settings are hidden again: %s" % [shown])
 	shown = await shown_settings("Fmod/Spatialization")
 	expect(shown == ["listener_count", "distance_factor", "rolloff_scale", "doppler_scale"], "Fmod/Spatialization shows its settings in order: %s" % [shown])
 	advanced.button_pressed = was_advanced

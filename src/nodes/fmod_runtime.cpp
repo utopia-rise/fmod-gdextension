@@ -1,7 +1,9 @@
 #include "fmod_runtime.h"
 
+#include <callback/audio_callbacks.h>
 #include <fmod_server.h>
 
+#include <classes/audio_stream_player.hpp>
 #include <classes/engine.hpp>
 #include <classes/os.hpp>
 #include <classes/performance.hpp>
@@ -40,6 +42,18 @@ void FmodRuntime::_enter_tree() {
         arguments.push_back(StringName(monitor[1]));
         performance->add_custom_monitor(monitor[0], callable_mp(this, &FmodRuntime::get_performance_value), arguments);
     }
+}
+
+void FmodRuntime::_ready() {
+    String godot_audio_bus = FmodServer::get_singleton()->get_godot_audio_bus();
+    if (godot_audio_bus.is_empty()) { return; }
+    Ref<FmodAudioStream> stream;
+    stream.instantiate();
+    AudioStreamPlayer* player = memnew(AudioStreamPlayer);
+    player->set_stream(stream);
+    player->set_bus(godot_audio_bus);
+    add_child(player);
+    player->play();
 }
 
 void FmodRuntime::_exit_tree() {

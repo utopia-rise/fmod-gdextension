@@ -9,6 +9,7 @@
 #include "plugins/ios_plugins_loader.h"
 #include "plugins/plugins_helper.h"
 
+#include <callback/audio_callbacks.h>
 #include <fmod_server.h>
 #include <nodes/fmod_runtime.h>
 
@@ -31,6 +32,7 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
     ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
+    ClassDB::bind_method(D_METHOD("get_godot_audio_bus"), &FmodServer::get_godot_audio_bus);
 
     // SETTINGS
     ClassDB::bind_method(
@@ -242,6 +244,38 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
     ERROR_CHECK_WITH_REASON(coreSystem->setOutput(FMOD_OUTPUTTYPE_AUDIOWORKLET), "Cannot select the audio worklet output");
 #endif
 
+#ifdef WEB_ENABLED
+    if (settings->get_output_routing() == FmodSettings::GODOT_BUS) {
+        GODOT_LOG_WARNING("FMOD Sound System: The Godot bus output is not available on the web, FMOD plays to the audio device")
+    }
+#else
+    if (settings->get_output_routing() == FmodSettings::GODOT_BUS) {
+        bool on_demand = settings->get_godot_bus_mixing() == FmodSettings::ON_DEMAND;
+
+        int godot_mix_rate = ProjectSettings::get_singleton()->get_setting("audio/driver/mix_rate", 44100);
+        if (settings->get_sync_to_godot_mix_rate() && godot_mix_rate > 0) {
+            int sample_rate;
+            FMOD_SPEAKERMODE speaker_mode;
+            int raw_speakers_count;
+            if (ERROR_CHECK(coreSystem->getSoftwareFormat(&sample_rate, &speaker_mode, &raw_speakers_count))) {
+                ERROR_CHECK_WITH_REASON(
+                  coreSystem->setSoftwareFormat(godot_mix_rate, speaker_mode, raw_speakers_count),
+                  "Cannot set the sample rate to Godot's mix rate"
+                );
+            }
+        }
+
+        unsigned int godot_output = 0;
+        if (ERROR_CHECK_WITH_REASON(
+                coreSystem->registerOutput(FmodAudioStream::get_fmod_output(on_demand), &godot_output),
+                "Cannot register the Godot output"
+            )
+            && ERROR_CHECK_WITH_REASON(coreSystem->setOutputByPlugin(godot_output), "Cannot select the Godot output")) {
+            godotAudioBus = settings->get_godot_audio_bus();
+        }
+    }
+#endif
+
     if (ERROR_CHECK(system->initialize(settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
@@ -362,6 +396,7 @@ void FmodServer::shutdown() {
 
     isInitialized = false;
     isNotInitializedPrinted = false;
+    godotAudioBus = String();
     Node* runtime_node = Object::cast_to<Node>(ObjectDB::get_instance(runtime));
     if (runtime_node) {
         runtime_node->set_process(false);
@@ -375,6 +410,10 @@ void FmodServer::shutdown() {
     delete cache;
     cache = nullptr;
     GODOT_LOG_INFO("FMOD Sound System: System released")
+}
+
+String FmodServer::get_godot_audio_bus() const {
+    return godotAudioBus;
 }
 
 void FmodServer::add_runtime_to_scene_tree() {

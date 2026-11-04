@@ -8,6 +8,7 @@
 #include <resources/fmod_settings.h>
 
 #include <classes/project_settings.hpp>
+#include <core/object.hpp>
 #include <variant/typed_array.hpp>
 
 using namespace godot;
@@ -66,6 +67,35 @@ void FmodEditorPlugin::_ready() {
     String plugins = get_setting_path(FmodPluginsSettings::RESOURCE_OPTION);
     add_setting(plugins, FmodPluginsSettings::DEFAULT_RESOURCE_OPTION, Variant::STRING, PROPERTY_HINT_FILE);
     project_settings->set_order(plugins, ++order);
+
+    update_godot_bus_settings_visibility();
+    project_settings->connect(
+        "settings_changed",
+        callable_mp(this, &FmodEditorPlugin::update_godot_bus_settings_visibility)
+    );
+}
+
+void FmodEditorPlugin::update_godot_bus_settings_visibility() {
+    ProjectSettings* project_settings = ProjectSettings::get_singleton();
+    int output_routing =
+        project_settings->get_setting(get_setting_path(FmodSettings::OUTPUT_ROUTING_OPTION), FmodSettings::DEVICE);
+    bool hidden = output_routing != FmodSettings::GODOT_BUS;
+    if (hidden == godot_bus_settings_hidden) { return; }
+    godot_bus_settings_hidden = hidden;
+
+    for (const char* option :
+         {FmodSettings::GODOT_AUDIO_BUS_OPTION,
+          FmodSettings::GODOT_BUS_MIXING_OPTION,
+          FmodSettings::SYNC_TO_GODOT_MIX_RATE_OPTION}) {
+        project_settings->set_as_internal(get_setting_path(option), hidden);
+    }
+
+    // The Project Settings dialog rereads which settings it shows only when it rebuilds its sections.
+    TypedArray<Node> inspectors =
+        get_node_or_null(NodePath("/root"))->find_children("*", "SectionedInspector", true, false);
+    for (int i = 0; i < inspectors.size(); ++i) {
+        Object::cast_to<Node>(inspectors[i])->call("update_category_list");
+    }
 }
 
 void FmodEditorPlugin::add_setting(

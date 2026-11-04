@@ -5,7 +5,7 @@
 
 namespace godot {
     // The node FmodServer adds at the root of the scene tree while FMOD runs: it updates FMOD every frame, before the
-    // other nodes.
+    // other nodes, and plays FMOD's output on the Godot audio bus.
     class FmodRuntime : public Node {
         GDCLASS(FmodRuntime, Node)
 
@@ -14,6 +14,7 @@ namespace godot {
 
         void _enter_tree() override;
         void _exit_tree() override;
+        void _ready() override;
         void _process(double p_delta) override;
         void _notification(int p_what);
 

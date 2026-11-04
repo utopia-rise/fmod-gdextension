@@ -181,6 +181,12 @@
 				Returns the path for the event with the specified GUID.
 			</description>
 		</method>
+		<method name="get_godot_audio_bus" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the Godot audio bus FMOD's output plays on, or an empty string when FMOD plays to the audio device. See [member FmodSettings.output_routing].
+			</description>
+		</method>
 		<method name="get_global_parameter_by_id">
 			<return type="float" />
 			<param index="0" name="parameter_id" type="int" />
@@ -326,7 +332,7 @@
 			<return type="void" />
 			<param index="0" name="settings" type="FmodSettings" default="null" />
 			<description>
-				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on. It adds an internal [code]FmodRuntime[/code] node at the root of the scene tree, which runs FMOD until [method shutdown]: every frame, before any other node, it calls [method update], even while the game is paused. It also suspends FMOD's mixer while a mobile application is in the background, and adds FMOD's CPU, memory and file monitors to [Performance].
+				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on. It adds an internal [code]FmodRuntime[/code] node at the root of the scene tree, which runs FMOD until [method shutdown]: every frame, before any other node, it calls [method update], even while the game is paused. It also plays FMOD's output on the Godot bus when [member FmodSettings.output_routing] is [constant FmodSettings.GODOT_BUS], suspends FMOD's mixer while a mobile application is in the background, and adds FMOD's CPU, memory and file monitors to [Performance].
 			</description>
 		</method>
 		<method name="is_plugin_loaded">
