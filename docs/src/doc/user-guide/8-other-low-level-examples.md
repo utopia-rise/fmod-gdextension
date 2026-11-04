@@ -6,10 +6,6 @@ You can mute all event using `mute_all_events`. This will mute the master bus.
 
 ```gdscript
 func _ready():
-	FmodServer.set_software_format(0, FmodSoftwareFormatSettings.SpeakerMode.STEREO, 0)
-	FmodServer.init(1024, FmodServer.StudioInitFlags.LIVEUPDATE, FmodServer.InitFlags.INIT_NORMAL)
-	FmodServer.set_sound_3d_settings(1.0, 64.0, 1.0)
-	
 	# load banks
 	FmodServer.load_bank("res://Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	FmodServer.load_bank("res://Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)
@@ -42,11 +38,6 @@ func _ready():
 
 ```gdscript
 func _ready():
-	# set up FMOD
-	FmodServer.set_software_format(0, FmodSoftwareFormatSettings.SpeakerMode.STEREO, 0)
-	FmodServer.init(1024, FmodServer.StudioInitFlags.LIVEUPDATE, FmodServer.InitFlags.INIT_NORMAL)
-	FmodServer.set_sound_3d_settings(1/0, 64.0, 1.0)
-	
 	# load banks
 	FmodServer.load_bank("res://Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	FmodServer.load_bank("res://Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)

@@ -33,7 +33,6 @@ func test_assert_fmod_enums_belong_to_their_class():
 	assert_bool(ClassDB.is_class_enum_bitfield("FmodEvent", "StudioEventCallbackType")).is_true()
 	assert_bool(ClassDB.class_has_enum("FmodBank", "StudioLoadingState")).is_true()
 	assert_bool(ClassDB.is_class_enum_bitfield("FmodBank", "StudioLoadBankFlags")).is_true()
-	assert_bool(ClassDB.is_class_enum_bitfield("FmodFile", "Mode")).is_true()
 	assert_bool(ClassDB.class_has_enum("FmodSoftwareFormatSettings", "SpeakerMode")).is_true()
 	assert_bool(ClassDB.class_has_enum("FmodLoggingSettings", "DebugMode")).is_true()
 

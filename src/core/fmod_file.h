@@ -13,6 +13,7 @@ namespace godot {
         FMOD::Sound* _wrapped = nullptr;
 
     public:
+        // Not registered with Godot: no method or property takes it yet.
         enum Mode : uint32_t {
             MODE_2D = FMOD_2D,
             MODE_3D = FMOD_3D,
@@ -61,7 +62,5 @@ namespace godot {
         static void _bind_methods();
     };
 }// namespace godot
-
-VARIANT_BITFIELD_CAST(FmodFile::Mode);
 
 #endif// GODOTFMOD_FMOD_FILE_H

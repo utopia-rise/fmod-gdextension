@@ -59,6 +59,7 @@ namespace godot {
         static FmodServer* singleton;
 
     public:
+        // Not registered with Godot: no method or property takes it yet.
         enum InitFlags : uint32_t {
             INIT_3D_RIGHTHANDED = FMOD_INIT_3D_RIGHTHANDED,
             CHANNEL_DISTANCEFILTER = FMOD_INIT_CHANNEL_DISTANCEFILTER,
@@ -73,6 +74,7 @@ namespace godot {
             VOL0_BECOMES_VIRTUAL = FMOD_INIT_VOL0_BECOMES_VIRTUAL,
         };
 
+        // Not registered with Godot: no method or property takes it yet.
         enum StudioInitFlags : uint32_t {
             STUDIO_INIT_NORMAL = FMOD_STUDIO_INIT_NORMAL,
             LIVEUPDATE = FMOD_STUDIO_INIT_LIVEUPDATE,
@@ -82,6 +84,7 @@ namespace godot {
             LOAD_FROM_UPDATE = FMOD_STUDIO_INIT_LOAD_FROM_UPDATE,
         };
 
+        // Not registered with Godot: no method or property takes it yet.
         enum StudioSystemCallbackType : uint32_t {
             PREUPDATE = FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE,
             POSTUPDATE = FMOD_STUDIO_SYSTEM_CALLBACK_POSTUPDATE,
@@ -141,7 +144,6 @@ namespace godot {
         // TODO: Change when https://github.com/godotengine/godot-cpp/pull/1091 is merged.
         Mutex callback_mutex;
         List<Callback> callbacks_to_process;
-
 
         void _set_listener_attributes();
 
@@ -303,7 +305,6 @@ namespace godot {
         static void _bind_methods();
     };
 
-
     template<FmodServer::EventIdentifierType parameter_type>
     Ref<FmodEventDescription> FmodServer::fetch_event_description(const FmodServer::EventIdentifier& identifier){
         Ref<FmodEventDescription> desc;
@@ -350,7 +351,6 @@ namespace godot {
             return;
         }
 
-
         Ref<FmodEvent> ref = _create_event_instance<parameter_type>(identifier);
 
         if (ref.is_null()) { return; }
@@ -390,9 +390,5 @@ namespace godot {
         }
     }
 }// namespace godot
-
-VARIANT_BITFIELD_CAST(FmodServer::InitFlags);
-VARIANT_BITFIELD_CAST(FmodServer::StudioInitFlags);
-VARIANT_BITFIELD_CAST(FmodServer::StudioSystemCallbackType);
 
 #endif// GODOTFMOD_FMOD_SERVER_H
