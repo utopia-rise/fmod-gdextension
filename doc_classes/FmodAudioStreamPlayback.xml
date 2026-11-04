@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodAudioStreamPlayback" inherits="AudioStreamPlaybackResampled" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		The playback of an [FmodAudioStream].
+	</brief_description>
+	<description>
+		Reads FMOD's mix, resampled from FMOD's sample rate to Godot's.
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

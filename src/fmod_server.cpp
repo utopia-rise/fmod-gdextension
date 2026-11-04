@@ -1,3 +1,4 @@
+#include "callback/output_callbacks.h"
 #include "classes/dir_access.hpp"
 #include "classes/engine.hpp"
 #include "classes/os.hpp"
@@ -10,9 +11,14 @@
 #include "plugins/plugins_helper.h"
 
 #include <fmod_server.h>
+#include <resources/fmod_audio_stream.h>
 
+#include <classes/audio_stream_player.hpp>
 #include <classes/node3d.hpp>
 #include <classes/project_settings.hpp>
+#include <classes/scene_tree.hpp>
+#include <classes/window.hpp>
+#include <core/object.hpp>
 
 #ifdef WEB_ENABLED
 #include <emscripten.h>
@@ -27,6 +33,7 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init);
     ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
     ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
+    ClassDB::bind_method(D_METHOD("get_godot_audio_bus"), &FmodServer::get_godot_audio_bus);
 
     // SETTINGS
     ClassDB::bind_method(D_METHOD("set_software_format", "settings"), &FmodServer::set_software_format);
@@ -204,6 +211,9 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     }
 
     if (p_settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
+    if (p_settings->get_studio_processing() == FmodGeneralSettings::MAIN_THREAD) {
+        studio_init_flags |= FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE;
+    }
 
     FMOD_INITFLAGS init_flags = FMOD_INIT_3D_RIGHTHANDED;
 
@@ -223,9 +233,44 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
     ERROR_CHECK_WITH_REASON(coreSystem->setOutput(FMOD_OUTPUTTYPE_AUDIOWORKLET), "Cannot select the audio worklet output");
 #endif
 
+#ifdef WEB_ENABLED
+    if (p_settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
+        GODOT_LOG_WARNING("FMOD Sound System: The Godot bus output is not available on the web, FMOD plays to the audio device")
+    }
+#else
+    if (p_settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
+        bool synchronous = p_settings->get_godot_bus_mixing() == FmodGeneralSettings::ON_DEMAND;
+
+        int godot_mix_rate = ProjectSettings::get_singleton()->get_setting("audio/driver/mix_rate", 44100);
+        if (p_settings->get_sync_to_godot_mix_rate() && godot_mix_rate > 0) {
+            int sample_rate;
+            FMOD_SPEAKERMODE speaker_mode;
+            int raw_speakers_count;
+            if (ERROR_CHECK(coreSystem->getSoftwareFormat(&sample_rate, &speaker_mode, &raw_speakers_count))) {
+                ERROR_CHECK_WITH_REASON(
+                  coreSystem->setSoftwareFormat(godot_mix_rate, speaker_mode, raw_speakers_count),
+                  "Cannot set the sample rate to Godot's mix rate"
+                );
+            }
+        }
+
+        unsigned int godot_output = 0;
+        if (ERROR_CHECK_WITH_REASON(
+              coreSystem->registerOutput(Callbacks::get_godot_output_description(synchronous), &godot_output),
+              "Cannot register the Godot output"
+            )
+            && ERROR_CHECK_WITH_REASON(coreSystem->setOutputByPlugin(godot_output), "Cannot select the Godot output")) {
+            godotAudioBus = p_settings->get_godot_audio_bus();
+        }
+    }
+#endif
+
     if (ERROR_CHECK(system->initialize(p_settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
+
+        // FMOD starting with the engine starts before the scene tree exists.
+        if (!godotAudioBus.is_empty()) { callable_mp(this, &FmodServer::play_output_on_godot_bus).call_deferred(); }
 
         if ((studio_init_flags & FMOD_STUDIO_INIT_LIVEUPDATE) == FMOD_STUDIO_INIT_LIVEUPDATE) {
             GODOT_LOG_INFO("FMOD Sound System: Live update enabled!")
@@ -336,6 +381,10 @@ void FmodServer::shutdown() {
 
     isInitialized = false;
     isNotInitializedPrinted = false;
+    godotAudioBus = String();
+    Node* player = Object::cast_to<Node>(ObjectDB::get_instance(godotOutputPlayer));
+    if (player) { player->queue_free(); }
+    godotOutputPlayer = ObjectID();
     ERROR_CHECK(system->unloadAll());
     ERROR_CHECK(system->release());
     system = nullptr;
@@ -343,6 +392,25 @@ void FmodServer::shutdown() {
     delete cache;
     cache = nullptr;
     GODOT_LOG_INFO("FMOD Sound System: System released")
+}
+
+String FmodServer::get_godot_audio_bus() const {
+    return godotAudioBus;
+}
+
+void FmodServer::play_output_on_godot_bus() {
+    SceneTree* tree = Object::cast_to<SceneTree>(Engine::get_singleton()->get_main_loop());
+    if (!isInitialized || godotAudioBus.is_empty() || !tree || ObjectDB::get_instance(godotOutputPlayer)) { return; }
+
+    Ref<FmodAudioStream> stream;
+    stream.instantiate();
+    AudioStreamPlayer* player = memnew(AudioStreamPlayer);
+    player->set_stream(stream);
+    player->set_bus(godotAudioBus);
+    player->set_process_mode(Node::PROCESS_MODE_ALWAYS);
+    tree->get_root()->add_child(player);
+    player->play();
+    godotOutputPlayer = player->get_instance_id();
 }
 
 void FmodServer::set_system_listener_number(int p_listenerNumber) {

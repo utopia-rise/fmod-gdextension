@@ -4,7 +4,7 @@
 		The general FMOD settings, read from Project Settings.
 	</brief_description>
 	<description>
-		Set in Project Settings under [code]Fmod/General[/code]. FMOD reads them when it initializes.
+		Set in Project Settings under [code]Fmod/General[/code] and [code]Fmod/Output[/code]. FMOD reads them when it initializes.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -18,14 +18,49 @@
 		<member name="default_listener_count" type="int" setter="set_default_listener_count" getter="get_default_listener_count" default="1">
 			The number of listeners FMOD starts with.
 		</member>
+		<member name="godot_audio_bus" type="String" setter="set_godot_audio_bus" getter="get_godot_audio_bus" default="&quot;Master&quot;">
+			The Godot audio bus FMOD's sound plays on, with [constant GODOT_BUS] output.
+		</member>
+		<member name="godot_bus_mixing" type="int" setter="set_godot_bus_mixing" getter="get_godot_bus_mixing" enum="FmodGeneralSettings.GodotBusMixing" default="0">
+			When FMOD mixes its sound for the Godot bus.
+		</member>
 		<member name="is_live_update_enabled" type="bool" setter="set_is_live_update_enabled" getter="get_is_live_update_enabled" default="true">
 			If [code]true[/code], FMOD Studio can connect to the running game to edit and profile its audio live. Never enabled in the editor.
 		</member>
 		<member name="is_memory_tracking_enabled" type="bool" setter="set_is_memory_tracking_enabled" getter="get_is_memory_tracking_enabled" default="false">
 			If [code]true[/code], FMOD tracks its memory use, reported to FMOD Studio's profiler.
 		</member>
+		<member name="output_routing" type="int" setter="set_output_routing" getter="get_output_routing" enum="FmodGeneralSettings.OutputRouting" default="0">
+			Where FMOD's sound goes.
+		</member>
 		<member name="should_load_by_name" type="bool" setter="set_should_load_by_name" getter="get_should_load_by_name" default="false">
 			If [code]true[/code], event emitters find their event by path rather than by GUID.
 		</member>
+		<member name="studio_processing" type="int" setter="set_studio_processing" getter="get_studio_processing" enum="FmodGeneralSettings.StudioProcessing" default="0">
+			Where FMOD Studio carries out what your game asks it: starting and stopping events, setting parameters, moving sounds.
+		</member>
+		<member name="sync_to_godot_mix_rate" type="bool" setter="set_sync_to_godot_mix_rate" getter="get_sync_to_godot_mix_rate" default="false">
+			If [code]true[/code], FMOD mixes at Godot's mix rate ([code]audio/driver/mix_rate[/code]) instead of the sample rate of [FmodSoftwareFormatSettings], so Godot does not convert FMOD's sound.
+		</member>
 	</members>
+	<constants>
+		<constant name="BACKGROUND_THREAD" value="0" enum="StudioProcessing">
+			On FMOD's own thread: costs your frames nothing, but a request can wait up to 20 ms.
+		</constant>
+		<constant name="MAIN_THREAD" value="1" enum="StudioProcessing">
+			In [method FmodServer.update], on the main thread: requests apply right away, at the cost of frame time.
+		</constant>
+		<constant name="DEVICE" value="0" enum="OutputRouting">
+			Straight to the audio device, as FMOD always did.
+		</constant>
+		<constant name="GODOT_BUS" value="1" enum="OutputRouting">
+			Onto a Godot audio bus: its effects and volume, Mute Game and Movie Maker then apply to FMOD. Not on the web.
+		</constant>
+		<constant name="MIX_AHEAD" value="0" enum="GodotBusMixing">
+			Ahead of time: protects against crackles, adds about 40 ms of delay.
+		</constant>
+		<constant name="ON_DEMAND" value="1" enum="GodotBusMixing">
+			When Godot asks: shortest delay, and the one for Movie Maker. A very heavy FMOD scene can crackle.
+		</constant>
+	</constants>
 </class>

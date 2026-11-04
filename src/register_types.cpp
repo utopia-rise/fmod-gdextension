@@ -13,6 +13,7 @@
 #include "studio/fmod_event_description.h"
 #include "studio/fmod_vca.h"
 #include "fmod_string_names.h"
+#include "resources/fmod_audio_stream.h"
 #include "resources/fmod_logging_settings.h"
 
 #ifdef TOOLS_ENABLED
@@ -106,6 +107,8 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_class<FmodStaticPluginMethod>();
         ClassDB::register_class<FmodPluginsSettings>();
         ClassDB::register_class<FmodLoggingSettings>();
+        ClassDB::register_class<FmodAudioStream>();
+        ClassDB::register_class<FmodAudioStreamPlayback>();
 
         // Server
         ClassDB::register_class<FmodServer>();

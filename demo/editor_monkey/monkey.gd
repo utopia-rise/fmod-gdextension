@@ -672,6 +672,49 @@ func step_edit_the_listeners() -> void:
 		expect(listener.listener_index == 1 and listener.is_locked and is_equal_approx(listener.weight, 0.5), "%s's properties change" % listener.name)
 
 
+func project_settings_dialog() -> Window:
+	return find_all(root, func(node: Node) -> bool: return node.get_class() == "ProjectSettingsEditor")[0]
+
+
+func project_settings_inspector() -> Node:
+	return find_all(project_settings_dialog(), func(node: Node) -> bool: return node.get_class() == "SectionedInspector")[0]
+
+
+func shown_settings(section: String) -> Dictionary:
+	project_settings_inspector().update_category_list()
+	var sections: Tree = find_all(project_settings_inspector(), func(node: Node) -> bool: return node is Tree)[0]
+	var item := sections.get_root()
+	while item != null and item.get_metadata(0) != section:
+		item = item.get_next_in_tree()
+	if item == null:
+		return {}
+	item.select(0)
+	await pause()
+	var shown := {}
+	for property in find_all(project_settings_inspector(), func(node: Node) -> bool: return node is EditorProperty):
+		shown[str(property.get_edited_property())] = property.tooltip_text
+	return shown
+
+
+func step_switch_the_output_routing_in_project_settings() -> void:
+	const ROUTING := "Fmod/Output/output_routing"
+	project_settings_dialog().popup_centered()
+	var shown := await shown_settings("Fmod/Output")
+	expect(shown.keys() == ["output_routing"], "with Direct to Device, Fmod/Output shows only Output Routing: %s" % [shown.keys()])
+	expect(shown.get("output_routing") == "property|FmodGeneralSettings|output_routing", "Output Routing's tooltip shows FmodGeneralSettings' documentation")
+	ProjectSettings.set_setting(ROUTING, 1)
+	await pause(5)
+	shown = await shown_settings("Fmod/Output")
+	expect(shown.has("godot_audio_bus") and shown.has("godot_bus_mixing"), "with Godot Bus, Fmod/Output shows the bus settings: %s" % [shown.keys()])
+	ProjectSettings.set_setting(ROUTING, 0)
+	await pause(5)
+	shown = await shown_settings("Fmod/Output")
+	expect(shown.keys() == ["output_routing"], "back to Direct to Device, the bus settings are hidden again: %s" % [shown.keys()])
+	shown = await shown_settings("Fmod/General")
+	expect(shown.get("channel_count") == "property|FmodGeneralSettings|channel_count", "the other FMOD settings' tooltips show their settings class' documentation")
+	project_settings_dialog().hide()
+
+
 func step_disable_and_re_enable_the_plugin() -> void:
 	var project := FileAccess.get_file_as_string("res://project.godot")
 	await select(emitter())

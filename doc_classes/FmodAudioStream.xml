@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodAudioStream" inherits="AudioStream" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		An audio stream playing FMOD's output through Godot's audio server.
+	</brief_description>
+	<description>
+		Plays FMOD's whole mix when [member FmodGeneralSettings.output_routing] sends it to a Godot bus, and silence otherwise. [FmodServer] already plays one on the configured bus, from [method FmodServer.init] to [method FmodServer.shutdown]: play no other, since each would read FMOD's mix.
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

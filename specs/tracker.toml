@@ -10,11 +10,13 @@
 "A.2.3" = { status = "partial", note = "breaks A.2.R2: most FmodServer calls made before FMOD starts dereference state created at start and can crash" }
 "A.2.4" = { status = "done" }
 "A.2.5" = { status = "done" }
-"A.3" = { hash = "165587cdf9f6" }
+"A.3" = { hash = "e985bd73b323" }
 "A.3.1" = { status = "done" }
 "A.3.2" = { status = "done" }
 "A.3.3" = { status = "done" }
 "A.3.4" = { status = "done" }
+"A.3.5" = { status = "partial", note = "breaks §3: not available on the web platform" }
+"A.3.6" = { status = "done" }
 "B.1" = { hash = "b8dd3e2cad4f" }
 "B.1.1" = { status = "done" }
 "B.1.2" = { status = "done" }

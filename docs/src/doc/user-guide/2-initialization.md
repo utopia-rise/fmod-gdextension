@@ -3,6 +3,7 @@
 When you first add fmod addon to your godot project, you need to setup fmod options within projects parameters.  
 Parameters are split in several categories:  
 - General  
+- Output  
 - Software Format  
 - Dsp  
 - 3d Settings  
@@ -19,8 +20,18 @@ See Studio::Bus::getMemoryUsage and Studio::EventInstance::getMemoryUsage for mo
 Implies FMOD_INIT_MEMORY_TRACKING.
 - Default Listener count: set max listener count (should be between 1 and 8).  
 - Should Load by Name: If true will load events and parameters by name instead of id when using fmod nodes.
+- "Studio Processing": Where FMOD Studio carries out your requests: on its own thread (default), or during
+`FmodServer.update()`. See [Output, latency and sync modes](10-output-and-latency.md#studio-processing).
 
 ![general-tab]
+
+## Output
+
+- "Output Routing": Where FMOD's sound goes: straight to the speakers (default), or through one of Godot's audio buses.
+- "Godot Audio Bus", "Godot Bus Mixing" and "Sync to Godot Mix Rate": With a Godot bus, the bus FMOD plays on, when FMOD
+prepares its sound, and its sample rate.
+
+See [Output, latency and sync modes](10-output-and-latency.md).
 
 ## Software Format
 

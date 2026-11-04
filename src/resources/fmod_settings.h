@@ -4,11 +4,27 @@
 #include "fmod_studio.h"
 
 #include <classes/resource.hpp>
+#include <core/binder_common.hpp>
 
 namespace godot {
     class FmodGeneralSettings : public Resource {
         GDCLASS(FmodGeneralSettings, Resource)
     public:
+        enum StudioProcessing {
+            BACKGROUND_THREAD,
+            MAIN_THREAD,
+        };
+
+        enum OutputRouting {
+            DEVICE,
+            GODOT_BUS,
+        };
+
+        enum GodotBusMixing {
+            MIX_AHEAD,
+            ON_DEMAND,
+        };
+
         void set_channel_count(const int p_channel_count);
         int get_channel_count() const;
 
@@ -27,6 +43,21 @@ namespace godot {
         void set_should_load_by_name(const bool p_should_load_by_name);
         bool get_should_load_by_name() const;
 
+        void set_studio_processing(StudioProcessing p_studio_processing);
+        StudioProcessing get_studio_processing() const;
+
+        void set_output_routing(OutputRouting p_output_routing);
+        OutputRouting get_output_routing() const;
+
+        void set_godot_bus_mixing(GodotBusMixing p_godot_bus_mixing);
+        GodotBusMixing get_godot_bus_mixing() const;
+
+        void set_sync_to_godot_mix_rate(const bool p_sync_to_godot_mix_rate);
+        bool get_sync_to_godot_mix_rate() const;
+
+        void set_godot_audio_bus(const String& p_godot_audio_bus);
+        const String& get_godot_audio_bus() const;
+
         static Ref<FmodGeneralSettings> get_from_project_settings();
 
         static constexpr const char* INITIALIZE_BASE_PATH = "General";
@@ -36,6 +67,15 @@ namespace godot {
         static constexpr const char* DEFAULT_LISTENER_COUNT_OPTION = "default_listener_count";
         static constexpr const char* BANKS_PATH_OPTION = "banks_path";
         static constexpr const char* SHOULD_LOAD_BY_NAME = "should_load_by_name";
+        static constexpr const char* STUDIO_PROCESSING_OPTION = "studio_processing";
+        static constexpr const char* STUDIO_PROCESSING_HINT = "Background Thread,Main Thread";
+        static constexpr const char* OUTPUT_BASE_PATH = "Output";
+        static constexpr const char* OUTPUT_ROUTING_OPTION = "output_routing";
+        static constexpr const char* OUTPUT_ROUTING_HINT = "Direct to Device,Godot Bus";
+        static constexpr const char* GODOT_BUS_MIXING_OPTION = "godot_bus_mixing";
+        static constexpr const char* GODOT_BUS_MIXING_HINT = "Mix Ahead,On Demand";
+        static constexpr const char* SYNC_TO_GODOT_MIX_RATE_OPTION = "sync_to_godot_mix_rate";
+        static constexpr const char* GODOT_AUDIO_BUS_OPTION = "godot_audio_bus";
 
         static constexpr const int DEFAULT_CHANNEL_COUNT = 1024;
         static constexpr const bool DEFAULT_IS_LIVEUPDATE = true;
@@ -43,6 +83,11 @@ namespace godot {
         static constexpr const int DEFAULT_DEFAULT_LISTENER_COUNT = 1;
         static constexpr const char* DEFAULT_BANKS_PATH = "res://";
         static constexpr const bool DEFAULT_SHOULD_LOAD_BY_NAME = false;
+        static constexpr const StudioProcessing DEFAULT_STUDIO_PROCESSING = BACKGROUND_THREAD;
+        static constexpr const OutputRouting DEFAULT_OUTPUT_ROUTING = DEVICE;
+        static constexpr const GodotBusMixing DEFAULT_GODOT_BUS_MIXING = MIX_AHEAD;
+        static constexpr const bool DEFAULT_SYNC_TO_GODOT_MIX_RATE = false;
+        static constexpr const char* DEFAULT_GODOT_AUDIO_BUS = "Master";
 
     private:
         int _channel_count = DEFAULT_CHANNEL_COUNT;
@@ -51,11 +96,20 @@ namespace godot {
         bool _is_memory_tracking_enabled = DEFAULT_IS_MEMORY_TRACKING;
         String _banks_path;
         bool _should_load_by_name = DEFAULT_SHOULD_LOAD_BY_NAME;
+        StudioProcessing _studio_processing = DEFAULT_STUDIO_PROCESSING;
+        OutputRouting _output_routing = DEFAULT_OUTPUT_ROUTING;
+        GodotBusMixing _godot_bus_mixing = DEFAULT_GODOT_BUS_MIXING;
+        bool _sync_to_godot_mix_rate = DEFAULT_SYNC_TO_GODOT_MIX_RATE;
+        String _godot_audio_bus = DEFAULT_GODOT_AUDIO_BUS;
 
     protected:
         static void _bind_methods();
 
     };
 }
+
+VARIANT_ENUM_CAST(FmodGeneralSettings::StudioProcessing);
+VARIANT_ENUM_CAST(FmodGeneralSettings::OutputRouting);
+VARIANT_ENUM_CAST(FmodGeneralSettings::GodotBusMixing);
 
 #endif// GODOTFMOD_FMOD_SETTINGS_H

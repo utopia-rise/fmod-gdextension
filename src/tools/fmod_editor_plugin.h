@@ -18,13 +18,19 @@ namespace godot {
         ~FmodEditorPlugin() = default;
 
     private:
+        bool godot_bus_settings_hidden = false;
+
         static void add_setting(
-          const String& p_name,
-          const Variant& p_default_value,
-          Variant::Type p_type,
-          PropertyHint p_hint = PROPERTY_HINT_NONE,
-          const String& p_hint_string = ""
+            const String& p_name,
+            const Variant& p_default_value,
+            Variant::Type p_type,
+            PropertyHint p_hint = PROPERTY_HINT_NONE,
+            const String& p_hint_string = "",
+            bool p_basic = true
         );
+        void update_godot_bus_settings_visibility();
+        void on_node_added(Node* p_node);
+        void point_tooltip_to_settings_class(uint64_t p_property_id);
 
     protected:
         static void _bind_methods();

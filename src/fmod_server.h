@@ -4,6 +4,7 @@
 #include "core/binder_common.hpp"
 #include "core/fmod_file.h"
 #include "core/fmod_sound.h"
+#include "core/object_id.hpp"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
 #include "resources/fmod_plugins_settings.h"
@@ -127,6 +128,10 @@ namespace godot {
 
         float distanceScale;
 
+        String godotAudioBus;
+        ObjectID godotOutputPlayer;
+        void play_output_on_godot_bus();
+
         FmodCache* cache;
 
         int systemListenerNumber = 1;
@@ -164,6 +169,7 @@ namespace godot {
         void init(const Ref<FmodGeneralSettings>& p_settings);
         void update();
         void shutdown();
+        String get_godot_audio_bus() const;
 
         // SETTINGS
         void set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings);

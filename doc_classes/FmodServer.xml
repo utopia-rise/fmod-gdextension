@@ -181,6 +181,12 @@
 				Returns the path for the event with the specified GUID.
 			</description>
 		</method>
+		<method name="get_godot_audio_bus" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the Godot audio bus FMOD's output plays on, or an empty string when FMOD plays to the audio device. See [member FmodGeneralSettings.output_routing].
+			</description>
+		</method>
 		<method name="get_global_parameter_by_id">
 			<return type="float" />
 			<param index="0" name="parameter_id" type="int" />
@@ -634,7 +640,7 @@
 		<method name="update">
 			<return type="void" />
 			<description>
-				Updates the FMOD system. This should be called every frame, typically in _process().
+				Updates the FMOD system. This should be called every frame, typically in _process(): the [code]FmodManager[/code] autoload does it. Calling it again right after a request that must be heard as soon as possible hands that request to FMOD at once instead of at the next frame.
 			</description>
 		</method>
 		<method name="wait_for_all_loads">
