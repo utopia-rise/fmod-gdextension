@@ -1,4 +1,5 @@
 #include "callback/audio_callbacks.h"
+#include "callback/file_callbacks_async.h"
 #include "constants.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"

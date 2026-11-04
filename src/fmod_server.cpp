@@ -1,3 +1,6 @@
+#include "callback/file_callbacks.h"
+#include "callback/file_callbacks_async.h"
+#include "callback/file_callbacks_sync.h"
 #include "classes/dir_access.hpp"
 #include "classes/engine.hpp"
 #include "classes/os.hpp"
@@ -298,9 +301,15 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
 #ifdef WEB_ENABLED
     if (ERROR_CHECK(coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, &Callbacks::godotFileRead, &Callbacks::godotFileSeek, nullptr, nullptr, -1))) {
 #else
-    if (ERROR_CHECK(
-          coreSystem->setFileSystem(&Callbacks::godotFileOpen, &Callbacks::godotFileClose, nullptr, nullptr, &Callbacks::godotSyncRead, &Callbacks::godotSyncCancel, -1)
-        )) {
+    if (ERROR_CHECK(coreSystem->setFileSystem(
+            &Callbacks::godotFileOpen,
+            &Callbacks::godotFileClose,
+            nullptr,
+            nullptr,
+            &Callbacks::godotFileAsyncRead,
+            &Callbacks::godotFileAsyncCancel,
+            -1
+        ))) {
 #endif
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }

@@ -1,11 +1,14 @@
 #ifdef TOOLS_ENABLED
 
 #include "fmod_editor_export_plugin.h"
+
 #include "fmod_server.h"
-#include <plugins/plugins_helper.h>
 
 #include <helpers/common.h>
 #include <helpers/files.h>
+#include <plugins/plugins_helper.h>
+
+#include <classes/file_access.hpp>
 
 using namespace godot;
 
