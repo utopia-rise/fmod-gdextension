@@ -7,11 +7,11 @@
 
 using namespace godot;
 
-void FmodLoggingSettings::set_debug_level(int p_debug_level) {
+void FmodLoggingSettings::set_debug_level(DebugLevel p_debug_level) {
     _debug_level = p_debug_level;
 }
 
-int FmodLoggingSettings::get_debug_level() const {
+FmodLoggingSettings::DebugLevel FmodLoggingSettings::get_debug_level() const {
     return _debug_level;
 }
 
@@ -38,11 +38,11 @@ int FmodLoggingSettings::_debug_level_to_fmod() const {
     }
 }
 
-void FmodLoggingSettings::set_log_output(int p_log_output) {
+void FmodLoggingSettings::set_log_output(DebugMode p_log_output) {
     _log_output = p_log_output;
 }
 
-int FmodLoggingSettings::get_log_output() const {
+FmodLoggingSettings::DebugMode FmodLoggingSettings::get_log_output() const {
     return _log_output;
 }
 
@@ -61,10 +61,10 @@ Ref<FmodLoggingSettings> FmodLoggingSettings::get_from_project_settings() {
     ProjectSettings* project_settings = ProjectSettings::get_singleton();
 
     String debug_level_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, LOGGING_SETTINGS_BASE_PATH, DEBUG_LEVEL_OPTION);
-    settings->set_debug_level(project_settings->get_setting(debug_level_setting_path, DEFAULT_DEBUG_LEVEL));
+    settings->set_debug_level(static_cast<DebugLevel>(static_cast<int>(project_settings->get_setting(debug_level_setting_path, DEFAULT_DEBUG_LEVEL))));
 
     String log_output_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, LOGGING_SETTINGS_BASE_PATH, LOG_OUTPUT_OPTION);
-    settings->set_log_output(project_settings->get_setting(log_output_setting_path, DEFAULT_LOG_OUTPUT));
+    settings->set_log_output(static_cast<DebugMode>(static_cast<int>(project_settings->get_setting(log_output_setting_path, DEFAULT_LOG_OUTPUT))));
 
     String log_file_path_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, LOGGING_SETTINGS_BASE_PATH, LOG_FILE_PATH_OPTION);
     settings->set_log_file_path(project_settings->get_setting(log_file_path_setting_path, DEFAULT_LOG_FILE_PATH));
@@ -84,25 +84,30 @@ void FmodLoggingSettings::_bind_methods() {
 
     // Debug level property
     ADD_PROPERTY(
-      PropertyInfo(Variant::INT, "debug_level", PROPERTY_HINT_ENUM, "None,Error Only,Error and Warning,Full Log,Verbose"),
+      PropertyInfo(Variant::INT, "debug_level", PROPERTY_HINT_ENUM, DEBUG_LEVEL_HINT, PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM, "FmodLoggingSettings.DebugLevel"),
       "set_debug_level",
       "get_debug_level"
     );
 
     // Log output property
-    ADD_PROPERTY(PropertyInfo(Variant::INT, "log_output", PROPERTY_HINT_ENUM, "TTY,Godot,File"), "set_log_output", "get_log_output");
+    ADD_PROPERTY(
+      PropertyInfo(Variant::INT, "log_output", PROPERTY_HINT_ENUM, LOG_OUTPUT_HINT, PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM, "FmodLoggingSettings.DebugMode"),
+      "set_log_output",
+      "get_log_output"
+    );
 
     // Log file path property
     ADD_PROPERTY(PropertyInfo(Variant::STRING, "log_file_path", PROPERTY_HINT_FILE, "*.txt,*.log", PROPERTY_USAGE_DEFAULT), "set_log_file_path", "get_log_file_path");
 
     // Bind enum constants
+    BIND_ENUM_CONSTANT(DEBUG_INHERIT);
     BIND_ENUM_CONSTANT(DEBUG_NONE);
     BIND_ENUM_CONSTANT(DEBUG_ERROR);
     BIND_ENUM_CONSTANT(DEBUG_WARNING);
     BIND_ENUM_CONSTANT(DEBUG_LOG);
     BIND_ENUM_CONSTANT(DEBUG_VERBOSE);
 
-    BIND_FMOD_ENUM(DebugMode, TTY, FMOD_DEBUG_MODE_TTY)
-    BIND_FMOD_ENUM(DebugMode, CALLBACK, FMOD_DEBUG_MODE_CALLBACK)
-    BIND_FMOD_ENUM(DebugMode, FILE, FMOD_DEBUG_MODE_FILE)
+    BIND_ENUM_CONSTANT(TTY);
+    BIND_ENUM_CONSTANT(FILE);
+    BIND_ENUM_CONSTANT(CALLBACK);
 }

@@ -5,7 +5,6 @@
 #include "data/performance_data.h"
 #include "fmod_logging.h"
 #include "helpers/common.h"
-#include "helpers/enum.h"
 #include "helpers/maths.h"
 #include "plugins/ios_plugins_loader.h"
 #include "plugins/plugins_helper.h"
@@ -144,31 +143,31 @@ void FmodServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
 
-    BIND_FMOD_FLAG(InitFlags, INIT_3D_RIGHTHANDED, FMOD_INIT_3D_RIGHTHANDED)
-    BIND_FMOD_FLAG(InitFlags, CHANNEL_DISTANCEFILTER, FMOD_INIT_CHANNEL_DISTANCEFILTER)
-    BIND_FMOD_FLAG(InitFlags, CHANNEL_LOWPASS, FMOD_INIT_CHANNEL_LOWPASS)
-    BIND_FMOD_FLAG(InitFlags, GEOMETRY_USECLOSEST, FMOD_INIT_GEOMETRY_USECLOSEST)
-    BIND_FMOD_FLAG(InitFlags, INIT_NORMAL, FMOD_INIT_NORMAL)
-    BIND_FMOD_FLAG(InitFlags, PREFER_DOLBY_DOWNMIX, FMOD_INIT_PREFER_DOLBY_DOWNMIX)
-    BIND_FMOD_FLAG(InitFlags, PROFILE_ENABLE, FMOD_INIT_PROFILE_ENABLE)
-    BIND_FMOD_FLAG(InitFlags, PROFILE_METER_ALL, FMOD_INIT_PROFILE_METER_ALL)
-    BIND_FMOD_FLAG(InitFlags, STREAM_FROM_UPDATE, FMOD_INIT_STREAM_FROM_UPDATE)
-    BIND_FMOD_FLAG(InitFlags, THREAD_UNSAFE, FMOD_INIT_THREAD_UNSAFE)
-    BIND_FMOD_FLAG(InitFlags, VOL0_BECOMES_VIRTUAL, FMOD_INIT_VOL0_BECOMES_VIRTUAL)
+    BIND_BITFIELD_FLAG(INIT_3D_RIGHTHANDED);
+    BIND_BITFIELD_FLAG(CHANNEL_DISTANCEFILTER);
+    BIND_BITFIELD_FLAG(CHANNEL_LOWPASS);
+    BIND_BITFIELD_FLAG(GEOMETRY_USECLOSEST);
+    BIND_BITFIELD_FLAG(INIT_NORMAL);
+    BIND_BITFIELD_FLAG(PREFER_DOLBY_DOWNMIX);
+    BIND_BITFIELD_FLAG(PROFILE_ENABLE);
+    BIND_BITFIELD_FLAG(PROFILE_METER_ALL);
+    BIND_BITFIELD_FLAG(STREAM_FROM_UPDATE);
+    BIND_BITFIELD_FLAG(THREAD_UNSAFE);
+    BIND_BITFIELD_FLAG(VOL0_BECOMES_VIRTUAL);
 
-    BIND_FMOD_FLAG(StudioInitFlags, STUDIO_INIT_NORMAL, FMOD_STUDIO_INIT_NORMAL)
-    BIND_FMOD_FLAG(StudioInitFlags, LIVEUPDATE, FMOD_STUDIO_INIT_LIVEUPDATE)
-    BIND_FMOD_FLAG(StudioInitFlags, ALLOW_MISSING_PLUGINS, FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS)
-    BIND_FMOD_FLAG(StudioInitFlags, SYNCHRONOUS_UPDATE, FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE)
-    BIND_FMOD_FLAG(StudioInitFlags, DEFERRED_CALLBACKS, FMOD_STUDIO_INIT_DEFERRED_CALLBACKS)
-    BIND_FMOD_FLAG(StudioInitFlags, LOAD_FROM_UPDATE, FMOD_STUDIO_INIT_LOAD_FROM_UPDATE)
+    BIND_BITFIELD_FLAG(STUDIO_INIT_NORMAL);
+    BIND_BITFIELD_FLAG(LIVEUPDATE);
+    BIND_BITFIELD_FLAG(ALLOW_MISSING_PLUGINS);
+    BIND_BITFIELD_FLAG(SYNCHRONOUS_UPDATE);
+    BIND_BITFIELD_FLAG(DEFERRED_CALLBACKS);
+    BIND_BITFIELD_FLAG(LOAD_FROM_UPDATE);
 
-    BIND_FMOD_FLAG(StudioSystemCallbackType, PREUPDATE, FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE)
-    BIND_FMOD_FLAG(StudioSystemCallbackType, POSTUPDATE, FMOD_STUDIO_SYSTEM_CALLBACK_POSTUPDATE)
-    BIND_FMOD_FLAG(StudioSystemCallbackType, BANK_UNLOAD, FMOD_STUDIO_SYSTEM_CALLBACK_BANK_UNLOAD)
-    BIND_FMOD_FLAG(StudioSystemCallbackType, LIVEUPDATE_CONNECTED, FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_CONNECTED)
-    BIND_FMOD_FLAG(StudioSystemCallbackType, LIVEUPDATE_DISCONNECTED, FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_DISCONNECTED)
-    BIND_FMOD_FLAG(StudioSystemCallbackType, ALL, FMOD_STUDIO_SYSTEM_CALLBACK_ALL)
+    BIND_BITFIELD_FLAG(PREUPDATE);
+    BIND_BITFIELD_FLAG(POSTUPDATE);
+    BIND_BITFIELD_FLAG(BANK_UNLOAD);
+    BIND_BITFIELD_FLAG(LIVEUPDATE_CONNECTED);
+    BIND_BITFIELD_FLAG(LIVEUPDATE_DISCONNECTED);
+    BIND_BITFIELD_FLAG(ALL);
 }
 
 FmodServer::FmodServer() :
@@ -532,12 +531,12 @@ void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_se
     }
     ERROR_CHECK(coreSystem->setSoftwareFormat(
       p_settings->get_sample_rate(),
-      static_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
+      fmod_enum_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
       p_settings->get_raw_speakers_count()
     ));
 }
 
-Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
+Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, BitField<FmodBank::StudioLoadBankFlags> flags) {
     if (cache->has_bank(pathToBank)) { return cache->get_bank(pathToBank); }// bank is already loaded
 
 #ifdef DEBUG_ENABLED
@@ -547,7 +546,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
     }
 #endif
 
-    return cache->add_bank(pathToBank, flag);
+    return cache->add_bank(pathToBank, fmod_enum_cast<FMOD_STUDIO_LOAD_BANK_FLAGS>(flags));
 }
 
 void FmodServer::unload_bank(const String& pathToBank) {

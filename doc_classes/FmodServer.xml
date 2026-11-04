@@ -336,7 +336,7 @@
 		<method name="load_bank">
 			<return type="FmodBank" />
 			<param index="0" name="bank_path" type="String" />
-			<param index="1" name="flags" type="int" />
+			<param index="1" name="flags" type="int" enum="FmodBank.StudioLoadBankFlags" is_bitfield="true" />
 			<description>
 				Loads an FMOD bank file from the specified path. The flag parameter controls loading behavior (synchronous, asynchronous, etc.).
 			</description>

@@ -19,22 +19,22 @@ void FmodBank::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_path"), &FmodBank::get_path);
     ClassDB::bind_method(D_METHOD("get_guid"), &FmodBank::get_guid_as_string);
 
-    BIND_FMOD_ENUM(StudioLoadingState, UNLOADING, FMOD_STUDIO_LOADING_STATE_UNLOADING)
-    BIND_FMOD_ENUM(StudioLoadingState, UNLOADED, FMOD_STUDIO_LOADING_STATE_UNLOADED)
-    BIND_FMOD_ENUM(StudioLoadingState, LOADING, FMOD_STUDIO_LOADING_STATE_LOADING)
-    BIND_FMOD_ENUM(StudioLoadingState, LOADED, FMOD_STUDIO_LOADING_STATE_LOADED)
-    BIND_FMOD_ENUM(StudioLoadingState, ERROR, FMOD_STUDIO_LOADING_STATE_ERROR)
+    BIND_ENUM_CONSTANT(UNLOADING);
+    BIND_ENUM_CONSTANT(UNLOADED);
+    BIND_ENUM_CONSTANT(LOADING);
+    BIND_ENUM_CONSTANT(LOADED);
+    BIND_ENUM_CONSTANT(ERROR);
 
-    BIND_FMOD_FLAG(StudioLoadBankFlags, NORMAL, FMOD_STUDIO_LOAD_BANK_NORMAL)
-    BIND_FMOD_FLAG(StudioLoadBankFlags, NONBLOCKING, FMOD_STUDIO_LOAD_BANK_NONBLOCKING)
-    BIND_FMOD_FLAG(StudioLoadBankFlags, DECOMPRESS_SAMPLES, FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES)
+    BIND_BITFIELD_FLAG(NORMAL);
+    BIND_BITFIELD_FLAG(NONBLOCKING);
+    BIND_BITFIELD_FLAG(DECOMPRESS_SAMPLES);
 }
 
-FMOD_STUDIO_LOADING_STATE FmodBank::get_loading_state() {
+FmodBank::StudioLoadingState FmodBank::get_loading_state() {
     FMOD_STUDIO_LOADING_STATE state = FMOD_STUDIO_LOADING_STATE_ERROR;
 
     ERROR_CHECK_WITH_REASON(_wrapped->getLoadingState(&state), vformat("Cannot get loading state for bank %s", get_path()));
-    return state;
+    return fmod_enum_cast<StudioLoadingState>(state);
 }
 
 int64_t FmodBank::get_bus_count() {

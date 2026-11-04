@@ -29,6 +29,12 @@
 
 #define ERROR_CHECK(_result) ((_result) == FMOD_OK)
 
+// Fmod enums and bitfields take FMOD's constants as values: converting between one and its FMOD type keeps the value.
+template<class TTarget, class TSource>
+inline TTarget fmod_enum_cast(TSource p_value) {
+    return static_cast<TTarget>(static_cast<int64_t>(p_value));
+}
+
 #define FMODCLASS(m_class, m_inherits, m_owned)               \
     GDCLASS(m_class, m_inherits)                              \
                                                               \

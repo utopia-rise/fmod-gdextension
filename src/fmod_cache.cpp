@@ -20,12 +20,12 @@ void FmodCache::update_pending() {
     if (loading_banks.size() == 0) { return; }
     List<Ref<FmodBank>> to_delete;
     for (const Ref<FmodBank>& loading_bank : loading_banks) {
-        int loading_state = loading_bank->get_loading_state();
-        if (loading_state == FMOD_STUDIO_LOADING_STATE_LOADED) {
+        FmodBank::StudioLoadingState loading_state = loading_bank->get_loading_state();
+        if (loading_state == FmodBank::LOADED) {
             _get_bank_data(loading_bank);
             banks[loading_bank->get_godot_res_path()] = loading_bank.ptr();
             to_delete.push_back(loading_bank);
-        } else if (loading_state == FMOD_STUDIO_LOADING_STATE_ERROR) {
+        } else if (loading_state == FmodBank::ERROR) {
             to_delete.push_back(loading_bank);
             GODOT_LOG_ERROR("Fmod Sound System: Error loading bank.")
         }

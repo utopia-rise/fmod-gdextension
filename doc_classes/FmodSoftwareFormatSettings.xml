@@ -11,7 +11,7 @@
 		</member>
 		<member name="sample_rate" type="int" setter="set_sample_rate" getter="get_sample_rate" default="48000">
 		</member>
-		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" default="3">
+		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" enum="FmodSoftwareFormatSettings.SpeakerMode" default="3">
 		</member>
 	</members>
 	<constants>

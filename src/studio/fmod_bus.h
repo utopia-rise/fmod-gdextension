@@ -20,7 +20,7 @@ namespace godot {
         void set_mute(bool mute) const;
         void set_paused(bool paused) const;
         void set_volume(float volume) const;
-        void stop_all_events(FMOD_STUDIO_STOP_MODE stop_mode);
+        void stop_all_events(FmodEvent::StudioStopMode stop_mode);
 
         protected:
             static void _bind_methods();

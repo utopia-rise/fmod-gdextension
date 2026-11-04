@@ -2,6 +2,7 @@
 
 #include <classes/project_settings.hpp>
 #include <fmod.hpp>
+#include <helpers/common.h>
 #include <sstream>
 #include <variant/string.hpp>
 #include <variant/utility_functions.hpp>
@@ -15,7 +16,7 @@ namespace godot {
 
         if (p_logging_settings.is_valid()) {
             unsigned int debug_flags = p_logging_settings->_debug_level_to_fmod();
-            FMOD_DEBUG_MODE log_output = static_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
+            FMOD_DEBUG_MODE log_output = fmod_enum_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
 
             switch (log_output) {
                 case FMOD_DEBUG_MODE_TTY: {

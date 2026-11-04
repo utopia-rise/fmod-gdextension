@@ -2,12 +2,12 @@
 #define GODOTFMOD_FMOD_BANK_H
 
 #include "classes/ref_counted.hpp"
+#include "core/binder_common.hpp"
 #include "fmod_bus.h"
 #include "fmod_event_description.h"
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
-#include "helpers/enum.h"
 
 namespace godot {
     class FmodBank : public RefCounted {
@@ -23,10 +23,24 @@ namespace godot {
         void load_all_event_descriptions();
 
     public:
+        enum StudioLoadingState {
+            UNLOADING = FMOD_STUDIO_LOADING_STATE_UNLOADING,
+            UNLOADED = FMOD_STUDIO_LOADING_STATE_UNLOADED,
+            LOADING = FMOD_STUDIO_LOADING_STATE_LOADING,
+            LOADED = FMOD_STUDIO_LOADING_STATE_LOADED,
+            ERROR = FMOD_STUDIO_LOADING_STATE_ERROR,
+        };
+
+        enum StudioLoadBankFlags : uint32_t {
+            NORMAL = FMOD_STUDIO_LOAD_BANK_NORMAL,
+            NONBLOCKING = FMOD_STUDIO_LOAD_BANK_NONBLOCKING,
+            DECOMPRESS_SAMPLES = FMOD_STUDIO_LOAD_BANK_DECOMPRESS_SAMPLES,
+        };
+
         FmodBank() = default;
         ~FmodBank() override;
 
-        FMOD_STUDIO_LOADING_STATE get_loading_state();
+        StudioLoadingState get_loading_state();
 
         int64_t get_event_description_count();
         int64_t get_bus_count();
@@ -56,6 +70,7 @@ namespace godot {
     };
 }// namespace godot
 
-FMOD_ENUM_CAST(FmodBank, FMOD_STUDIO_LOADING_STATE, StudioLoadingState)
+VARIANT_BITFIELD_CAST(FmodBank::StudioLoadBankFlags);
+VARIANT_ENUM_CAST(FmodBank::StudioLoadingState);
 
 #endif// GODOTFMOD_FMOD_BANK_H

@@ -70,3 +70,34 @@ func test_assert_new_objects_start_from_their_defaults():
 	assert_int(FmodSoftwareFormatSettings.new().raw_speakers_count).is_equal(0)
 	assert_int(FmodDspSettings.new().dsp_buffer_size).is_equal(512)
 	assert_int(FmodGeneralSettings.new().channel_count).is_equal(1024)
+
+func _method(name: String, method_name: String) -> Dictionary:
+	for method in ClassDB.class_get_method_list(name, true):
+		if method["name"] == method_name:
+			return method
+	return {}
+
+func _property(name: String, property_name: String) -> Dictionary:
+	for property in ClassDB.class_get_property_list(name, true):
+		if property["name"] == property_name:
+			return property
+	return {}
+
+func test_assert_flag_arguments_are_bitfields():
+	var flags: Dictionary = _method("FmodServer", "load_bank")["args"][1]
+	assert_bool(bool(flags["usage"] & PROPERTY_USAGE_CLASS_IS_BITFIELD)).is_true()
+	assert_str(flags["class_name"]).is_equal("FmodBank.StudioLoadBankFlags")
+	var mask: Dictionary = _method("FmodEvent", "set_callback")["args"][1]
+	assert_bool(bool(mask["usage"] & PROPERTY_USAGE_CLASS_IS_BITFIELD)).is_true()
+	assert_str(mask["class_name"]).is_equal("FmodEvent.StudioEventCallbackType")
+
+func test_assert_enum_properties_label_their_values():
+	var cases := [
+		["FmodSoftwareFormatSettings", "speaker_mode", "FmodSoftwareFormatSettings.SpeakerMode", FmodSoftwareFormatSettings.SpeakerMode.STEREO, "STEREO"],
+		["FmodLoggingSettings", "log_output", "FmodLoggingSettings.DebugMode", FmodLoggingSettings.DebugMode.CALLBACK, "Godot"],
+		["FmodLoggingSettings", "debug_level", "FmodLoggingSettings.DebugLevel", FmodLoggingSettings.DebugLevel.DEBUG_VERBOSE, "Verbose"],
+	]
+	for case in cases:
+		var property := _property(case[0], case[1])
+		assert_str(property["class_name"]).is_equal(case[2])
+		assert_str(property["hint_string"].split(",")[case[3]]).override_failure_message("%s.%s labels value %d wrongly" % [case[0], case[1], case[3]]).is_equal(case[4])

@@ -7,14 +7,16 @@
 	<tutorials>
 	</tutorials>
 	<members>
-		<member name="debug_level" type="int" setter="set_debug_level" getter="get_debug_level" default="0">
+		<member name="debug_level" type="int" setter="set_debug_level" getter="get_debug_level" enum="FmodLoggingSettings.DebugLevel" default="0">
 		</member>
 		<member name="log_file_path" type="String" setter="set_log_file_path" getter="get_log_file_path" default="&quot;&quot;">
 		</member>
-		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" default="2">
+		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" enum="FmodLoggingSettings.DebugMode" default="2">
 		</member>
 	</members>
 	<constants>
+		<constant name="DEBUG_INHERIT" value="0" enum="DebugLevel">
+		</constant>
 		<constant name="DEBUG_NONE" value="1" enum="DebugLevel">
 		</constant>
 		<constant name="DEBUG_ERROR" value="2" enum="DebugLevel">
@@ -27,9 +29,9 @@
 		</constant>
 		<constant name="TTY" value="0" enum="DebugMode">
 		</constant>
-		<constant name="CALLBACK" value="2" enum="DebugMode">
-		</constant>
 		<constant name="FILE" value="1" enum="DebugMode">
+		</constant>
+		<constant name="CALLBACK" value="2" enum="DebugMode">
 		</constant>
 	</constants>
 </class>

@@ -96,7 +96,7 @@
 		<method name="set_callback">
 			<return type="void" />
 			<param index="0" name="callback" type="Callable" />
-			<param index="1" name="callback_mask" type="int" />
+			<param index="1" name="callback_mask" type="int" enum="FmodEvent.StudioEventCallbackType" is_bitfield="true" />
 			<description>
 				Sets a callback function to receive event notifications. The mask determines which types of callbacks to receive.
 			</description>

@@ -52,35 +52,35 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_3d_attributes", "get_3d_attributes");
 
-    BIND_FMOD_ENUM(StudioStopMode, ALLOWFADEOUT, FMOD_STUDIO_STOP_ALLOWFADEOUT)
-    BIND_FMOD_ENUM(StudioStopMode, IMMEDIATE, FMOD_STUDIO_STOP_IMMEDIATE)
+    BIND_ENUM_CONSTANT(ALLOWFADEOUT);
+    BIND_ENUM_CONSTANT(IMMEDIATE);
 
-    BIND_FMOD_ENUM(StudioPlaybackState, PLAYING, FMOD_STUDIO_PLAYBACK_PLAYING)
-    BIND_FMOD_ENUM(StudioPlaybackState, SUSTAINING, FMOD_STUDIO_PLAYBACK_SUSTAINING)
-    BIND_FMOD_ENUM(StudioPlaybackState, PLAYBACK_STOPPED, FMOD_STUDIO_PLAYBACK_STOPPED)
-    BIND_FMOD_ENUM(StudioPlaybackState, PLAYBACK_STARTING, FMOD_STUDIO_PLAYBACK_STARTING)
-    BIND_FMOD_ENUM(StudioPlaybackState, STOPPING, FMOD_STUDIO_PLAYBACK_STOPPING)
+    BIND_ENUM_CONSTANT(PLAYING);
+    BIND_ENUM_CONSTANT(SUSTAINING);
+    BIND_ENUM_CONSTANT(PLAYBACK_STOPPED);
+    BIND_ENUM_CONSTANT(PLAYBACK_STARTING);
+    BIND_ENUM_CONSTANT(STOPPING);
 
-    BIND_FMOD_FLAG(StudioEventCallbackType, CREATED, FMOD_STUDIO_EVENT_CALLBACK_CREATED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, DESTROYED, FMOD_STUDIO_EVENT_CALLBACK_DESTROYED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, CALLBACK_STARTING, FMOD_STUDIO_EVENT_CALLBACK_STARTING)
-    BIND_FMOD_FLAG(StudioEventCallbackType, STARTED, FMOD_STUDIO_EVENT_CALLBACK_STARTED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, RESTARTED, FMOD_STUDIO_EVENT_CALLBACK_RESTARTED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, CALLBACK_STOPPED, FMOD_STUDIO_EVENT_CALLBACK_STOPPED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, START_FAILED, FMOD_STUDIO_EVENT_CALLBACK_START_FAILED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, CREATE_PROGRAMMER_SOUND, FMOD_STUDIO_EVENT_CALLBACK_CREATE_PROGRAMMER_SOUND)
-    BIND_FMOD_FLAG(StudioEventCallbackType, DESTROY_PROGRAMMER_SOUND, FMOD_STUDIO_EVENT_CALLBACK_DESTROY_PROGRAMMER_SOUND)
-    BIND_FMOD_FLAG(StudioEventCallbackType, PLUGIN_CREATED, FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_CREATED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, PLUGIN_DESTROYED, FMOD_STUDIO_EVENT_CALLBACK_PLUGIN_DESTROYED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, TIMELINE_MARKER, FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_MARKER)
-    BIND_FMOD_FLAG(StudioEventCallbackType, TIMELINE_BEAT, FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT)
-    BIND_FMOD_FLAG(StudioEventCallbackType, SOUND_PLAYED, FMOD_STUDIO_EVENT_CALLBACK_SOUND_PLAYED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, SOUND_STOPPED, FMOD_STUDIO_EVENT_CALLBACK_SOUND_STOPPED)
-    BIND_FMOD_FLAG(StudioEventCallbackType, REAL_TO_VIRTUAL, FMOD_STUDIO_EVENT_CALLBACK_REAL_TO_VIRTUAL)
-    BIND_FMOD_FLAG(StudioEventCallbackType, VIRTUAL_TO_REAL, FMOD_STUDIO_EVENT_CALLBACK_VIRTUAL_TO_REAL)
-    BIND_FMOD_FLAG(StudioEventCallbackType, START_EVENT_COMMAND, FMOD_STUDIO_EVENT_CALLBACK_START_EVENT_COMMAND)
-    BIND_FMOD_FLAG(StudioEventCallbackType, NESTED_TIMELINE_BEAT, FMOD_STUDIO_EVENT_CALLBACK_NESTED_TIMELINE_BEAT)
-    BIND_FMOD_FLAG(StudioEventCallbackType, ALL, FMOD_STUDIO_EVENT_CALLBACK_ALL)
+    BIND_BITFIELD_FLAG(CREATED);
+    BIND_BITFIELD_FLAG(DESTROYED);
+    BIND_BITFIELD_FLAG(CALLBACK_STARTING);
+    BIND_BITFIELD_FLAG(STARTED);
+    BIND_BITFIELD_FLAG(RESTARTED);
+    BIND_BITFIELD_FLAG(CALLBACK_STOPPED);
+    BIND_BITFIELD_FLAG(START_FAILED);
+    BIND_BITFIELD_FLAG(CREATE_PROGRAMMER_SOUND);
+    BIND_BITFIELD_FLAG(DESTROY_PROGRAMMER_SOUND);
+    BIND_BITFIELD_FLAG(PLUGIN_CREATED);
+    BIND_BITFIELD_FLAG(PLUGIN_DESTROYED);
+    BIND_BITFIELD_FLAG(TIMELINE_MARKER);
+    BIND_BITFIELD_FLAG(TIMELINE_BEAT);
+    BIND_BITFIELD_FLAG(SOUND_PLAYED);
+    BIND_BITFIELD_FLAG(SOUND_STOPPED);
+    BIND_BITFIELD_FLAG(REAL_TO_VIRTUAL);
+    BIND_BITFIELD_FLAG(VIRTUAL_TO_REAL);
+    BIND_BITFIELD_FLAG(START_EVENT_COMMAND);
+    BIND_BITFIELD_FLAG(NESTED_TIMELINE_BEAT);
+    BIND_BITFIELD_FLAG(ALL);
 }
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
@@ -151,18 +151,18 @@ void FmodEvent::start() const {
     ERROR_CHECK(_wrapped->start());
 }
 
-void FmodEvent::stop(FMOD_STUDIO_STOP_MODE stop_mode) const {
-    ERROR_CHECK(_wrapped->stop(stop_mode));
+void FmodEvent::stop(StudioStopMode stop_mode) const {
+    ERROR_CHECK(_wrapped->stop(fmod_enum_cast<FMOD_STUDIO_STOP_MODE>(stop_mode)));
 }
 
 void FmodEvent::event_key_off() const {
     ERROR_CHECK(_wrapped->keyOff());
 }
 
-FMOD_STUDIO_PLAYBACK_STATE FmodEvent::get_playback_state() const {
-    FMOD_STUDIO_PLAYBACK_STATE playback_state;
+FmodEvent::StudioPlaybackState FmodEvent::get_playback_state() const {
+    FMOD_STUDIO_PLAYBACK_STATE playback_state = FMOD_STUDIO_PLAYBACK_STOPPED;
     ERROR_CHECK(_wrapped->getPlaybackState(&playback_state));
-    return playback_state;
+    return fmod_enum_cast<StudioPlaybackState>(playback_state);
 }
 
 bool FmodEvent::get_paused() const {
@@ -273,10 +273,10 @@ void FmodEvent::set_node_attributes(Node* node) const {
     GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
 }
 
-void FmodEvent::set_callback(const Callable& callback, uint32_t p_callback_mask) {
+void FmodEvent::set_callback(const Callable& callback, BitField<StudioEventCallbackType> p_callback_mask) {
     eventCallback = callback;
-    callback_mask = p_callback_mask;
-    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, p_callback_mask));
+    callback_mask = fmod_enum_cast<FMOD_STUDIO_EVENT_CALLBACK_TYPE>(p_callback_mask);
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, callback_mask));
 }
 
 void FmodEvent::set_programmer_callback(const String& p_programmers_callback_sound_key) {

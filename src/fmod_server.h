@@ -1,6 +1,7 @@
 #ifndef GODOTFMOD_FMOD_SERVER_H
 #define GODOTFMOD_FMOD_SERVER_H
 
+#include "core/binder_common.hpp"
 #include "core/fmod_file.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
@@ -58,6 +59,38 @@ namespace godot {
         static FmodServer* singleton;
 
     public:
+        enum InitFlags : uint32_t {
+            INIT_3D_RIGHTHANDED = FMOD_INIT_3D_RIGHTHANDED,
+            CHANNEL_DISTANCEFILTER = FMOD_INIT_CHANNEL_DISTANCEFILTER,
+            CHANNEL_LOWPASS = FMOD_INIT_CHANNEL_LOWPASS,
+            GEOMETRY_USECLOSEST = FMOD_INIT_GEOMETRY_USECLOSEST,
+            INIT_NORMAL = FMOD_INIT_NORMAL,
+            PREFER_DOLBY_DOWNMIX = FMOD_INIT_PREFER_DOLBY_DOWNMIX,
+            PROFILE_ENABLE = FMOD_INIT_PROFILE_ENABLE,
+            PROFILE_METER_ALL = FMOD_INIT_PROFILE_METER_ALL,
+            STREAM_FROM_UPDATE = FMOD_INIT_STREAM_FROM_UPDATE,
+            THREAD_UNSAFE = FMOD_INIT_THREAD_UNSAFE,
+            VOL0_BECOMES_VIRTUAL = FMOD_INIT_VOL0_BECOMES_VIRTUAL,
+        };
+
+        enum StudioInitFlags : uint32_t {
+            STUDIO_INIT_NORMAL = FMOD_STUDIO_INIT_NORMAL,
+            LIVEUPDATE = FMOD_STUDIO_INIT_LIVEUPDATE,
+            ALLOW_MISSING_PLUGINS = FMOD_STUDIO_INIT_ALLOW_MISSING_PLUGINS,
+            SYNCHRONOUS_UPDATE = FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE,
+            DEFERRED_CALLBACKS = FMOD_STUDIO_INIT_DEFERRED_CALLBACKS,
+            LOAD_FROM_UPDATE = FMOD_STUDIO_INIT_LOAD_FROM_UPDATE,
+        };
+
+        enum StudioSystemCallbackType : uint32_t {
+            PREUPDATE = FMOD_STUDIO_SYSTEM_CALLBACK_PREUPDATE,
+            POSTUPDATE = FMOD_STUDIO_SYSTEM_CALLBACK_POSTUPDATE,
+            BANK_UNLOAD = FMOD_STUDIO_SYSTEM_CALLBACK_BANK_UNLOAD,
+            LIVEUPDATE_CONNECTED = FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_CONNECTED,
+            LIVEUPDATE_DISCONNECTED = FMOD_STUDIO_SYSTEM_CALLBACK_LIVEUPDATE_DISCONNECTED,
+            ALL = FMOD_STUDIO_SYSTEM_CALLBACK_ALL,
+        };
+
         union EventIdentifier {
             const char* string_identifier;
             FMOD_GUID guid;
@@ -200,7 +233,7 @@ namespace godot {
         Object* get_object_attached_to_listener(int index);
 
         // BANKS
-        Ref<FmodBank> load_bank(const String& pathToBank, unsigned int flag);
+        Ref<FmodBank> load_bank(const String& pathToBank, BitField<FmodBank::StudioLoadBankFlags> flags);
         void unload_bank(const String& pathToBank);
         bool banks_still_loading();
 
@@ -357,5 +390,9 @@ namespace godot {
         }
     }
 }// namespace godot
+
+VARIANT_BITFIELD_CAST(FmodServer::InitFlags);
+VARIANT_BITFIELD_CAST(FmodServer::StudioInitFlags);
+VARIANT_BITFIELD_CAST(FmodServer::StudioSystemCallbackType);
 
 #endif// GODOTFMOD_FMOD_SERVER_H

@@ -223,11 +223,11 @@ namespace godot {
     void FmodEventEmitter<Derived, NodeType>::stop() {
         if (_event.is_null() || !_event->is_valid()) { return; }
         if (_allow_fadeout) {
-            _event->stop(FMOD_STUDIO_STOP_ALLOWFADEOUT);
+            _event->stop(FmodEvent::ALLOWFADEOUT);
 
             return;
         }
-        _event->stop(FMOD_STUDIO_STOP_IMMEDIATE);
+        _event->stop(FmodEvent::IMMEDIATE);
     }
 
     template<class Derived, class NodeType>
@@ -260,7 +260,7 @@ namespace godot {
             event->set_programmer_callback(_programmer_callback_sound_key);
         }
 
-        if (!should_start_event && event->get_playback_state() != FMOD_STUDIO_PLAYBACK_STOPPED) { return; }
+        if (!should_start_event && event->get_playback_state() != FmodEvent::PLAYBACK_STOPPED) { return; }
 
         event->start();
         event->release();
@@ -387,7 +387,7 @@ namespace godot {
 
         if (_event.is_null()) { return; }
 
-        _event->set_callback(Callable(this, "_emit_callbacks"), FMOD_STUDIO_EVENT_CALLBACK_ALL);
+        _event->set_callback(Callable(this, "_emit_callbacks"), FmodEvent::ALL);
     }
 
     template<class Derived, class NodeType>

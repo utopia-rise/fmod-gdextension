@@ -52,7 +52,7 @@ void FmodBus::set_volume(float volume) const {
     ERROR_CHECK_WITH_REASON(_wrapped->setVolume(volume), vformat("Cannot set bus %s volume to %f", get_path(), volume));
 }
 
-void FmodBus::stop_all_events(FMOD_STUDIO_STOP_MODE stop_mode) {
-    ERROR_CHECK_WITH_REASON(_wrapped->stopAllEvents(stop_mode),
+void FmodBus::stop_all_events(FmodEvent::StudioStopMode stop_mode) {
+    ERROR_CHECK_WITH_REASON(_wrapped->stopAllEvents(fmod_enum_cast<FMOD_STUDIO_STOP_MODE>(stop_mode)),
                             vformat("Cannot stop all bus %s events", get_path()));
 }

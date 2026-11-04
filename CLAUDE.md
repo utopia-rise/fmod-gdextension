@@ -112,7 +112,7 @@ Build `target=editor` with `debug_symbols=yes` (SConstruct always adds `/Zi` on 
 - **`callback/`** — namespace `Callbacks`: FMOD event callbacks, and the file system callbacks that route FMOD's file reads through Godot's `FileAccess`, so banks load from `res://` and from exported packs alike.
 - **`tools/`** — editor only (`TOOLS_ENABLED`): `FmodEditorPlugin`; `FmodEditorExportPlugin` packs banks and audio files into exports (per-preset `fmod/auto_export_banks` option) and FMOD plugin libraries per platform, generating the static registration code on iOS.
 - **`plugins/`** — loading FMOD plugin libraries, dynamic or static (iOS).
-- **`helpers/`** — logging and FMOD error macros, `FMODCLASS`, constants, transform conversions (`maths.h`) and file listing.
+- **`helpers/`** — logging and FMOD error macros, `FMODCLASS`, `fmod_enum_cast` (converts between the classes' enums, declared with FMOD's constants as values, and FMOD's own types), transform conversions (`maths.h`) and file listing.
 
 ### Editor addon (`demo/addons/fmod/`)
 
