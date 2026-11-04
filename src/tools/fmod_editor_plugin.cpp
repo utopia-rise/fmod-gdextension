@@ -2,145 +2,109 @@
 
 #include "fmod_editor_plugin.h"
 
-#include "fmod_editor_export_plugin.h"
-#include "classes/os.hpp"
 #include "resources/fmod_plugins_settings.h"
 
 #include <constants.h>
-#include <fmod_server.h>
-#include <helpers/common.h>
-#include <helpers/files.h>
-#include <resources/fmod_dsp_settings.h>
 #include <resources/fmod_settings.h>
-#include <resources/fmod_software_format_settings.h>
-#include <resources/fmod_sound_3d_settings.h>
-#include <resources/fmod_logging_settings.h>
 
 #include <classes/project_settings.hpp>
+#include <core/object.hpp>
+#include <variant/typed_array.hpp>
 
 using namespace godot;
 
+static String get_setting_path(const char* p_option) {
+    return vformat("%s/%s", FMOD_SETTINGS_BASE_PATH, p_option);
+}
+
+static bool move_old_setting(const char* p_old_option, const char* p_option) {
+    ProjectSettings* project_settings = ProjectSettings::get_singleton();
+    if (!project_settings->has_setting(get_setting_path(p_old_option))) { return false; }
+    project_settings->set_setting(
+        get_setting_path(p_option),
+        project_settings->get_setting(get_setting_path(p_old_option))
+    );
+    project_settings->set_setting(get_setting_path(p_old_option), Variant());
+    return true;
+}
+
 void FmodEditorPlugin::_ready() {
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FMOD_SETTING_AUTO_INITIALIZE),
-      DEFAULT_AUTO_INITIALIZE,
-      Variant::Type::BOOL
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::CHANNEL_COUNT_OPTION),
-      FmodGeneralSettings::DEFAULT_CHANNEL_COUNT,
-      Variant::Type::INT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::IS_LIVE_UPDATE_ENABLED_OPTION),
-      FmodGeneralSettings::DEFAULT_IS_LIVEUPDATE,
-      Variant::Type::BOOL
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::IS_LIVE_MEMORY_TRACKING_ENABLED_OPTION),
-      FmodGeneralSettings::DEFAULT_IS_MEMORY_TRACKING,
-      Variant::Type::BOOL
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SOFTWARE_FORMAT_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SAMPLE_RATE_OPTION),
-      FmodSoftwareFormatSettings::DEFAULT_SAMPLE_RATE,
-      Variant::Type::INT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SOFTWARE_FORMAT_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SPEAKER_MODE_OPTION),
-      FmodSoftwareFormatSettings::DEFAULT_SPEAKER_MODE,
-      Variant::Type::INT,
-      PROPERTY_HINT_ENUM,
-      FmodSoftwareFormatSettings::SPEAKER_MODE_HINT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SOFTWARE_FORMAT_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::RAW_SPEAKER_COUNT_OPTION),
-      FmodSoftwareFormatSettings::DEFAULT_RAW_SPEAKER_COUNT,
-      Variant::Type::INT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::DEFAULT_LISTENER_COUNT_OPTION),
-      FmodGeneralSettings::DEFAULT_DEFAULT_LISTENER_COUNT,
-      Variant::Type::INT
-    );
+    ProjectSettings* project_settings = ProjectSettings::get_singleton();
+    Ref<FmodSettings> defaults;
+    defaults.instantiate();
 
-    String bank_path_option_name =
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::BANKS_PATH_OPTION);
+    bool moved = false;
+    for (const FmodProjectSetting& setting : FmodSettings::PROJECT_SETTINGS) {
+        if (setting.old_path) { moved |= move_old_setting(setting.old_path, setting.path); }
+    }
+    moved |= move_old_setting("Plugins/path_to_plugin_configuration", FmodPluginsSettings::RESOURCE_OPTION);
+    if (moved) { project_settings->save(); }
 
-    add_setting(bank_path_option_name,
-      FmodGeneralSettings::DEFAULT_BANKS_PATH,
-      Variant::Type::STRING,
-      PROPERTY_HINT_DIR
-    );
+    String auto_initialize = get_setting_path(FMOD_SETTING_AUTO_INITIALIZE);
+    add_setting(auto_initialize, DEFAULT_AUTO_INITIALIZE, Variant::BOOL);
+    // Project Settings lists settings in creation order, which differs between new projects and projects that saved
+    // some.
+    int order = project_settings->get_order(auto_initialize);
+    Dictionary properties;
+    TypedArray<Dictionary> property_list = defaults->get_property_list();
+    for (int i = 0; i < property_list.size(); ++i) {
+        Dictionary property = property_list[i];
+        properties[property["name"]] = property;
+    }
+    for (const FmodProjectSetting& setting : FmodSettings::PROJECT_SETTINGS) {
+        String path = get_setting_path(setting.path);
+        Dictionary property = properties[setting.property];
+        add_setting(
+            path,
+            defaults->get(setting.property),
+            static_cast<Variant::Type>(static_cast<int>(property["type"])),
+            static_cast<PropertyHint>(static_cast<int>(property["hint"])),
+            property["hint_string"],
+            setting.basic
+        );
+        project_settings->set_order(path, ++order);
+    }
+    String plugins = get_setting_path(FmodPluginsSettings::RESOURCE_OPTION);
+    add_setting(plugins, FmodPluginsSettings::DEFAULT_RESOURCE_OPTION, Variant::STRING, PROPERTY_HINT_FILE);
+    project_settings->set_order(plugins, ++order);
 
-    add_setting(
-            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodPluginsSettings::PLUGINS_SETTINGS_BASE_PATH, FmodPluginsSettings::RESOURCE_OPTION),
-        FmodPluginsSettings::DEFAULT_RESOURCE_OPTION,
-        Variant::Type::STRING,
-        PROPERTY_HINT_FILE
-    );
-
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME),
-      FmodGeneralSettings::DEFAULT_SHOULD_LOAD_BY_NAME,
-      Variant::Type::BOOL
-    );
-
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodDspSettings::DSP_SETTINGS_BASE_PATH, FmodDspSettings::DSP_BUFFER_SIZE_OPTION),
-      FmodDspSettings::DEFAULT_DSP_BUFFER_SIZE,
-      Variant::Type::INT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodDspSettings::DSP_SETTINGS_BASE_PATH, FmodDspSettings::DSP_BUFFER_COUNT_OPTION),
-      FmodDspSettings::DEFAULT_DSP_BUFFER_COUNT,
-      Variant::Type::INT
-    );
-
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSound3DSettings::THREE_D_SETTINGS_BASE_PATH, FmodSound3DSettings::DOPPLER_SCALE_OPTION),
-      FmodSound3DSettings::DEFAULT_DOPPLER_SCALE,
-      Variant::Type::FLOAT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSound3DSettings::THREE_D_SETTINGS_BASE_PATH, FmodSound3DSettings::DISTANCE_FACTOR_OPTION),
-      FmodSound3DSettings::DEFAULT_DISTANCE_FACTOR,
-      Variant::Type::FLOAT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSound3DSettings::THREE_D_SETTINGS_BASE_PATH, FmodSound3DSettings::ROLLOFF_SCALE_OPTION),
-      FmodSound3DSettings::DEFAULT_ROLLOFF_SCALE,
-      Variant::Type::FLOAT
-    );
-    add_setting(
-    vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::DEBUG_LEVEL_OPTION),
-    FmodLoggingSettings::DEFAULT_DEBUG_LEVEL,
-    Variant::Type::INT,
-    PROPERTY_HINT_ENUM,
-    FmodLoggingSettings::DEBUG_LEVEL_HINT
-  );
-  add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_OUTPUT_OPTION),
-      FmodLoggingSettings::DEFAULT_LOG_OUTPUT,
-      Variant::Type::INT,
-      PROPERTY_HINT_ENUM,
-      FmodLoggingSettings::LOG_OUTPUT_HINT
-    );
-    add_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_FILE_PATH_OPTION),
-      FmodLoggingSettings::DEFAULT_LOG_FILE_PATH,
-      Variant::Type::STRING,
-      PROPERTY_HINT_FILE,
-      "*.txt,*.log"
+    update_godot_bus_settings_visibility();
+    project_settings->connect(
+        "settings_changed",
+        callable_mp(this, &FmodEditorPlugin::update_godot_bus_settings_visibility)
     );
 }
 
+void FmodEditorPlugin::update_godot_bus_settings_visibility() {
+    ProjectSettings* project_settings = ProjectSettings::get_singleton();
+    int output_routing =
+        project_settings->get_setting(get_setting_path(FmodSettings::OUTPUT_ROUTING_OPTION), FmodSettings::DEVICE);
+    bool hidden = output_routing != FmodSettings::GODOT_BUS;
+    if (hidden == godot_bus_settings_hidden) { return; }
+    godot_bus_settings_hidden = hidden;
+
+    for (const char* option :
+         {FmodSettings::GODOT_AUDIO_BUS_OPTION,
+          FmodSettings::GODOT_BUS_MIXING_OPTION,
+          FmodSettings::SYNC_TO_GODOT_MIX_RATE_OPTION}) {
+        project_settings->set_as_internal(get_setting_path(option), hidden);
+    }
+
+    // The Project Settings dialog rereads which settings it shows only when it rebuilds its sections.
+    TypedArray<Node> inspectors =
+        get_node_or_null(NodePath("/root"))->find_children("*", "SectionedInspector", true, false);
+    for (int i = 0; i < inspectors.size(); ++i) {
+        Object::cast_to<Node>(inspectors[i])->call("update_category_list");
+    }
+}
+
 void FmodEditorPlugin::add_setting(
-  const String& p_name,
-  const Variant& p_default_value,
-  Variant::Type p_type,
-  PropertyHint p_hint,
-  const String& p_hint_string
+    const String& p_name,
+    const Variant& p_default_value,
+    Variant::Type p_type,
+    PropertyHint p_hint,
+    const String& p_hint_string,
+    bool p_basic
 ) {
     Dictionary setting;
     setting["name"] = p_name;
@@ -154,7 +118,7 @@ void FmodEditorPlugin::add_setting(
     }
 
     ProjectSettings::get_singleton()->add_property_info(setting);
-    ProjectSettings::get_singleton()->set_as_basic(p_name, true);
+    ProjectSettings::get_singleton()->set_as_basic(p_name, p_basic);
     ProjectSettings::get_singleton()->set_initial_value(p_name, p_default_value);
 }
 

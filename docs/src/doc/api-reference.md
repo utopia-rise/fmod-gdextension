@@ -9,14 +9,14 @@ The FMOD GDExtension provides a comprehensive set of classes and nodes for integ
 The main singleton class that manages the FMOD Studio API integration. Access it directly as `FmodServer` since it's registered as a singleton.
 
 **Key Methods:**
-- `init(p_settings: FmodGeneralSettings)` - Initialize the FMOD system
+- `init(settings: FmodSettings = null)` - Start FMOD with these settings, or with the Project Settings
 - `load_bank(pathToBank: String, flag: int) -> FmodBank` - Load an FMOD bank file
 - `create_event_instance(eventPath: String) -> FmodEvent` - Create an event instance
 - `get_event(eventPath: String) -> FmodEventDescription` - Get event description
 - `get_bus(busPath: String) -> FmodBus` - Get bus by path
 - `get_vca(vcaPath: String) -> FmodVCA` - Get VCA by path
 - `play_one_shot(event_name: String)` - Play a one-shot event
-- `update()` - Update the FMOD system (call every frame)
+- `update()` - Update the FMOD system (FMOD calls it every frame by itself)
 - `shutdown()` - Shutdown and cleanup FMOD
 
 **Global Parameters:**

@@ -1,22 +1,20 @@
 #include "fmod_logging.h"
 
+#include <helpers/common.h>
+#include <resources/fmod_settings.h>
+
 #include <classes/project_settings.hpp>
 #include <fmod.hpp>
-#include <helpers/common.h>
 #include <sstream>
 #include <variant/string.hpp>
 #include <variant/utility_functions.hpp>
-#include <resources/fmod_logging_settings.h>
 
 namespace godot {
 
-    // initialize FMOD logging based on project settings
-    void logging_init() {
-        const Ref<FmodLoggingSettings> p_logging_settings = FmodLoggingSettings::get_from_project_settings();
-
-        if (p_logging_settings.is_valid()) {
-            unsigned int debug_flags = p_logging_settings->_debug_level_to_fmod();
-            FMOD_DEBUG_MODE log_output = fmod_enum_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());
+    void logging_init(const Ref<FmodSettings>& p_settings) {
+        if (p_settings.is_valid()) {
+            unsigned int debug_flags = p_settings->get_fmod_debug_flags();
+            FMOD_DEBUG_MODE log_output = fmod_enum_cast<FMOD_DEBUG_MODE>(p_settings->get_log_output());
 
             switch (log_output) {
                 case FMOD_DEBUG_MODE_TTY: {
@@ -34,7 +32,7 @@ namespace godot {
                 case FMOD_DEBUG_MODE_FILE: {
                     UtilityFunctions::push_warning("FMOD log output set to File");
                     // Output to a file
-                    String file_path = p_logging_settings->get_log_file_path();
+                    String file_path = p_settings->get_log_file_path();
                     CharString file_path_utf8 = file_path.utf8();
 
                     file_path = ProjectSettings::get_singleton()->globalize_path(file_path);

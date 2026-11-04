@@ -4,6 +4,7 @@
 #include "core/binder_common.hpp"
 #include "core/fmod_file.h"
 #include "core/fmod_sound.h"
+#include "core/object_id.hpp"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
 #include "resources/fmod_plugins_settings.h"
@@ -19,11 +20,7 @@
 #include "variant/string.hpp"
 
 #include <callback/event_callbacks.h>
-#include <callback/file_callbacks.h>
-#include <resources/fmod_dsp_settings.h>
 #include <resources/fmod_settings.h>
-#include <resources/fmod_software_format_settings.h>
-#include <resources/fmod_sound_3d_settings.h>
 
 #include <classes/canvas_item.hpp>
 #include <classes/global_constants.hpp>
@@ -127,6 +124,10 @@ namespace godot {
 
         float distanceScale;
 
+        String godotAudioBus;
+        ObjectID runtime;
+        void add_runtime_to_scene_tree();
+
         FmodCache* cache;
 
         int systemListenerNumber = 1;
@@ -161,15 +162,13 @@ namespace godot {
         static FmodServer* get_singleton();
 
         // LIFECYCLE
-        void init(const Ref<FmodGeneralSettings>& p_settings);
+        void init(const Ref<FmodSettings>& p_settings = Ref<FmodSettings>());
         void update();
         void shutdown();
+        String get_godot_audio_bus() const;
 
         // SETTINGS
-        void set_software_format(const Ref<FmodSoftwareFormatSettings>& p_settings);
-        void set_sound_3d_settings(const Ref<FmodSound3DSettings>& p_settings);
-        void set_system_dsp_buffer_size(const Ref<FmodDspSettings>& p_settings);
-        Ref<FmodDspSettings> get_system_dsp_buffer_settings();
+        void set_spatialization(float p_doppler_scale, float p_distance_factor, float p_rolloff_scale);
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
 

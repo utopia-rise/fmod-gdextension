@@ -40,7 +40,8 @@ Web exports need Godot's GDExtension support: enable `Extensions Support` in you
 Browsers only start audio after the player interacts with the page: FMOD starts playing on the first click, touch or
 key press.
 
-FMOD's web runtime has no live update and cannot load FMOD plugins (see [Plugins](9-plugins.md)).
+FMOD's web runtime has no live update, cannot load FMOD plugins (see [Plugins](9-plugins.md)) and cannot play through
+Godot's audio buses (see [Output, latency and sync modes](10-output-and-latency.md)).
 
 FMOD 2.04.00's web libraries have a bug with sounds played through the low level API (`FmodServer.load_file_as_sound`,
 `load_file_as_music` and `create_sound_instance`): once any Studio event has been stopped, they mix a stereo sound as a

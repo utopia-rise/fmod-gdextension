@@ -10,8 +10,8 @@ config_version=5
 
 [Fmod]
 
-"3D Settings/distance_factor"=64.0
-General/banks_path="res://assets/Banks"
+General/banks/path="res://assets/Banks"
+Spatialization/distance_factor=64.0
 
 [android]
 
@@ -25,10 +25,6 @@ run/main_loop_type.export-tests="ExportTestMain"
 run/main_scene.export-tests="res://test_runner/ExportTestScene.tscn"
 config/features=PackedStringArray("4.6")
 config/icon="uid://cih2yjmtjoohg"
-
-[autoload]
-
-FmodManager="*res://addons/fmod/FmodManager.gd"
 
 [dotnet]
 

@@ -8,13 +8,21 @@
     "CanvasItem",
     "Node2D",
     "Node3D",
+    "SceneTree",
+    "Window",
 
     "Engine",
     "OS",
     "ProjectSettings",
+    "Performance",
     "FileAccess",
     "DirAccess",
     "ResourceLoader",
+
+    "AudioFrame",
+    "AudioStream",
+    "AudioStreamPlayer",
+    "AudioStreamPlaybackResampled",
 
     "EditorPlugin",
     "EditorExportPlugin",

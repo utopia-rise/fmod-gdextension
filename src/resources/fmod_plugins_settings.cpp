@@ -29,8 +29,8 @@ Ref<FmodPluginsSettings> FmodPluginsSettings::get_from_project_settings() {
     ProjectSettings* project_settings = ProjectSettings::get_singleton();
 
     String resource_path = project_settings->get_setting(
-      vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, PLUGINS_SETTINGS_BASE_PATH, RESOURCE_OPTION),
-      FmodPluginsSettings::DEFAULT_RESOURCE_OPTION
+        vformat("%s/%s", FMOD_SETTINGS_BASE_PATH, RESOURCE_OPTION),
+        FmodPluginsSettings::DEFAULT_RESOURCE_OPTION
     );
     if (resource_path.is_empty()) {
         Ref<FmodPluginsSettings> settings;

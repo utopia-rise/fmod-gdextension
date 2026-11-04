@@ -3,7 +3,7 @@ class_name FmodPlugin extends EditorPlugin
 
 
 const ADDON_PATH: StringName = &"res://addons/fmod"
-const FmodManager_Autoload_Name: StringName = &"FmodManager"
+const OLD_AUTOLOAD_NAME: StringName = &"FmodManager"
 @onready var theme: Theme = get_editor_interface().get_base_control().get_theme()
 
 var fmod_bank_explorer_window: PackedScene = load("res://addons/fmod/tool/ui/FmodBankExplorer.tscn")
@@ -17,13 +17,11 @@ var bank_loader_inspector_plugin: FmodBankLoaderPropertyInspectorPlugin = FmodBa
 func _init() -> void:
 	FmodBankDatabase.reload_all_banks()
 
-func _enable_plugin() -> void:
-	add_autoload_singleton(FmodManager_Autoload_Name, "res://addons/fmod/FmodManager.gd")
-
-func _disable_plugin() -> void:
-	remove_autoload_singleton(FmodManager_Autoload_Name)
-
 func _enter_tree() -> void:
+	# FmodServer now runs FMOD through its own FmodRuntime node: drop the autoload earlier versions registered.
+	if ProjectSettings.has_setting("autoload/" + OLD_AUTOLOAD_NAME):
+		remove_autoload_singleton(OLD_AUTOLOAD_NAME)
+
 	_add_explorer_button()
 	
 	_add_bank_explorer_window()

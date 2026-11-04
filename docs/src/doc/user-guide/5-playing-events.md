@@ -5,7 +5,7 @@ In this guide we'll explore how to play Fmod events.
 ## FmodEventEmitter nodes
 
 `FmodEventEmitter2D` and `FmodEventEmitter3D` are nodes which play Fmod events.
-Events and their parameters are loaded by id or name according to [Fmod General settings](./2-initialization.md#general).
+Events and their parameters are loaded by id or name according to the [Load by Name](../settings/1-general.md#load-by-name) setting.
 
 ![emitter-image]
 

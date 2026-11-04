@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Everything FMOD starts with.
+	</brief_description>
+	<description>
+		The settings [method FmodServer.init] starts FMOD with. Without settings, [method FmodServer.init] reads them from Project Settings, under [code]Fmod/[/code], in the same groups as the properties below.
+		A new [FmodSettings] holds the defaults of the platform the game runs on, which differ for [member channel_count], [member dsp_buffer_size], [member dsp_buffer_count], [member studio_processing] and [member live_update]:
+		[codeblock lang=text]
+		                    Desktop   Mobile   Web       Web (threads)
+		channel_count       1024      512      512       512
+		dsp_buffer_size     512       1024     2048      1024
+		dsp_buffer_count    4         4        2         4
+		studio_processing   Background Thread  Main Thread  Background Thread
+		live_update         on        on       off       off
+		[/codeblock]
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="banks_path" type="String" setter="set_banks_path" getter="get_banks_path" default="&quot;res://&quot;">
+			The folder holding the project's banks, which the editor loads for the FMOD explorer and the event pickers.
+		</member>
+		<member name="channel_count" type="int" setter="set_channel_count" getter="get_channel_count">
+			The most sounds FMOD tracks at once. Only the most audible ones are mixed.
+		</member>
+		<member name="distance_factor" type="float" setter="set_distance_factor" getter="get_distance_factor" default="1.0">
+			The number of game units in one meter. In 2D, game units are pixels: set it to the number of pixels in one meter of your world.
+		</member>
+		<member name="doppler_scale" type="float" setter="set_doppler_scale" getter="get_doppler_scale" default="1.0">
+			Scales the pitch change of moving sounds.
+		</member>
+		<member name="dsp_buffer_count" type="int" setter="set_dsp_buffer_count" getter="get_dsp_buffer_count">
+			How many blocks of sound FMOD keeps ready. More is steadier, fewer is quicker.
+		</member>
+		<member name="dsp_buffer_size" type="int" setter="set_dsp_buffer_size" getter="get_dsp_buffer_size">
+			The size of the blocks FMOD mixes, in samples. Larger is steadier, smaller is quicker.
+		</member>
+		<member name="godot_audio_bus" type="String" setter="set_godot_audio_bus" getter="get_godot_audio_bus" default="&quot;Master&quot;">
+			The Godot audio bus FMOD's sound plays on, with [constant GODOT_BUS] output.
+		</member>
+		<member name="godot_bus_mixing" type="int" setter="set_godot_bus_mixing" getter="get_godot_bus_mixing" enum="FmodSettings.GodotBusMixing" default="0">
+			When FMOD mixes its sound for the Godot bus.
+		</member>
+		<member name="listener_count" type="int" setter="set_listener_count" getter="get_listener_count" default="1">
+			The number of listeners FMOD starts with, from 1 to 8.
+		</member>
+		<member name="live_update" type="bool" setter="set_live_update" getter="get_live_update">
+			If [code]true[/code], FMOD Studio can connect to the running game to edit and profile its sound. Never in the editor, and not available on the web.
+		</member>
+		<member name="load_by_name" type="bool" setter="set_load_by_name" getter="get_load_by_name" default="false">
+			If [code]true[/code], FMOD nodes find their events and parameters by path and name instead of by GUID and ID.
+		</member>
+		<member name="log_file_path" type="String" setter="set_log_file_path" getter="get_log_file_path" default="&quot;user://fmod.log&quot;">
+			The file FMOD logs to, with [constant LOG_OUTPUT_FILE].
+		</member>
+		<member name="log_level" type="int" setter="set_log_level" getter="get_log_level" enum="FmodSettings.LogLevel" default="0">
+			How much FMOD logs.
+		</member>
+		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" enum="FmodSettings.LogOutput" default="2">
+			Where FMOD logs.
+		</member>
+		<member name="memory_tracking" type="bool" setter="set_memory_tracking" getter="get_memory_tracking" default="false">
+			If [code]true[/code], FMOD reports its memory use to FMOD Studio's profiler, at a small cost.
+		</member>
+		<member name="output_routing" type="int" setter="set_output_routing" getter="get_output_routing" enum="FmodSettings.OutputRouting" default="0">
+			Where FMOD's sound goes.
+		</member>
+		<member name="plugins" type="FmodPluginsSettings" setter="set_plugins" getter="get_plugins">
+			The FMOD plugins loaded once FMOD has started.
+		</member>
+		<member name="raw_speaker_count" type="int" setter="set_raw_speaker_count" getter="get_raw_speaker_count" default="0">
+			The number of speakers of the [constant RAW] speaker mode.
+		</member>
+		<member name="rolloff_scale" type="float" setter="set_rolloff_scale" getter="get_rolloff_scale" default="1.0">
+			Scales how fast sounds fade with distance.
+		</member>
+		<member name="sample_rate" type="int" setter="set_sample_rate" getter="get_sample_rate" default="48000">
+			The sample rate FMOD mixes at, in Hz.
+		</member>
+		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" enum="FmodSettings.SpeakerMode" default="3">
+			The speaker layout FMOD mixes for.
+		</member>
+		<member name="studio_processing" type="int" setter="set_studio_processing" getter="get_studio_processing" enum="FmodSettings.StudioProcessing">
+			Where FMOD Studio carries out what your game asks it: starting and stopping events, setting parameters, moving sounds.
+		</member>
+		<member name="sync_to_godot_mix_rate" type="bool" setter="set_sync_to_godot_mix_rate" getter="get_sync_to_godot_mix_rate" default="false">
+			If [code]true[/code], with [constant GODOT_BUS] output, FMOD mixes at Godot's mix rate instead of [member sample_rate], so Godot does not convert FMOD's sound.
+		</member>
+	</members>
+	<constants>
+		<constant name="DEFAULT" value="0" enum="SpeakerMode">
+			The layout of the output device.
+		</constant>
+		<constant name="RAW" value="1" enum="SpeakerMode">
+			[member raw_speaker_count] speakers, with no panning between them.
+		</constant>
+		<constant name="MONO" value="2" enum="SpeakerMode">
+			One speaker.
+		</constant>
+		<constant name="STEREO" value="3" enum="SpeakerMode">
+			Left and right.
+		</constant>
+		<constant name="QUAD" value="4" enum="SpeakerMode">
+			Front and back pairs.
+		</constant>
+		<constant name="SURROUND" value="5" enum="SpeakerMode">
+			Front pair, center, and back pair.
+		</constant>
+		<constant name="SPEAKERMODE_5POINT1" value="6" enum="SpeakerMode">
+			5.1 surround.
+		</constant>
+		<constant name="SPEAKERMODE_7POINT1" value="7" enum="SpeakerMode">
+			7.1 surround.
+		</constant>
+		<constant name="SPEAKERMODE_7POINT1POINT4" value="8" enum="SpeakerMode">
+			7.1.4 surround, with four height speakers.
+		</constant>
+		<constant name="DEVICE" value="0" enum="OutputRouting">
+			Straight to the audio device. The only choice on the web.
+		</constant>
+		<constant name="GODOT_BUS" value="1" enum="OutputRouting">
+			Onto a Godot audio bus: its effects and volume, Mute Game and Movie Maker then apply to FMOD. Not on the web.
+		</constant>
+		<constant name="MIX_AHEAD" value="0" enum="GodotBusMixing">
+			Ahead of time: protects against crackles, but delays the sound by the whole of FMOD's buffers, [member dsp_buffer_size] times [member dsp_buffer_count].
+		</constant>
+		<constant name="ON_DEMAND" value="1" enum="GodotBusMixing">
+			When Godot asks: delays the sound by at most one block of [member dsp_buffer_size], and is the one for Movie Maker. A very heavy FMOD scene can crackle.
+		</constant>
+		<constant name="BACKGROUND_THREAD" value="0" enum="StudioProcessing">
+			On FMOD's own thread: costs your frames nothing, but a request waits for that thread's next update.
+		</constant>
+		<constant name="MAIN_THREAD" value="1" enum="StudioProcessing">
+			In [method FmodServer.update], on the main thread: requests apply right away, at the cost of frame time.
+		</constant>
+		<constant name="LOG_LEVEL_INHERIT" value="0" enum="LogLevel">
+			Errors and warnings, and everything when Godot runs with [code]--verbose[/code].
+		</constant>
+		<constant name="LOG_LEVEL_NONE" value="1" enum="LogLevel">
+			Nothing.
+		</constant>
+		<constant name="LOG_LEVEL_ERROR" value="2" enum="LogLevel">
+			Errors only.
+		</constant>
+		<constant name="LOG_LEVEL_WARNING" value="3" enum="LogLevel">
+			Errors and warnings.
+		</constant>
+		<constant name="LOG_LEVEL_LOG" value="4" enum="LogLevel">
+			Errors, warnings and information.
+		</constant>
+		<constant name="LOG_LEVEL_VERBOSE" value="5" enum="LogLevel">
+			Everything, including FMOD's call trace.
+		</constant>
+		<constant name="LOG_OUTPUT_TTY" value="0" enum="LogOutput">
+			The terminal.
+		</constant>
+		<constant name="LOG_OUTPUT_FILE" value="1" enum="LogOutput">
+			The file of [member log_file_path].
+		</constant>
+		<constant name="LOG_OUTPUT_GODOT" value="2" enum="LogOutput">
+			Godot's output.
+		</constant>
+	</constants>
+</class>

@@ -10,7 +10,7 @@ const MASTER_BANK_NAME = "Master.bank"
 static func reload_all_banks(): 
 	banks.clear()
 	
-	var banks_root = ProjectSettings.get_setting("Fmod/General/banks_path", "")
+	var banks_root = ProjectSettings.get_setting("Fmod/General/banks/path", "")
 	var master_strings_bank_path = "%s/%s" % [banks_root, MASTER_STRINGS_BANK_NAME]
 	var master_bank_path = "%s/%s" % [banks_root, MASTER_BANK_NAME]
 	

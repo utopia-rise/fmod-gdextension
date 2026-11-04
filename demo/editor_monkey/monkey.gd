@@ -193,6 +193,10 @@ func script_named(node: Node, script_name: String) -> bool:
 	return script != null and script.get_global_name() == script_name
 
 
+func fmod_runtimes() -> Array:
+	return root.get_children().filter(func(node: Node) -> bool: return node.is_class("FmodRuntime"))
+
+
 func plugins() -> Array:
 	return find_all(root, func(node: Node) -> bool: return script_named(node, "FmodPlugin"))
 
@@ -492,7 +496,8 @@ func step_the_fmod_plugin_is_loaded() -> void:
 	expect(scene() != null and scene().name == "MonkeyScene", "the work scene is edited")
 	expect(plugin() != null, "the FMOD plugin is enabled")
 	expect(plugin().fmod_button.text == "Fmod Explorer", "the toolbar has the Fmod Explorer button")
-	expect(ProjectSettings.has_setting("autoload/FmodManager"), "enabling the plugin registers the FmodManager autoload")
+	expect(fmod_runtimes().size() == 1, "FMOD runs one FmodRuntime node at the root of the editor's scene tree")
+	expect(not ProjectSettings.has_setting("autoload/FmodManager"), "no FmodManager autoload is registered")
 	load_events()
 	expect(not events.is_empty(), "the editor loaded the master banks' events")
 	log_line("%d banks, %d events, event with parameters: %s" % [server().get_all_banks().size(), events.size(), parameter_event.get_path() if parameter_event != null else "none"])
@@ -672,6 +677,54 @@ func step_edit_the_listeners() -> void:
 		expect(listener.listener_index == 1 and listener.is_locked and is_equal_approx(listener.weight, 0.5), "%s's properties change" % listener.name)
 
 
+func project_settings_dialog() -> Window:
+	return find_all(root, func(node: Node) -> bool: return node.get_class() == "ProjectSettingsEditor")[0]
+
+
+func project_settings_inspector() -> Node:
+	return find_all(project_settings_dialog(), func(node: Node) -> bool: return node.get_class() == "SectionedInspector")[0]
+
+
+func shown_settings(section: String) -> Array:
+	project_settings_inspector().update_category_list()
+	var sections: Tree = find_all(project_settings_inspector(), func(node: Node) -> bool: return node is Tree)[0]
+	var item := sections.get_root()
+	while item != null and item.get_metadata(0) != section:
+		item = item.get_next_in_tree()
+	if item == null:
+		return []
+	item.select(0)
+	await pause()
+	return find_all(project_settings_inspector(), func(node: Node) -> bool: return node is EditorProperty).map(func(property: EditorProperty) -> String: return str(property.get_edited_property()))
+
+
+func output_settings(shown: Array) -> Array:
+	return shown.filter(func(name: String) -> bool: return name.begins_with("output/"))
+
+
+func step_switch_the_output_routing_in_project_settings() -> void:
+	const ROUTING := "Fmod/Mixer/output/routing"
+	project_settings_dialog().popup_centered()
+	var advanced: CheckButton = find_all(project_settings_dialog(), func(node: Node) -> bool: return node is CheckButton and node.text.contains("Advanced"))[0]
+	var was_advanced := advanced.button_pressed
+	advanced.button_pressed = true
+	var shown := await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown) == ["output/routing"], "with Direct to Device, Fmod/Mixer's Output group shows only Routing: %s" % [shown])
+	expect(shown.has("format/raw_speaker_count"), "Advanced Settings show the advanced settings: %s" % [shown])
+	ProjectSettings.set_setting(ROUTING, 1)
+	await pause(5)
+	shown = await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown).has("output/godot_audio_bus") and output_settings(shown).has("output/godot_bus_mixing"), "with Godot Bus, the Output group shows the bus settings: %s" % [shown])
+	ProjectSettings.set_setting(ROUTING, 0)
+	await pause(5)
+	shown = await shown_settings("Fmod/Mixer")
+	expect(output_settings(shown) == ["output/routing"], "back to Direct to Device, the bus settings are hidden again: %s" % [shown])
+	shown = await shown_settings("Fmod/Spatialization")
+	expect(shown == ["listener_count", "distance_factor", "rolloff_scale", "doppler_scale"], "Fmod/Spatialization shows its settings in order: %s" % [shown])
+	advanced.button_pressed = was_advanced
+	project_settings_dialog().hide()
+
+
 func step_disable_and_re_enable_the_plugin() -> void:
 	var project := FileAccess.get_file_as_string("res://project.godot")
 	await select(emitter())
@@ -681,12 +734,12 @@ func step_disable_and_re_enable_the_plugin() -> void:
 	EditorInterface.set_plugin_enabled("res://addons/fmod/plugin.cfg", false)
 	await pause(10)
 	expect(plugins().is_empty(), "disabling the plugin removes it")
-	expect(not ProjectSettings.has_setting("autoload/FmodManager"), "disabling the plugin removes the FmodManager autoload")
+	expect(fmod_runtimes().size() == 1, "FMOD keeps running with the plugin disabled")
 	EditorInterface.set_plugin_enabled("res://addons/fmod/plugin.cfg", true)
 	await pause(10)
 	expect(plugins().size() == 1, "enabling the plugin adds it back once")
 	load_events()
-	expect(ProjectSettings.has_setting("autoload/FmodManager"), "enabling the plugin registers the FmodManager autoload again")
+	expect(fmod_runtimes().size() == 1, "re-enabling the plugin adds no second FmodRuntime")
 	await open_explorer()
 	expect(not explorer_items().is_empty(), "the explorer works again")
 	await close_explorer()

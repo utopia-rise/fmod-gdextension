@@ -612,9 +612,9 @@ namespace godot {
 #ifndef TOOLS_ENABLED
         static
 #endif
-          bool should_load_by_name {ProjectSettings::get_singleton()->get_setting(
-            vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodGeneralSettings::INITIALIZE_BASE_PATH, FmodGeneralSettings::SHOULD_LOAD_BY_NAME)
-          )};
+            bool should_load_by_name {ProjectSettings::get_singleton()->get_setting(
+                vformat("%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSettings::LOAD_BY_NAME_OPTION)
+            )};
         return should_load_by_name;
     }
 
