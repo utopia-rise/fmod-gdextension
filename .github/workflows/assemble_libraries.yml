@@ -1,0 +1,24 @@
+name: 📚 Assemble libraries
+on:
+  workflow_call:
+    inputs:
+      platform:
+        type: string
+        required: true
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+    name: ${{ inputs.platform }}
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: '*_${{ inputs.platform }}*'
+          path: libraries
+          merge-multiple: true
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: fmod-gdextension-${{ inputs.platform }}
+          path: libraries
+          if-no-files-found: error

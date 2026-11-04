@@ -41,6 +41,10 @@ runs:
               template_directory="$HOME/Library/Application Support/Godot/export_templates/$template_version"
               template="ios.zip"
               ;;
+            android)
+              template_directory="$HOME/.local/share/godot/export_templates/$template_version"
+              template="android_source.zip"
+              ;;
             web)
               # Exported from a Linux host. GDExtension needs the dlink templates, with and without threads.
               template_directory="$HOME/.local/share/godot/export_templates/$template_version"

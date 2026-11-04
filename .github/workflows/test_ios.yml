@@ -8,10 +8,19 @@ on:
 
 jobs:
   # App Store Connect rejects an extension Godot embeds as a framework (issue #438): the iOS library must be static and
-  # end up linked into the app binary. This exports the tests_ios Xcode project, builds it unsigned and checks that.
+  # end up linked into the app binary. This exports the tests_ios Xcode project, builds it unsigned for a device and
+  # checks that, then builds it for the simulator and runs the tests there.
   test-ios:
     runs-on: macos-15
-    name: Xcode build
+    name: ${{ matrix.variant }} export
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: debug
+            configuration: Debug
+          - variant: release
+            configuration: Release
     defaults:
       run:
         shell: bash
@@ -35,16 +44,16 @@ jobs:
           template: release
 
       # The editor library carries the export plugin that adds the FMOD iOS libraries to the Xcode project.
-      - name: Download macOS editor library
+      - name: Download macOS libraries
         uses: actions/download-artifact@v7
         with:
-          name: editor_macos
+          name: fmod-gdextension-macos
           path: demo/addons/fmod/libs/macos
 
-      - name: Download iOS release library
+      - name: Download iOS libraries
         uses: actions/download-artifact@v7
         with:
-          name: template_release_ios
+          name: fmod-gdextension-ios
           path: demo/addons/fmod/libs/ios
 
       - name: Export Xcode project
@@ -54,19 +63,19 @@ jobs:
           cd demo
           "$godot" --headless --path . --import
           mkdir -p export/tests_ios
-          "$godot" --headless --path . --export-release tests_ios export/tests_ios/tests.ipa
+          "$godot" --headless --path . --export-${{ matrix.variant }} tests_ios export/tests_ios/tests.ipa
 
       - name: Build Xcode project
         timeout-minutes: 30
         run: |
           cd demo/export/tests_ios
-          xcodebuild -project tests.xcodeproj -scheme tests -configuration Release -sdk iphoneos \
-            -destination generic/platform=iOS -derivedDataPath build \
+          xcodebuild -project tests.xcodeproj -scheme tests -configuration ${{ matrix.configuration }} -sdk iphoneos \
+            -destination generic/platform=iOS -derivedDataPath "$RUNNER_TEMP/build-device" \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
 
       - name: Check the extension is linked, not embedded
         run: |
-          app="$(find demo/export/tests_ios/build/Build/Products -maxdepth 2 -name '*.app' -type d | head -n 1)"
+          app="$(find "$RUNNER_TEMP/build-device/Build/Products" -maxdepth 2 -name '*.app' -type d | head -n 1)"
           embedded="$(find "$app" -iname '*GodotFmod*')"
           if [[ -n "$embedded" ]]; then
             echo "The FMOD extension is embedded in the app, App Store Connect rejects it:" >&2
@@ -81,3 +90,56 @@ jobs:
             exit 1
           fi
           echo "The FMOD extension is linked into $binary."
+
+      - name: Build Xcode project for the simulator
+        timeout-minutes: 30
+        run: |
+          cd demo/export/tests_ios
+          xcodebuild -project tests.xcodeproj -scheme tests -configuration ${{ matrix.configuration }} -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/build-simulator" \
+            ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO build
+
+      - name: Run the tests on the simulator
+        timeout-minutes: 20
+        run: |
+          app="$(find "$RUNNER_TEMP/build-simulator/Build/Products" -maxdepth 2 -name '*.app' -type d | head -n 1)"
+          executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$app/Info.plist")"
+          bundle="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plist")"
+          architectures="$(lipo -archs "$app/$executable")"
+          echo "The simulator app is built for $architectures."
+          if [[ " $architectures " != *" arm64 "* ]]; then
+            sudo softwareupdate --install-rosetta --agree-to-license
+          fi
+
+          device="$(xcrun simctl list devices available --json | python3 -c '
+          import json, sys
+          devices = json.load(sys.stdin)["devices"]
+          print(next(d["udid"] for runtime, entries in devices.items() if "iOS" in runtime for d in entries if d["name"].startswith("iPhone")))
+          ')"
+          xcrun simctl boot "$device"
+          xcrun simctl bootstatus "$device" -b
+          xcrun simctl install "$device" "$app"
+
+          xcrun simctl spawn "$device" log stream --level debug --style compact --predicate "process == \"$executable\"" \
+            > ios-simulator.log 2>&1 &
+          xcrun simctl launch --console-pty "$device" "$bundle" >> ios-simulator.log 2>&1 &
+
+          for attempt in $(seq 1 180); do
+            result="$(grep -ao 'Export tests exit code: [0-9]*' ios-simulator.log | tail -n 1 || true)"
+            if [[ -n "$result" ]]; then
+              sed 's/\x1b\[[0-9;]*m//g' ios-simulator.log
+              [[ "$result" == "Export tests exit code: 0" ]] && exit 0
+              exit 1
+            fi
+            sleep 5
+          done
+          sed 's/\x1b\[[0-9;]*m//g' ios-simulator.log
+          echo "The tests reported no result within 15 minutes." >&2
+          exit 1
+
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: ios-simulator-${{ matrix.variant }}-log
+          path: ios-simulator.log
+          if-no-files-found: ignore

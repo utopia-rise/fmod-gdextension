@@ -19,29 +19,24 @@ jobs:
 
       - uses: actions/download-artifact@v7
         with:
-          pattern: '*_linux'
+          name: fmod-gdextension-linux
           path: package/addons/fmod/libs/linux
-          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          pattern: '*_windows'
+          name: fmod-gdextension-windows
           path: package/addons/fmod/libs/windows
-          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          pattern: '*_macos'
+          name: fmod-gdextension-macos
           path: package/addons/fmod/libs/macos
-          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          pattern: '*_ios'
+          name: fmod-gdextension-ios
           path: package/addons/fmod/libs/ios
-          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
-          pattern: '*_web*'
+          name: fmod-gdextension-web
           path: package/addons/fmod/libs/web
-          merge-multiple: true
       - uses: actions/download-artifact@v7
         with:
           name: fmod-gdextension-android

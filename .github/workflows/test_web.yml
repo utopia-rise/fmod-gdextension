@@ -29,7 +29,7 @@ jobs:
           platform: linux
           destination: ${{ runner.temp }}/godot
 
-      - name: Install web export templates
+      - name: Install release web export templates
         uses: ./.github/actions/download-godot
         with:
           version: ${{ inputs.godot-version }}
@@ -37,19 +37,26 @@ jobs:
           destination: ${{ runner.temp }}/godot
           template: release
 
+      - name: Install debug web export templates
+        uses: ./.github/actions/download-godot
+        with:
+          version: ${{ inputs.godot-version }}
+          platform: web
+          destination: ${{ runner.temp }}/godot
+          template: debug
+
       # The editor library runs the export plugin, which packs the banks.
       - name: Download editor library
         uses: actions/download-artifact@v7
         with:
-          name: editor_linux
+          name: fmod-gdextension-linux
           path: demo/addons/fmod/libs/linux
 
       - name: Download web libraries
         uses: actions/download-artifact@v7
         with:
-          pattern: template_release_web*
+          name: fmod-gdextension-web
           path: demo/addons/fmod/libs/web
-          merge-multiple: true
 
       # Runners have no sound card: browsers then report no output channel, and setting up audio throws before the tests
       # start. A PulseAudio null sink gives them a stereo output.
@@ -62,8 +69,15 @@ jobs:
           pactl set-default-sink virtual_output
 
       # A display rather than headless browsers, whose WebGL support varies.
-      - name: Run tests
+      - name: Run release export tests
         timeout-minutes: 20
         run: |
           cd demo
           xvfb-run --auto-servernum ./run_tests.sh "$RUNNER_TEMP/godot/godot.linuxbsd.editor.x86_64" web-release "$(command -v ${{ matrix.browser }})" ${{ matrix.threading }} window
+
+      - name: Run debug export tests
+        if: success() || failure()
+        timeout-minutes: 20
+        run: |
+          cd demo
+          xvfb-run --auto-servernum ./run_tests.sh "$RUNNER_TEMP/godot/godot.linuxbsd.editor.x86_64" web-debug "$(command -v ${{ matrix.browser }})" ${{ matrix.threading }} window

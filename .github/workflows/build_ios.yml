@@ -34,6 +34,11 @@ jobs:
           target: ${{ matrix.target }}
           scons-flags: arch=arm64
           fmod-version: ${{ inputs.fmod-version }}
+      - name: Compile for the simulator
+        run: |
+          for arch in arm64 x86_64; do
+            scons platform=ios target=${{ matrix.target }} arch=$arch ios_simulator=yes -j"$(sysctl -n hw.ncpu)"
+          done
       - uses: ./.github/actions/scons-cache
         if: always()
         with:
