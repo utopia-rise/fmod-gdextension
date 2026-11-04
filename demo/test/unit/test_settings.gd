@@ -6,11 +6,12 @@ static func _is_desktop() -> bool:
 static func _is_web(threads: bool) -> bool:
 	return OS.has_feature("web") and OS.has_feature("threads" if threads else "nothreads")
 
-func _assert_platform_defaults(channel_count: int, buffer_size: int, buffer_count: int, live_update: bool):
+func _assert_platform_defaults(channel_count: int, buffer_size: int, buffer_count: int, processing: FmodSettings.StudioProcessing, live_update: bool):
 	var settings := FmodSettings.new()
 	assert_int(settings.channel_count).is_equal(channel_count)
 	assert_int(settings.dsp_buffer_size).is_equal(buffer_size)
 	assert_int(settings.dsp_buffer_count).is_equal(buffer_count)
+	assert_int(settings.studio_processing).is_equal(processing)
 	assert_bool(settings.live_update).is_equal(live_update)
 
 func test_assert_common_defaults():
@@ -35,13 +36,13 @@ func test_assert_common_defaults():
 	assert_object(settings.plugins).is_null()
 
 func test_assert_desktop_defaults(do_skip := not _is_desktop(), skip_reason := "Desktop only"):
-	_assert_platform_defaults(1024, 512, 4, true)
+	_assert_platform_defaults(1024, 512, 4, FmodSettings.StudioProcessing.BACKGROUND_THREAD, true)
 
 func test_assert_mobile_defaults(do_skip := not OS.has_feature("mobile"), skip_reason := "Mobile only"):
-	_assert_platform_defaults(512, 1024, 4, true)
+	_assert_platform_defaults(512, 1024, 4, FmodSettings.StudioProcessing.BACKGROUND_THREAD, true)
 
 func test_assert_web_defaults(do_skip := not _is_web(false), skip_reason := "Single-threaded web only"):
-	_assert_platform_defaults(512, 2048, 2, false)
+	_assert_platform_defaults(512, 2048, 2, FmodSettings.StudioProcessing.MAIN_THREAD, false)
 
 func test_assert_web_with_threads_defaults(do_skip := not _is_web(true), skip_reason := "Threaded web only"):
-	_assert_platform_defaults(512, 1024, 4, false)
+	_assert_platform_defaults(512, 1024, 4, FmodSettings.StudioProcessing.BACKGROUND_THREAD, false)

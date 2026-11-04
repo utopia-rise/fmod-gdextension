@@ -76,3 +76,25 @@ func test_assert_on_demand_stream_plays_fmod_mix():
 
 func test_assert_mix_ahead_stream_plays_fmod_mix():
 	assert_bool(await _fmod_mix_reaches_godot(FmodSettings.GodotBusMixing.MIX_AHEAD)).is_true()
+
+func _event_state_without_update(processing: FmodSettings.StudioProcessing) -> FmodEvent.StudioPlaybackState:
+	var settings := FmodSettings.new()
+	settings.studio_processing = processing
+	_restart_fmod(settings)
+	var banks := []
+	for bank in ["Master.strings", "Master", "Vehicles"]:
+		banks.append(FmodServer.load_bank("res://assets/Banks/%s.bank" % bank, FmodBank.StudioLoadBankFlags.NORMAL))
+	var event := FmodServer.create_event_instance("event:/Vehicles/Car Engine")
+	event.start()
+	FmodServer.update()
+	OS.delay_msec(300)
+	var state := event.get_playback_state()
+	event.stop(FmodEvent.StudioStopMode.IMMEDIATE)
+	event.release()
+	return state
+
+func test_assert_background_thread_processing_works_between_updates():
+	assert_int(_event_state_without_update(FmodSettings.StudioProcessing.BACKGROUND_THREAD)).is_equal(FmodEvent.StudioPlaybackState.PLAYING)
+
+func test_assert_main_thread_processing_waits_for_update():
+	assert_int(_event_state_without_update(FmodSettings.StudioProcessing.MAIN_THREAD)).is_equal(FmodEvent.StudioPlaybackState.PLAYBACK_STARTING)

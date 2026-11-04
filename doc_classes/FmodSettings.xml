@@ -5,12 +5,13 @@
 	</brief_description>
 	<description>
 		The settings [method FmodServer.init] starts FMOD with. Without settings, [method FmodServer.init] reads them from Project Settings, under [code]Fmod/[/code], in the same groups as the properties below.
-		A new [FmodSettings] holds the defaults of the platform the game runs on, which differ for [member channel_count], [member dsp_buffer_size], [member dsp_buffer_count] and [member live_update]:
+		A new [FmodSettings] holds the defaults of the platform the game runs on, which differ for [member channel_count], [member dsp_buffer_size], [member dsp_buffer_count], [member studio_processing] and [member live_update]:
 		[codeblock lang=text]
 		                    Desktop   Mobile   Web       Web (threads)
 		channel_count       1024      512      512       512
 		dsp_buffer_size     512       1024     2048      1024
 		dsp_buffer_count    4         4        2         4
+		studio_processing   Background Thread  Main Thread  Background Thread
 		live_update         on        on       off       off
 		[/codeblock]
 	</description>
@@ -80,6 +81,9 @@
 		<member name="speaker_mode" type="int" setter="set_speaker_mode" getter="get_speaker_mode" enum="FmodSettings.SpeakerMode" default="3">
 			The speaker layout FMOD mixes for.
 		</member>
+		<member name="studio_processing" type="int" setter="set_studio_processing" getter="get_studio_processing" enum="FmodSettings.StudioProcessing">
+			Where FMOD Studio carries out what your game asks it: starting and stopping events, setting parameters, moving sounds.
+		</member>
 		<member name="sync_to_godot_mix_rate" type="bool" setter="set_sync_to_godot_mix_rate" getter="get_sync_to_godot_mix_rate" default="false">
 			If [code]true[/code], with [constant GODOT_BUS] output, FMOD mixes at Godot's mix rate instead of [member sample_rate], so Godot does not convert FMOD's sound.
 		</member>
@@ -123,6 +127,12 @@
 		</constant>
 		<constant name="ON_DEMAND" value="1" enum="GodotBusMixing">
 			When Godot asks: delays the sound by at most one block of [member dsp_buffer_size], and is the one for Movie Maker. A very heavy FMOD scene can crackle.
+		</constant>
+		<constant name="BACKGROUND_THREAD" value="0" enum="StudioProcessing">
+			On FMOD's own thread: costs your frames nothing, but a request waits for that thread's next update.
+		</constant>
+		<constant name="MAIN_THREAD" value="1" enum="StudioProcessing">
+			In [method FmodServer.update], on the main thread: requests apply right away, at the cost of frame time.
 		</constant>
 		<constant name="LOG_LEVEL_INHERIT" value="0" enum="LogLevel">
 			Errors and warnings, and everything when Godot runs with [code]--verbose[/code].

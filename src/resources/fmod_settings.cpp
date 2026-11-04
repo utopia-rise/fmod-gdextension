@@ -105,6 +105,14 @@ int FmodSettings::get_dsp_buffer_count() const {
     return _dsp_buffer_count;
 }
 
+void FmodSettings::set_studio_processing(StudioProcessing p_studio_processing) {
+    _studio_processing = p_studio_processing;
+}
+
+FmodSettings::StudioProcessing FmodSettings::get_studio_processing() const {
+    return _studio_processing;
+}
+
 void FmodSettings::set_listener_count(int p_listener_count) {
     _listener_count = p_listener_count;
 }
@@ -253,6 +261,8 @@ void FmodSettings::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_dsp_buffer_size"), &FmodSettings::get_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("set_dsp_buffer_count", "dsp_buffer_count"), &FmodSettings::set_dsp_buffer_count);
     ClassDB::bind_method(D_METHOD("get_dsp_buffer_count"), &FmodSettings::get_dsp_buffer_count);
+    ClassDB::bind_method(D_METHOD("set_studio_processing", "studio_processing"), &FmodSettings::set_studio_processing);
+    ClassDB::bind_method(D_METHOD("get_studio_processing"), &FmodSettings::get_studio_processing);
     ClassDB::bind_method(D_METHOD("set_listener_count", "listener_count"), &FmodSettings::set_listener_count);
     ClassDB::bind_method(D_METHOD("get_listener_count"), &FmodSettings::get_listener_count);
     ClassDB::bind_method(D_METHOD("set_distance_factor", "distance_factor"), &FmodSettings::set_distance_factor);
@@ -355,6 +365,18 @@ void FmodSettings::_bind_methods() {
         "set_dsp_buffer_count",
         "get_dsp_buffer_count"
     );
+    ADD_PROPERTY(
+        PropertyInfo(
+            Variant::INT,
+            "studio_processing",
+            PROPERTY_HINT_ENUM,
+            "Background Thread,Main Thread",
+            PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+            "FmodSettings.StudioProcessing"
+        ),
+        "set_studio_processing",
+        "get_studio_processing"
+    );
 
     ADD_GROUP("Spatialization", "");
     ADD_PROPERTY(
@@ -432,6 +454,8 @@ void FmodSettings::_bind_methods() {
     BIND_ENUM_CONSTANT(GODOT_BUS);
     BIND_ENUM_CONSTANT(MIX_AHEAD);
     BIND_ENUM_CONSTANT(ON_DEMAND);
+    BIND_ENUM_CONSTANT(BACKGROUND_THREAD);
+    BIND_ENUM_CONSTANT(MAIN_THREAD);
     BIND_ENUM_CONSTANT(LOG_LEVEL_INHERIT);
     BIND_ENUM_CONSTANT(LOG_LEVEL_NONE);
     BIND_ENUM_CONSTANT(LOG_LEVEL_ERROR);

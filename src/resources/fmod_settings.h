@@ -45,6 +45,11 @@ namespace godot {
             ON_DEMAND,
         };
 
+        enum StudioProcessing {
+            BACKGROUND_THREAD,
+            MAIN_THREAD,
+        };
+
         enum LogLevel {
             LOG_LEVEL_INHERIT,
             LOG_LEVEL_NONE,
@@ -80,6 +85,7 @@ namespace godot {
             {SYNC_TO_GODOT_MIX_RATE_OPTION, "sync_to_godot_mix_rate", false, nullptr},
             {"Mixer/latency/buffer_size", "dsp_buffer_size", true, "DSP/dsp_buffer_size"},
             {"Mixer/latency/buffer_count", "dsp_buffer_count", true, "DSP/dsp_buffer_count"},
+            {"Mixer/latency/studio_processing", "studio_processing", false, nullptr},
             {"Spatialization/listener_count", "listener_count", true, "General/default_listener_count"},
             {"Spatialization/distance_factor", "distance_factor", true, "3D Settings/distance_factor"},
             {"Spatialization/rolloff_scale", "rolloff_scale", true, "3D Settings/rolloff_scale"},
@@ -97,21 +103,25 @@ namespace godot {
         static constexpr int DEFAULT_CHANNEL_COUNT = 512;
         static constexpr int DEFAULT_DSP_BUFFER_SIZE = 2048;
         static constexpr int DEFAULT_DSP_BUFFER_COUNT = 2;
+        static constexpr StudioProcessing DEFAULT_STUDIO_PROCESSING = MAIN_THREAD;
         static constexpr bool DEFAULT_LIVE_UPDATE = false;
 #elif defined(WEB_ENABLED)
         static constexpr int DEFAULT_CHANNEL_COUNT = 512;
         static constexpr int DEFAULT_DSP_BUFFER_SIZE = 1024;
         static constexpr int DEFAULT_DSP_BUFFER_COUNT = 4;
+        static constexpr StudioProcessing DEFAULT_STUDIO_PROCESSING = BACKGROUND_THREAD;
         static constexpr bool DEFAULT_LIVE_UPDATE = false;
 #elif defined(ANDROID_ENABLED) || defined(IOS_ENABLED)
         static constexpr int DEFAULT_CHANNEL_COUNT = 512;
         static constexpr int DEFAULT_DSP_BUFFER_SIZE = 1024;
         static constexpr int DEFAULT_DSP_BUFFER_COUNT = 4;
+        static constexpr StudioProcessing DEFAULT_STUDIO_PROCESSING = BACKGROUND_THREAD;
         static constexpr bool DEFAULT_LIVE_UPDATE = true;
 #else
         static constexpr int DEFAULT_CHANNEL_COUNT = 1024;
         static constexpr int DEFAULT_DSP_BUFFER_SIZE = 512;
         static constexpr int DEFAULT_DSP_BUFFER_COUNT = 4;
+        static constexpr StudioProcessing DEFAULT_STUDIO_PROCESSING = BACKGROUND_THREAD;
         static constexpr bool DEFAULT_LIVE_UPDATE = true;
 #endif
 
@@ -140,6 +150,8 @@ namespace godot {
         int get_dsp_buffer_size() const;
         void set_dsp_buffer_count(int p_dsp_buffer_count);
         int get_dsp_buffer_count() const;
+        void set_studio_processing(StudioProcessing p_studio_processing);
+        StudioProcessing get_studio_processing() const;
 
         void set_listener_count(int p_listener_count);
         int get_listener_count() const;
@@ -181,6 +193,7 @@ namespace godot {
         bool _sync_to_godot_mix_rate = false;
         int _dsp_buffer_size = DEFAULT_DSP_BUFFER_SIZE;
         int _dsp_buffer_count = DEFAULT_DSP_BUFFER_COUNT;
+        StudioProcessing _studio_processing = DEFAULT_STUDIO_PROCESSING;
         int _listener_count = 1;
         float _distance_factor = 1;
         float _rolloff_scale = 1;
@@ -202,6 +215,7 @@ namespace godot {
 VARIANT_ENUM_CAST(FmodSettings::SpeakerMode);
 VARIANT_ENUM_CAST(FmodSettings::OutputRouting);
 VARIANT_ENUM_CAST(FmodSettings::GodotBusMixing);
+VARIANT_ENUM_CAST(FmodSettings::StudioProcessing);
 VARIANT_ENUM_CAST(FmodSettings::LogLevel);
 VARIANT_ENUM_CAST(FmodSettings::LogOutput);
 

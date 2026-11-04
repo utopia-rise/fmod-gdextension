@@ -225,6 +225,9 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
     }
 
     if (settings->get_memory_tracking()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
+    if (settings->get_studio_processing() == FmodSettings::MAIN_THREAD) {
+        studio_init_flags |= FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE;
+    }
 
     FMOD_INITFLAGS init_flags = FMOD_INIT_3D_RIGHTHANDED;
 
