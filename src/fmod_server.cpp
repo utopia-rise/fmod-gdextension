@@ -30,7 +30,7 @@ FmodServer* FmodServer::singleton = nullptr;
 
 void FmodServer::_bind_methods() {
     // LIFECYCLE
-    ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init);
+    ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init, DEFVAL(Variant()));
     ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
     ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
     ClassDB::bind_method(D_METHOD("get_godot_audio_bus"), &FmodServer::get_godot_audio_bus);
@@ -183,13 +183,19 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         return;
     }
 
-    logging_init();
+    Ref<FmodGeneralSettings> settings = p_settings.is_valid() ? p_settings
+                                                              : FmodGeneralSettings::get_from_project_settings();
+
+    if (settings->get_logging().is_valid()) { logging_init(settings->get_logging()); }
 
     // initialize FMOD Studio and FMOD Core System with provided flags
     if (system == nullptr && coreSystem == nullptr) {
         ERROR_CHECK(FMOD::Studio::System::create(&system));
         ERROR_CHECK(system->getCoreSystem(&coreSystem));
     }
+
+    if (settings->get_software_format().is_valid()) { set_software_format(settings->get_software_format()); }
+    if (settings->get_dsp().is_valid()) { set_system_dsp_buffer_size(settings->get_dsp()); }
 
     // editing advanced settings to set random seed before system initialization
     FMOD_ADVANCEDSETTINGS advancedSettings = {};
@@ -203,15 +209,15 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 
     if (
 #ifdef TOOLS_ENABLED
-            !Engine::get_singleton()->is_editor_hint() &&
+        !Engine::get_singleton()->is_editor_hint() &&
 #endif
-            p_settings->get_is_live_update_enabled()
-       ) {
+        settings->get_is_live_update_enabled()
+    ) {
         studio_init_flags |= FMOD_STUDIO_INIT_LIVEUPDATE;
     }
 
-    if (p_settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
-    if (p_settings->get_studio_processing() == FmodGeneralSettings::MAIN_THREAD) {
+    if (settings->get_is_memory_tracking_enabled()) { studio_init_flags |= FMOD_STUDIO_INIT_MEMORY_TRACKING; }
+    if (settings->get_studio_processing() == FmodGeneralSettings::MAIN_THREAD) {
         studio_init_flags |= FMOD_STUDIO_INIT_SYNCHRONOUS_UPDATE;
     }
 
@@ -234,15 +240,15 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
 #endif
 
 #ifdef WEB_ENABLED
-    if (p_settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
+    if (settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
         GODOT_LOG_WARNING("FMOD Sound System: The Godot bus output is not available on the web, FMOD plays to the audio device")
     }
 #else
-    if (p_settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
-        bool synchronous = p_settings->get_godot_bus_mixing() == FmodGeneralSettings::ON_DEMAND;
+    if (settings->get_output_routing() == FmodGeneralSettings::GODOT_BUS) {
+        bool synchronous = settings->get_godot_bus_mixing() == FmodGeneralSettings::ON_DEMAND;
 
         int godot_mix_rate = ProjectSettings::get_singleton()->get_setting("audio/driver/mix_rate", 44100);
-        if (p_settings->get_sync_to_godot_mix_rate() && godot_mix_rate > 0) {
+        if (settings->get_sync_to_godot_mix_rate() && godot_mix_rate > 0) {
             int sample_rate;
             FMOD_SPEAKERMODE speaker_mode;
             int raw_speakers_count;
@@ -260,12 +266,12 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
               "Cannot register the Godot output"
             )
             && ERROR_CHECK_WITH_REASON(coreSystem->setOutputByPlugin(godot_output), "Cannot select the Godot output")) {
-            godotAudioBus = p_settings->get_godot_audio_bus();
+            godotAudioBus = settings->get_godot_audio_bus();
         }
     }
 #endif
 
-    if (ERROR_CHECK(system->initialize(p_settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
+    if (ERROR_CHECK(system->initialize(settings->get_channel_count(), studio_init_flags, init_flags, nullptr))) {
         isInitialized = true;
         GODOT_LOG_INFO("FMOD Sound System: Successfully initialized")
 
@@ -291,6 +297,10 @@ void FmodServer::init(const Ref<FmodGeneralSettings>& p_settings) {
         GODOT_LOG_VERBOSE("Custom File System enabled.")
     }
     cache = new FmodCache(system, coreSystem);
+
+    if (settings->get_sound_3d().is_valid()) { set_sound_3d_settings(settings->get_sound_3d()); }
+    set_system_listener_number(settings->get_default_listener_count());
+    if (settings->get_plugins().is_valid()) { load_all_plugins(settings->get_plugins()); }
 }
 
 void FmodServer::update() {

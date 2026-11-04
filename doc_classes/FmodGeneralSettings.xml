@@ -4,7 +4,7 @@
 		The general FMOD settings, read from Project Settings.
 	</brief_description>
 	<description>
-		Set in Project Settings under [code]Fmod/General[/code] and [code]Fmod/Output[/code]. FMOD reads them when it initializes.
+		The settings FMOD starts with, given to [method FmodServer.init]. Without settings, [method FmodServer.init] reads them from Project Settings, under [code]Fmod/[/code]. The other settings resources it holds are applied when they are set; one left empty keeps what FMOD already uses.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -18,6 +18,9 @@
 		<member name="default_listener_count" type="int" setter="set_default_listener_count" getter="get_default_listener_count" default="1">
 			The number of listeners FMOD starts with.
 		</member>
+		<member name="dsp" type="FmodDspSettings" setter="set_dsp" getter="get_dsp">
+			The DSP buffer settings FMOD starts with.
+		</member>
 		<member name="godot_audio_bus" type="String" setter="set_godot_audio_bus" getter="get_godot_audio_bus" default="&quot;Master&quot;">
 			The Godot audio bus FMOD's sound plays on, with [constant GODOT_BUS] output.
 		</member>
@@ -30,11 +33,23 @@
 		<member name="is_memory_tracking_enabled" type="bool" setter="set_is_memory_tracking_enabled" getter="get_is_memory_tracking_enabled" default="false">
 			If [code]true[/code], FMOD tracks its memory use, reported to FMOD Studio's profiler.
 		</member>
+		<member name="logging" type="FmodLoggingSettings" setter="set_logging" getter="get_logging">
+			How FMOD logs its messages.
+		</member>
 		<member name="output_routing" type="int" setter="set_output_routing" getter="get_output_routing" enum="FmodGeneralSettings.OutputRouting" default="0">
 			Where FMOD's sound goes.
 		</member>
+		<member name="plugins" type="FmodPluginsSettings" setter="set_plugins" getter="get_plugins">
+			The FMOD plugins loaded once FMOD has started.
+		</member>
 		<member name="should_load_by_name" type="bool" setter="set_should_load_by_name" getter="get_should_load_by_name" default="false">
 			If [code]true[/code], event emitters find their event by path rather than by GUID.
+		</member>
+		<member name="software_format" type="FmodSoftwareFormatSettings" setter="set_software_format" getter="get_software_format">
+			The sample rate and speaker mode FMOD mixes with.
+		</member>
+		<member name="sound_3d" type="FmodSound3DSettings" setter="set_sound_3d" getter="get_sound_3d">
+			The 3D settings FMOD starts with.
 		</member>
 		<member name="studio_processing" type="int" setter="set_studio_processing" getter="get_studio_processing" enum="FmodGeneralSettings.StudioProcessing" default="0">
 			Where FMOD Studio carries out what your game asks it: starting and stopping events, setting parameters, moving sounds.

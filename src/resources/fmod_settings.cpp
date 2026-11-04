@@ -94,9 +94,63 @@ const String& FmodGeneralSettings::get_godot_audio_bus() const {
     return _godot_audio_bus;
 }
 
+void FmodGeneralSettings::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_software_format) {
+    _software_format = p_software_format;
+}
+
+Ref<FmodSoftwareFormatSettings> FmodGeneralSettings::get_software_format() const {
+    return _software_format;
+}
+
+void FmodGeneralSettings::set_dsp(const Ref<FmodDspSettings>& p_dsp) {
+    _dsp = p_dsp;
+}
+
+Ref<FmodDspSettings> FmodGeneralSettings::get_dsp() const {
+    return _dsp;
+}
+
+void FmodGeneralSettings::set_sound_3d(const Ref<FmodSound3DSettings>& p_sound_3d) {
+    _sound_3d = p_sound_3d;
+}
+
+Ref<FmodSound3DSettings> FmodGeneralSettings::get_sound_3d() const {
+    return _sound_3d;
+}
+
+void FmodGeneralSettings::set_logging(const Ref<FmodLoggingSettings>& p_logging) {
+    _logging = p_logging;
+}
+
+Ref<FmodLoggingSettings> FmodGeneralSettings::get_logging() const {
+    return _logging;
+}
+
+void FmodGeneralSettings::set_plugins(const Ref<FmodPluginsSettings>& p_plugins) {
+    _plugins = p_plugins;
+}
+
+Ref<FmodPluginsSettings> FmodGeneralSettings::get_plugins() const {
+    return _plugins;
+}
+
+Ref<FmodGeneralSettings> FmodGeneralSettings::cached_project_settings;
+
+void FmodGeneralSettings::free_project_settings() {
+    cached_project_settings.unref();
+}
+
 Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
+    if (cached_project_settings.is_valid()) { return cached_project_settings; }
+
     Ref<FmodGeneralSettings> settings;
     settings.instantiate();
+    settings->set_software_format(FmodSoftwareFormatSettings::get_from_project_settings());
+    settings->set_dsp(FmodDspSettings::get_from_project_settings());
+    settings->set_sound_3d(FmodSound3DSettings::get_from_project_settings());
+    settings->set_logging(FmodLoggingSettings::get_from_project_settings());
+    settings->set_plugins(FmodPluginsSettings::get_from_project_settings());
+    cached_project_settings = settings;
 
     ProjectSettings* project_settings = ProjectSettings::get_singleton();
 
@@ -171,6 +225,42 @@ void FmodGeneralSettings::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("set_should_load_by_name", "should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
     ClassDB::bind_method(D_METHOD("get_should_load_by_name"), &FmodGeneralSettings::get_should_load_by_name);
+
+    ClassDB::bind_method(D_METHOD("set_software_format", "software_format"), &FmodGeneralSettings::set_software_format);
+    ClassDB::bind_method(D_METHOD("get_software_format"), &FmodGeneralSettings::get_software_format);
+    ClassDB::bind_method(D_METHOD("set_dsp", "dsp"), &FmodGeneralSettings::set_dsp);
+    ClassDB::bind_method(D_METHOD("get_dsp"), &FmodGeneralSettings::get_dsp);
+    ClassDB::bind_method(D_METHOD("set_sound_3d", "sound_3d"), &FmodGeneralSettings::set_sound_3d);
+    ClassDB::bind_method(D_METHOD("get_sound_3d"), &FmodGeneralSettings::get_sound_3d);
+    ClassDB::bind_method(D_METHOD("set_logging", "logging"), &FmodGeneralSettings::set_logging);
+    ClassDB::bind_method(D_METHOD("get_logging"), &FmodGeneralSettings::get_logging);
+    ClassDB::bind_method(D_METHOD("set_plugins", "plugins"), &FmodGeneralSettings::set_plugins);
+    ClassDB::bind_method(D_METHOD("get_plugins"), &FmodGeneralSettings::get_plugins);
+    ADD_PROPERTY(
+        PropertyInfo(Variant::OBJECT, "software_format", PROPERTY_HINT_RESOURCE_TYPE, "FmodSoftwareFormatSettings"),
+        "set_software_format",
+        "get_software_format"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::OBJECT, "dsp", PROPERTY_HINT_RESOURCE_TYPE, "FmodDspSettings"),
+        "set_dsp",
+        "get_dsp"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::OBJECT, "sound_3d", PROPERTY_HINT_RESOURCE_TYPE, "FmodSound3DSettings"),
+        "set_sound_3d",
+        "get_sound_3d"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::OBJECT, "logging", PROPERTY_HINT_RESOURCE_TYPE, "FmodLoggingSettings"),
+        "set_logging",
+        "get_logging"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::OBJECT, "plugins", PROPERTY_HINT_RESOURCE_TYPE, "FmodPluginsSettings"),
+        "set_plugins",
+        "get_plugins"
+    );
 
     ClassDB::bind_method(
         D_METHOD("set_studio_processing", "studio_processing"),

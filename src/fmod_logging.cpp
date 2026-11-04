@@ -10,10 +10,7 @@
 
 namespace godot {
 
-    // initialize FMOD logging based on project settings
-    void logging_init() {
-        const Ref<FmodLoggingSettings> p_logging_settings = FmodLoggingSettings::get_from_project_settings();
-
+    void logging_init(const Ref<FmodLoggingSettings>& p_logging_settings) {
         if (p_logging_settings.is_valid()) {
             unsigned int debug_flags = p_logging_settings->_debug_level_to_fmod();
             FMOD_DEBUG_MODE log_output = fmod_enum_cast<FMOD_DEBUG_MODE>(p_logging_settings->get_log_output());

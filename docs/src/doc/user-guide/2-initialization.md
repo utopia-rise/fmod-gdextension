@@ -65,6 +65,29 @@ roll-off scale.
 
 ![3d-tab]
 
+## Starting FMOD yourself
+
+With "Auto Initialize" on, FMOD starts with the game using the Project Settings above. To choose its settings at run
+time instead, from an options menu for instance, turn "Auto Initialize" off and call `FmodServer.init()` yourself:
+
+```gdscript
+# With the Project Settings.
+FmodServer.init()
+```
+
+```gdscript
+# With settings of your own.
+var settings := FmodGeneralSettings.new()
+settings.channel_count = 512
+settings.software_format = FmodSoftwareFormatSettings.new()
+settings.software_format.sample_rate = 44100
+FmodServer.init(settings)
+```
+
+`FmodGeneralSettings` holds the general and output settings, and the software format, DSP, 3D, logging and plugin
+settings as `software_format`, `dsp`, `sound_3d`, `logging` and `plugins`. One you leave empty is not applied: FMOD
+keeps what it already uses.
+
 ## Fmod explorer
 
 When all is setup you can explore your project's banks using `Fmod Explorer`.  

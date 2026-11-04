@@ -166,7 +166,7 @@ namespace godot {
         static FmodServer* get_singleton();
 
         // LIFECYCLE
-        void init(const Ref<FmodGeneralSettings>& p_settings);
+        void init(const Ref<FmodGeneralSettings>& p_settings = Ref<FmodGeneralSettings>());
         void update();
         void shutdown();
         String get_godot_audio_bus() const;

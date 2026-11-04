@@ -336,9 +336,9 @@
 		</method>
 		<method name="init">
 			<return type="void" />
-			<param index="0" name="settings" type="FmodGeneralSettings" />
+			<param index="0" name="settings" type="FmodGeneralSettings" default="null" />
 			<description>
-				Initializes the FMOD system with the specified settings. This must be called before using any FMOD functionality.
+				Initializes the FMOD system with [param settings], or with the Project Settings when [param settings] is [code]null[/code]. This must be called before using any FMOD functionality. FMOD calls it by itself at startup when [code]Fmod/General/auto_initialize[/code] is on.
 			</description>
 		</method>
 		<method name="is_plugin_loaded">

@@ -3,7 +3,8 @@ extends GdUnitTestSuite
 const SOUND_FILE = "res://assets/Sounds/doorOpen_1.ogg"
 
 func after():
-	_restart_fmod(FmodGeneralSettings.new())
+	FmodServer.shutdown()
+	FmodServer.init()
 
 func _restart_fmod(settings: FmodGeneralSettings):
 	FmodServer.shutdown()

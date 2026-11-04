@@ -1,6 +1,11 @@
 #ifndef GODOTFMOD_FMOD_SETTINGS_H
 #define GODOTFMOD_FMOD_SETTINGS_H
 
+#include "fmod_dsp_settings.h"
+#include "fmod_logging_settings.h"
+#include "fmod_plugins_settings.h"
+#include "fmod_software_format_settings.h"
+#include "fmod_sound_3d_settings.h"
 #include "fmod_studio.h"
 
 #include <classes/resource.hpp>
@@ -58,7 +63,23 @@ namespace godot {
         void set_godot_audio_bus(const String& p_godot_audio_bus);
         const String& get_godot_audio_bus() const;
 
+        void set_software_format(const Ref<FmodSoftwareFormatSettings>& p_software_format);
+        Ref<FmodSoftwareFormatSettings> get_software_format() const;
+
+        void set_dsp(const Ref<FmodDspSettings>& p_dsp);
+        Ref<FmodDspSettings> get_dsp() const;
+
+        void set_sound_3d(const Ref<FmodSound3DSettings>& p_sound_3d);
+        Ref<FmodSound3DSettings> get_sound_3d() const;
+
+        void set_logging(const Ref<FmodLoggingSettings>& p_logging);
+        Ref<FmodLoggingSettings> get_logging() const;
+
+        void set_plugins(const Ref<FmodPluginsSettings>& p_plugins);
+        Ref<FmodPluginsSettings> get_plugins() const;
+
         static Ref<FmodGeneralSettings> get_from_project_settings();
+        static void free_project_settings();
 
         static constexpr const char* INITIALIZE_BASE_PATH = "General";
         static constexpr const char* CHANNEL_COUNT_OPTION = "channel_count";
@@ -101,6 +122,13 @@ namespace godot {
         GodotBusMixing _godot_bus_mixing = DEFAULT_GODOT_BUS_MIXING;
         bool _sync_to_godot_mix_rate = DEFAULT_SYNC_TO_GODOT_MIX_RATE;
         String _godot_audio_bus = DEFAULT_GODOT_AUDIO_BUS;
+        Ref<FmodSoftwareFormatSettings> _software_format;
+        Ref<FmodDspSettings> _dsp;
+        Ref<FmodSound3DSettings> _sound_3d;
+        Ref<FmodLoggingSettings> _logging;
+        Ref<FmodPluginsSettings> _plugins;
+
+        static Ref<FmodGeneralSettings> cached_project_settings;
 
     protected:
         static void _bind_methods();
