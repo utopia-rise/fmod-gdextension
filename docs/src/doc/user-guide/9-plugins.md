@@ -46,7 +46,7 @@ plugin it will be:
 Here is what the configuration looks like for this example:  
 ![fmod-plugins-settings-resource]
 
-Then you have to set the path of this resource in project's settings, in the `Fmod/Plugins` section:  
+Then set the path of this resource in Project Settings, as [Fmod → Plugins → Configuration](../settings/5-plugins.md):  
 ![plugins-project-settings]
 
 ## Web
@@ -58,4 +58,4 @@ keep plugin effects out of the banks of a game that ships on the web.
 
 [plugins-create-settings-resource]: ./assets/plugins-create-settings-resource.png
 [fmod-plugins-settings-resource]: ./assets/fmod-plugins-settings-resource.png
-[plugins-project-settings]: ./assets/plugins-project-settings.png
+[plugins-project-settings]: ../settings/assets/settings-plugins.png
