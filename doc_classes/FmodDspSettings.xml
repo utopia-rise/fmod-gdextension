@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodDspSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		The DSP buffer settings FMOD's mixer uses, read from Project Settings.
+	</brief_description>
+	<description>
+		Set in Project Settings under [code]Fmod/DSP[/code], and applied by [method FmodServer.set_system_dsp_buffer_size]. Smaller buffers lower the audio latency and raise the CPU cost, and too small a buffer makes the sound stutter.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="dsp_buffer_count" type="int" setter="set_dsp_buffer_count" getter="get_dsp_buffer_count" default="4">
+			The number of DSP buffers FMOD's mixer cycles through.
+		</member>
+		<member name="dsp_buffer_size" type="int" setter="set_dsp_buffer_size" getter="get_dsp_buffer_size" default="512">
+			The length of each DSP buffer, in samples.
+		</member>
+	</members>
+</class>

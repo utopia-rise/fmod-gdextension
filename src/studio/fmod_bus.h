@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_BUS_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_event.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
 
@@ -19,7 +20,7 @@ namespace godot {
         void set_mute(bool mute) const;
         void set_paused(bool paused) const;
         void set_volume(float volume) const;
-        void stop_all_events(int stopMode);
+        void stop_all_events(FmodEvent::StudioStopMode stop_mode);
 
         protected:
             static void _bind_methods();

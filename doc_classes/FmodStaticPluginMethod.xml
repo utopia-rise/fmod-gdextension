@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodStaticPluginMethod" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A static FMOD plugin's registration method, for iOS.
+	</brief_description>
+	<description>
+		iOS links FMOD plugins statically: each one exposes a C function returning its description, which the export registers with FMOD. List them in [member FmodPluginsSettings.static_plugins_methods].
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="method_name" type="String" setter="set_method_name" getter="get_method_name" default="&quot;&quot;">
+			The name of the plugin's C function returning its description, such as [code]FMOD_SteamAudio_Spatialize_GetDSPDescription[/code].
+		</member>
+		<member name="type" type="int" setter="set_type" getter="get_type" enum="FmodStaticPluginMethod.Type" default="0">
+			The kind of plugin the method describes.
+		</member>
+	</members>
+	<constants>
+		<constant name="CODEC" value="0" enum="Type">
+			A codec plugin, decoding an audio format.
+		</constant>
+		<constant name="DSP" value="1" enum="Type">
+			A DSP plugin, processing audio as an effect.
+		</constant>
+		<constant name="OUTPUT" value="2" enum="Type">
+			An output plugin, sending FMOD's mix to an audio device.
+		</constant>
+	</constants>
+</class>

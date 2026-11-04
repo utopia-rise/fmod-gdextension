@@ -38,10 +38,10 @@ Ref<FmodDspSettings> FmodDspSettings::get_from_project_settings() {
 }
 
 void FmodDspSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_dsp_buffer_size", "p_dsp_buffer_size"), &FmodDspSettings::set_dsp_buffer_size);
+    ClassDB::bind_method(D_METHOD("set_dsp_buffer_size", "dsp_buffer_size"), &FmodDspSettings::set_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("get_dsp_buffer_size"), &FmodDspSettings::get_dsp_buffer_size);
 
-    ClassDB::bind_method(D_METHOD("set_dsp_buffer_count", "p_dsp_buffer_count"), &FmodDspSettings::set_dsp_buffer_count);
+    ClassDB::bind_method(D_METHOD("set_dsp_buffer_count", "dsp_buffer_count"), &FmodDspSettings::set_dsp_buffer_count);
     ClassDB::bind_method(D_METHOD("get_dsp_buffer_count"), &FmodDspSettings::get_dsp_buffer_count);
 
     ADD_PROPERTY(

@@ -51,7 +51,7 @@ void FmodEditorPlugin::_ready() {
       FmodSoftwareFormatSettings::DEFAULT_SPEAKER_MODE,
       Variant::Type::INT,
       PROPERTY_HINT_ENUM,
-      "DEFAULT,RAW,MONO,STEREO,QUAD,SURROUND,5POINT1,7POINT1,7POINT1POINT4"
+      FmodSoftwareFormatSettings::SPEAKER_MODE_HINT
     );
     add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::SOFTWARE_FORMAT_SETTINGS_BASE_PATH, FmodSoftwareFormatSettings::RAW_SPEAKER_COUNT_OPTION),
@@ -117,14 +117,14 @@ void FmodEditorPlugin::_ready() {
     FmodLoggingSettings::DEFAULT_DEBUG_LEVEL,
     Variant::Type::INT,
     PROPERTY_HINT_ENUM,
-    "Inherit,None,Error,Warning,Log,Verbose"
+    FmodLoggingSettings::DEBUG_LEVEL_HINT
   );
   add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_OUTPUT_OPTION),
       FmodLoggingSettings::DEFAULT_LOG_OUTPUT,
       Variant::Type::INT,
       PROPERTY_HINT_ENUM,
-      "TTY,File,Godot"
+      FmodLoggingSettings::LOG_OUTPUT_HINT
     );
     add_setting(
       vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, FmodLoggingSettings::LOGGING_SETTINGS_BASE_PATH, FmodLoggingSettings::LOG_FILE_PATH_OPTION),

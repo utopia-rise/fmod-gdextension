@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodFile" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A sound file loaded by FMOD's Core API.
+	</brief_description>
+	<description>
+		Returned by [method FmodServer.load_file_as_sound] and [method FmodServer.load_file_as_music]. Play it with [method FmodServer.create_sound_instance], and release it with [method FmodServer.unload_file].
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

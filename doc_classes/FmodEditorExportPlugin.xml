@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodEditorExportPlugin" inherits="EditorExportPlugin" api_type="editor_extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		Adds the FMOD banks, audio files and plugin libraries to the game's exports.
+	</brief_description>
+	<description>
+		Registered by the editor plugin. It packs the banks found in the banks folder and the audio files the project loads, unless the export preset's [code]fmod/auto_export_banks[/code] option is off, and adds the FMOD plugin libraries declared in the [FmodPluginsSettings] resource for the exported platform. On iOS it generates the code registering the static plugins.
+	</description>
+	<tutorials>
+	</tutorials>
+</class>

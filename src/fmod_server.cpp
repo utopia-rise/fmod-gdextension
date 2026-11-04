@@ -24,13 +24,13 @@ FmodServer* FmodServer::singleton = nullptr;
 
 void FmodServer::_bind_methods() {
     // LIFECYCLE
-    ClassDB::bind_method(D_METHOD("init", "p_settings"), &FmodServer::init);
+    ClassDB::bind_method(D_METHOD("init", "settings"), &FmodServer::init);
     ClassDB::bind_method(D_METHOD("update"), &FmodServer::update);
     ClassDB::bind_method(D_METHOD("shutdown"), &FmodServer::shutdown);
 
     // SETTINGS
-    ClassDB::bind_method(D_METHOD("set_software_format", "p_settings"), &FmodServer::set_software_format);
-    ClassDB::bind_method(D_METHOD("set_sound_3D_settings", "p_settings"), &FmodServer::set_sound_3d_settings);
+    ClassDB::bind_method(D_METHOD("set_software_format", "settings"), &FmodServer::set_software_format);
+    ClassDB::bind_method(D_METHOD("set_sound_3d_settings", "settings"), &FmodServer::set_sound_3d_settings);
     ClassDB::bind_method(D_METHOD("set_system_dsp_buffer_size", "dsp_settings"), &FmodServer::set_system_dsp_buffer_size);
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_settings"), &FmodServer::get_system_dsp_buffer_settings);
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &FmodServer::get_system_dsp_buffer_length);
@@ -38,17 +38,17 @@ void FmodServer::_bind_methods() {
 
     // OBJECT
     ClassDB::bind_method(D_METHOD("check_vca_guid", "guid"), &FmodServer::check_vca_guid);
-    ClassDB::bind_method(D_METHOD("check_vca_path", "cvaPath"), &FmodServer::check_vca_path);
+    ClassDB::bind_method(D_METHOD("check_vca_path", "vca_path"), &FmodServer::check_vca_path);
     ClassDB::bind_method(D_METHOD("check_bus_guid", "guid"), &FmodServer::check_bus_guid);
-    ClassDB::bind_method(D_METHOD("check_bus_path", "busPath"), &FmodServer::check_bus_path);
+    ClassDB::bind_method(D_METHOD("check_bus_path", "bus_path"), &FmodServer::check_bus_path);
     ClassDB::bind_method(D_METHOD("check_event_guid", "guid"), &FmodServer::check_event_guid);
-    ClassDB::bind_method(D_METHOD("check_event_path", "eventPath"), &FmodServer::check_event_path);
+    ClassDB::bind_method(D_METHOD("check_event_path", "event_path"), &FmodServer::check_event_path);
     ClassDB::bind_method(D_METHOD("get_vca_from_guid", "guid"), &FmodServer::get_vca_from_guid);
-    ClassDB::bind_method(D_METHOD("get_vca", "cvaPath"), &FmodServer::get_vca);
+    ClassDB::bind_method(D_METHOD("get_vca", "vca_path"), &FmodServer::get_vca);
     ClassDB::bind_method(D_METHOD("get_bus_from_guid", "guid"), &FmodServer::get_bus_from_guid);
-    ClassDB::bind_method(D_METHOD("get_bus", "busPath"), &FmodServer::get_bus);
+    ClassDB::bind_method(D_METHOD("get_bus", "bus_path"), &FmodServer::get_bus);
     ClassDB::bind_method(D_METHOD("get_event_from_guid", "guid"), &FmodServer::get_event_from_guid);
-    ClassDB::bind_method(D_METHOD("get_event", "eventPath"), &FmodServer::get_event);
+    ClassDB::bind_method(D_METHOD("get_event", "event_path"), &FmodServer::get_event);
     ClassDB::bind_method(D_METHOD("get_event_guid", "event_path"), &FmodServer::get_event_guid);
     ClassDB::bind_method(D_METHOD("get_event_path", "guid"), &FmodServer::get_event_path);
     ClassDB::bind_method(D_METHOD("get_all_vca"), &FmodServer::get_all_vca);
@@ -71,7 +71,7 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_global_parameter_by_id", "parameter_id"), &FmodServer::get_global_parameter_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_user_value_by_name", "parameter_name"), &FmodServer::get_global_parameter_user_value_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_user_value_by_id", "parameter_id"), &FmodServer::get_global_parameter_user_value_by_id);
-    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name", "parameterName"), &FmodServer::get_global_parameter_desc_by_name);
+    ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_name", "parameter_name"), &FmodServer::get_global_parameter_desc_by_name);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_by_id", "parameter_id"), &FmodServer::get_global_parameter_desc_by_id);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_count"), &FmodServer::get_global_parameter_desc_count);
     ClassDB::bind_method(D_METHOD("get_global_parameter_desc_list"), &FmodServer::get_global_parameter_desc_list);
@@ -79,7 +79,7 @@ void FmodServer::_bind_methods() {
     // LISTENERS
     ClassDB::bind_method(D_METHOD("add_listener", "index", "game_obj"), &FmodServer::add_listener);
     ClassDB::bind_method(D_METHOD("remove_listener", "index", "game_obj"), &FmodServer::remove_listener);
-    ClassDB::bind_method(D_METHOD("set_listener_number", "listenerNumber"), &FmodServer::set_system_listener_number);
+    ClassDB::bind_method(D_METHOD("set_listener_number", "listener_number"), &FmodServer::set_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_number"), &FmodServer::get_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &FmodServer::get_system_listener_weight);
     ClassDB::bind_method(D_METHOD("set_listener_weight", "index", "weight"), &FmodServer::set_system_listener_weight);
@@ -89,27 +89,27 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_2d_velocity", "index"), &FmodServer::get_listener_2d_velocity);
     ClassDB::bind_method(D_METHOD("set_listener_transform3d", "index", "transform"), &FmodServer::set_listener_transform3d);
     ClassDB::bind_method(D_METHOD("set_listener_transform2d", "index", "transform"), &FmodServer::set_listener_transform2d);
-    ClassDB::bind_method(D_METHOD("set_listener_lock", "index", "isLocked"), &FmodServer::set_listener_lock);
+    ClassDB::bind_method(D_METHOD("set_listener_lock", "index", "is_locked"), &FmodServer::set_listener_lock);
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
 
     // BANKS
-    ClassDB::bind_method(D_METHOD("load_bank", "pathToBank", "flag"), &FmodServer::load_bank);
+    ClassDB::bind_method(D_METHOD("load_bank", "bank_path", "flags"), &FmodServer::load_bank);
     ClassDB::bind_method(D_METHOD("wait_for_all_loads"), &FmodServer::wait_for_all_loads);
     ClassDB::bind_method(D_METHOD("banks_still_loading"), &FmodServer::banks_still_loading);
 
     // PLUGINS
-    ClassDB::bind_method(D_METHOD("load_plugin", "p_plugin_path", "p_priority"), &FmodServer::load_plugin, DEFVAL(0));
-    ClassDB::bind_method(D_METHOD("unload_plugin", "p_plugin_handle"), &FmodServer::unload_plugin);
-    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "p_plugin_handle"), &FmodServer::is_plugin_loaded);
+    ClassDB::bind_method(D_METHOD("load_plugin", "plugin_path", "priority"), &FmodServer::load_plugin, DEFVAL(0));
+    ClassDB::bind_method(D_METHOD("unload_plugin", "plugin_handle"), &FmodServer::unload_plugin);
+    ClassDB::bind_method(D_METHOD("is_plugin_loaded", "plugin_handle"), &FmodServer::is_plugin_loaded);
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
     ClassDB::bind_method(D_METHOD("unload_file", "path"), &FmodServer::unload_file);
 
     ClassDB::bind_method(D_METHOD("create_event_instance_with_guid", "guid"), &FmodServer::create_event_instance_with_guid);
-    ClassDB::bind_method(D_METHOD("create_event_instance", "eventPath"), &FmodServer::create_event_instance);
-    ClassDB::bind_method(D_METHOD("create_event_instance_from_description", "eventPath"), &FmodServer::create_event_instance_from_description);
+    ClassDB::bind_method(D_METHOD("create_event_instance", "event_path"), &FmodServer::create_event_instance);
+    ClassDB::bind_method(D_METHOD("create_event_instance_from_description", "event_description"), &FmodServer::create_event_instance_from_description);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_guid", "guid"), &FmodServer::play_one_shot_using_guid);
     ClassDB::bind_method(D_METHOD("play_one_shot", "event_name"), &FmodServer::play_one_shot);
     ClassDB::bind_method(D_METHOD("play_one_shot_using_event_description", "event_description"), &FmodServer::play_one_shot_using_event_description);
@@ -142,7 +142,6 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("mixer_resume"), &FmodServer::mixer_resume);
 
     ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
-    REGISTER_ALL_CONSTANTS
 }
 
 FmodServer::FmodServer() :
@@ -506,12 +505,12 @@ void FmodServer::set_software_format(const Ref<FmodSoftwareFormatSettings>& p_se
     }
     ERROR_CHECK(coreSystem->setSoftwareFormat(
       p_settings->get_sample_rate(),
-      static_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
+      fmod_enum_cast<FMOD_SPEAKERMODE>(p_settings->get_speaker_mode()),
       p_settings->get_raw_speakers_count()
     ));
 }
 
-Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag) {
+Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, BitField<FmodBank::StudioLoadBankFlags> flags) {
     if (cache->has_bank(pathToBank)) { return cache->get_bank(pathToBank); }// bank is already loaded
 
 #ifdef DEBUG_ENABLED
@@ -521,7 +520,7 @@ Ref<FmodBank> FmodServer::load_bank(const String& pathToBank, unsigned int flag)
     }
 #endif
 
-    return cache->add_bank(pathToBank, flag);
+    return cache->add_bank(pathToBank, fmod_enum_cast<FMOD_STUDIO_LOAD_BANK_FLAGS>(flags));
 }
 
 void FmodServer::unload_bank(const String& pathToBank) {

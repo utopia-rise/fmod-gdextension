@@ -9,14 +9,14 @@ using namespace godot;
 void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_parameter_by_name", "parameter_name"), &FmodEvent::get_parameter_by_name);
     ClassDB::bind_method(D_METHOD("set_parameter_by_name", "parameter_name", "value"), &FmodEvent::set_parameter_by_name);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_name_with_label", "parameter_name", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_name_with_label);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_name_with_label", "parameter_name", "label", "ignore_seek_speed"), &FmodEvent::set_parameter_by_name_with_label, DEFVAL(false));
     ClassDB::bind_method(D_METHOD("get_parameter_by_id", "parameter_id"), &FmodEvent::get_parameter_by_id);
     ClassDB::bind_method(D_METHOD("set_parameter_by_id", "parameter_id", "value"), &FmodEvent::set_parameter_by_id);
-    ClassDB::bind_method(D_METHOD("set_parameter_by_id_with_label", "parameter_id", "label", "ignoreseekspeed"), &FmodEvent::set_parameter_by_id_with_label);
+    ClassDB::bind_method(D_METHOD("set_parameter_by_id_with_label", "parameter_id", "label", "ignore_seek_speed"), &FmodEvent::set_parameter_by_id_with_label, DEFVAL(false));
     ClassDB::bind_method(D_METHOD("get_parameter_user_value_by_name", "parameter_name"), &FmodEvent::get_parameter_user_value_by_name);
     ClassDB::bind_method(D_METHOD("get_parameter_user_value_by_id", "parameter_id"), &FmodEvent::get_parameter_user_value_by_id);
     ClassDB::bind_method(D_METHOD("start"), &FmodEvent::start);
-    ClassDB::bind_method(D_METHOD("stop", "stopMode"), &FmodEvent::stop);
+    ClassDB::bind_method(D_METHOD("stop", "stop_mode"), &FmodEvent::stop);
     ClassDB::bind_method(D_METHOD("event_key_off"), &FmodEvent::event_key_off);
     ClassDB::bind_method(D_METHOD("get_playback_state"), &FmodEvent::get_playback_state);
     ClassDB::bind_method(D_METHOD("get_paused"), &FmodEvent::get_paused);
@@ -36,9 +36,9 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
     ClassDB::bind_method(D_METHOD("set_3d_attributes", "transform"), &FmodEvent::set_3d_attributes);
     ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
-    ClassDB::bind_method(D_METHOD("set_node_attributes", "transform"), &FmodEvent::set_node_attributes);
-    ClassDB::bind_method(D_METHOD("set_callback", "callback", "callbackMask"), &FmodEvent::set_callback);
-    ClassDB::bind_method(D_METHOD("set_programmer_callback", "p_programmers_callback_sound_key"), &FmodEvent::set_programmer_callback);
+    ClassDB::bind_method(D_METHOD("set_node_attributes", "node"), &FmodEvent::set_node_attributes);
+    ClassDB::bind_method(D_METHOD("set_callback", "callback", "callback_mask"), &FmodEvent::set_callback);
+    ClassDB::bind_method(D_METHOD("set_programmer_callback", "sound_key"), &FmodEvent::set_programmer_callback);
     ClassDB::bind_method(D_METHOD("get_programmer_callback_sound_key"), &FmodEvent::get_programmers_callback_sound_key);
     ClassDB::bind_method(D_METHOD("is_valid"), &FmodEvent::is_valid);
     ClassDB::bind_method(D_METHOD("release"), &FmodEvent::release);
@@ -50,14 +50,37 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::INT, "position",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_timeline_position", "get_timeline_position");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_listener_mask", "get_listener_mask");
     ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_node_attributes", "get_3d_attributes");
+    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_3d_attributes", "get_3d_attributes");
 
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_PLAYING);
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_SUSTAINING);
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPED);
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STARTING);
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_STOPPING);
-    BIND_ENUM_CONSTANT(FMOD_STUDIO_PLAYBACK_FORCEINT);
+    BIND_ENUM_CONSTANT(ALLOWFADEOUT);
+    BIND_ENUM_CONSTANT(IMMEDIATE);
+
+    BIND_ENUM_CONSTANT(PLAYING);
+    BIND_ENUM_CONSTANT(SUSTAINING);
+    BIND_ENUM_CONSTANT(PLAYBACK_STOPPED);
+    BIND_ENUM_CONSTANT(PLAYBACK_STARTING);
+    BIND_ENUM_CONSTANT(STOPPING);
+
+    BIND_BITFIELD_FLAG(CREATED);
+    BIND_BITFIELD_FLAG(DESTROYED);
+    BIND_BITFIELD_FLAG(CALLBACK_STARTING);
+    BIND_BITFIELD_FLAG(STARTED);
+    BIND_BITFIELD_FLAG(RESTARTED);
+    BIND_BITFIELD_FLAG(CALLBACK_STOPPED);
+    BIND_BITFIELD_FLAG(START_FAILED);
+    BIND_BITFIELD_FLAG(CREATE_PROGRAMMER_SOUND);
+    BIND_BITFIELD_FLAG(DESTROY_PROGRAMMER_SOUND);
+    BIND_BITFIELD_FLAG(PLUGIN_CREATED);
+    BIND_BITFIELD_FLAG(PLUGIN_DESTROYED);
+    BIND_BITFIELD_FLAG(TIMELINE_MARKER);
+    BIND_BITFIELD_FLAG(TIMELINE_BEAT);
+    BIND_BITFIELD_FLAG(SOUND_PLAYED);
+    BIND_BITFIELD_FLAG(SOUND_STOPPED);
+    BIND_BITFIELD_FLAG(REAL_TO_VIRTUAL);
+    BIND_BITFIELD_FLAG(VIRTUAL_TO_REAL);
+    BIND_BITFIELD_FLAG(START_EVENT_COMMAND);
+    BIND_BITFIELD_FLAG(NESTED_TIMELINE_BEAT);
+    BIND_BITFIELD_FLAG(ALL);
 }
 
 float FmodEvent::get_parameter_by_name(const String& parameter_name) const {
@@ -128,18 +151,18 @@ void FmodEvent::start() const {
     ERROR_CHECK(_wrapped->start());
 }
 
-void FmodEvent::stop(int stopMode) const {
-    ERROR_CHECK(_wrapped->stop(static_cast<FMOD_STUDIO_STOP_MODE>(stopMode)));
+void FmodEvent::stop(StudioStopMode stop_mode) const {
+    ERROR_CHECK(_wrapped->stop(fmod_enum_cast<FMOD_STUDIO_STOP_MODE>(stop_mode)));
 }
 
 void FmodEvent::event_key_off() const {
     ERROR_CHECK(_wrapped->keyOff());
 }
 
-FMOD_STUDIO_PLAYBACK_STATE FmodEvent::get_playback_state() const {
-    FMOD_STUDIO_PLAYBACK_STATE playback_state;
+FmodEvent::StudioPlaybackState FmodEvent::get_playback_state() const {
+    FMOD_STUDIO_PLAYBACK_STATE playback_state = FMOD_STUDIO_PLAYBACK_STOPPED;
     ERROR_CHECK(_wrapped->getPlaybackState(&playback_state));
-    return playback_state;
+    return fmod_enum_cast<StudioPlaybackState>(playback_state);
 }
 
 bool FmodEvent::get_paused() const {
@@ -250,10 +273,10 @@ void FmodEvent::set_node_attributes(Node* node) const {
     GODOT_LOG_ERROR("Invalid Object. A Godot object bound to FMOD has to be either a Node3D or CanvasItem.")
 }
 
-void FmodEvent::set_callback(const Callable& callback, uint32_t p_callback_mask) {
+void FmodEvent::set_callback(const Callable& callback, BitField<StudioEventCallbackType> p_callback_mask) {
     eventCallback = callback;
-    callback_mask = p_callback_mask;
-    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, p_callback_mask));
+    callback_mask = fmod_enum_cast<FMOD_STUDIO_EVENT_CALLBACK_TYPE>(p_callback_mask);
+    ERROR_CHECK(_wrapped->setCallback(Callbacks::event_callback, callback_mask));
 }
 
 void FmodEvent::set_programmer_callback(const String& p_programmers_callback_sound_key) {

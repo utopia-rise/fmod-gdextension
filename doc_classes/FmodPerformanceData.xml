@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodPerformanceData" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A snapshot of FMOD's CPU, memory and file usage.
+	</brief_description>
+	<description>
+		Returned by [method FmodServer.get_performance_data], which updates it each time it is called. The same figures are shown as performance monitors in the editor's debugger.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="convolution1" type="float" setter="" getter="get_convolution1">
+			The CPU usage of the first convolution reverb thread, in percent.
+		</member>
+		<member name="convolution2" type="float" setter="" getter="get_convolution2">
+			The CPU usage of the second convolution reverb thread, in percent.
+		</member>
+		<member name="currently_allocated" type="int" setter="" getter="get_currently_allocated">
+			The memory FMOD has allocated, in bytes.
+		</member>
+		<member name="dsp" type="float" setter="" getter="get_dsp">
+			The CPU usage of FMOD's mixer, in percent.
+		</member>
+		<member name="geometry" type="float" setter="" getter="get_geometry">
+			The CPU usage of FMOD's geometry occlusion, in percent.
+		</member>
+		<member name="max_allocated" type="int" setter="" getter="get_max_allocated">
+			The most memory FMOD has allocated at once, in bytes.
+		</member>
+		<member name="other_bytes_read" type="int" setter="" getter="get_other_bytes_read">
+			The bytes FMOD has read from files other than samples and streams, such as banks' metadata.
+		</member>
+		<member name="sample_bytes_read" type="int" setter="" getter="get_sample_bytes_read">
+			The bytes FMOD has read from files to load sample data.
+		</member>
+		<member name="stream" type="float" setter="" getter="get_stream">
+			The CPU usage of FMOD's streaming, in percent.
+		</member>
+		<member name="stream_bytes_read" type="int" setter="" getter="get_stream_bytes_read">
+			The bytes FMOD has read from files to play streams.
+		</member>
+		<member name="studio" type="float" setter="" getter="get_studio">
+			The CPU usage of FMOD Studio's update, in percent.
+		</member>
+		<member name="update" type="float" setter="" getter="get_update">
+			The CPU usage of FMOD Core's update, in percent.
+		</member>
+	</members>
+</class>

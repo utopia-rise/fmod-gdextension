@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<class name="FmodBank" inherits="RefCounted" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+<class name="FmodBank" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
 		Represents a loaded FMOD Studio bank containing audio content and metadata.
 	</brief_description>
@@ -26,13 +26,13 @@
 				Returns the number of buses defined in this bank.
 			</description>
 		</method>
-		<method name="get_bus_list">
+		<method name="get_bus_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodBus] objects defined in this bank.
 			</description>
 		</method>
-		<method name="get_description_list">
+		<method name="get_description_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodEventDescription] objects defined in this bank.
@@ -44,8 +44,20 @@
 				Returns the number of event descriptions defined in this bank.
 			</description>
 		</method>
+		<method name="get_godot_res_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the Godot path the bank was loaded from, such as [code]res://banks/Music.bank[/code].
+			</description>
+		</method>
+		<method name="get_guid" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the GUID of this bank, as a string in braces: [code]{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}[/code].
+			</description>
+		</method>
 		<method name="get_loading_state">
-			<return type="int" />
+			<return type="int" enum="FmodBank.StudioLoadingState" />
 			<description>
 				Returns the loading state of the bank. See FMOD_STUDIO_LOADING_STATE enum for possible values:
 				- FMOD_STUDIO_LOADING_STATE_UNLOADING: Bank is being unloaded
@@ -55,29 +67,61 @@
 				- FMOD_STUDIO_LOADING_STATE_ERROR: An error occurred during loading
 			</description>
 		</method>
-		<method name="get_string_count">
+		<method name="get_path" qualifiers="const">
+			<return type="String" />
+			<description>
+				Returns the path of this bank in the FMOD Studio project, such as [code]bank:/Music[/code]. It is empty when the strings bank is not loaded.
+			</description>
+		</method>
+		<method name="get_string_count" qualifiers="const">
 			<return type="int" />
 			<description>
 				Returns the number of strings in the bank's string table. This includes names for events, buses, VCAs, and parameters.
 			</description>
 		</method>
-		<method name="get_vca_count">
+		<method name="get_vca_count" qualifiers="const">
 			<return type="int" />
 			<description>
 				Returns the number of VCAs (Volume Control Automation) defined in this bank.
 			</description>
 		</method>
-		<method name="get_vca_list">
+		<method name="get_vca_list" qualifiers="const">
 			<return type="Array" />
 			<description>
 				Returns an array of all [FmodVCA] objects defined in this bank.
 			</description>
 		</method>
-		<method name="update_bank_data">
-			<return type="void" />
+		<method name="is_valid" qualifiers="const">
+			<return type="bool" />
 			<description>
-				Forces an update of the bank's cached data including event descriptions, buses, and VCAs. This is typically called automatically but can be useful if the bank content changes at runtime.
+				Returns [code]true[/code] while the underlying FMOD bank exists. It becomes invalid once released or once its bank is unloaded.
 			</description>
 		</method>
 	</methods>
+	<constants>
+		<constant name="UNLOADING" value="0" enum="StudioLoadingState">
+			The bank is being unloaded.
+		</constant>
+		<constant name="UNLOADED" value="1" enum="StudioLoadingState">
+			The bank is not loaded.
+		</constant>
+		<constant name="LOADING" value="2" enum="StudioLoadingState">
+			The bank is loading, after [method FmodServer.load_bank] with [constant NONBLOCKING].
+		</constant>
+		<constant name="LOADED" value="3" enum="StudioLoadingState">
+			The bank is loaded and its events, buses and VCAs can be used.
+		</constant>
+		<constant name="ERROR" value="4" enum="StudioLoadingState">
+			Loading the bank failed.
+		</constant>
+		<constant name="NORMAL" value="0" enum="StudioLoadBankFlags" is_bitfield="true">
+			Loads the bank synchronously: [method FmodServer.load_bank] returns once it is loaded.
+		</constant>
+		<constant name="NONBLOCKING" value="1" enum="StudioLoadBankFlags" is_bitfield="true">
+			Loads the bank in the background: [method FmodServer.load_bank] returns at once, and [method get_loading_state] reports when the bank is loaded.
+		</constant>
+		<constant name="DECOMPRESS_SAMPLES" value="2" enum="StudioLoadBankFlags" is_bitfield="true">
+			Decompresses the bank's sample data into memory when it loads, trading memory for less CPU while playing.
+		</constant>
+	</constants>
 </class>

@@ -51,13 +51,13 @@ Ref<FmodPluginsSettings> FmodPluginsSettings::get_from_project_settings() {
 }
 
 void FmodPluginsSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_plugins_base_path", "p_base_path"), &FmodPluginsSettings::set_plugins_base_path);
+    ClassDB::bind_method(D_METHOD("set_plugins_base_path", "base_path"), &FmodPluginsSettings::set_plugins_base_path);
     ClassDB::bind_method(D_METHOD("get_fmod_plugins_base_path"), &FmodPluginsSettings::get_plugins_base_path);
 
-    ClassDB::bind_method(D_METHOD("set_dynamic_plugin_list", "p_dynamic_plugin_list"), &FmodPluginsSettings::set_dynamic_plugin_list);
+    ClassDB::bind_method(D_METHOD("set_dynamic_plugin_list", "dynamic_plugin_list"), &FmodPluginsSettings::set_dynamic_plugin_list);
     ClassDB::bind_method(D_METHOD("get_dynamic_plugin_list"), &FmodPluginsSettings::get_dynamic_plugin_list);
 
-    ClassDB::bind_method(D_METHOD("set_static_plugins_methods", "p_static_plugins_settings"), &FmodPluginsSettings::set_static_plugins_methods);
+    ClassDB::bind_method(D_METHOD("set_static_plugins_methods", "static_plugins_methods"), &FmodPluginsSettings::set_static_plugins_methods);
     ClassDB::bind_method(D_METHOD("get_static_plugins_methods"), &FmodPluginsSettings::get_static_plugins_methods);
 
     ADD_PROPERTY(
@@ -89,7 +89,7 @@ void FmodPluginsSettings::_bind_methods() {
                     Variant::ARRAY,
                     "static_plugins_methods",
                     PROPERTY_HINT_ARRAY_TYPE,
-                    vformat("%s/%s:%s", Variant::OBJECT, PROPERTY_HINT_RESOURCE_TYPE, "FmodStaticPluginMethod"),
+                    "FmodStaticPluginMethod",
                     PROPERTY_USAGE_DEFAULT
             ),
             "set_static_plugins_methods",
@@ -97,11 +97,11 @@ void FmodPluginsSettings::_bind_methods() {
     );
 }
 
-void FmodPluginsSettings::set_static_plugins_methods(const Array& p_static_plugins_settings) {
+void FmodPluginsSettings::set_static_plugins_methods(const TypedArray<FmodStaticPluginMethod>& p_static_plugins_settings) {
     _static_plugins_methods = p_static_plugins_settings;
 }
 
-const Array& FmodPluginsSettings::get_static_plugins_methods() const {
+TypedArray<FmodStaticPluginMethod> FmodPluginsSettings::get_static_plugins_methods() const {
     return _static_plugins_methods;
 }
 
@@ -122,10 +122,10 @@ const String& FmodStaticPluginMethod::get_method_name() const {
 }
 
 void FmodStaticPluginMethod::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_type", "p_type"), &FmodStaticPluginMethod::set_type);
+    ClassDB::bind_method(D_METHOD("set_type", "type"), &FmodStaticPluginMethod::set_type);
     ClassDB::bind_method(D_METHOD("get_type"), &FmodStaticPluginMethod::get_type);
 
-    ClassDB::bind_method(D_METHOD("set_method_name", "p_method_name"), &FmodStaticPluginMethod::set_method_name);
+    ClassDB::bind_method(D_METHOD("set_method_name", "method_name"), &FmodStaticPluginMethod::set_method_name);
     ClassDB::bind_method(D_METHOD("get_method_name"), &FmodStaticPluginMethod::get_method_name);
 
     ADD_PROPERTY(
@@ -134,7 +134,8 @@ void FmodStaticPluginMethod::_bind_methods() {
                     "type",
                     PROPERTY_HINT_ENUM,
                     "CODEC,DSP,OUTPUT",
-                    PROPERTY_USAGE_DEFAULT
+                    PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+                    "FmodStaticPluginMethod.Type"
             ),
             "set_type",
             "get_type"

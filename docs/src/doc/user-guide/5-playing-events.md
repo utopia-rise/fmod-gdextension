@@ -172,7 +172,7 @@ var icon: Sprite2D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	event = FmodServer.create_event_instance("event:/Music/Level 02")
-	event.set_callback(Callable(self, "change_color"), FmodServer.FMOD_STUDIO_EVENT_CALLBACK_ALL)
+	event.set_callback(Callable(self, "change_color"), FmodEvent.StudioEventCallbackType.ALL)
 	body_entered.connect(enter)
 	body_exited.connect(leave)
 	event.start()
@@ -190,7 +190,7 @@ func leave(_area):
 
 # warning-ignore:unused_argument
 func change_color(_dict: Dictionary, type: int):
-	if type == FmodServer.FMOD_STUDIO_EVENT_CALLBACK_TIMELINE_BEAT:
+	if type == FmodEvent.StudioEventCallbackType.TIMELINE_BEAT:
 		$icon.self_modulate = Color(randf_range(0,1), randf_range(0,1), randf_range(0,1), 1)
 ```
 
@@ -203,7 +203,7 @@ In order to play a programmer callback you must load the bank with audio table c
 then you can use `set_programmer_callback` to specify key from audio table to use.
 
 ```gdscript
-FmodServer.load_bank("res://assets/Banks/Dialogue_EN.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+FmodServer.load_bank("res://assets/Banks/Dialogue_EN.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 var event_instance = FmodServer.create_event_instance("event:/Character/Dialogue") # event from sfx bank.
 event_instance.set_programmer_callback("welcome") # welcome key in audio table from Dialogue bank.
 event_instance.start()

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodSound" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		A sound file playing through FMOD's Core API.
+	</brief_description>
+	<description>
+		Returned by [method FmodServer.create_sound_instance], from a file loaded by [method FmodServer.load_file_as_sound] or [method FmodServer.load_file_as_music]. Release it once it is no longer needed.
+	</description>
+	<tutorials>
+	</tutorials>
+	<methods>
+		<method name="is_playing" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] while the sound plays.
+			</description>
+		</method>
+		<method name="is_valid" qualifiers="const">
+			<return type="bool" />
+			<description>
+				Returns [code]true[/code] while the sound's FMOD channel exists.
+			</description>
+		</method>
+		<method name="play" qualifiers="const">
+			<return type="void" />
+			<description>
+				Plays the sound.
+			</description>
+		</method>
+		<method name="release" qualifiers="const">
+			<return type="void" />
+			<description>
+				Stops the sound and releases its FMOD channel.
+			</description>
+		</method>
+		<method name="set_paused" qualifiers="const">
+			<return type="void" />
+			<param index="0" name="paused" type="bool" />
+			<description>
+				Pauses the sound if [param paused] is [code]true[/code], and resumes it otherwise.
+			</description>
+		</method>
+		<method name="stop" qualifiers="const">
+			<return type="void" />
+			<description>
+				Stops the sound.
+			</description>
+		</method>
+	</methods>
+	<members>
+		<member name="pitch" type="float" setter="set_pitch" getter="get_pitch">
+			The pitch multiplier of the sound: 1 is the original pitch, 2 an octave higher.
+		</member>
+		<member name="volume" type="float" setter="set_volume" getter="get_volume">
+			The volume multiplier of the sound: 1 is the original volume, 0 silent.
+		</member>
+	</members>
+</class>

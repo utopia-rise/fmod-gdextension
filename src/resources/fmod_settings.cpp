@@ -82,22 +82,22 @@ Ref<FmodGeneralSettings> FmodGeneralSettings::get_from_project_settings() {
 }
 
 void FmodGeneralSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_channel_count", "p_channel_count"), &FmodGeneralSettings::set_channel_count);
+    ClassDB::bind_method(D_METHOD("set_channel_count", "channel_count"), &FmodGeneralSettings::set_channel_count);
     ClassDB::bind_method(D_METHOD("get_channel_count"), &FmodGeneralSettings::get_channel_count);
 
-    ClassDB::bind_method(D_METHOD("set_is_live_update_enabled", "p_enable_live_update"), &FmodGeneralSettings::set_is_live_update_enabled);
+    ClassDB::bind_method(D_METHOD("set_is_live_update_enabled", "enable_live_update"), &FmodGeneralSettings::set_is_live_update_enabled);
     ClassDB::bind_method(D_METHOD("get_is_live_update_enabled"), &FmodGeneralSettings::get_is_live_update_enabled);
 
-    ClassDB::bind_method(D_METHOD("set_is_memory_tracking_enabled", "p_enable_memory_tracking"), &FmodGeneralSettings::set_is_memory_tracking_enabled);
+    ClassDB::bind_method(D_METHOD("set_is_memory_tracking_enabled", "enable_memory_tracking"), &FmodGeneralSettings::set_is_memory_tracking_enabled);
     ClassDB::bind_method(D_METHOD("get_is_memory_tracking_enabled"), &FmodGeneralSettings::get_is_memory_tracking_enabled);
 
-    ClassDB::bind_method(D_METHOD("set_default_listener_count", "p_listener_count"), &FmodGeneralSettings::set_default_listener_count);
+    ClassDB::bind_method(D_METHOD("set_default_listener_count", "listener_count"), &FmodGeneralSettings::set_default_listener_count);
     ClassDB::bind_method(D_METHOD("get_default_listener_count"), &FmodGeneralSettings::get_default_listener_count);
 
-    ClassDB::bind_method(D_METHOD("set_banks_path", "p_paths"), &FmodGeneralSettings::set_banks_path);
+    ClassDB::bind_method(D_METHOD("set_banks_path", "paths"), &FmodGeneralSettings::set_banks_path);
     ClassDB::bind_method(D_METHOD("get_banks_path"), &FmodGeneralSettings::get_banks_path);
 
-    ClassDB::bind_method(D_METHOD("set_should_load_by_name", "p_should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
+    ClassDB::bind_method(D_METHOD("set_should_load_by_name", "should_load_by_name"), &FmodGeneralSettings::set_should_load_by_name);
     ClassDB::bind_method(D_METHOD("get_should_load_by_name"), &FmodGeneralSettings::get_should_load_by_name);
 
     ADD_PROPERTY(

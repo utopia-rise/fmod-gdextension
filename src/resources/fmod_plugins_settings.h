@@ -3,6 +3,7 @@
 
 
 #include <classes/resource.hpp>
+#include <variant/typed_array.hpp>
 
 namespace godot {
     class FmodStaticPluginMethod : public Resource {
@@ -41,8 +42,8 @@ namespace godot {
         void set_dynamic_plugin_list(const PackedStringArray& p_dynamic_plugin_list);
         const PackedStringArray& get_dynamic_plugin_list() const;
 
-        void set_static_plugins_methods(const Array& p_static_plugins_settings);
-        const Array& get_static_plugins_methods() const;
+        void set_static_plugins_methods(const TypedArray<FmodStaticPluginMethod>& p_static_plugins_settings);
+        TypedArray<FmodStaticPluginMethod> get_static_plugins_methods() const;
 
         static Ref<FmodPluginsSettings> get_from_project_settings();
 
@@ -57,7 +58,7 @@ namespace godot {
     private:
         String _plugins_base_path;
         PackedStringArray _dynamic_plugin_list;
-        Array _static_plugins_methods;
+        TypedArray<FmodStaticPluginMethod> _static_plugins_methods;
 
     protected:
         static void _bind_methods();

@@ -14,11 +14,11 @@ int FmodSoftwareFormatSettings::get_sample_rate() const {
     return _sample_rate;
 }
 
-void FmodSoftwareFormatSettings::set_speaker_mode(const int p_speaker_mode) {
+void FmodSoftwareFormatSettings::set_speaker_mode(SpeakerMode p_speaker_mode) {
     _speaker_mode = p_speaker_mode;
 }
 
-int FmodSoftwareFormatSettings::get_speaker_mode() const {
+FmodSoftwareFormatSettings::SpeakerMode FmodSoftwareFormatSettings::get_speaker_mode() const {
     return _speaker_mode;
 }
 
@@ -40,7 +40,7 @@ Ref<FmodSoftwareFormatSettings> FmodSoftwareFormatSettings::get_from_project_set
     settings->set_sample_rate(project_settings->get_setting(sample_rate_setting_path, DEFAULT_SAMPLE_RATE));
 
     String speaker_mode_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, SOFTWARE_FORMAT_SETTINGS_BASE_PATH, SPEAKER_MODE_OPTION);
-    settings->set_speaker_mode(project_settings->get_setting(speaker_mode_setting_path, DEFAULT_SPEAKER_MODE));
+    settings->set_speaker_mode(static_cast<SpeakerMode>(static_cast<int>(project_settings->get_setting(speaker_mode_setting_path, DEFAULT_SPEAKER_MODE))));
 
     String raw_speaker_count_setting_path = vformat("%s/%s/%s", FMOD_SETTINGS_BASE_PATH, SOFTWARE_FORMAT_SETTINGS_BASE_PATH, RAW_SPEAKER_COUNT_OPTION);
     settings->set_raw_speakers_count(project_settings->get_setting(raw_speaker_count_setting_path, DEFAULT_RAW_SPEAKER_COUNT));
@@ -49,13 +49,13 @@ Ref<FmodSoftwareFormatSettings> FmodSoftwareFormatSettings::get_from_project_set
 }
 
 void FmodSoftwareFormatSettings::_bind_methods() {
-    ClassDB::bind_method(D_METHOD("set_sample_rate", "p_sample_rate"), &FmodSoftwareFormatSettings::set_sample_rate);
+    ClassDB::bind_method(D_METHOD("set_sample_rate", "sample_rate"), &FmodSoftwareFormatSettings::set_sample_rate);
     ClassDB::bind_method(D_METHOD("get_sample_rate"), &FmodSoftwareFormatSettings::get_sample_rate);
 
-    ClassDB::bind_method(D_METHOD("set_speaker_mode", "p_speaker_mode"), &FmodSoftwareFormatSettings::set_speaker_mode);
+    ClassDB::bind_method(D_METHOD("set_speaker_mode", "speaker_mode"), &FmodSoftwareFormatSettings::set_speaker_mode);
     ClassDB::bind_method(D_METHOD("get_speaker_mode"), &FmodSoftwareFormatSettings::get_speaker_mode);
 
-    ClassDB::bind_method(D_METHOD("set_raw_speakers_count", "p_raw_speakers_count"), &FmodSoftwareFormatSettings::set_raw_speakers_count);
+    ClassDB::bind_method(D_METHOD("set_raw_speakers_count", "raw_speakers_count"), &FmodSoftwareFormatSettings::set_raw_speakers_count);
     ClassDB::bind_method(D_METHOD("get_raw_speakers_count"), &FmodSoftwareFormatSettings::get_raw_speakers_count);
 
     ADD_PROPERTY(
@@ -75,8 +75,9 @@ void FmodSoftwareFormatSettings::_bind_methods() {
         Variant::INT,
         "speaker_mode",
         PROPERTY_HINT_ENUM,
-        "",
-        PROPERTY_USAGE_DEFAULT
+        SPEAKER_MODE_HINT,
+        PROPERTY_USAGE_DEFAULT | PROPERTY_USAGE_CLASS_IS_ENUM,
+        "FmodSoftwareFormatSettings.SpeakerMode"
       ),
       "set_speaker_mode",
       "get_speaker_mode"
@@ -93,4 +94,14 @@ void FmodSoftwareFormatSettings::_bind_methods() {
       "set_raw_speakers_count",
       "get_raw_speakers_count"
     );
+
+    BIND_ENUM_CONSTANT(DEFAULT);
+    BIND_ENUM_CONSTANT(RAW);
+    BIND_ENUM_CONSTANT(MONO);
+    BIND_ENUM_CONSTANT(STEREO);
+    BIND_ENUM_CONSTANT(QUAD);
+    BIND_ENUM_CONSTANT(SURROUND);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_5POINT1);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1);
+    BIND_ENUM_CONSTANT(SPEAKERMODE_7POINT1POINT4);
 }

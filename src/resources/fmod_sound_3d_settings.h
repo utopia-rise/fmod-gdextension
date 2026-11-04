@@ -33,9 +33,9 @@ namespace godot {
         static constexpr const float DEFAULT_ROLLOFF_SCALE = 1;
 
     private:
-        float _doppler_scale;
-        float _distance_factor;
-        float _rolloff_scale;
+        float _doppler_scale = DEFAULT_DOPPLER_SCALE;
+        float _distance_factor = DEFAULT_DISTANCE_FACTOR;
+        float _rolloff_scale = DEFAULT_ROLLOFF_SCALE;
 
     protected:
         static void _bind_methods();

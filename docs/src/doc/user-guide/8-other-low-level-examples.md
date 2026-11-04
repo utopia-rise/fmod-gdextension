@@ -6,14 +6,10 @@ You can mute all event using `mute_all_events`. This will mute the master bus.
 
 ```gdscript
 func _ready():
-	FmodServer.set_software_format(0, FmodServer.FMOD_SPEAKERMODE_STEREO, 0)
-	FmodServer.init(1024, FmodServer.FMOD_STUDIO_INIT_LIVEUPDATE, FmodServer.FMOD_INIT_NORMAL)
-	FmodServer.set_sound_3d_settings(1.0, 64.0, 1.0)
-	
 	# load banks
-	FmodServer.load_bank("res://Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	FmodServer.load_bank("res://Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	FmodServer.load_bank("res://Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	FmodServer.load_bank("res://Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	FmodServer.load_bank("res://Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	FmodServer.load_bank("res://Music.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	
 	# register listener
 	FmodServer.add_listener(0, self)
@@ -42,15 +38,10 @@ func _ready():
 
 ```gdscript
 func _ready():
-	# set up FMOD
-	FmodServer.set_software_format(0, FmodServer.FMOD_SPEAKERMODE_STEREO, 0)
-	FmodServer.init(1024, FmodServer.FMOD_STUDIO_INIT_LIVEUPDATE, FmodServer.FMOD_INIT_NORMAL)
-	FmodServer.set_sound_3d_settings(1/0, 64.0, 1.0)
-	
 	# load banks
-	FmodServer.load_bank("res://Master.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	FmodServer.load_bank("res://Master.strings.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
-	FmodServer.load_bank("res://Music.bank", FmodServer.FMOD_STUDIO_LOAD_BANK_NORMAL)
+	FmodServer.load_bank("res://Master.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	FmodServer.load_bank("res://Master.strings.bank", FmodBank.StudioLoadBankFlags.NORMAL)
+	FmodServer.load_bank("res://Music.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	
 	# register listener
 	FmodServer.add_listener(0, self)

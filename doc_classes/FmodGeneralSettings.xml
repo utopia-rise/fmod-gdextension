@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<class name="FmodGeneralSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
+	<brief_description>
+		The general FMOD settings, read from Project Settings.
+	</brief_description>
+	<description>
+		Set in Project Settings under [code]Fmod/General[/code]. FMOD reads them when it initializes.
+	</description>
+	<tutorials>
+	</tutorials>
+	<members>
+		<member name="banks_path" type="String" setter="set_banks_path" getter="get_banks_path" default="&quot;&quot;">
+			The folder holding the project's banks. The editor's bank explorer reads the banks from it, and exports pack them.
+		</member>
+		<member name="channel_count" type="int" setter="set_channel_count" getter="get_channel_count" default="1024">
+			The maximum number of channels FMOD plays at once.
+		</member>
+		<member name="default_listener_count" type="int" setter="set_default_listener_count" getter="get_default_listener_count" default="1">
+			The number of listeners FMOD starts with.
+		</member>
+		<member name="is_live_update_enabled" type="bool" setter="set_is_live_update_enabled" getter="get_is_live_update_enabled" default="true">
+			If [code]true[/code], FMOD Studio can connect to the running game to edit and profile its audio live. Never enabled in the editor.
+		</member>
+		<member name="is_memory_tracking_enabled" type="bool" setter="set_is_memory_tracking_enabled" getter="get_is_memory_tracking_enabled" default="false">
+			If [code]true[/code], FMOD tracks its memory use, reported to FMOD Studio's profiler.
+		</member>
+		<member name="should_load_by_name" type="bool" setter="set_should_load_by_name" getter="get_should_load_by_name" default="false">
+			If [code]true[/code], event emitters find their event by path rather than by GUID.
+		</member>
+	</members>
+</class>

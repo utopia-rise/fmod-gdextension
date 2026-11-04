@@ -10,7 +10,7 @@ void FmodBank::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_bus_count"), &FmodBank::get_bus_count);
     ClassDB::bind_method(D_METHOD("get_event_description_count"), &FmodBank::get_event_description_count);
     ClassDB::bind_method(D_METHOD("get_string_count"), &FmodBank::get_string_count);
-    ClassDB::bind_method(D_METHOD("get_VCA_count"), &FmodBank::get_vca_count);
+    ClassDB::bind_method(D_METHOD("get_vca_count"), &FmodBank::get_vca_count);
     ClassDB::bind_method(D_METHOD("get_description_list"), &FmodBank::get_description_list);
     ClassDB::bind_method(D_METHOD("get_bus_list"), &FmodBank::get_bus_list);
     ClassDB::bind_method(D_METHOD("get_vca_list"), &FmodBank::get_vca_list);
@@ -18,13 +18,23 @@ void FmodBank::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_godot_res_path"), &FmodBank::get_godot_res_path);
     ClassDB::bind_method(D_METHOD("get_path"), &FmodBank::get_path);
     ClassDB::bind_method(D_METHOD("get_guid"), &FmodBank::get_guid_as_string);
+
+    BIND_ENUM_CONSTANT(UNLOADING);
+    BIND_ENUM_CONSTANT(UNLOADED);
+    BIND_ENUM_CONSTANT(LOADING);
+    BIND_ENUM_CONSTANT(LOADED);
+    BIND_ENUM_CONSTANT(ERROR);
+
+    BIND_BITFIELD_FLAG(NORMAL);
+    BIND_BITFIELD_FLAG(NONBLOCKING);
+    BIND_BITFIELD_FLAG(DECOMPRESS_SAMPLES);
 }
 
-int FmodBank::get_loading_state() {
-    FMOD_STUDIO_LOADING_STATE state;
+FmodBank::StudioLoadingState FmodBank::get_loading_state() {
+    FMOD_STUDIO_LOADING_STATE state = FMOD_STUDIO_LOADING_STATE_ERROR;
 
     ERROR_CHECK_WITH_REASON(_wrapped->getLoadingState(&state), vformat("Cannot get loading state for bank %s", get_path()));
-    return state;
+    return fmod_enum_cast<StudioLoadingState>(state);
 }
 
 int64_t FmodBank::get_bus_count() {
