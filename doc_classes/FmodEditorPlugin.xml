@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="FmodEditorPlugin" inherits="EditorPlugin" api_type="editor_extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
+		The editor side of FMOD GDExtension.
 	</brief_description>
 	<description>
+		Registers the FMOD Project Settings and the export plugin, and provides the editor tools of the FMOD addon.
 	</description>
 	<tutorials>
 	</tutorials>

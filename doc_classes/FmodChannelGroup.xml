@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="FmodChannelGroup" inherits="RefCounted" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
+		A group of channels FMOD mixes together, such as the one an event instance plays through.
 	</brief_description>
 	<description>
+		Returned by [method FmodEvent.get_channel_group]. Its DSP clocks count the samples mixed, which lets game code schedule sounds in time with an event's audio.
 	</description>
 	<tutorials>
 	</tutorials>
@@ -10,11 +12,13 @@
 		<method name="get_dsp_clock" qualifiers="const">
 			<return type="int" />
 			<description>
+				Returns this channel group's DSP clock, in samples mixed at the output rate.
 			</description>
 		</method>
 		<method name="get_parent_dsp_clock" qualifiers="const">
 			<return type="int" />
 			<description>
+				Returns the DSP clock of this channel group's parent, in samples mixed at the output rate.
 			</description>
 		</method>
 	</methods>

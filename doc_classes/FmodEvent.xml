@@ -27,6 +27,7 @@
 		<method name="get_channel_group" qualifiers="const">
 			<return type="FmodChannelGroup" />
 			<description>
+				Returns the channel group the event instance plays through, whose DSP clock can schedule sounds in time with it. It is null until the instance starts playing.
 			</description>
 		</method>
 		<method name="get_parameter_by_id" qualifiers="const">
@@ -79,6 +80,7 @@
 		<method name="is_valid" qualifiers="const">
 			<return type="bool" />
 			<description>
+				Returns [code]true[/code] while the underlying FMOD event instance exists. It becomes invalid once released or once its bank is unloaded.
 			</description>
 		</method>
 		<method name="is_virtual" qualifiers="const">
@@ -196,58 +198,85 @@
 	</members>
 	<constants>
 		<constant name="ALLOWFADEOUT" value="0" enum="StudioStopMode">
+			Stops the event letting its AHDSR modulators fade it out, as designed in FMOD Studio.
 		</constant>
 		<constant name="IMMEDIATE" value="1" enum="StudioStopMode">
+			Stops the event at once, cutting its sound.
 		</constant>
 		<constant name="PLAYING" value="0" enum="StudioPlaybackState">
+			The event is playing.
 		</constant>
 		<constant name="SUSTAINING" value="1" enum="StudioPlaybackState">
+			The event is stopped at a sustain point, until [method event_key_off] lets it continue.
 		</constant>
 		<constant name="PLAYBACK_STOPPED" value="2" enum="StudioPlaybackState">
+			The event is stopped.
 		</constant>
 		<constant name="PLAYBACK_STARTING" value="3" enum="StudioPlaybackState">
+			The event is starting: [method start] was called, and it plays once its sample data is loaded.
 		</constant>
 		<constant name="STOPPING" value="4" enum="StudioPlaybackState">
+			The event is stopping, fading out after [method stop] with [constant ALLOWFADEOUT].
 		</constant>
 		<constant name="CREATED" value="1" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance is created.
 		</constant>
 		<constant name="DESTROYED" value="2" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance is destroyed.
 		</constant>
 		<constant name="CALLBACK_STARTING" value="4" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when [method start] is called on the event instance.
 		</constant>
 		<constant name="STARTED" value="8" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance starts playing.
 		</constant>
 		<constant name="RESTARTED" value="16" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when [method start] restarts an event instance that was already playing.
 		</constant>
 		<constant name="CALLBACK_STOPPED" value="32" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance stops.
 		</constant>
 		<constant name="START_FAILED" value="64" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance fails to start, for example because of its instance limit.
 		</constant>
 		<constant name="CREATE_PROGRAMMER_SOUND" value="128" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when a programmer instrument needs its sound.
 		</constant>
 		<constant name="DESTROY_PROGRAMMER_SOUND" value="256" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when a programmer instrument's sound is no longer needed.
 		</constant>
 		<constant name="PLUGIN_CREATED" value="512" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when a DSP plugin of the event instance is created.
 		</constant>
 		<constant name="PLUGIN_DESTROYED" value="1024" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when a DSP plugin of the event instance is destroyed.
 		</constant>
 		<constant name="TIMELINE_MARKER" value="2048" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when playback reaches a marker on the event's timeline. The callback's data holds the marker's name and position.
 		</constant>
 		<constant name="TIMELINE_BEAT" value="4096" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called on each beat of a tempo marker on the event's timeline. The callback's data holds the bar, beat, position, tempo and time signature.
 		</constant>
 		<constant name="SOUND_PLAYED" value="8192" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when an instrument of the event starts playing a sound.
 		</constant>
 		<constant name="SOUND_STOPPED" value="16384" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when an instrument of the event stops playing a sound.
 		</constant>
 		<constant name="REAL_TO_VIRTUAL" value="32768" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance becomes virtual: FMOD stops mixing it to save voices, while keeping its timeline running.
 		</constant>
 		<constant name="VIRTUAL_TO_REAL" value="65536" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when the event instance stops being virtual and is mixed again.
 		</constant>
 		<constant name="START_EVENT_COMMAND" value="131072" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called when a start event command instrument starts another event instance.
 		</constant>
 		<constant name="NESTED_TIMELINE_BEAT" value="262144" enum="StudioEventCallbackType" is_bitfield="true">
+			The callback is called on each beat of a tempo marker in a nested event's timeline.
 		</constant>
 		<constant name="ALL" value="4294967295" enum="StudioEventCallbackType" is_bitfield="true">
+			Every callback type.
 		</constant>
 	</constants>
 </class>

@@ -78,12 +78,14 @@
 		<method name="tool_remove_all_parameters">
 			<return type="void" />
 			<description>
+				Removes every parameter value set on the emitter. Used by the editor's Inspector when the emitter's event changes; it does nothing outside the editor.
 			</description>
 		</method>
 		<method name="tool_remove_parameter">
 			<return type="void" />
 			<param index="0" name="parameter_id" type="int" />
 			<description>
+				Removes the value set for the parameter with the given ID. Used by the editor's Inspector; it does nothing outside the editor.
 			</description>
 		</method>
 	</methods>

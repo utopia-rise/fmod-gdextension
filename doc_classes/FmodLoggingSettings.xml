@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="FmodLoggingSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
+		The settings of FMOD's own logging, read from Project Settings.
 	</brief_description>
 	<description>
+		Set in Project Settings under [code]Fmod/Logging[/code]. They choose how much FMOD logs and where.
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
 		<member name="debug_level" type="int" setter="set_debug_level" getter="get_debug_level" enum="FmodLoggingSettings.DebugLevel" default="0">
+			How much FMOD logs.
 		</member>
 		<member name="log_file_path" type="String" setter="set_log_file_path" getter="get_log_file_path" default="&quot;&quot;">
+			The file FMOD logs to when [member log_output] is [constant FILE].
 		</member>
 		<member name="log_output" type="int" setter="set_log_output" getter="get_log_output" enum="FmodLoggingSettings.DebugMode" default="2">
+			Where FMOD logs.
 		</member>
 	</members>
 	<constants>
 		<constant name="DEBUG_INHERIT" value="0" enum="DebugLevel">
+			Follows Godot's verbosity: errors and warnings, plus FMOD's log and trace messages when Godot runs verbose.
 		</constant>
 		<constant name="DEBUG_NONE" value="1" enum="DebugLevel">
+			FMOD logs nothing.
 		</constant>
 		<constant name="DEBUG_ERROR" value="2" enum="DebugLevel">
+			FMOD logs errors only.
 		</constant>
 		<constant name="DEBUG_WARNING" value="3" enum="DebugLevel">
+			FMOD logs errors and warnings.
 		</constant>
 		<constant name="DEBUG_LOG" value="4" enum="DebugLevel">
+			FMOD logs errors, warnings and informational messages.
 		</constant>
 		<constant name="DEBUG_VERBOSE" value="5" enum="DebugLevel">
+			FMOD logs errors, warnings, informational messages and trace messages.
 		</constant>
 		<constant name="TTY" value="0" enum="DebugMode">
+			FMOD logs to the standard output.
 		</constant>
 		<constant name="FILE" value="1" enum="DebugMode">
+			FMOD logs to [member log_file_path].
 		</constant>
 		<constant name="CALLBACK" value="2" enum="DebugMode">
+			FMOD logs to Godot's output, as Godot errors, warnings and messages.
 		</constant>
 	</constants>
 </class>

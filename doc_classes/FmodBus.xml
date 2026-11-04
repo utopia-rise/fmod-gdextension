@@ -22,16 +22,19 @@
 		<method name="get_guid" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the GUID of this bus, as a string in braces: [code]{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}[/code].
 			</description>
 		</method>
 		<method name="get_path" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the path of this bus in the FMOD Studio project, such as [code]bus:/SFX[/code]. It is empty when the strings bank is not loaded.
 			</description>
 		</method>
 		<method name="is_valid" qualifiers="const">
 			<return type="bool" />
 			<description>
+				Returns [code]true[/code] while the underlying FMOD bus exists. It becomes invalid once released or once its bank is unloaded.
 			</description>
 		</method>
 		<method name="stop_all_events">

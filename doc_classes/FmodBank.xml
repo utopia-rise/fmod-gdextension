@@ -47,11 +47,13 @@
 		<method name="get_godot_res_path" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the Godot path the bank was loaded from, such as [code]res://banks/Music.bank[/code].
 			</description>
 		</method>
 		<method name="get_guid" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the GUID of this bank, as a string in braces: [code]{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}[/code].
 			</description>
 		</method>
 		<method name="get_loading_state">
@@ -68,6 +70,7 @@
 		<method name="get_path" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the path of this bank in the FMOD Studio project, such as [code]bank:/Music[/code]. It is empty when the strings bank is not loaded.
 			</description>
 		</method>
 		<method name="get_string_count" qualifiers="const">
@@ -91,25 +94,34 @@
 		<method name="is_valid" qualifiers="const">
 			<return type="bool" />
 			<description>
+				Returns [code]true[/code] while the underlying FMOD bank exists. It becomes invalid once released or once its bank is unloaded.
 			</description>
 		</method>
 	</methods>
 	<constants>
 		<constant name="UNLOADING" value="0" enum="StudioLoadingState">
+			The bank is being unloaded.
 		</constant>
 		<constant name="UNLOADED" value="1" enum="StudioLoadingState">
+			The bank is not loaded.
 		</constant>
 		<constant name="LOADING" value="2" enum="StudioLoadingState">
+			The bank is loading, after [method FmodServer.load_bank] with [constant NONBLOCKING].
 		</constant>
 		<constant name="LOADED" value="3" enum="StudioLoadingState">
+			The bank is loaded and its events, buses and VCAs can be used.
 		</constant>
 		<constant name="ERROR" value="4" enum="StudioLoadingState">
+			Loading the bank failed.
 		</constant>
 		<constant name="NORMAL" value="0" enum="StudioLoadBankFlags" is_bitfield="true">
+			Loads the bank synchronously: [method FmodServer.load_bank] returns once it is loaded.
 		</constant>
 		<constant name="NONBLOCKING" value="1" enum="StudioLoadBankFlags" is_bitfield="true">
+			Loads the bank in the background: [method FmodServer.load_bank] returns at once, and [method get_loading_state] reports when the bank is loaded.
 		</constant>
 		<constant name="DECOMPRESS_SAMPLES" value="2" enum="StudioLoadBankFlags" is_bitfield="true">
+			Decompresses the bank's sample data into memory when it loads, trading memory for less CPU while playing.
 		</constant>
 	</constants>
 </class>

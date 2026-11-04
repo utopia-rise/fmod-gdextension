@@ -20,6 +20,7 @@
 		<method name="get_guid" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the GUID of this event, as a string in braces: [code]{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}[/code].
 			</description>
 		</method>
 		<method name="get_instance_count">
@@ -127,6 +128,7 @@
 		<method name="get_path" qualifiers="const">
 			<return type="String" />
 			<description>
+				Returns the path of this event in the FMOD Studio project, such as [code]event:/Music/Level 01[/code]. It is empty when the strings bank is not loaded.
 			</description>
 		</method>
 		<method name="get_sample_loading_state">
@@ -187,6 +189,7 @@
 		<method name="is_valid" qualifiers="const">
 			<return type="bool" />
 			<description>
+				Returns [code]true[/code] while the underlying FMOD event description exists. It becomes invalid once released or once its bank is unloaded.
 			</description>
 		</method>
 		<method name="load_sample_data">

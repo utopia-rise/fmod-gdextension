@@ -81,7 +81,7 @@
 "E.3.3" = { status = "done" }
 "E.3.4" = { status = "done" }
 "E.4" = { hash = "7ef0477e8426" }
-"E.4.1" = { status = "partial", note = "FmodSound, FmodFile, FmodChannelGroup, FmodPerformanceData and the settings resources have no class reference yet" }
+"E.4.1" = { status = "done" }
 "F.1" = { hash = "ff3d2b1ecc4e" }
 "F.1.1" = { status = "done" }
 "F.1.2" = { status = "done" }

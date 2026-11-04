@@ -239,12 +239,14 @@
 			<return type="Vector2" />
 			<param index="0" name="index" type="int" />
 			<description>
+				Returns the velocity of the listener at [param index], in pixels per second.
 			</description>
 		</method>
 		<method name="get_listener_3d_velocity">
 			<return type="Vector3" />
 			<param index="0" name="index" type="int" />
 			<description>
+				Returns the velocity of the listener at [param index], in meters per second.
 			</description>
 		</method>
 		<method name="get_listener_lock">
@@ -257,6 +259,7 @@
 		<method name="get_listener_number" qualifiers="const">
 			<return type="int" />
 			<description>
+				Returns the number of listeners FMOD mixes for.
 			</description>
 		</method>
 		<method name="get_listener_transform2d">
@@ -277,12 +280,14 @@
 			<return type="float" />
 			<param index="0" name="index" type="int" />
 			<description>
+				Returns the weight of the listener at [param index], between 0 and 1.
 			</description>
 		</method>
 		<method name="get_object_attached_to_listener">
 			<return type="Object" />
 			<param index="0" name="index" type="int" />
 			<description>
+				Returns the node whose transform the listener at [param index] follows, or null when none is attached.
 			</description>
 		</method>
 		<method name="get_performance_data">
@@ -294,16 +299,19 @@
 		<method name="get_system_dsp_buffer_length">
 			<return type="int" />
 			<description>
+				Returns the length of FMOD's DSP buffers, in samples.
 			</description>
 		</method>
 		<method name="get_system_dsp_buffer_settings">
 			<return type="FmodDspSettings" />
 			<description>
+				Returns FMOD's current DSP buffer settings.
 			</description>
 		</method>
 		<method name="get_system_dsp_num_buffers">
 			<return type="int" />
 			<description>
+				Returns the number of DSP buffers FMOD's mixer uses.
 			</description>
 		</method>
 		<method name="get_vca">
@@ -331,6 +339,7 @@
 			<return type="bool" />
 			<param index="0" name="plugin_handle" type="int" />
 			<description>
+				Returns [code]true[/code] if the plugin with the handle [method load_plugin] returned is loaded.
 			</description>
 		</method>
 		<method name="load_bank">
@@ -360,16 +369,19 @@
 			<param index="0" name="plugin_path" type="String" />
 			<param index="1" name="priority" type="int" default="0" />
 			<description>
+				Loads the FMOD plugin library at [param plugin_path], with the given [param priority], and returns its handle. Plugins declared in [FmodPluginsSettings] are loaded at startup. Not available on iOS, which links plugins statically.
 			</description>
 		</method>
 		<method name="mixer_resume">
 			<return type="void" />
 			<description>
+				Resumes FMOD's mixer after [method mixer_suspend]. The FMOD manager calls it when a mobile game regains focus.
 			</description>
 		</method>
 		<method name="mixer_suspend">
 			<return type="void" />
 			<description>
+				Suspends FMOD's mixer, releasing the audio device. The FMOD manager calls it when a mobile game loses focus.
 			</description>
 		</method>
 		<method name="mute_all_events">
@@ -412,6 +424,7 @@
 			<return type="void" />
 			<param index="0" name="event_description" type="FmodEventDescription" />
 			<description>
+				Plays a one-shot instance of the event of [param event_description], released once it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_event_description_attached">
@@ -419,6 +432,7 @@
 			<param index="0" name="event_description" type="FmodEventDescription" />
 			<param index="1" name="game_obj" type="Node" />
 			<description>
+				Plays a one-shot instance of the event of [param event_description], following [param game_obj]'s position until it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_event_description_attached_with_params">
@@ -427,6 +441,7 @@
 			<param index="1" name="game_obj" type="Node" />
 			<param index="2" name="parameters" type="Dictionary" />
 			<description>
+				Plays a one-shot instance of the event of [param event_description] with the parameter values of [param parameters], following [param game_obj]'s position until it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_event_description_with_params">
@@ -434,12 +449,14 @@
 			<param index="0" name="event_description" type="FmodEventDescription" />
 			<param index="1" name="parameters" type="Dictionary" />
 			<description>
+				Plays a one-shot instance of the event of [param event_description], with the parameter values of [param parameters] (name to value).
 			</description>
 		</method>
 		<method name="play_one_shot_using_guid">
 			<return type="void" />
 			<param index="0" name="guid" type="String" />
 			<description>
+				Plays a one-shot instance of the event with the GUID [param guid], released once it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_guid_attached">
@@ -447,6 +464,7 @@
 			<param index="0" name="guid" type="String" />
 			<param index="1" name="game_obj" type="Node" />
 			<description>
+				Plays a one-shot instance of the event with the GUID [param guid], following [param game_obj]'s position until it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_guid_attached_with_params">
@@ -455,6 +473,7 @@
 			<param index="1" name="game_obj" type="Node" />
 			<param index="2" name="parameters" type="Dictionary" />
 			<description>
+				Plays a one-shot instance of the event with the GUID [param guid] with the parameter values of [param parameters], following [param game_obj]'s position until it ends.
 			</description>
 		</method>
 		<method name="play_one_shot_using_guid_with_params">
@@ -462,6 +481,7 @@
 			<param index="0" name="guid" type="String" />
 			<param index="1" name="parameters" type="Dictionary" />
 			<description>
+				Plays a one-shot instance of the event with the GUID [param guid], with the parameter values of [param parameters] (name to value).
 			</description>
 		</method>
 		<method name="play_one_shot_with_params">
@@ -531,6 +551,7 @@
 			<return type="void" />
 			<param index="0" name="listener_number" type="int" />
 			<description>
+				Sets the number of listeners FMOD mixes for, between 1 and 8.
 			</description>
 		</method>
 		<method name="set_listener_transform2d">
@@ -554,24 +575,28 @@
 			<param index="0" name="index" type="int" />
 			<param index="1" name="weight" type="float" />
 			<description>
+				Sets the weight of the listener at [param index], between 0 and 1: how much it contributes to the mix when there are several.
 			</description>
 		</method>
 		<method name="set_software_format">
 			<return type="void" />
 			<param index="0" name="settings" type="FmodSoftwareFormatSettings" />
 			<description>
+				Applies the sample rate, speaker mode and raw speaker count of [param settings] to FMOD's mixer. It must be called before FMOD initializes, which applies the Project Settings ones.
 			</description>
 		</method>
 		<method name="set_sound_3d_settings">
 			<return type="void" />
 			<param index="0" name="settings" type="FmodSound3DSettings" />
 			<description>
+				Applies the doppler scale, distance factor and rolloff scale of [param settings] to FMOD's 3D audio.
 			</description>
 		</method>
 		<method name="set_system_dsp_buffer_size">
 			<return type="void" />
 			<param index="0" name="dsp_settings" type="FmodDspSettings" />
 			<description>
+				Applies the DSP buffer length and count of [param dsp_settings] to FMOD's mixer. FMOD applies the Project Settings ones when it initializes.
 			</description>
 		</method>
 		<method name="shutdown">
@@ -584,12 +609,14 @@
 			<return type="void" />
 			<param index="0" name="path" type="String" />
 			<description>
+				Releases the sound file loaded from [param path] by [method load_file_as_sound] or [method load_file_as_music].
 			</description>
 		</method>
 		<method name="unload_plugin">
 			<return type="void" />
 			<param index="0" name="plugin_handle" type="int" />
 			<description>
+				Unloads the plugin with the handle [method load_plugin] returned.
 			</description>
 		</method>
 		<method name="unmute_all_events">

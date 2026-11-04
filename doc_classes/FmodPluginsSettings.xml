@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <class name="FmodPluginsSettings" inherits="Resource" api_type="extension" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/godotengine/godot/master/doc/class.xsd">
 	<brief_description>
+		The FMOD plugins the game uses, such as Steam Audio or Resonance.
 	</brief_description>
 	<description>
+		Saved as a resource and set in Project Settings under [code]Fmod/Plugins[/code]. FMOD loads the plugins at startup, and exports pack their libraries. Desktop and Android load dynamic libraries; iOS links static libraries registered through the methods in [member static_plugins_methods].
 	</description>
 	<tutorials>
 	</tutorials>
 	<members>
 		<member name="dynamic_plugin_list" type="PackedStringArray" setter="set_dynamic_plugin_list" getter="get_dynamic_plugin_list" default="PackedStringArray()">
+			The names of the plugin libraries to load on desktop and Android, without platform prefix or extension.
 		</member>
 		<member name="plugins_base_path" type="String" setter="set_plugins_base_path" getter="get_fmod_plugins_base_path" default="&quot;&quot;">
+			The folder holding the plugin libraries, one subfolder per platform.
 		</member>
 		<member name="static_plugins_methods" type="FmodStaticPluginMethod[]" setter="set_static_plugins_methods" getter="get_static_plugins_methods" default="[]">
+			The registration methods of the plugins linked statically on iOS.
 		</member>
 	</members>
 </class>
