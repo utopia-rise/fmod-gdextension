@@ -18,6 +18,12 @@ namespace godot {
         return fv;
     }
 
+    // FMOD rejects a zero orientation vector, which a zero scale produces.
+    static inline Vector3 normalized_or(const Vector3& vec, const Vector3& fallback) {
+        Vector3 normalized = vec.normalized();
+        return normalized == Vector3() ? fallback : normalized;
+    }
+
     static inline FMOD_3D_ATTRIBUTES get_3d_attributes(const FMOD_VECTOR& pos, const FMOD_VECTOR& up, const FMOD_VECTOR& forward, const FMOD_VECTOR& vel) {
         FMOD_3D_ATTRIBUTES f3d;
         f3d.forward = forward;
@@ -29,15 +35,15 @@ namespace godot {
 
     static inline FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform3d(const Transform3D& transform, const Vector3& velocity, const float distanceScale) {
         Vector3 pos = transform.get_origin() / distanceScale;
-        Vector3 up = transform.get_basis().get_column(1).normalized();;
-        Vector3 forward = -transform.get_basis().get_column(2).normalized();;
+        Vector3 up = normalized_or(transform.get_basis().get_column(1), Vector3(0, 1, 0));
+        Vector3 forward = -normalized_or(transform.get_basis().get_column(2), Vector3(0, 0, 1));
         return get_3d_attributes(get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(velocity));
     }
 
     static inline FMOD_3D_ATTRIBUTES get_3d_attributes_from_transform3d(const Transform3D& transform, const float distanceScale) {
         Vector3 pos = transform.get_origin() / distanceScale;
-        Vector3 up = transform.get_basis().get_column(1).normalized();
-        Vector3 forward = -transform.get_basis().get_column(2).normalized();
+        Vector3 up = normalized_or(transform.get_basis().get_column(1), Vector3(0, 1, 0));
+        Vector3 forward = -normalized_or(transform.get_basis().get_column(2), Vector3(0, 0, 1));
         Vector3 vel(0, 0, 0);
         return get_3d_attributes(get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(vel));
     }
@@ -46,7 +52,7 @@ namespace godot {
         Vector2 posVector = transform.get_origin() / distanceScale;
         Vector3 pos = Vector3(-posVector.x, 0.0f, posVector.y);
         Vector3 up = Vector3(0, 1, 0).normalized();
-        Vector3 forward = Vector3(-transform.columns[1].x, 0, transform.columns[1].y).normalized();
+        Vector3 forward = normalized_or(Vector3(-transform.columns[1].x, 0, transform.columns[1].y), Vector3(0, 0, 1));
         Vector3 vel(-velocity.x, 0, velocity.y);
         return get_3d_attributes(get_fmod_vector_from_3d(pos), get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(vel));
     }
@@ -55,7 +61,7 @@ namespace godot {
         Vector2 posVector = transform.get_origin() / distanceScale;
         Vector3 pos(-posVector.x, 0.0f, posVector.y);
         Vector3 up(0, 1, 0);
-        Vector3 forward = Vector3(-transform.columns[1].x, 0, transform.columns[1].y).normalized();
+        Vector3 forward = normalized_or(Vector3(-transform.columns[1].x, 0, transform.columns[1].y), Vector3(0, 0, 1));
         Vector3 vel(0, 0, 0);
         const FMOD_VECTOR& posFmodVector = get_fmod_vector_from_3d(pos);
         return get_3d_attributes(posFmodVector, get_fmod_vector_from_3d(up), get_fmod_vector_from_3d(forward), get_fmod_vector_from_3d(vel));

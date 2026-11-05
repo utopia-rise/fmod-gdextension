@@ -35,3 +35,18 @@ func test_assert_one_shot_is_not_the_emitter_event():
 	emitter.event_name = "event:/Music/Level 02"
 	emitter.play_one_shot()
 	assert_object(emitter.get_event()).is_null()
+
+func test_assert_zero_scale_keeps_a_valid_orientation():
+	var emitter: FmodEventEmitter3D = auto_free(FmodEventEmitter3D.new())
+	emitter.event_name = "event:/Music/Level 02"
+	add_child(emitter)
+	emitter.volume = 0
+	emitter.play()
+	var event: FmodEvent = emitter.get_event()
+	event.set_3d_attributes(Transform3D.IDENTITY)
+	var default_basis: Basis = event.transform_3d.basis
+	event.set_3d_attributes(Transform3D(Basis(Vector3.RIGHT, 1.0), Vector3.ZERO))
+	event.set_3d_attributes(Transform3D(Basis.from_scale(Vector3.ZERO), Vector3(1, 2, 3)))
+	assert_vector(event.transform_3d.basis.y).is_equal_approx(default_basis.y, Vector3(0.001, 0.001, 0.001))
+	assert_vector(event.transform_3d.basis.z).is_equal_approx(default_basis.z, Vector3(0.001, 0.001, 0.001))
+	emitter.stop()
