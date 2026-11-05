@@ -4,7 +4,6 @@
 #include "classes/dir_access.hpp"
 #include "classes/engine.hpp"
 #include "classes/os.hpp"
-#include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "fmod_logging.h"
 #include "helpers/common.h"
@@ -114,7 +113,6 @@ void FmodServer::_bind_methods() {
 
     ClassDB::bind_method(D_METHOD("load_file_as_sound", "path"), &FmodServer::load_file_as_sound);
     ClassDB::bind_method(D_METHOD("load_file_as_music", "path"), &FmodServer::load_file_as_music);
-    ClassDB::bind_method(D_METHOD("unload_file", "path"), &FmodServer::unload_file);
 
     ClassDB::bind_method(D_METHOD("create_event_instance_with_guid", "guid"), &FmodServer::create_event_instance_with_guid);
     ClassDB::bind_method(D_METHOD("create_event_instance", "event_path"), &FmodServer::create_event_instance);
@@ -149,14 +147,11 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("unmute_all_events"), &FmodServer::unmute_all_events);
     ClassDB::bind_method(D_METHOD("mixer_suspend"), &FmodServer::mixer_suspend);
     ClassDB::bind_method(D_METHOD("mixer_resume"), &FmodServer::mixer_resume);
-
-    ClassDB::bind_method(D_METHOD("create_sound_instance", "path"), &FmodServer::create_sound_instance);
 }
 
 FmodServer::FmodServer() :
   system(nullptr),
   coreSystem(nullptr),
-  isInitialized(false),
   isNotInitializedPrinted(false),
   distanceScale(1.0),
   cache(nullptr) {
@@ -943,56 +938,18 @@ void FmodServer::mixer_resume() {
     ERROR_CHECK(coreSystem->mixerResume());
 }
 
+Ref<FmodFile> FmodServer::_load_file(const String& path, FMOD_MODE mode) {
+    FMOD::Sound* sound = nullptr;
+    ERROR_CHECK_WITH_REASON(coreSystem->createSound(path.utf8().get_data(), mode, nullptr, &sound), vformat("Cannot create sound %s", path));
+    return FmodFile::create_ref(sound);
+}
+
 Ref<FmodFile> FmodServer::load_file_as_sound(const String& path) {
-    if (cache->has_file(path)) {
-        GODOT_LOG_WARNING("FMOD Sound System: FILE ALREADY LOADED AS SOUND" + String(path))
-        return cache->get_file(path);
-    }
-    return cache->add_file(path, FMOD_CREATESAMPLE);
+    return _load_file(path, FMOD_CREATESAMPLE);
 }
 
 Ref<FmodFile> FmodServer::load_file_as_music(const String& path) {
-    if (cache->has_file(path)) {
-        GODOT_LOG_WARNING("FMOD Sound System: FILE ALREADY LOADED AS MUSIC" + String(path))
-        return cache->get_file(path);
-    }
-    return cache->add_file(path, (FMOD_CREATESTREAM | FMOD_LOOP_NORMAL));
-}
-
-void FmodServer::unload_file(const String& path) {
-    if (!cache->has_file(path)) {
-        GODOT_LOG_WARNING("File " + path + " can't be found. Check if it was properly loaded or already unloaded.")
-        return;
-    }
-    cache->remove_file(path);
-    GODOT_LOG_VERBOSE("FMOD Sound System: UNLOADING FILE" + String(path))
-}
-
-Ref<FmodSound> FmodServer::create_sound_instance(const String& path) {
-    if (!cache->has_file(path)) {
-        GODOT_LOG_WARNING("File " + path + " can't be found. Check if it was properly loaded.")
-        return {};
-    }
-
-    Ref<FmodFile> file = cache->get_file(path);
-    FMOD::Channel* channel = nullptr;
-    ERROR_CHECK_WITH_REASON(coreSystem->playSound(file->get_wrapped(), nullptr, true, &channel), vformat("Cannot play sound %s", path));
-    if (channel) {
-#ifdef WEB_ENABLED
-        // Once a Studio event has been stopped, FMOD 2.04.00's web libraries mix a stereo sound's channel as a mono one
-        // (interleaved samples on one speaker) unless its mix matrix is set: set FMOD's default one, explicitly.
-        // TODO: remove once a FMOD release fixes it.
-        int sound_channels = 0;
-        ERROR_CHECK(file->get_wrapped()->getFormat(nullptr, nullptr, &sound_channels, nullptr));
-        if (sound_channels == 2) {
-            float stereo_matrix[] {1, 0, 0, 1};
-            ERROR_CHECK_WITH_REASON(channel->setMixMatrix(stereo_matrix, 2, 2), vformat("Cannot set the mix matrix of sound %s", path));
-        }
-#endif
-        Ref<FmodSound> ref = FmodSound::create_ref(channel);
-        return ref;
-    }
-    return {};
+    return _load_file(path, FMOD_CREATESTREAM | FMOD_LOOP_NORMAL);
 }
 
 FMOD_STUDIO_SOUND_INFO FmodServer::get_sound_info(const String& sound_key) const {

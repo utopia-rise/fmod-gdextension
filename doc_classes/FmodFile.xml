@@ -4,8 +4,16 @@
 		A sound file loaded by FMOD's Core API.
 	</brief_description>
 	<description>
-		Returned by [method FmodServer.load_file_as_sound] and [method FmodServer.load_file_as_music]. Play it with [method FmodServer.create_sound_instance], and release it with [method FmodServer.unload_file].
+		Returned by [method FmodServer.load_file_as_sound] and [method FmodServer.load_file_as_music]. Play it with [method create_instance]. The file is unloaded once nothing references it any more, neither a script nor an [FmodSound] created from it. Release every file and its sounds before [method FmodServer.shutdown].
 	</description>
 	<tutorials>
 	</tutorials>
+	<methods>
+		<method name="create_instance">
+			<return type="FmodSound" />
+			<description>
+				Creates a paused instance of this file. Call [method FmodSound.play] to start it.
+			</description>
+		</method>
+	</methods>
 </class>

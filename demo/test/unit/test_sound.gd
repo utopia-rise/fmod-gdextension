@@ -7,16 +7,14 @@ var sound: FmodSound
 var music: FmodSound
 
 func before():
-	FmodServer.load_file_as_sound(SOUND_FILE)
-	FmodServer.load_file_as_music(MUSIC_FILE)
-	sound = FmodServer.create_sound_instance(SOUND_FILE)
-	music = FmodServer.create_sound_instance(MUSIC_FILE)
+	sound = FmodServer.load_file_as_sound(SOUND_FILE).create_instance()
+	music = FmodServer.load_file_as_music(MUSIC_FILE).create_instance()
 
 func after():
 	sound.release()
 	music.release()
-	FmodServer.unload_file(SOUND_FILE)
-	FmodServer.unload_file(MUSIC_FILE)
+	sound = null
+	music = null
 
 func test_assert_set_volume():
 	sound.volume = 2.0
@@ -35,3 +33,11 @@ func test_assert_playing():
 	assert_bool(sound.is_playing()).is_true()
 	music.play()
 	assert_bool(music.is_playing()).is_true()
+
+func test_assert_instance_keeps_its_file_loaded():
+	var file := FmodServer.load_file_as_sound(SOUND_FILE)
+	var instance := file.create_instance()
+	file = null
+	instance.play()
+	assert_bool(instance.is_playing()).is_true()
+	instance.release()

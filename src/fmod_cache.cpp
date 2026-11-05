@@ -113,37 +113,6 @@ void FmodCache::remove_plugin(uint32_t p_plugin_handle) {
     plugin_handles.erase(p_plugin_handle);
 }
 
-Ref<FmodFile> FmodCache::add_file(const String& file_path, unsigned int flag) {
-    FMOD::System* core = nullptr;
-    ERROR_CHECK(system->getCoreSystem(&core));
-
-    FMOD::Sound* sound = nullptr;
-    ERROR_CHECK_WITH_REASON(core->createSound(file_path.utf8().get_data(), flag, nullptr, &sound), vformat("Cannot create sound %s", file_path));
-    if (sound) {
-        Ref<FmodFile> ref = FmodFile::create_ref(sound);
-        files[file_path] = ref;
-        GODOT_LOG_VERBOSE("FMOD Sound System: LOADING AS SOUND FILE" + String(file_path))
-        return ref;
-    }
-    return {};
-}
-
-bool FmodCache::has_file(const String& filePath) {
-    return files.find(filePath).operator bool();
-}
-
-Ref<FmodFile> FmodCache::get_file(const String& filePath) {
-    return files.get(filePath);
-}
-
-void FmodCache::remove_file(const String& filePath) {
-    if (files.has(filePath)) {
-        Ref<FmodFile> ref = files[filePath];
-        ERROR_CHECK(ref->get_wrapped()->release());
-        files.erase(filePath);
-    }
-}
-
 bool FmodCache::has_vca_guid(const FMOD_GUID& guid) {
     return vcas.has(guid);
 }

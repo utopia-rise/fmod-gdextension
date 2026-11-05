@@ -44,7 +44,7 @@ FMOD's web runtime has no live update, cannot load FMOD plugins (see [Plugins](9
 Godot's audio buses (see [Output, latency and sync modes](10-output-and-latency.md)).
 
 FMOD 2.04.00's web libraries have a bug with sounds played through the low level API (`FmodServer.load_file_as_sound`,
-`load_file_as_music` and `create_sound_instance`): once any Studio event has been stopped, they mix a stereo sound as a
+`load_file_as_music` and `FmodFile.create_instance`): once any Studio event has been stopped, they mix a stereo sound as a
 mono one, which sounds garbled. Studio events and mono sounds are not affected. The addon works around the bug, so
 these sounds play correctly, until a fixed FMOD release.
 

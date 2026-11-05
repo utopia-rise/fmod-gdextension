@@ -60,6 +60,11 @@ func test_assert_emitter_paused_property_is_bool():
 		if property["name"] == "paused":
 			assert_int(property["type"]).is_equal(TYPE_BOOL)
 
+func test_assert_scripts_cannot_create_objects_the_extension_returns():
+	for name in ["FmodServer", "FmodBank", "FmodEvent", "FmodEventDescription", "FmodParameterDescription", "FmodBus", "FmodVCA", "FmodChannelGroup", "FmodFile", "FmodSound", "FmodPerformanceData"]:
+		assert_bool(ClassDB.class_exists(name)).override_failure_message("%s is not registered" % name).is_true()
+		assert_bool(ClassDB.can_instantiate(name)).override_failure_message("scripts can create %s" % name).is_false()
+
 func test_assert_new_objects_start_from_their_defaults():
 	var emitter := FmodEventEmitter3D.new()
 	assert_str(emitter.event_guid).is_equal("{00000000-0000-0000-0000-000000000000}")

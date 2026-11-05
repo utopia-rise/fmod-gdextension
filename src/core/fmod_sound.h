@@ -3,6 +3,7 @@
 
 #include "classes/ref.hpp"
 #include "classes/ref_counted.hpp"
+#include "core/fmod_file.h"
 #include "fmod.hpp"
 
 namespace godot {
@@ -10,13 +11,15 @@ namespace godot {
         GDCLASS(FmodSound, RefCounted);
 
         FMOD::Channel* _wrapped = nullptr;
+        Ref<FmodFile> file;
 
     public:
-        inline static Ref<FmodSound> create_ref(FMOD::Channel* wrapped) {
+        inline static Ref<FmodSound> create_ref(FMOD::Channel* wrapped, const Ref<FmodFile>& file) {
             Ref<FmodSound> ref;
             if (wrapped) {
                 ref.instantiate();
                 ref->_wrapped = wrapped;
+                ref->file = file;
                 wrapped->setUserData(ref.ptr());
             }
             return ref;

@@ -766,7 +766,6 @@ func step_call_fmodserver_with_invalid_input() -> void:
 		return null)
 	await expect_rejected("loading a missing file as a sound", func() -> Variant: return server().load_file_as_sound("res://not_a_sound.ogg"))
 	await expect_rejected("loading a missing file as music", func() -> Variant: return server().load_file_as_music("res://not_a_sound.ogg"))
-	await expect_rejected("creating an instance of a file never loaded", func() -> Variant: return server().create_sound_instance("res://not_a_sound.ogg"))
 	await expect_rejected("loading a missing bank", func() -> Variant: return server().load_bank("res://not_a_bank.bank", 0))
 	var event: Object = parameter_event if parameter_event != null else events[0]
 	await expect_rejected("labels of an unknown parameter name", func() -> Variant: return event.get_parameter_labels_by_name("not a parameter"), func(result: Variant) -> bool: return result.is_empty())
@@ -779,9 +778,8 @@ func step_call_fmodserver_with_invalid_input() -> void:
 
 
 func step_round_trips_through_fmodserver_buses_vcas_and_sounds() -> void:
-	var sound_path := "res://assets/Sounds/doorOpen_1.ogg"
-	server().load_file_as_sound(sound_path)
-	var sound: Object = server().create_sound_instance(sound_path)
+	var file: Object = server().load_file_as_sound("res://assets/Sounds/doorOpen_1.ogg")
+	var sound: Object = file.create_instance() if file != null else null
 	expect(sound != null and sound.is_valid(), "a loaded file gives a sound instance")
 	if sound != null:
 		sound.play()
@@ -789,7 +787,6 @@ func step_round_trips_through_fmodserver_buses_vcas_and_sounds() -> void:
 		sound.set_pitch(1.5)
 		expect(is_equal_approx(sound.get_volume(), 0.5) and is_equal_approx(sound.get_pitch(), 1.5), "a sound keeps its volume and pitch")
 		sound.stop()
-		server().unload_file(sound_path)
 		await pause(5)
 	for description in server().get_global_parameter_desc_list():
 		var name: String = description["name"]
