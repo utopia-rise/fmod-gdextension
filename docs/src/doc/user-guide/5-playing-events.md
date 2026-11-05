@@ -52,6 +52,17 @@ emitter.get_parameter("RPM")
 emitter.get_parameter_by_id(5864137074015534804)
 ```
 
+#### The event instance
+
+`get_event()` returns the `FmodEvent` the emitter plays, or `null` when it has none (before it is loaded, once it stopped and was released, and in the editor). One-shots played with `play_one_shot()` are separate instances and are not returned.
+`get_timeline_position()` and `set_timeline_position(position)` read and move the playhead of that event, in milliseconds.
+```gdscript
+$Music.set_timeline_position(30000)
+var event: FmodEvent = $Music.get_event()
+if event:
+    event.pitch = 1.5
+```
+
 ### Signals
 
 `FmodEventEmitter2D` and `FmodEventEmitter3D` emits signals:

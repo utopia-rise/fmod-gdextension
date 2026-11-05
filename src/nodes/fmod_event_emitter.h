@@ -59,7 +59,9 @@ namespace godot {
         Variant get_parameter_by_id(uint64_t p_id) const;
         void set_parameter_by_id(uint64_t p_id, const Variant& p_property);
         void set_paused(bool p_is_paused);
-        const Ref<FmodEvent>& get_event() const;
+        Ref<FmodEvent> get_event() const;
+        int get_timeline_position() const;
+        void set_timeline_position(int p_position);
         bool is_paused();
         void set_event_name(const String& name);
         String get_event_name() const;
@@ -432,8 +434,21 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    const Ref<FmodEvent>& FmodEventEmitter<Derived, NodeType>::get_event() const {
+    Ref<FmodEvent> FmodEventEmitter<Derived, NodeType>::get_event() const {
+        if (_event.is_null() || !_event->is_valid()) { return Ref<FmodEvent>(); }
         return _event;
+    }
+
+    template<class Derived, class NodeType>
+    int FmodEventEmitter<Derived, NodeType>::get_timeline_position() const {
+        if (_event.is_null() || !_event->is_valid()) { return 0; }
+        return _event->get_timeline_position();
+    }
+
+    template<class Derived, class NodeType>
+    void FmodEventEmitter<Derived, NodeType>::set_timeline_position(int p_position) {
+        if (_event.is_null() || !_event->is_valid()) { return; }
+        _event->set_timeline_position(p_position);
     }
 
     template<class Derived, class NodeType>
@@ -886,6 +901,9 @@ namespace godot {
         ClassDB::bind_method(D_METHOD("is_preload_event"), &Derived::is_preload_event);
         ClassDB::bind_method(D_METHOD("get_volume"), &Derived::get_volume);
         ClassDB::bind_method(D_METHOD("set_volume", "volume"), &Derived::set_volume);
+        ClassDB::bind_method(D_METHOD("get_event"), &Derived::get_event);
+        ClassDB::bind_method(D_METHOD("get_timeline_position"), &Derived::get_timeline_position);
+        ClassDB::bind_method(D_METHOD("set_timeline_position", "position"), &Derived::set_timeline_position);
         ClassDB::bind_method(D_METHOD("set_programmer_callback", "sound_key"), &Derived::set_programmer_callback);
         ClassDB::bind_method(D_METHOD("_emit_callbacks", "dict", "type"), &Derived::_emit_callbacks);
 

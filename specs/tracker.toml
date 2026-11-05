@@ -48,7 +48,7 @@
 "B.6.1" = { status = "done" }
 "B.6.2" = { status = "done" }
 "B.6.3" = { status = "done" }
-"C.1" = { hash = "52e34b7f10cf" }
+"C.1" = { hash = "7153a4d858db" }
 "C.1.1" = { status = "done" }
 "C.1.2" = { status = "done" }
 "C.1.3" = { status = "done" }
@@ -57,6 +57,7 @@
 "C.1.6" = { status = "done" }
 "C.1.7" = { status = "done" }
 "C.1.8" = { status = "done" }
+"C.1.9" = { status = "done" }
 "C.2" = { hash = "0e2bdc7996e8" }
 "C.2.1" = { status = "done" }
 "C.2.2" = { status = "done" }
