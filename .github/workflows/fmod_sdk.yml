@@ -54,8 +54,8 @@ jobs:
           from pathlib import Path
 
           KEEP = {
-              "windows": ["core/lib/x64/*", "studio/lib/x64/*"],
-              "linux": ["core/lib/x86_64/*", "studio/lib/x86_64/*"],
+              "windows": ["core/lib/x64/*", "studio/lib/x64/*", "core/lib/arm64/*", "studio/lib/arm64/*"],
+              "linux": ["core/lib/x86_64/*", "studio/lib/x86_64/*", "core/lib/arm64/*", "studio/lib/arm64/*"],
               "osx": ["core/lib/*.dylib", "studio/lib/*.dylib"],
               "ios": ["core/lib/*_iphoneos.a", "core/lib/*_iphonesimulator.a", "studio/lib/*_iphoneos.a", "studio/lib/*_iphonesimulator.a"],
               "android": [
