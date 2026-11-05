@@ -37,3 +37,19 @@ When we exit the node, it will release the sound.
 The file stays loaded as long as something references it: the script's `music_file` variable, or a sound instance
 created from it. Once the node is freed and its instances are gone, the file is unloaded. Release every file and sound
 instance before calling `FmodServer.shutdown()`.
+
+## Positioning a sound
+
+A sound instance can be placed in the world with its `position` (a `Vector3`) and `velocity`, or `position_2d` and
+`velocity_2d` (`Vector2`) from a 2D scene. Setting any of them makes the sound 3D, so FMOD spatializes it against the
+listeners:
+
+```gdscript
+var sound := FmodServer.load_file_as_sound("res://assets/Sounds/doorOpen_1.ogg").create_instance()
+sound.position = Vector3(2, 0, -5)
+sound.play()
+```
+
+Positions use the same units as the nodes of the extension: meters in 3D, pixels in 2D, with the `distance_factor`
+setting converting between them. The velocity is only used for the Doppler effect: update the position yourself as
+the sound moves.
