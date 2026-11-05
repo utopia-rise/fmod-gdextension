@@ -4,7 +4,7 @@
 		A sound file playing through FMOD's Core API.
 	</brief_description>
 	<description>
-		Returned by [method FmodServer.create_sound_instance], from a file loaded by [method FmodServer.load_file_as_sound] or [method FmodServer.load_file_as_music]. Release it once it is no longer needed.
+		Returned by [method FmodFile.create_instance]. It keeps its [FmodFile] loaded. Release it once it is no longer needed.
 	</description>
 	<tutorials>
 	</tutorials>

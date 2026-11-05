@@ -29,8 +29,7 @@ func _fmod_mix_reaches_godot(mixing: FmodSettings.GodotBusMixing) -> bool:
 	player.stop()
 	var playback := player.stream.instantiate_playback()
 	playback.start()
-	FmodServer.load_file_as_sound(SOUND_FILE)
-	var sound := FmodServer.create_sound_instance(SOUND_FILE)
+	var sound := FmodServer.load_file_as_sound(SOUND_FILE).create_instance()
 	sound.play()
 	var heard := false
 	for i in 100:
@@ -40,7 +39,6 @@ func _fmod_mix_reaches_godot(mixing: FmodSettings.GodotBusMixing) -> bool:
 			break
 		await get_tree().create_timer(0.02).timeout
 	sound.release()
-	FmodServer.unload_file(SOUND_FILE)
 	return heard
 
 func test_assert_godot_audio_bus_is_empty_on_the_device_output():

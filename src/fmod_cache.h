@@ -1,7 +1,6 @@
 #ifndef GODOTFMOD_FMOD_CACHE_H
 #define GODOTFMOD_FMOD_CACHE_H
 
-#include "core/fmod_file.h"
 #include "fmod_studio.hpp"
 #include "studio/fmod_bank.h"
 #include "studio/fmod_bus.h"
@@ -34,7 +33,6 @@ namespace godot {
 
         List<Ref<FmodBank>> loading_banks;
 
-        HashMap<String, Ref<FmodFile>> files;
         HashMap<String, FmodBank*> banks;
         Vector<uint32_t> plugin_handles;
 
@@ -66,11 +64,6 @@ namespace godot {
 #endif
         bool has_plugin(uint32_t p_plugin_handle) const;
         void remove_plugin(uint32_t p_plugin_handle);
-
-        Ref<FmodFile> add_file(const String& filePath, unsigned int flag);
-        bool has_file(const String& filePath);
-        Ref<FmodFile> get_file(const String& filePath);
-        void remove_file(const String& filePath);
 
         bool is_master_loaded();
         void clear();

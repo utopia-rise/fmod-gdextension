@@ -96,13 +96,6 @@
 				Creates a new instance of the FMOD event identified by its GUID.
 			</description>
 		</method>
-		<method name="create_sound_instance">
-			<return type="FmodSound" />
-			<param index="0" name="path" type="String" />
-			<description>
-				Creates an instance of a loaded sound file for playback.
-			</description>
-		</method>
 		<method name="get_all_banks">
 			<return type="Array" />
 			<description>
@@ -354,14 +347,14 @@
 			<return type="FmodFile" />
 			<param index="0" name="path" type="String" />
 			<description>
-				Loads an audio file for music playback with streaming optimizations.
+				Loads an audio file as looping music streamed from disk. The file stays loaded while the returned [FmodFile] is referenced.
 			</description>
 		</method>
 		<method name="load_file_as_sound">
 			<return type="FmodFile" />
 			<param index="0" name="path" type="String" />
 			<description>
-				Loads an audio file as a sound effect with full loading into memory.
+				Loads an audio file as a sound kept in memory. The file stays loaded while the returned [FmodFile] is referenced.
 			</description>
 		</method>
 		<method name="load_plugin">
@@ -591,13 +584,6 @@
 			<return type="void" />
 			<description>
 				Shuts down the FMOD system and releases all resources, freeing the [code]FmodRuntime[/code] node.
-			</description>
-		</method>
-		<method name="unload_file">
-			<return type="void" />
-			<param index="0" name="path" type="String" />
-			<description>
-				Releases the sound file loaded from [param path] by [method load_file_as_sound] or [method load_file_as_music].
 			</description>
 		</method>
 		<method name="unload_plugin">

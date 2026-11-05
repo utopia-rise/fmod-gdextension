@@ -7,6 +7,9 @@
 #include "fmod.hpp"
 
 namespace godot {
+    class FmodSound;
+
+    // Owns its FMOD sound, released with the last reference.
     class FmodFile : public RefCounted {
         GDCLASS(FmodFile, RefCounted);
 
@@ -46,17 +49,10 @@ namespace godot {
             VIRTUAL_PLAYFROMSTART = FMOD_VIRTUAL_PLAYFROMSTART,
         };
 
-        inline static Ref<FmodFile> create_ref(FMOD::Sound* wrapped) {
-            Ref<FmodFile> ref;
-            if (wrapped) {
-                ref.instantiate();
-                ref->_wrapped = wrapped;
-                wrapped->setUserData(ref.ptr());
-            }
-            return ref;
-        }
+        static Ref<FmodFile> create_ref(FMOD::Sound* wrapped);
+        ~FmodFile() override;
 
-        FMOD::Sound* get_wrapped() const { return _wrapped; }
+        Ref<FmodSound> create_instance();
 
     protected:
         static void _bind_methods();

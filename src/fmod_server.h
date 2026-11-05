@@ -3,7 +3,6 @@
 
 #include "core/binder_common.hpp"
 #include "core/fmod_file.h"
-#include "core/fmod_sound.h"
 #include "core/object_id.hpp"
 #include "data/performance_data.h"
 #include "fmod_cache.h"
@@ -119,7 +118,7 @@ namespace godot {
         FMOD::Studio::System* system;
         FMOD::System* coreSystem;
 
-        bool isInitialized;
+        inline static bool isInitialized = false;
         bool isNotInitializedPrinted;
 
         float distanceScale;
@@ -160,6 +159,7 @@ namespace godot {
         ~FmodServer() override;
 
         static FmodServer* get_singleton();
+        static bool is_initialized() { return isInitialized; }
 
         // LIFECYCLE
         void init(const Ref<FmodSettings>& p_settings = Ref<FmodSettings>());
@@ -255,10 +255,11 @@ namespace godot {
         Ref<FmodEvent> create_event_instance_from_description(const Ref<FmodEventDescription>& event_description);
 
         // SOUNDS
+    private:
+        Ref<FmodFile> _load_file(const String& path, FMOD_MODE mode);
+    public:
         Ref<FmodFile> load_file_as_sound(const String& path);
         Ref<FmodFile> load_file_as_music(const String& path);
-        void unload_file(const String& path);
-        Ref<FmodSound> create_sound_instance(const String& path);
         FMOD_STUDIO_SOUND_INFO get_sound_info(const String& sound_key) const;
         FMOD::Sound* create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_MODE mode) const;
 

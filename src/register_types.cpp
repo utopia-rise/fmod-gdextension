@@ -1,6 +1,7 @@
 #include "callback/audio_callbacks.h"
 #include "callback/file_callbacks_async.h"
 #include "constants.h"
+#include "core/fmod_file.h"
 #include "core/fmod_sound.h"
 #include "data/performance_data.h"
 #include "fmod_server.h"
@@ -60,21 +61,21 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
     }
     if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
         // Data
-        ClassDB::register_class<FmodPerformanceData>();
+        ClassDB::register_abstract_class<FmodPerformanceData>();
 
         // Core
-        ClassDB::register_class<FmodSound>();
-        ClassDB::register_class<FmodFile>();
-        ClassDB::register_class<FmodChannelGroup>();
+        ClassDB::register_abstract_class<FmodSound>();
+        ClassDB::register_abstract_class<FmodFile>();
+        ClassDB::register_abstract_class<FmodChannelGroup>();
 
         // Studio
-        ClassDB::register_class<FmodBank>();
-        ClassDB::register_class<FmodEventDescription>();
-        ClassDB::register_class<FmodParameterDescription>();
+        ClassDB::register_abstract_class<FmodBank>();
+        ClassDB::register_abstract_class<FmodEventDescription>();
+        ClassDB::register_abstract_class<FmodParameterDescription>();
 
-        ClassDB::register_class<FmodEvent>();
-        ClassDB::register_class<FmodBus>();
-        ClassDB::register_class<FmodVCA>();
+        ClassDB::register_abstract_class<FmodEvent>();
+        ClassDB::register_abstract_class<FmodBus>();
+        ClassDB::register_abstract_class<FmodVCA>();
 
         // Nodes
         ClassDB::register_class<FmodListener3D>();
@@ -92,7 +93,7 @@ void initialize_fmod_module(ModuleInitializationLevel p_level) {
         ClassDB::register_internal_class<FmodAudioStreamPlayback>();
 
         // Server
-        ClassDB::register_class<FmodServer>();
+        ClassDB::register_abstract_class<FmodServer>();
         fmod_singleton = memnew(FmodServer);
         Engine::get_singleton()->register_singleton("FmodServer", FmodServer::get_singleton());
         initialize_fmod();
