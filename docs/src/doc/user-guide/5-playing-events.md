@@ -149,7 +149,7 @@ var event: FmodEvent = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	event = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
-	event.set_2d_attributes(self.global_transform)
+	event.set_transform_2d(self.global_transform)
 	event.set_parameter_by_name("RPM", 600)
 	event.volume = 2
 	event.start()

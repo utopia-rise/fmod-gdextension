@@ -137,12 +137,20 @@ int FmodSettings::get_listener_count() const {
     return _listener_count;
 }
 
-void FmodSettings::set_distance_factor(float p_distance_factor) {
-    _distance_factor = p_distance_factor;
+void FmodSettings::set_distance_factor_2d(float p_distance_factor) {
+    _distance_factor_2d = p_distance_factor;
 }
 
-float FmodSettings::get_distance_factor() const {
-    return _distance_factor;
+float FmodSettings::get_distance_factor_2d() const {
+    return _distance_factor_2d;
+}
+
+void FmodSettings::set_distance_factor_3d(float p_distance_factor) {
+    _distance_factor_3d = p_distance_factor;
+}
+
+float FmodSettings::get_distance_factor_3d() const {
+    return _distance_factor_3d;
 }
 
 void FmodSettings::set_rolloff_scale(float p_rolloff_scale) {
@@ -285,8 +293,10 @@ void FmodSettings::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_studio_processing"), &FmodSettings::get_studio_processing);
     ClassDB::bind_method(D_METHOD("set_listener_count", "listener_count"), &FmodSettings::set_listener_count);
     ClassDB::bind_method(D_METHOD("get_listener_count"), &FmodSettings::get_listener_count);
-    ClassDB::bind_method(D_METHOD("set_distance_factor", "distance_factor"), &FmodSettings::set_distance_factor);
-    ClassDB::bind_method(D_METHOD("get_distance_factor"), &FmodSettings::get_distance_factor);
+    ClassDB::bind_method(D_METHOD("set_distance_factor_2d", "distance_factor"), &FmodSettings::set_distance_factor_2d);
+    ClassDB::bind_method(D_METHOD("get_distance_factor_2d"), &FmodSettings::get_distance_factor_2d);
+    ClassDB::bind_method(D_METHOD("set_distance_factor_3d", "distance_factor"), &FmodSettings::set_distance_factor_3d);
+    ClassDB::bind_method(D_METHOD("get_distance_factor_3d"), &FmodSettings::get_distance_factor_3d);
     ClassDB::bind_method(D_METHOD("set_rolloff_scale", "rolloff_scale"), &FmodSettings::set_rolloff_scale);
     ClassDB::bind_method(D_METHOD("get_rolloff_scale"), &FmodSettings::get_rolloff_scale);
     ClassDB::bind_method(D_METHOD("set_doppler_scale", "doppler_scale"), &FmodSettings::set_doppler_scale);
@@ -415,9 +425,14 @@ void FmodSettings::_bind_methods() {
         "get_listener_count"
     );
     ADD_PROPERTY(
-        PropertyInfo(Variant::FLOAT, "distance_factor", PROPERTY_HINT_RANGE, "0.001,1000,or_greater"),
-        "set_distance_factor",
-        "get_distance_factor"
+        PropertyInfo(Variant::FLOAT, "distance_factor_2d", PROPERTY_HINT_RANGE, "0.001,1000,or_greater"),
+        "set_distance_factor_2d",
+        "get_distance_factor_2d"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::FLOAT, "distance_factor_3d", PROPERTY_HINT_RANGE, "0.001,1000,or_greater"),
+        "set_distance_factor_3d",
+        "get_distance_factor_3d"
     );
     ADD_PROPERTY(
         PropertyInfo(Variant::FLOAT, "rolloff_scale", PROPERTY_HINT_RANGE, "0,10,or_greater"),

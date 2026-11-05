@@ -38,9 +38,10 @@ void FmodServer::_bind_methods() {
 
     // SETTINGS
     ClassDB::bind_method(
-        D_METHOD("set_spatialization", "doppler_scale", "distance_factor", "rolloff_scale"),
+        D_METHOD("set_spatialization", "doppler_scale", "rolloff_scale"),
         &FmodServer::set_spatialization
     );
+    ClassDB::bind_method(D_METHOD("set_distance_factors", "factor_2d", "factor_3d"), &FmodServer::set_distance_factors);
     ClassDB::bind_method(D_METHOD("get_system_dsp_buffer_length"), &FmodServer::get_system_dsp_buffer_length);
     ClassDB::bind_method(D_METHOD("get_system_dsp_num_buffers"), &FmodServer::get_system_dsp_num_buffers);
 
@@ -91,12 +92,18 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_listener_number"), &FmodServer::get_system_listener_number);
     ClassDB::bind_method(D_METHOD("get_listener_weight", "index"), &FmodServer::get_system_listener_weight);
     ClassDB::bind_method(D_METHOD("set_listener_weight", "index", "weight"), &FmodServer::set_system_listener_weight);
-    ClassDB::bind_method(D_METHOD("get_listener_transform3d", "index"), &FmodServer::get_listener_transform3d);
-    ClassDB::bind_method(D_METHOD("get_listener_transform2d", "index"), &FmodServer::get_listener_transform2d);
-    ClassDB::bind_method(D_METHOD("get_listener_3d_velocity", "index"), &FmodServer::get_listener_3d_velocity);
-    ClassDB::bind_method(D_METHOD("get_listener_2d_velocity", "index"), &FmodServer::get_listener_2d_velocity);
-    ClassDB::bind_method(D_METHOD("set_listener_transform3d", "index", "transform"), &FmodServer::set_listener_transform3d);
-    ClassDB::bind_method(D_METHOD("set_listener_transform2d", "index", "transform"), &FmodServer::set_listener_transform2d);
+    ClassDB::bind_method(D_METHOD("get_listener_transform_3d", "index"), &FmodServer::get_listener_transform_3d);
+    ClassDB::bind_method(D_METHOD("get_listener_transform_2d", "index"), &FmodServer::get_listener_transform_2d);
+    ClassDB::bind_method(D_METHOD("get_listener_velocity_3d", "index"), &FmodServer::get_listener_velocity_3d);
+    ClassDB::bind_method(D_METHOD("get_listener_velocity_2d", "index"), &FmodServer::get_listener_velocity_2d);
+    ClassDB::bind_method(
+        D_METHOD("set_listener_transform_3d", "index", "transform"),
+        &FmodServer::set_listener_transform_3d
+    );
+    ClassDB::bind_method(
+        D_METHOD("set_listener_transform_2d", "index", "transform"),
+        &FmodServer::set_listener_transform_2d
+    );
     ClassDB::bind_method(D_METHOD("set_listener_lock", "index", "is_locked"), &FmodServer::set_listener_lock);
     ClassDB::bind_method(D_METHOD("get_listener_lock", "index"), &FmodServer::get_listener_lock);
     ClassDB::bind_method(D_METHOD("get_object_attached_to_listener", "index"), &FmodServer::get_object_attached_to_listener);
@@ -149,12 +156,7 @@ void FmodServer::_bind_methods() {
     ClassDB::bind_method(D_METHOD("mixer_resume"), &FmodServer::mixer_resume);
 }
 
-FmodServer::FmodServer() :
-  system(nullptr),
-  coreSystem(nullptr),
-  isNotInitializedPrinted(false),
-  distanceScale(1.0),
-  cache(nullptr) {
+FmodServer::FmodServer() : system(nullptr), coreSystem(nullptr), isNotInitializedPrinted(false), cache(nullptr) {
     ERR_FAIL_COND(singleton != nullptr);
     singleton = this;
     performanceData = create_ref<FmodPerformanceData>();
@@ -322,7 +324,8 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
     }
     cache = new FmodCache(system, coreSystem);
 
-    set_spatialization(settings->get_doppler_scale(), settings->get_distance_factor(), settings->get_rolloff_scale());
+    set_spatialization(settings->get_doppler_scale(), settings->get_rolloff_scale());
+    set_distance_factors(settings->get_distance_factor_2d(), settings->get_distance_factor_3d());
     set_system_listener_number(settings->get_listener_count());
     if (settings->get_plugins().is_valid()) { load_all_plugins(settings->get_plugins()); }
 }
@@ -395,13 +398,13 @@ void FmodServer::_set_listener_attributes() {
         if (!node->is_inside_tree()) { return; }
 
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
+            FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_2d(ci->get_global_transform());
             ERROR_CHECK_WITH_REASON(system->setListenerAttributes(i, &attr), vformat("Cannot set listener %d attributes", i));
             continue;
         }
 
         if (auto* s {Node::cast_to<Node3D>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(s->get_global_transform(), distanceScale);
+            FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_3d(s->get_global_transform());
             ERROR_CHECK_WITH_REASON(system->setListenerAttributes(i, &attr), vformat("Cannot set listener %d attributes", i));
             continue;
         }
@@ -505,67 +508,79 @@ void FmodServer::set_system_listener_weight(const int index, float weight) {
     }
 }
 
-Transform3D FmodServer::get_listener_transform3d(int index) {
+Transform3D FmodServer::get_listener_transform_3d(int index) {
     Transform3D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr), vformat("Cannot get listener %d transform3d", index));
-        transform = get_transform3d_from_3d_attributes(attr, distanceScale);
+        ERROR_CHECK_WITH_REASON(
+            system->getListenerAttributes(index, &attr),
+            vformat("Cannot get listener %d transform_3d", index)
+        );
+        transform = FmodSpatial::transform_to_godot_3d(attr);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return transform;
 }
 
-Transform2D FmodServer::get_listener_transform2d(int index) {
+Transform2D FmodServer::get_listener_transform_2d(int index) {
     Transform2D transform;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
-        ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr), vformat("Cannot get listener %d transform2d", index));
-        transform = get_transform2d_from_3d_attributes(attr, distanceScale);
+        ERROR_CHECK_WITH_REASON(
+            system->getListenerAttributes(index, &attr),
+            vformat("Cannot get listener %d transform_2d", index)
+        );
+        transform = FmodSpatial::transform_to_godot_2d(attr);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return transform;
 }
 
-Vector3 FmodServer::get_listener_3d_velocity(int index) {
+Vector3 FmodServer::get_listener_velocity_3d(int index) {
     Vector3 velocity;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
         ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr), vformat("Cannot get listener %d velocity", index));
-        velocity = get_velocity3d_from_3d_attributes(attr, distanceScale);
+        velocity = FmodSpatial::vector_to_godot_3d(attr.velocity);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return velocity;
 }
 
-Vector2 FmodServer::get_listener_2d_velocity(int index) {
+Vector2 FmodServer::get_listener_velocity_2d(int index) {
     Vector2 velocity;
     if (index >= 0 && index < systemListenerNumber) {
         FMOD_3D_ATTRIBUTES attr;
         ERROR_CHECK_WITH_REASON(system->getListenerAttributes(index, &attr), vformat("Cannot get listener %d velocity", index));
-        velocity = get_velocity2d_from_3d_attributes(attr, distanceScale);
+        velocity = FmodSpatial::vector_to_godot_2d(attr.velocity);
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
     return velocity;
 }
 
-void FmodServer::set_listener_transform3d(int index, const Transform3D& transform) {
+void FmodServer::set_listener_transform_3d(int index, const Transform3D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
-        FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
-        ERROR_CHECK_WITH_REASON(system->setListenerAttributes(index, &attr), vformat("Cannot set listener %d transform3d", index));
+        FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_3d(transform);
+        ERROR_CHECK_WITH_REASON(
+            system->setListenerAttributes(index, &attr),
+            vformat("Cannot set listener %d transform_3d", index)
+        );
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
 }
 
-void FmodServer::set_listener_transform2d(int index, const Transform2D& transform) {
+void FmodServer::set_listener_transform_2d(int index, const Transform2D& transform) {
     if (index >= 0 && index < systemListenerNumber) {
-        FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(transform, distanceScale);
-        ERROR_CHECK_WITH_REASON(system->setListenerAttributes(index, &attr), vformat("Cannot set listener %d transform2d", index));
+        FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_2d(transform);
+        ERROR_CHECK_WITH_REASON(
+            system->setListenerAttributes(index, &attr),
+            vformat("Cannot set listener %d transform_2d", index)
+        );
     } else {
         GODOT_LOG_ERROR("index of listeners must be set between 0 and the number of listeners set")
     }
@@ -979,15 +994,22 @@ FMOD::Sound* FmodServer::create_sound(FMOD_STUDIO_SOUND_INFO& sound_info, FMOD_M
     return sound;
 }
 
-void FmodServer::set_spatialization(float p_doppler_scale, float p_distance_factor, float p_rolloff_scale) {
-    if (p_distance_factor <= 0) {
-        GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings - invalid distance factor!")
-    } else if (ERROR_CHECK(coreSystem->set3DSettings(p_doppler_scale, p_distance_factor, p_rolloff_scale))) {
-        distanceScale = p_distance_factor;
-        GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set global 3D settings")
+// FMOD's own distance factor stays at 1: positions reach it already in meters, converted with the 2D or 3D factor.
+void FmodServer::set_spatialization(float p_doppler_scale, float p_rolloff_scale) {
+    if (ERROR_CHECK(coreSystem->set3DSettings(p_doppler_scale, 1.0f, p_rolloff_scale))) {
+        GODOT_LOG_VERBOSE("FMOD Sound System: Successfully set spatialization settings")
     } else {
-        GODOT_LOG_ERROR("FMOD Sound System: Failed to set 3D settings")
+        GODOT_LOG_ERROR("FMOD Sound System: Failed to set spatialization settings")
     }
+}
+
+void FmodServer::set_distance_factors(float p_factor_2d, float p_factor_3d) {
+    if (p_factor_2d <= 0 || p_factor_3d <= 0) {
+        GODOT_LOG_ERROR("FMOD Sound System: Failed to set distance factors - they must be greater than 0!")
+        return;
+    }
+    FmodSpatial::distance_factor_2d = p_factor_2d;
+    FmodSpatial::distance_factor_3d = p_factor_3d;
 }
 
 void FmodServer::wait_for_all_loads() {

@@ -121,8 +121,6 @@ namespace godot {
         inline static bool isInitialized = false;
         bool isNotInitializedPrinted;
 
-        float distanceScale;
-
         String godotAudioBus;
         ObjectID runtime;
         void add_runtime_to_scene_tree();
@@ -160,7 +158,6 @@ namespace godot {
 
         static FmodServer* get_singleton();
         static bool is_initialized() { return isInitialized; }
-        float get_distance_scale() const { return distanceScale; }
 
         // LIFECYCLE
         void init(const Ref<FmodSettings>& p_settings = Ref<FmodSettings>());
@@ -169,7 +166,8 @@ namespace godot {
         String get_godot_audio_bus() const;
 
         // SETTINGS
-        void set_spatialization(float p_doppler_scale, float p_distance_factor, float p_rolloff_scale);
+        void set_spatialization(float p_doppler_scale, float p_rolloff_scale);
+        void set_distance_factors(float p_factor_2d, float p_factor_3d);
         unsigned int get_system_dsp_buffer_length();
         int get_system_dsp_num_buffers();
 
@@ -224,12 +222,12 @@ namespace godot {
         int get_system_listener_number() const;
         float get_system_listener_weight(int index);
         void set_system_listener_weight(int index, float weight);
-        Transform3D get_listener_transform3d(int index);
-        Transform2D get_listener_transform2d(int index);
-        Vector3 get_listener_3d_velocity(int index);
-        Vector2 get_listener_2d_velocity(int index);
-        void set_listener_transform3d(int index, const Transform3D& transform);
-        void set_listener_transform2d(int index, const Transform2D& transform);
+        Transform3D get_listener_transform_3d(int index);
+        Transform2D get_listener_transform_2d(int index);
+        Vector3 get_listener_velocity_3d(int index);
+        Vector2 get_listener_velocity_2d(int index);
+        void set_listener_transform_3d(int index, const Transform3D& transform);
+        void set_listener_transform_2d(int index, const Transform2D& transform);
         void set_listener_lock(int index, bool isLocked);
         bool get_listener_lock(int index);
         Object* get_object_attached_to_listener(int index);
@@ -338,7 +336,6 @@ namespace godot {
         }
 
         ref->get_wrapped()->setUserData(ref.ptr());
-        ref->set_distance_scale(distanceScale);
         runningEvents.push_back(ref);
         return ref;
     }

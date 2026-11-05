@@ -29,15 +29,25 @@ func test_assert_set_pitch():
 	assert_float(music.pitch).is_equal(0.75)
 
 func test_assert_set_position():
-	sound.position = Vector3(1, 2, 3)
-	assert_vector(sound.position).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
+	sound.position_3d = Vector3(1, 2, 3)
+	assert_vector(sound.position_3d).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
 	sound.position_2d = Vector2(4, 5)
 	assert_vector(sound.position_2d).is_equal_approx(Vector2(4, 5), Vector2(0.001, 0.001))
-	assert_vector(sound.position).is_equal_approx(Vector3(-4, 0, 5), Vector3(0.001, 0.001, 0.001))
+	assert_vector(sound.position_3d).is_equal_approx(Vector3(-4, 0, 5) / 64.0, Vector3(0.001, 0.001, 0.001))
+
+func test_assert_distance_factors_convert_separately():
+	FmodServer.set_distance_factors(10.0, 2.0)
+	sound.position_3d = Vector3(2, 0, 0)
+	sound.position_2d = Vector2(10, 0)
+	assert_vector(sound.position_2d).is_equal_approx(Vector2(10, 0), Vector2(0.001, 0.001))
+	assert_vector(sound.position_3d).is_equal_approx(Vector3(-2, 0, 0), Vector3(0.001, 0.001, 0.001))
+	sound.position_3d = Vector3(2, 0, 0)
+	assert_vector(sound.position_2d).is_equal_approx(Vector2(-10, 0), Vector2(0.001, 0.001))
+	FmodServer.set_distance_factors(64.0, 1.0)
 
 func test_assert_set_velocity():
-	sound.velocity = Vector3(1, 2, 3)
-	assert_vector(sound.velocity).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
+	sound.velocity_3d = Vector3(1, 2, 3)
+	assert_vector(sound.velocity_3d).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
 	sound.velocity_2d = Vector2(4, 5)
 	assert_vector(sound.velocity_2d).is_equal_approx(Vector2(4, 5), Vector2(0.001, 0.001))
 

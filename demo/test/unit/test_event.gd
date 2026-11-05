@@ -62,7 +62,7 @@ func test_assert_event_parameter_by_name():
 func test_assert_event_parameter_reflects_automatic_value():
 	var sfx_bank := FmodServer.load_bank("res://assets/Banks/SFX.bank", FmodBank.StudioLoadBankFlags.NORMAL)
 	var explosion := FmodServer.create_event_instance("event:/Weapons/Explosion")
-	explosion.set_2d_attributes(Transform2D(0, Vector2(500, 0)))
+	explosion.set_transform_2d(Transform2D(0, Vector2(500, 0)))
 	explosion.start()
 	await await_millis(200)
 	var distance := explosion.get_parameter_by_name("Distance")

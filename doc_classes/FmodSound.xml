@@ -48,17 +48,17 @@
 		</method>
 	</methods>
 	<members>
-		<member name="position" type="Vector3" setter="set_position" getter="get_position">
-			The position of the sound in the world, in 3D. Positions are in meters times [code]distance_factor[/code], like the nodes of the extension. Setting it, or any of the position and velocity properties, makes the sound 3D, so FMOD spatializes it against the listeners.
+		<member name="position_3d" type="Vector3" setter="set_position_3d" getter="get_position_3d">
+			The position of the sound in the world, in 3D. Positions are in meters times [member FmodSettings.distance_factor_3d], like the 3D nodes of the extension. Setting it, or any of the position and velocity properties, makes the sound 3D, so FMOD spatializes it against the listeners.
 		</member>
 		<member name="position_2d" type="Vector2" setter="set_position_2d" getter="get_position_2d">
-			The position of the sound in the world, in 2D, in pixels with the 2D mapping the 2D nodes of the extension use. It is the same position as [member position], seen on a plane.
+			The position of the sound in the world, in 2D, in pixels, converted with [member FmodSettings.distance_factor_2d] and the 2D mapping the 2D nodes of the extension use. It is the same position as [member position_3d], seen on a plane.
 		</member>
 		<member name="pitch" type="float" setter="set_pitch" getter="get_pitch">
 			The pitch multiplier of the sound: 1 is the original pitch, 2 an octave higher.
 		</member>
-		<member name="velocity" type="Vector3" setter="set_velocity" getter="get_velocity">
-			The velocity of the sound in 3D, in position units per second, used for the Doppler effect. FMOD does not move the sound by it: update [member position] yourself.
+		<member name="velocity_3d" type="Vector3" setter="set_velocity_3d" getter="get_velocity_3d">
+			The velocity of the sound in 3D, in position units per second, used for the Doppler effect. FMOD does not move the sound by it: update [member position_3d] yourself.
 		</member>
 		<member name="velocity_2d" type="Vector2" setter="set_velocity_2d" getter="get_velocity_2d">
 			The velocity of the sound in 2D, in pixels per second, with the 2D mapping of [member position_2d].

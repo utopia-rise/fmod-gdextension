@@ -28,6 +28,13 @@ static bool move_old_setting(const char* p_old_option, const char* p_option) {
     return true;
 }
 
+static bool remove_old_setting(const char* p_old_option) {
+    ProjectSettings* project_settings = ProjectSettings::get_singleton();
+    if (!project_settings->has_setting(get_setting_path(p_old_option))) { return false; }
+    project_settings->set_setting(get_setting_path(p_old_option), Variant());
+    return true;
+}
+
 void FmodEditorPlugin::_ready() {
     ProjectSettings* project_settings = ProjectSettings::get_singleton();
     Ref<FmodSettings> defaults;
@@ -38,6 +45,8 @@ void FmodEditorPlugin::_ready() {
         if (setting.old_path) { moved |= move_old_setting(setting.old_path, setting.path); }
     }
     moved |= move_old_setting("Plugins/path_to_plugin_configuration", FmodPluginsSettings::RESOURCE_OPTION);
+    moved |= remove_old_setting("3D Settings/distance_factor");
+    moved |= remove_old_setting("Spatialization/distance_factor");
     if (moved) { project_settings->save(); }
 
     String auto_initialize = get_setting_path(FMOD_SETTING_AUTO_INITIALIZE);

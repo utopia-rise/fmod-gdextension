@@ -3,7 +3,7 @@
 using namespace godot;
 
 void FmodEventEmitter3D::set_space_attribute_impl(const Ref<FmodEvent>& p_event) const {
-    p_event->set_3d_attributes(get_global_transform());
+    p_event->set_transform_3d(get_global_transform());
 }
 
 void FmodEventEmitter3D::_ready() {
