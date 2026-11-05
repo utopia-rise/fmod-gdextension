@@ -7,8 +7,8 @@ Each platform needs its native library for the editor (desktop only) and for bot
 Exporting the game's audio content is F.2.
 
 ## Capabilities
-- **F.1.1**: Game developers use FMOD in the Godot editor on Windows x86_64, Linux x86_64 and macOS.
-- **F.1.2**: Games export with FMOD to Windows x86_64, Linux x86_64 and macOS, in debug and release.
+- **F.1.1**: Game developers use FMOD in the Godot editor on Windows (x86_64 and arm64), Linux (x86_64 and arm64) and macOS.
+- **F.1.2**: Games export with FMOD to Windows (x86_64 and arm64), Linux (x86_64 and arm64) and macOS, in debug and release.
 - **F.1.3**: Games export with FMOD to Android arm64, the Android plugin being added to the Gradle build without game developer action.
 - **F.1.4**: Games export with FMOD to Android x86_64.
 - **F.1.5**: Games export with FMOD to iOS.

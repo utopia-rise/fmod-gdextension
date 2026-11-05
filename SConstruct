@@ -80,23 +80,25 @@ if env["platform"] == "macos":
     )
 
 elif env["platform"] == "linux":
+    fmod_arch_dir = env["arch"]
     libfmod = 'libfmod%s.so'% lfix
     libfmodstudio = 'libfmodstudio%s.so'% lfix
 
     env.Append(CPPPATH=[env['fmod_lib_dir'] + 'linux/core/inc/', env['fmod_lib_dir'] + 'linux/studio/inc/'])
-    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"], env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]])
+    env.Append(LIBPATH=[env['fmod_lib_dir'] + 'linux/core/lib/' + fmod_arch_dir, env['fmod_lib_dir'] + 'linux/studio/lib/' + fmod_arch_dir])
     env.Append(LIBS=[libfmod, libfmodstudio])
 
     env.Append(CCFLAGS=["-fPIC", "-Wwrite-strings"])
     env.Append(LINKFLAGS=["-Wl,-R,'$$ORIGIN'"])
-    env.Append(LINKFLAGS=["-m64", "-fuse-ld=gold"])
+    if env["arch"] == "x86_64":
+        env.Append(LINKFLAGS=["-fuse-ld=gold"])
 
 elif env["platform"] == "windows":
     libfmod = 'fmod%s_vc'% lfix
     libfmodstudio = 'fmodstudio%s_vc'% lfix
     fmod_info_table = {
-        "x86_64" : "x64",
-        "x86_32" : "x86",
+        "x86_64": "x64",
+        "arm64": "arm64"
     }
     arch_suffix_override = fmod_info_table[env["arch"]]
 
@@ -136,10 +138,11 @@ elif env["platform"] == "web":
     env.Append(LINKFLAGS=[env.File(env['fmod_lib_dir'] + 'web/studio/lib/browser/{}/c_cpp/{}'.format(threading, libfmodstudio))])
 
 #Output is placed in the addons directory of the demo project directly
-target = "{}{}/{}.{}.{}".format(
-    target_path, env["platform"], target_name, env["platform"], env["target"]
-) if env["platform"] != "android" else "{}{}/{}/{}.{}.{}".format(
+per_arch_dir = env["platform"] in ["android", "linux", "windows"]
+target = "{}{}/{}/{}.{}.{}".format(
     target_path, env["platform"], env["arch"], target_name, env["platform"], env["target"]
+) if per_arch_dir else "{}{}/{}.{}.{}".format(
+    target_path, env["platform"], target_name, env["platform"], env["target"]
 )
 
 if env["platform"] == "macos":
@@ -172,18 +175,18 @@ def copy_fmod_libraries(self, arg, env, executor = None):
     fmod_core_lib_dir = ""
     fmod_studio_lib_dir = ""
 
-    addon_fmod_libs_output = "{}{}/".format(
-        target_path, env["platform"]
-    ) if env["platform"] != "android" else "{}{}/{}/".format(
+    addon_fmod_libs_output = "{}{}/{}/".format(
         target_path, env["platform"], env["arch"]
+    ) if per_arch_dir else "{}{}/".format(
+        target_path, env["platform"]
     )
 
     if env["platform"] == "macos":
         fmod_core_lib_dir = env['fmod_lib_dir'] + 'osx/core/lib/'
         fmod_studio_lib_dir = env['fmod_lib_dir'] + 'osx/studio/lib/'
     elif env["platform"] == "linux":
-        fmod_core_lib_dir = env['fmod_lib_dir'] + 'linux/core/lib/' + env["arch"]
-        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'linux/studio/lib/' + env["arch"]
+        fmod_core_lib_dir = env['fmod_lib_dir'] + 'linux/core/lib/' + fmod_arch_dir
+        fmod_studio_lib_dir = env['fmod_lib_dir'] + 'linux/studio/lib/' + fmod_arch_dir
     elif env["platform"] == "windows":
         fmod_core_lib_dir = env['fmod_lib_dir'] + 'windows/core/lib/' + arch_suffix_override + '/'
         fmod_studio_lib_dir = env['fmod_lib_dir'] + 'windows/studio/lib/' + arch_suffix_override + '/'

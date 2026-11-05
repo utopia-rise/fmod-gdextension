@@ -57,7 +57,7 @@ void FmodEditorExportPlugin::_export_begin(const PackedStringArray& features, bo
         String target_dir = path.get_base_dir();
         String os_name = is_linux_export ? "linux" : "windows";
         String extension = is_linux_export ? ".so" : ".dll";
-        PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, os_name, extension);
+        PackedStringArray plugins_libraries_path = _get_libraries_to_export(plugins_settings, os_name, extension, features.has("arm64") ? "arm64" : "x86_64");
 
         Ref<DirAccess> dir_access = DirAccess::open(target_dir);
 

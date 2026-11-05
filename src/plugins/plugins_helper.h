@@ -3,6 +3,7 @@
 
 #include <variant/string.hpp>
 #include <resources/fmod_plugins_settings.h>
+#include <classes/engine.hpp>
 #include <classes/os.hpp>
 
 namespace godot {
@@ -40,7 +41,12 @@ namespace godot {
 
 #if !defined(ANDROID_ENABLED) || defined(TOOLS_ENABLED)
         String os_lower_name = os_override.is_empty() ? OS::get_singleton()->get_name().to_lower() : os_override.to_lower();
-        String plugin_directory = get_plugins_os_directory(p_settings, os_lower_name, arch);
+#ifdef TOOLS_ENABLED
+        String plugin_arch = arch.is_empty() && (os_lower_name == "windows" || os_lower_name == "linux") ? Engine::get_singleton()->get_architecture_name() : arch;
+#else
+        const String& plugin_arch = arch;
+#endif
+        String plugin_directory = get_plugins_os_directory(p_settings, os_lower_name, plugin_arch);
 
         String plugin_extension;
         String plugin_lib_prefix = "lib";

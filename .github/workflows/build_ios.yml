@@ -49,5 +49,4 @@ jobs:
           name: ${{ matrix.target }}_ios
           path: |
             demo/addons/fmod/libs/ios
-            !demo/addons/fmod/libs/ios/CopyPast_Fmod_Libs_Here.txt
           if-no-files-found: error
