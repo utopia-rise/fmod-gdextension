@@ -4,8 +4,8 @@ extends SceneTree
 ## opens it like a user and drives the addon's own controls: the toolbar's Fmod Explorer (its tree, search, refresh,
 ## selection, event audition and parameter display), the Inspector's event picker of FmodEventEmitter2D/3D (through the
 ## explorer, typing a path or a GUID) with the fmod_parameters properties it creates, the bank list of FmodBankLoader
-## (adding from the explorer or by hand, moving, removing), the FMOD nodes' properties, and the undo history. A run
-## passes when it prints `[MONKEY] DONE with 0 failure(s)` and no engine or script error.
+## (adding from the explorer or by hand, moving, removing) and its sample data preloading, the FMOD nodes' properties,
+## and the undo history. A run passes when it prints `[MONKEY] DONE with 0 failure(s)` and no engine or script error.
 ##
 ## The runner calls every `step_*` method in declaration order, each a scripted step checking what its actions do. The
 ## `step_random_user_actions` step then calls `action_*` methods picked at random from the seed, each a single user
@@ -417,7 +417,7 @@ func node_state(node: Node) -> Dictionary:
 		"FmodListener2D", "FmodListener3D":
 			state["listener"] = [node.listener_index, node.is_locked, node.weight]
 		"FmodBankLoader":
-			state["banks"] = node.bank_paths.duplicate()
+			state["banks"] = [node.bank_paths.duplicate(), node.preload_sample_data]
 	return state
 
 
@@ -666,6 +666,8 @@ func step_edit_a_bank_loaders_banks() -> void:
 	var bank_item := explorer_item_of_class("FmodBank")
 	await choose(bank_item, 4)
 	expect(bank_loader().bank_paths.has(bank_item.get_metadata(0).get_godot_res_path()), "a bank picked in the explorer is listed")
+	await set_property(bank_loader(), "preload_sample_data", true)
+	expect(bank_loader().preload_sample_data, "the bank loader's preload_sample_data changes")
 
 
 func step_edit_the_listeners() -> void:

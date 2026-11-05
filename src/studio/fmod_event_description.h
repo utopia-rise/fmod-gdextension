@@ -2,6 +2,7 @@
 #define GODOTFMOD_FMOD_EVENT_DESCRIPTION_H
 
 #include "classes/ref_counted.hpp"
+#include "fmod_bank.h"
 #include "fmod_parameter_description.h"
 #include "fmod_studio.hpp"
 #include "helpers/common.h"
@@ -20,7 +21,7 @@ namespace godot {
         void release_all_instances();
         void load_sample_data();
         void unload_sample_data();
-        int get_sample_loading_state();
+        FmodBank::StudioLoadingState get_sample_loading_state();
         bool is_3d();
         bool is_one_shot();
         bool is_snapshot();

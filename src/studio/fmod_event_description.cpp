@@ -99,13 +99,13 @@ void FmodEventDescription::unload_sample_data() {
     );
 }
 
-int FmodEventDescription::get_sample_loading_state() {
-    FMOD_STUDIO_LOADING_STATE s;
+FmodBank::StudioLoadingState FmodEventDescription::get_sample_loading_state() {
+    FMOD_STUDIO_LOADING_STATE s = FMOD_STUDIO_LOADING_STATE_ERROR;
     ERROR_CHECK_WITH_REASON(
       _wrapped->getSampleLoadingState(&s),
       vformat("Cannot get sample loading state for event %s with guid %s", get_path(), get_guid_as_string())
     );
-    return s;
+    return fmod_enum_cast<FmodBank::StudioLoadingState>(s);
 }
 
 bool FmodEventDescription::is_3d() {

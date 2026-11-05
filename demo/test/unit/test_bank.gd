@@ -43,3 +43,37 @@ func test_assert_bank_vca_count():
 	assert_int(musicBank.get_vca_count()).is_equal(0)
 	assert_int(masterBank.get_vca_count()).is_equal(3)
 	assert_int(vehicleBank.get_vca_count()).is_equal(0)
+
+func test_bank_sample_data():
+	vehicleBank.load_sample_data()
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.LOADED)
+	vehicleBank.unload_sample_data()
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.UNLOADED)
+
+func test_bank_loader_preloads_sample_data():
+	var loader := FmodBankLoader.new()
+	loader.bank_paths = [vehicleBank.get_godot_res_path()]
+	loader.preload_sample_data = true
+	get_tree().get_root().add_child(loader)
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.LOADED)
+
+	loader.bank_paths = []
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.UNLOADED)
+
+	loader.bank_paths = [vehicleBank.get_godot_res_path()]
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.LOADED)
+
+	loader.preload_sample_data = false
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.UNLOADED)
+
+	loader.preload_sample_data = true
+	get_tree().get_root().remove_child(loader)
+	FmodServer.wait_for_all_loads()
+	assert_int(vehicleBank.get_sample_loading_state()).is_equal(FmodBank.StudioLoadingState.UNLOADED)
+	loader.free()

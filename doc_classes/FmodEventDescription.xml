@@ -132,9 +132,9 @@
 			</description>
 		</method>
 		<method name="get_sample_loading_state">
-			<return type="int" />
+			<return type="int" enum="FmodBank.StudioLoadingState" />
 			<description>
-				Returns the loading state of sample data for this event. See FMOD_STUDIO_LOADING_STATE enum for possible values.
+				Returns the loading state of the sample data for this event.
 			</description>
 		</method>
 		<method name="get_sound_size">
