@@ -209,7 +209,19 @@ void FmodServer::init(const Ref<FmodSettings>& p_settings) {
     ERROR_CHECK(coreSystem->getAdvancedSettings(&advancedSettings));
 
     advancedSettings.randomSeed = static_cast<unsigned int>(std::time(nullptr));// Use time as a seed
+    int per_codec_channel_count = settings->get_per_codec_channel_count();
+    advancedSettings.maxMPEGCodecs = per_codec_channel_count;
+    advancedSettings.maxADPCMCodecs = per_codec_channel_count;
+    advancedSettings.maxXMACodecs = per_codec_channel_count;
+    advancedSettings.maxVorbisCodecs = per_codec_channel_count;
+    advancedSettings.maxAT9Codecs = per_codec_channel_count;
+    advancedSettings.maxFADPCMCodecs = per_codec_channel_count;
+    advancedSettings.maxOpusCodecs = per_codec_channel_count;
     ERROR_CHECK(coreSystem->setAdvancedSettings(&advancedSettings));
+    ERROR_CHECK_WITH_REASON(
+        coreSystem->setSoftwareChannels(settings->get_real_channel_count()),
+        "Cannot set the real channel count"
+    );
 
     FMOD_STUDIO_INITFLAGS studio_init_flags = FMOD_STUDIO_INIT_NORMAL;
 

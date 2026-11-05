@@ -33,6 +33,22 @@ int FmodSettings::get_channel_count() const {
     return _channel_count;
 }
 
+void FmodSettings::set_real_channel_count(int p_real_channel_count) {
+    _real_channel_count = p_real_channel_count;
+}
+
+int FmodSettings::get_real_channel_count() const {
+    return _real_channel_count;
+}
+
+void FmodSettings::set_per_codec_channel_count(int p_per_codec_channel_count) {
+    _per_codec_channel_count = p_per_codec_channel_count;
+}
+
+int FmodSettings::get_per_codec_channel_count() const {
+    return _per_codec_channel_count;
+}
+
 void FmodSettings::set_sample_rate(int p_sample_rate) {
     _sample_rate = p_sample_rate;
 }
@@ -243,6 +259,10 @@ void FmodSettings::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_load_by_name"), &FmodSettings::get_load_by_name);
     ClassDB::bind_method(D_METHOD("set_channel_count", "channel_count"), &FmodSettings::set_channel_count);
     ClassDB::bind_method(D_METHOD("get_channel_count"), &FmodSettings::get_channel_count);
+    ClassDB::bind_method(D_METHOD("set_real_channel_count", "real_channel_count"), &FmodSettings::set_real_channel_count);
+    ClassDB::bind_method(D_METHOD("get_real_channel_count"), &FmodSettings::get_real_channel_count);
+    ClassDB::bind_method(D_METHOD("set_per_codec_channel_count", "per_codec_channel_count"), &FmodSettings::set_per_codec_channel_count);
+    ClassDB::bind_method(D_METHOD("get_per_codec_channel_count"), &FmodSettings::get_per_codec_channel_count);
     ClassDB::bind_method(D_METHOD("set_sample_rate", "sample_rate"), &FmodSettings::set_sample_rate);
     ClassDB::bind_method(D_METHOD("get_sample_rate"), &FmodSettings::get_sample_rate);
     ClassDB::bind_method(D_METHOD("set_speaker_mode", "speaker_mode"), &FmodSettings::set_speaker_mode);
@@ -299,6 +319,16 @@ void FmodSettings::_bind_methods() {
         PropertyInfo(Variant::INT, "channel_count", PROPERTY_HINT_RANGE, "1,4095"),
         "set_channel_count",
         "get_channel_count"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "real_channel_count", PROPERTY_HINT_RANGE, "1,4095"),
+        "set_real_channel_count",
+        "get_real_channel_count"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::INT, "per_codec_channel_count", PROPERTY_HINT_RANGE, "0,256"),
+        "set_per_codec_channel_count",
+        "get_per_codec_channel_count"
     );
     ADD_SUBGROUP("Format", "");
     ADD_PROPERTY(

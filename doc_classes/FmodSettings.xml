@@ -24,6 +24,12 @@
 		<member name="channel_count" type="int" setter="set_channel_count" getter="get_channel_count">
 			The most sounds FMOD tracks at once. Only the most audible ones are mixed.
 		</member>
+		<member name="per_codec_channel_count" type="int" setter="set_per_codec_channel_count" getter="get_per_codec_channel_count" default="32">
+			The most sounds FMOD decodes at once for each compressed format (MP3, ADPCM, XMA, Vorbis, AT9, FADPCM and Opus).
+		</member>
+		<member name="real_channel_count" type="int" setter="set_real_channel_count" getter="get_real_channel_count" default="64">
+			The most sounds FMOD mixes at once. The most audible of the [member channel_count] sounds are mixed.
+		</member>
 		<member name="distance_factor" type="float" setter="set_distance_factor" getter="get_distance_factor" default="1.0">
 			The number of game units in one meter. In 2D, game units are pixels: set it to the number of pixels in one meter of your world.
 		</member>
