@@ -9,7 +9,7 @@ namespace godot {
     template<class Derived, class NodeType>
     class FmodListener : public NodeType {
 
-        void ready();
+        void enter_tree();
         void exit_tree();
 
     public:
@@ -47,8 +47,8 @@ namespace godot {
         if (Engine::get_singleton()->is_editor_hint()) { return; }
 #endif
         switch(p_what){
-            case Node::NOTIFICATION_READY:
-                ready();
+            case Node::NOTIFICATION_ENTER_TREE:
+                enter_tree();
                 break;
             case Node::NOTIFICATION_EXIT_TREE:
                 exit_tree();
@@ -59,7 +59,7 @@ namespace godot {
     }
 
     template<class Derived, class NodeType>
-    void FmodListener<Derived, NodeType>::ready() {
+    void FmodListener<Derived, NodeType>::enter_tree() {
 #ifdef TOOLS_ENABLED
         // ensure we only run FMOD when the game is running!
         if (Engine::get_singleton()->is_editor_hint()) { return; }
