@@ -76,6 +76,8 @@ namespace godot {
             {BANKS_PATH_OPTION, "banks_path", true, "General/banks_path"},
             {LOAD_BY_NAME_OPTION, "load_by_name", true, "General/should_load_by_name"},
             {"Mixer/voices/channel_count", "channel_count", true, "General/channel_count"},
+            {"Mixer/voices/real_channel_count", "real_channel_count", false, nullptr},
+            {"Mixer/voices/per_codec_channel_count", "per_codec_channel_count", false, nullptr},
             {"Mixer/format/sample_rate", "sample_rate", true, "Software Format/sample_rate"},
             {"Mixer/format/speaker_mode", "speaker_mode", true, "Software Format/speaker_mode"},
             {"Mixer/format/raw_speaker_count", "raw_speaker_count", false, "Software Format/raw_speaker_count"},
@@ -132,6 +134,10 @@ namespace godot {
 
         void set_channel_count(int p_channel_count);
         int get_channel_count() const;
+        void set_real_channel_count(int p_real_channel_count);
+        int get_real_channel_count() const;
+        void set_per_codec_channel_count(int p_per_codec_channel_count);
+        int get_per_codec_channel_count() const;
         void set_sample_rate(int p_sample_rate);
         int get_sample_rate() const;
         void set_speaker_mode(SpeakerMode p_speaker_mode);
@@ -184,6 +190,8 @@ namespace godot {
         String _banks_path = "res://";
         bool _load_by_name = false;
         int _channel_count = DEFAULT_CHANNEL_COUNT;
+        int _real_channel_count = 64;
+        int _per_codec_channel_count = 32;
         int _sample_rate = 48000;
         SpeakerMode _speaker_mode = STEREO;
         int _raw_speaker_count = 0;

@@ -19,6 +19,30 @@ keeps the others silent but running, so they resume where they would be when the
 
 Raise it if sounds stop starting in busy scenes. A sound tracked but not mixed costs very little.
 
+### Real Channel Count
+
+| **Project Setting** | `Fmod/Mixer/voices/real_channel_count` |
+|---|---|
+| **Property** | `real_channel_count` |
+| **Default** | 64 |
+| **Values** | 1 to 4095 |
+
+The most sounds FMOD mixes at once, also called real voices. The most audible of the [channel count](#channel-count)
+sounds are mixed, so raise it if busy scenes drop sounds that should be heard. Each real voice costs CPU. An advanced
+setting.
+
+### Per Codec Channel Count
+
+| **Project Setting** | `Fmod/Mixer/voices/per_codec_channel_count` |
+|---|---|
+| **Property** | `per_codec_channel_count` |
+| **Default** | 32 |
+| **Values** | 0 to 256 |
+
+The most sounds FMOD decodes at once for each compressed format (MP3, ADPCM, XMA, Vorbis, AT9, FADPCM and Opus), which
+bounds how many streams or compressed samples of one format play together. Raise it with the real channel count when
+many compressed sounds play at once. An advanced setting.
+
 ## Format
 
 ### Sample Rate
