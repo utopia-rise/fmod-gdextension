@@ -4,6 +4,7 @@
 #include <fmod_server.h>
 
 #include <classes/audio_stream_player.hpp>
+#include <classes/display_server.hpp>
 #include <classes/engine.hpp>
 #include <classes/os.hpp>
 #include <classes/performance.hpp>
@@ -68,6 +69,11 @@ void FmodRuntime::_process(double p_delta) {
 }
 
 void FmodRuntime::_notification(int p_what) {
+    // Godot exposes every node to screen readers, which would announce this internal one and its player.
+    if (p_what == NOTIFICATION_ACCESSIBILITY_UPDATE) {
+        DisplayServer::get_singleton()
+            ->accessibility_update_set_flag(get_accessibility_element(), DisplayServer::FLAG_HIDDEN, true);
+    }
     if (!OS::get_singleton()->has_feature("mobile")) { return; }
     if (p_what == NOTIFICATION_APPLICATION_FOCUS_OUT) { FmodServer::get_singleton()->mixer_suspend(); }
     if (p_what == NOTIFICATION_APPLICATION_FOCUS_IN) { FmodServer::get_singleton()->mixer_resume(); }
