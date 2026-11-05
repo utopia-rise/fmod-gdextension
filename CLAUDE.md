@@ -142,7 +142,7 @@ Sound designer builds banks in FMOD Studio
 ## Key Gotchas
 
 - **Master banks first** — `Master.strings.bank` then `Master.bank` must be loaded before any other bank; the bank explorer reads them from `Fmod/General/banks/path`.
-- **2D distances** — 2D positions are in pixels: the `distance_factor` 3D setting must be the number of pixels per meter, or 2D attenuation is wrong.
+- **2D distances** — 2D positions are in pixels: the `distance_factor_2d` setting must be the number of pixels per meter, or 2D attenuation is wrong. FMOD's own distance factor stays 1: nodes, listeners and sounds are converted to meters with `distance_factor_2d` or `distance_factor_3d`.
 - **Editor resaves demo scripts** — Opening `demo/` with an editor that applies personal settings can rewrite the indentation of its scripts: run tests with a self-contained editor (an empty `._sc_` file next to its binary), or revert what a run changed under `demo/` before committing.
 - **godot-cpp after a branch switch** — A godot-cpp checked out at another commit, or bindings generated for another one, build a library the editor rejects or crashes on: `git submodule update godot-cpp`, then delete `godot-cpp/gen/`.
 - **Locked libraries on Windows** — An editor open on `demo/` holds the DLLs, and the link fails with LNK1104; close it first.

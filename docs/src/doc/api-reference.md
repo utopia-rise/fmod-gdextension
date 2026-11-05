@@ -40,8 +40,8 @@ Represents an instance of an FMOD Studio event that can be played and controlled
 - `set_parameter_by_id(id: int, value: float)` - Set parameter by ID
 
 **Spatial Audio:**
-- `set_3d_attributes(transform: Transform3D)` - Set 3D position and rotation
-- `set_2d_attributes(position: Transform2D)` - Set 2D position
+- `set_transform_3d(transform: Transform3D)` - Set 3D position and rotation
+- `set_transform_2d(position: Transform2D)` - Set 2D position
 - `set_node_attributes(node: Node)` - Attach to node's transform
 
 **Properties:**

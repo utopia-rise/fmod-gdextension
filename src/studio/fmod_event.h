@@ -13,7 +13,6 @@ namespace godot {
 
         Callable eventCallback;
         String programmers_callback_sound_key;
-        float distanceScale = 1.0f;
         uint32_t callback_mask;
 
     public:
@@ -85,16 +84,15 @@ namespace godot {
         bool is_virtual() const;
         void set_listener_mask(unsigned int mask) const;
         uint32_t get_listener_mask() const;
-        Transform3D get_3d_attributes() const;
-        Transform2D get_2d_attributes() const;
-        void set_2d_attributes(const Transform2D& position) const;
-        void set_3d_attributes(const Transform3D& transform) const;
+        Transform3D get_transform_3d() const;
+        Transform2D get_transform_2d() const;
+        void set_transform_2d(const Transform2D& transform) const;
+        void set_transform_3d(const Transform3D& transform) const;
         void set_node_attributes(Node* node) const;
         void set_callback(const Callable& callback, BitField<StudioEventCallbackType> p_callback_mask);
         const Callable& get_callback() const;
         void set_programmer_callback(const String& p_programmers_callback_sound_key);
         const String& get_programmers_callback_sound_key() const;
-        void set_distance_scale(float scale);
         Ref<FmodChannelGroup> get_channel_group() const;
 
     protected:

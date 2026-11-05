@@ -32,10 +32,10 @@ void FmodEvent::_bind_methods() {
     ClassDB::bind_method(D_METHOD("is_virtual"), &FmodEvent::is_virtual);
     ClassDB::bind_method(D_METHOD("set_listener_mask", "mask"), &FmodEvent::set_listener_mask);
     ClassDB::bind_method(D_METHOD("get_listener_mask"), &FmodEvent::get_listener_mask);
-    ClassDB::bind_method(D_METHOD("set_2d_attributes", "position"), &FmodEvent::set_2d_attributes);
-    ClassDB::bind_method(D_METHOD("get_2d_attributes"), &FmodEvent::get_2d_attributes);
-    ClassDB::bind_method(D_METHOD("set_3d_attributes", "transform"), &FmodEvent::set_3d_attributes);
-    ClassDB::bind_method(D_METHOD("get_3d_attributes"), &FmodEvent::get_3d_attributes);
+    ClassDB::bind_method(D_METHOD("set_transform_2d", "transform"), &FmodEvent::set_transform_2d);
+    ClassDB::bind_method(D_METHOD("get_transform_2d"), &FmodEvent::get_transform_2d);
+    ClassDB::bind_method(D_METHOD("set_transform_3d", "transform"), &FmodEvent::set_transform_3d);
+    ClassDB::bind_method(D_METHOD("get_transform_3d"), &FmodEvent::get_transform_3d);
     ClassDB::bind_method(D_METHOD("set_node_attributes", "node"), &FmodEvent::set_node_attributes);
     ClassDB::bind_method(D_METHOD("set_callback", "callback", "callback_mask"), &FmodEvent::set_callback);
     ClassDB::bind_method(D_METHOD("set_programmer_callback", "sound_key"), &FmodEvent::set_programmer_callback);
@@ -49,8 +49,16 @@ void FmodEvent::_bind_methods() {
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "position",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_timeline_position", "get_timeline_position");
     ADD_PROPERTY(PropertyInfo(Variant::INT, "listener_mask",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_listener_mask", "get_listener_mask");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM2D, "transform_2d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_2d_attributes", "get_2d_attributes");
-    ADD_PROPERTY(PropertyInfo(Variant::TRANSFORM3D, "transform_3d",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_3d_attributes", "get_3d_attributes");
+    ADD_PROPERTY(
+        PropertyInfo(Variant::TRANSFORM2D, "transform_2d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE),
+        "set_transform_2d",
+        "get_transform_2d"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::TRANSFORM3D, "transform_3d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE),
+        "set_transform_3d",
+        "get_transform_3d"
+    );
 
     BIND_ENUM_CONSTANT(ALLOWFADEOUT);
     BIND_ENUM_CONSTANT(IMMEDIATE);
@@ -231,41 +239,41 @@ uint32_t FmodEvent::get_listener_mask() const {
     return mask;
 }
 
-void FmodEvent::set_2d_attributes(const Transform2D& position) const {
-    FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(position, distanceScale);
+void FmodEvent::set_transform_2d(const Transform2D& transform) const {
+    FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_2d(transform);
     ERROR_CHECK(_wrapped->set3DAttributes(&attr));
 }
 
-Transform2D FmodEvent::get_2d_attributes() const {
-    Transform2D _2Dattr;
+Transform2D FmodEvent::get_transform_2d() const {
+    Transform2D transform;
     FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(_wrapped->get3DAttributes(&attr));
-    _2Dattr = get_transform2d_from_3d_attributes(attr, distanceScale);
-    return _2Dattr;
+    transform = FmodSpatial::transform_to_godot_2d(attr);
+    return transform;
 }
 
-void FmodEvent::set_3d_attributes(const Transform3D& transform) const {
-    FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(transform, distanceScale);
+void FmodEvent::set_transform_3d(const Transform3D& transform) const {
+    FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_3d(transform);
     ERROR_CHECK(_wrapped->set3DAttributes(&attr));
 }
 
-Transform3D FmodEvent::get_3d_attributes() const {
-    Transform3D _3Dattr;
+Transform3D FmodEvent::get_transform_3d() const {
+    Transform3D transform;
     FMOD_3D_ATTRIBUTES attr;
     ERROR_CHECK(_wrapped->get3DAttributes(&attr));
-    _3Dattr = get_transform3d_from_3d_attributes(attr, distanceScale);
-    return _3Dattr;
+    transform = FmodSpatial::transform_to_godot_3d(attr);
+    return transform;
 }
 
 void FmodEvent::set_node_attributes(Node* node) const {
     if (node->is_inside_tree()) {
         if (auto* ci {Node::cast_to<CanvasItem>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform2d(ci->get_global_transform(), distanceScale);
+            FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_2d(ci->get_global_transform());
             ERROR_CHECK(_wrapped->set3DAttributes(&attr));
             return;
         }
         if (auto* s {Node::cast_to<Node3D>(node)}) {
-            FMOD_3D_ATTRIBUTES attr = get_3d_attributes_from_transform3d(s->get_global_transform(), distanceScale);
+            FMOD_3D_ATTRIBUTES attr = FmodSpatial::attributes_to_fmod_3d(s->get_global_transform());
             ERROR_CHECK(_wrapped->set3DAttributes(&attr));
             return;
         }
@@ -290,10 +298,6 @@ const Callable& FmodEvent::get_callback() const {
 
 const String& FmodEvent::get_programmers_callback_sound_key() const {
     return programmers_callback_sound_key;
-}
-
-void FmodEvent::set_distance_scale(float scale){
-    distanceScale = scale;
 }
 
 Ref<FmodChannelGroup> FmodEvent::get_channel_group() const {

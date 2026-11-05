@@ -89,7 +89,8 @@ namespace godot {
             {"Mixer/latency/buffer_count", "dsp_buffer_count", true, "DSP/dsp_buffer_count"},
             {"Mixer/latency/studio_processing", "studio_processing", false, nullptr},
             {"Spatialization/listener_count", "listener_count", true, "General/default_listener_count"},
-            {"Spatialization/distance_factor", "distance_factor", true, "3D Settings/distance_factor"},
+            {"Spatialization/distance_factor_2d", "distance_factor_2d", true, nullptr},
+            {"Spatialization/distance_factor_3d", "distance_factor_3d", true, nullptr},
             {"Spatialization/rolloff_scale", "rolloff_scale", true, "3D Settings/rolloff_scale"},
             {"Spatialization/doppler_scale", "doppler_scale", true, "3D Settings/doppler_scale"},
             {"Debugging/live_update/enabled", "live_update", true, "General/is_live_update_enabled"},
@@ -161,8 +162,10 @@ namespace godot {
 
         void set_listener_count(int p_listener_count);
         int get_listener_count() const;
-        void set_distance_factor(float p_distance_factor);
-        float get_distance_factor() const;
+        void set_distance_factor_2d(float p_distance_factor);
+        float get_distance_factor_2d() const;
+        void set_distance_factor_3d(float p_distance_factor);
+        float get_distance_factor_3d() const;
         void set_rolloff_scale(float p_rolloff_scale);
         float get_rolloff_scale() const;
         void set_doppler_scale(float p_doppler_scale);
@@ -203,7 +206,8 @@ namespace godot {
         int _dsp_buffer_count = DEFAULT_DSP_BUFFER_COUNT;
         StudioProcessing _studio_processing = DEFAULT_STUDIO_PROCESSING;
         int _listener_count = 1;
-        float _distance_factor = 1;
+        float _distance_factor_2d = 64;
+        float _distance_factor_3d = 1;
         float _rolloff_scale = 1;
         float _doppler_scale = 1;
         bool _live_update = DEFAULT_LIVE_UPDATE;

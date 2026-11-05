@@ -48,7 +48,7 @@ func test_assert_every_bound_argument_is_named():
 				var argument_name: String = argument["name"]
 				assert_bool(argument_name.is_empty() or argument_name.begins_with("_unnamed") or argument_name != argument_name.to_snake_case()).override_failure_message("%s.%s has argument '%s'" % [name, method["name"], argument_name]).is_false()
 
-func test_assert_event_transform_3d_property_sets_attributes():
+func test_assert_event_transform_property_sets_attributes_3d():
 	var event: FmodEvent = FmodServer.create_event_instance("event:/Vehicles/Car Engine")
 	var transform := Transform3D(Basis.IDENTITY, Vector3(1, 2, 3))
 	event.transform_3d = transform

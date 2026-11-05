@@ -43,10 +43,10 @@ func test_assert_zero_scale_keeps_a_valid_orientation():
 	emitter.volume = 0
 	emitter.play()
 	var event: FmodEvent = emitter.get_event()
-	event.set_3d_attributes(Transform3D.IDENTITY)
+	event.set_transform_3d(Transform3D.IDENTITY)
 	var default_basis: Basis = event.transform_3d.basis
-	event.set_3d_attributes(Transform3D(Basis(Vector3.RIGHT, 1.0), Vector3.ZERO))
-	event.set_3d_attributes(Transform3D(Basis.from_scale(Vector3.ZERO), Vector3(1, 2, 3)))
+	event.set_transform_3d(Transform3D(Basis(Vector3.RIGHT, 1.0), Vector3.ZERO))
+	event.set_transform_3d(Transform3D(Basis.from_scale(Vector3.ZERO), Vector3(1, 2, 3)))
 	assert_vector(event.transform_3d.basis.y).is_equal_approx(default_basis.y, Vector3(0.001, 0.001, 0.001))
 	assert_vector(event.transform_3d.basis.z).is_equal_approx(default_basis.z, Vector3(0.001, 0.001, 0.001))
 	emitter.stop()

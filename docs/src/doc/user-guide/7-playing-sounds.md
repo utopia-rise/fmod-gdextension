@@ -40,16 +40,16 @@ instance before calling `FmodServer.shutdown()`.
 
 ## Positioning a sound
 
-A sound instance can be placed in the world with its `position` (a `Vector3`) and `velocity`, or `position_2d` and
+A sound instance can be placed in the world with its `position_3d` (a `Vector3`) and `velocity_3d`, or `position_2d` and
 `velocity_2d` (`Vector2`) from a 2D scene. Setting any of them makes the sound 3D, so FMOD spatializes it against the
 listeners:
 
 ```gdscript
 var sound := FmodServer.load_file_as_sound("res://assets/Sounds/doorOpen_1.ogg").create_instance()
-sound.position = Vector3(2, 0, -5)
+sound.position_3d = Vector3(2, 0, -5)
 sound.play()
 ```
 
-Positions use the same units as the nodes of the extension: meters in 3D, pixels in 2D, with the `distance_factor`
-setting converting between them. The velocity is only used for the Doppler effect: update the position yourself as
+Positions use the same units as the nodes of the extension: meters in 3D, pixels in 2D, with the Distance Factor 2D and
+Distance Factor 3D settings converting them to meters. The velocity is only used for the Doppler effect: update the position yourself as
 the sound moves.

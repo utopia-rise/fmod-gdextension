@@ -15,22 +15,28 @@ How sounds are placed around the listeners, in 2D and in 3D.
 The number of listeners FMOD starts with. Use more than one for split-screen games, where each player hears the sounds
 around their own camera. See [Listeners](../user-guide/6-listeners.md).
 
-## Distance Factor
+## Distance Factor 2D
 
-| **Project Setting** | `Fmod/Spatialization/distance_factor` |
+| **Project Setting** | `Fmod/Spatialization/distance_factor_2d` |
 |---|---|
-| **Property** | `distance_factor` |
+| **Property** | `distance_factor_2d` |
+| **Default** | 64 |
+
+The number of pixels in one meter of your 2D world. FMOD Studio sets the distances at which events fade in meters, and
+this setting converts the positions of 2D nodes and sounds to them. Set it to match your art, such as 64 if a character
+1.8 meters tall is 115 pixels tall. If every pixel counted as a meter, sounds would fade out far too quickly.
+
+## Distance Factor 3D
+
+| **Project Setting** | `Fmod/Spatialization/distance_factor_3d` |
+|---|---|
+| **Property** | `distance_factor_3d` |
 | **Default** | 1 |
 
-The number of game units in one meter. FMOD Studio sets the distances at which events fade in meters, and this setting
-converts your game's positions to them.
+The number of 3D units in one meter. Godot's 3D units are already meters: keep it at 1 unless your world uses another
+scale.
 
-!!! warning "Set it in 2D games"
-    In 2D, game units are pixels. Set Distance Factor to the number of pixels in one meter of your world, such as 64
-    if a character 1.8 meters tall is 115 pixels tall. Left at 1, every pixel counts as a meter and sounds fade out far
-    too quickly.
-
-In 3D, Godot's units are already meters: keep it at 1.
+The two factors are independent, so a project can mix 2D and 3D nodes and have correct distances in both.
 
 ## Rolloff Scale
 
@@ -54,8 +60,9 @@ Studio. 0 turns it off, 2 doubles it.
 
 ## Changing them while the game runs
 
-Distance Factor, Rolloff Scale and Doppler Scale can change after FMOD has started, for example per level:
+Rolloff Scale and Doppler Scale, and the two Distance Factors, can change after FMOD has started, for example per level:
 
 ```gdscript
-FmodServer.set_spatialization(1.0, 64.0, 1.0)  # Doppler Scale, Distance Factor, Rolloff Scale
+FmodServer.set_spatialization(1.0, 1.0)  # Doppler Scale, Rolloff Scale
+FmodServer.set_distance_factors(64.0, 1.0)  # Distance Factor 2D, Distance Factor 3D
 ```

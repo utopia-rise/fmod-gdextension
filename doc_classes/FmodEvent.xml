@@ -107,7 +107,7 @@
 			<return type="void" />
 			<param index="0" name="node" type="Node" />
 			<description>
-				Sets the spatial attributes of the event based on a node's transform. For 3D nodes, uses the global transform; for 2D nodes, uses the global transform2d.
+				Sets the spatial attributes of the event based on a node's transform. For 3D nodes, uses the global transform; for 2D nodes, uses the global transform.
 			</description>
 		</method>
 		<method name="set_parameter_by_id" qualifiers="const">
@@ -186,10 +186,10 @@
 		<member name="position" type="int" setter="set_timeline_position" getter="get_timeline_position">
 			The timeline position in milliseconds.
 		</member>
-		<member name="transform_2d" type="Transform2D" setter="set_2d_attributes" getter="get_2d_attributes">
+		<member name="transform_2d" type="Transform2D" setter="set_transform_2d" getter="get_transform_2d">
 			The 2D spatial attributes (position and rotation) of the event.
 		</member>
-		<member name="transform_3d" type="Transform3D" setter="set_3d_attributes" getter="get_3d_attributes">
+		<member name="transform_3d" type="Transform3D" setter="set_transform_3d" getter="get_transform_3d">
 			The 3D spatial attributes (position, rotation, and scale) of the event.
 		</member>
 		<member name="volume" type="float" setter="set_volume" getter="get_volume">

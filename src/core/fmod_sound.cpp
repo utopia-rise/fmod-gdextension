@@ -1,6 +1,5 @@
 #include "fmod_sound.h"
 
-#include "fmod_server.h"
 #include "helpers/common.h"
 #include "helpers/maths.h"
 
@@ -17,10 +16,10 @@ void FmodSound::_bind_methods() {
     ClassDB::bind_method(D_METHOD("get_volume"), &FmodSound::get_volume);
     ClassDB::bind_method(D_METHOD("set_pitch", "pitch"), &FmodSound::set_pitch);
     ClassDB::bind_method(D_METHOD("get_pitch"), &FmodSound::get_pitch);
-    ClassDB::bind_method(D_METHOD("set_position", "position"), &FmodSound::set_position);
-    ClassDB::bind_method(D_METHOD("get_position"), &FmodSound::get_position);
-    ClassDB::bind_method(D_METHOD("set_velocity", "velocity"), &FmodSound::set_velocity);
-    ClassDB::bind_method(D_METHOD("get_velocity"), &FmodSound::get_velocity);
+    ClassDB::bind_method(D_METHOD("set_position_3d", "position"), &FmodSound::set_position_3d);
+    ClassDB::bind_method(D_METHOD("get_position_3d"), &FmodSound::get_position_3d);
+    ClassDB::bind_method(D_METHOD("set_velocity_3d", "velocity"), &FmodSound::set_velocity_3d);
+    ClassDB::bind_method(D_METHOD("get_velocity_3d"), &FmodSound::get_velocity_3d);
     ClassDB::bind_method(D_METHOD("set_position_2d", "position"), &FmodSound::set_position_2d);
     ClassDB::bind_method(D_METHOD("get_position_2d"), &FmodSound::get_position_2d);
     ClassDB::bind_method(D_METHOD("set_velocity_2d", "velocity"), &FmodSound::set_velocity_2d);
@@ -28,20 +27,28 @@ void FmodSound::_bind_methods() {
 
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "pitch",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_pitch", "get_pitch");
     ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "volume",PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_volume", "get_volume");
-    ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "position", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_position", "get_position");
-    ADD_PROPERTY(PropertyInfo(Variant::VECTOR3, "velocity", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_velocity", "get_velocity");
+    ADD_PROPERTY(
+        PropertyInfo(Variant::VECTOR3, "position_3d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE),
+        "set_position_3d",
+        "get_position_3d"
+    );
+    ADD_PROPERTY(
+        PropertyInfo(Variant::VECTOR3, "velocity_3d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE),
+        "set_velocity_3d",
+        "get_velocity_3d"
+    );
     ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "position_2d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_position_2d", "get_position_2d");
     ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "velocity_2d", PROPERTY_HINT_NONE, "", PROPERTY_USAGE_NONE), "set_velocity_2d", "get_velocity_2d");
 }
 
-FMOD_3D_ATTRIBUTES FmodSound::get_3d_attributes() const {
+FMOD_3D_ATTRIBUTES FmodSound::get_attributes() const {
     FMOD_3D_ATTRIBUTES attributes = {};
     ERROR_CHECK(_wrapped->get3DAttributes(&attributes.position, &attributes.velocity));
     return attributes;
 }
 
 // A channel only spatializes in 3D mode, and files load in 2D: placing the sound switches it.
-void FmodSound::set_3d_attributes(FMOD_3D_ATTRIBUTES& attributes) const {
+void FmodSound::set_attributes(FMOD_3D_ATTRIBUTES& attributes) const {
     FMOD_MODE mode = 0;
     if (ERROR_CHECK(_wrapped->getMode(&mode)) && !(mode & FMOD_3D)) {
         ERROR_CHECK(_wrapped->setMode((mode & ~FMOD_2D) | FMOD_3D));
@@ -49,44 +56,44 @@ void FmodSound::set_3d_attributes(FMOD_3D_ATTRIBUTES& attributes) const {
     ERROR_CHECK(_wrapped->set3DAttributes(&attributes.position, &attributes.velocity));
 }
 
-void FmodSound::set_position(const Vector3& position) const {
-    FMOD_3D_ATTRIBUTES attributes = get_3d_attributes();
-    attributes.position = get_fmod_vector_from_3d(position / FmodServer::get_singleton()->get_distance_scale());
-    set_3d_attributes(attributes);
+void FmodSound::set_position_3d(const Vector3& position) const {
+    FMOD_3D_ATTRIBUTES attributes = get_attributes();
+    attributes.position = FmodSpatial::vector_to_fmod_3d(position);
+    set_attributes(attributes);
 }
 
-Vector3 FmodSound::get_position() const {
-    FMOD_3D_ATTRIBUTES attributes = get_3d_attributes();
-    return Vector3(attributes.position.x, attributes.position.y, attributes.position.z) * FmodServer::get_singleton()->get_distance_scale();
+Vector3 FmodSound::get_position_3d() const {
+    return FmodSpatial::vector_to_godot_3d(get_attributes().position);
 }
 
-void FmodSound::set_velocity(const Vector3& velocity) const {
-    FMOD_3D_ATTRIBUTES attributes = get_3d_attributes();
-    attributes.velocity = get_fmod_vector_from_3d(velocity / FmodServer::get_singleton()->get_distance_scale());
-    set_3d_attributes(attributes);
+void FmodSound::set_velocity_3d(const Vector3& velocity) const {
+    FMOD_3D_ATTRIBUTES attributes = get_attributes();
+    attributes.velocity = FmodSpatial::vector_to_fmod_3d(velocity);
+    set_attributes(attributes);
 }
 
-Vector3 FmodSound::get_velocity() const {
-    FMOD_3D_ATTRIBUTES attributes = get_3d_attributes();
-    return Vector3(attributes.velocity.x, attributes.velocity.y, attributes.velocity.z) * FmodServer::get_singleton()->get_distance_scale();
+Vector3 FmodSound::get_velocity_3d() const {
+    return FmodSpatial::vector_to_godot_3d(get_attributes().velocity);
 }
 
 void FmodSound::set_position_2d(const Vector2& position) const {
-    set_position(Vector3(-position.x, 0.0f, position.y));
+    FMOD_3D_ATTRIBUTES attributes = get_attributes();
+    attributes.position = FmodSpatial::vector_to_fmod_2d(position);
+    set_attributes(attributes);
 }
 
 Vector2 FmodSound::get_position_2d() const {
-    Vector3 position = get_position();
-    return {-position.x, position.z};
+    return FmodSpatial::vector_to_godot_2d(get_attributes().position);
 }
 
 void FmodSound::set_velocity_2d(const Vector2& velocity) const {
-    set_velocity(Vector3(-velocity.x, 0.0f, velocity.y));
+    FMOD_3D_ATTRIBUTES attributes = get_attributes();
+    attributes.velocity = FmodSpatial::vector_to_fmod_2d(velocity);
+    set_attributes(attributes);
 }
 
 Vector2 FmodSound::get_velocity_2d() const {
-    Vector3 velocity = get_velocity();
-    return {-velocity.x, velocity.z};
+    return FmodSpatial::vector_to_godot_2d(get_attributes().velocity);
 }
 
 void FmodSound::release() const {

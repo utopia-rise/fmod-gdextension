@@ -30,8 +30,11 @@
 		<member name="real_channel_count" type="int" setter="set_real_channel_count" getter="get_real_channel_count" default="64">
 			The most sounds FMOD mixes at once. The most audible of the [member channel_count] sounds are mixed.
 		</member>
-		<member name="distance_factor" type="float" setter="set_distance_factor" getter="get_distance_factor" default="1.0">
-			The number of game units in one meter. In 2D, game units are pixels: set it to the number of pixels in one meter of your world.
+		<member name="distance_factor_2d" type="float" setter="set_distance_factor_2d" getter="get_distance_factor_2d" default="64.0">
+			The number of pixels in one meter of your 2D world. FMOD Studio sets the distances at which events fade in meters, and this converts the positions of 2D nodes to them.
+		</member>
+		<member name="distance_factor_3d" type="float" setter="set_distance_factor_3d" getter="get_distance_factor_3d" default="1.0">
+			The number of 3D units in one meter. Godot's 3D units are meters already: change it only if your world uses another scale.
 		</member>
 		<member name="doppler_scale" type="float" setter="set_doppler_scale" getter="get_doppler_scale" default="1.0">
 			Scales the pitch change of moving sounds.

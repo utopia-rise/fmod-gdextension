@@ -234,14 +234,14 @@
 				Gets the value set from code for a global parameter, by its name, or its default value when code never set one. Unlike the value FMOD uses, it ignores automatic parameters, automation, modulation and seek speed.
 			</description>
 		</method>
-		<method name="get_listener_2d_velocity">
+		<method name="get_listener_velocity_2d">
 			<return type="Vector2" />
 			<param index="0" name="index" type="int" />
 			<description>
 				Returns the velocity of the listener at [param index], in pixels per second.
 			</description>
 		</method>
-		<method name="get_listener_3d_velocity">
+		<method name="get_listener_velocity_3d">
 			<return type="Vector3" />
 			<param index="0" name="index" type="int" />
 			<description>
@@ -261,14 +261,14 @@
 				Returns the number of listeners FMOD mixes for.
 			</description>
 		</method>
-		<method name="get_listener_transform2d">
+		<method name="get_listener_transform_2d">
 			<return type="Transform2D" />
 			<param index="0" name="index" type="int" />
 			<description>
 				Gets the 2D transform of the listener at the specified index.
 			</description>
 		</method>
-		<method name="get_listener_transform3d">
+		<method name="get_listener_transform_3d">
 			<return type="Transform3D" />
 			<param index="0" name="index" type="int" />
 			<description>
@@ -547,7 +547,7 @@
 				Sets the number of listeners FMOD mixes for, between 1 and 8.
 			</description>
 		</method>
-		<method name="set_listener_transform2d">
+		<method name="set_listener_transform_2d">
 			<return type="void" />
 			<param index="0" name="index" type="int" />
 			<param index="1" name="transform" type="Transform2D" />
@@ -555,7 +555,7 @@
 				Sets the 2D transform of the listener at the specified index.
 			</description>
 		</method>
-		<method name="set_listener_transform3d">
+		<method name="set_listener_transform_3d">
 			<return type="void" />
 			<param index="0" name="index" type="int" />
 			<param index="1" name="transform" type="Transform3D" />
@@ -574,10 +574,17 @@
 		<method name="set_spatialization">
 			<return type="void" />
 			<param index="0" name="doppler_scale" type="float" />
-			<param index="1" name="distance_factor" type="float" />
-			<param index="2" name="rolloff_scale" type="float" />
+			<param index="1" name="rolloff_scale" type="float" />
 			<description>
-				Changes how sounds are placed around the listeners while FMOD runs. FMOD starts with those of [member FmodSettings.doppler_scale], [member FmodSettings.distance_factor] and [member FmodSettings.rolloff_scale].
+				Changes how sounds are placed around the listeners while FMOD runs. FMOD starts with those of [member FmodSettings.doppler_scale] and [member FmodSettings.rolloff_scale].
+			</description>
+		</method>
+		<method name="set_distance_factors">
+			<return type="void" />
+			<param index="0" name="factor_2d" type="float" />
+			<param index="1" name="factor_3d" type="float" />
+			<description>
+				Changes the number of 2D units (pixels) and of 3D units in one meter while FMOD runs, which converts the positions of nodes, listeners and sounds to the meters FMOD Studio works in. Both must be greater than 0. FMOD starts with [member FmodSettings.distance_factor_2d] and [member FmodSettings.distance_factor_3d].
 			</description>
 		</method>
 		<method name="shutdown">

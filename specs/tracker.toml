@@ -4,7 +4,7 @@
 "A.1.1" = { status = "done" }
 "A.1.2" = { status = "done" }
 "A.1.3" = { status = "done" }
-"A.2" = { hash = "c7ad98ab0346" }
+"A.2" = { hash = "62c8de2134d9" }
 "A.2.1" = { status = "done" }
 "A.2.2" = { status = "done" }
 "A.2.3" = { status = "partial", note = "breaks A.2.R2: most FmodServer calls made before FMOD starts dereference state created at start and can crash" }

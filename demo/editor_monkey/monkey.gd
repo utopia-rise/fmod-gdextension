@@ -736,7 +736,7 @@ func step_switch_the_output_routing_in_project_settings() -> void:
 	shown = await shown_settings("Fmod/Mixer")
 	expect(output_settings(shown) == ["output/routing"], "back to Direct to Device, the bus settings are hidden again: %s" % [shown])
 	shown = await shown_settings("Fmod/Spatialization")
-	expect(shown == ["listener_count", "distance_factor", "rolloff_scale", "doppler_scale"], "Fmod/Spatialization shows its settings in order: %s" % [shown])
+	expect(shown == ["listener_count", "distance_factor_2d", "distance_factor_3d", "rolloff_scale", "doppler_scale"], "Fmod/Spatialization shows its settings in order: %s" % [shown])
 	advanced.button_pressed = was_advanced
 	project_settings_dialog().hide()
 
