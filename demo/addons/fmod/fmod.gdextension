@@ -28,10 +28,10 @@ web.debug.wasm32 = "res://addons/fmod/libs/web/libGodotFmod.web.template_debug.w
 web.release.wasm32 = "res://addons/fmod/libs/web/libGodotFmod.web.template_release.wasm32.nothreads.wasm"
 
 [icons]
-FmodEventEmitter2D = "res://addons/fmod/icons/fmod_icon.svg"
-FmodEventEmitter3D = "res://addons/fmod/icons/fmod_icon.svg"
-FmodListener2D = "res://addons/fmod/icons/fmod_icon.svg"
-FmodListener3D = "res://addons/fmod/icons/fmod_icon.svg"
+FmodEventEmitter2D = "res://addons/fmod/icons/fmod_event_emitter_2d.svg"
+FmodEventEmitter3D = "res://addons/fmod/icons/fmod_event_emitter_3d.svg"
+FmodListener2D = "res://addons/fmod/icons/audio_listener_2d.svg"
+FmodListener3D = "res://addons/fmod/icons/audio_listener_3d.svg"
 FmodBankLoader = "res://addons/fmod/icons/fmod_icon.svg"
 
 [dependencies]

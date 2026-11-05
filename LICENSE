@@ -19,3 +19,12 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+The node icons in demo/addons/fmod/icons/ (audio_listener_2d.svg and audio_listener_3d.svg, and the speaker shape of fmod_event_emitter_2d.svg and fmod_event_emitter_3d.svg) come from the Godot Engine editor icons.
+
+Copyright (c) 2014-present Godot Engine contributors.
+Copyright (c) 2007-2014 Juan Linietsky, Ariel Manzur.
+
+Licensed under the MIT License, the same terms as above.
