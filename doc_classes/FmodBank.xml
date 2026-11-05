@@ -73,6 +73,12 @@
 				Returns the path of this bank in the FMOD Studio project, such as [code]bank:/Music[/code]. It is empty when the strings bank is not loaded.
 			</description>
 		</method>
+		<method name="get_sample_loading_state">
+			<return type="int" enum="FmodBank.StudioLoadingState" />
+			<description>
+				Returns the loading state of the sample data of the bank's events, loaded by [method load_sample_data].
+			</description>
+		</method>
 		<method name="get_string_count" qualifiers="const">
 			<return type="int" />
 			<description>
@@ -91,10 +97,22 @@
 				Returns an array of all [FmodVCA] objects defined in this bank.
 			</description>
 		</method>
+		<method name="load_sample_data">
+			<return type="void" />
+			<description>
+				Starts loading the non-streaming sample data of all of the bank's events, so they play without loading delay. It loads in the background: check [method get_sample_loading_state], or wait with [method FmodServer.wait_for_all_loads]. Each call must be matched by a call to [method unload_sample_data]; sample data that events loaded themselves stays loaded.
+			</description>
+		</method>
 		<method name="is_valid" qualifiers="const">
 			<return type="bool" />
 			<description>
 				Returns [code]true[/code] while the underlying FMOD bank exists. It becomes invalid once released or once its bank is unloaded.
+			</description>
+		</method>
+		<method name="unload_sample_data">
+			<return type="void" />
+			<description>
+				Unloads the sample data that [method load_sample_data] loaded. Sample data still used by playing event instances, or loaded by [method FmodEventDescription.load_sample_data], stays loaded until it is no longer needed.
 			</description>
 		</method>
 	</methods>

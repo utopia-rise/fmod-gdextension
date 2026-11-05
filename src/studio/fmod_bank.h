@@ -4,12 +4,13 @@
 #include "classes/ref_counted.hpp"
 #include "core/binder_common.hpp"
 #include "fmod_bus.h"
-#include "fmod_event_description.h"
 #include "fmod_studio.hpp"
 #include "fmod_vca.h"
 #include "helpers/common.h"
 
 namespace godot {
+    class FmodEventDescription;
+
     class FmodBank : public RefCounted {
         FMODCLASSWITHPATH(FmodBank, RefCounted, FMOD::Studio::Bank);
 
@@ -41,6 +42,10 @@ namespace godot {
         ~FmodBank() override;
 
         StudioLoadingState get_loading_state();
+
+        void load_sample_data();
+        void unload_sample_data();
+        StudioLoadingState get_sample_loading_state();
 
         int64_t get_event_description_count();
         int64_t get_bus_count();

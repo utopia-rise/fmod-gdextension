@@ -12,7 +12,7 @@
 		- Bus and VCA configurations
 		- Mixing and effect settings
 
-		The node accepts an array of bank file paths and loads them all when _enter_tree() is called. Banks are loaded with the default loading mode, which is typically asynchronous to avoid blocking the main thread.
+		The node accepts an array of bank file paths and loads them, in order, when it enters the scene tree, and releases them when it leaves it. Changing [member bank_paths] while the node is in the tree loads the banks added and releases the banks removed. A bank stays loaded while anything else still holds it.
 
 		This is particularly useful for loading banks at the start of a level or scene, ensuring all required audio content is available when events are played.
 
@@ -23,6 +23,9 @@
 	<members>
 		<member name="bank_paths" type="Array" setter="set_bank_paths" getter="get_bank_paths" default="[]">
 			An array of file paths to FMOD Studio bank files (.bank) that should be loaded when this node enters the scene tree. Paths should be relative to the project or absolute file paths.
+		</member>
+		<member name="preload_sample_data" type="bool" setter="set_preload_sample_data" getter="is_preload_sample_data" default="false">
+			If [code]true[/code], the loader also loads the sample data of its banks' events (see [method FmodBank.load_sample_data]), so they play without loading delay, and unloads it when the banks are released: when the node leaves the tree, when a bank is removed from [member bank_paths], or when this property is turned off.
 		</member>
 	</members>
 </class>

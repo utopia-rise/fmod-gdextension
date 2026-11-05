@@ -85,6 +85,11 @@ Represents a loaded FMOD Studio bank containing audio content.
 
 **State:**
 - `get_loading_state() -> int` - Check bank loading status
+- `get_sample_loading_state() -> int` - Check the loading status of the sample data
+
+**Sample Data:**
+- `load_sample_data()` - Load the sample data of all the bank's events ahead of playing them
+- `unload_sample_data()` - Unload the sample data `load_sample_data()` loaded
 - `update_bank_data()` - Force update cached data
 
 ## Node Classes
@@ -142,6 +147,7 @@ Utility node for automatically loading FMOD Studio banks when entering the scene
 
 **Properties:**
 - `bank_paths: Array` - Array of bank file paths to load
+- `preload_sample_data: bool` - Also load the sample data of the banks while they are loaded
 
 **Methods:**
 - `set_bank_paths(paths: Array)` - Set banks to load

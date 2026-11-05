@@ -11,6 +11,7 @@ Loading banks from the scene tree without code is C.3; exporting banks with the 
 - **B.1.2**: Game code loads banks without blocking, checks whether banks are still loading, and waits for all pending loads.
 - **B.1.3**: Game code lists the loaded banks and, for each, its loading state, events, buses, VCAs and string count.
 - **B.1.4**: Game code finds an event, bus or VCA of the loaded banks by path or GUID, checks that one exists, and lists all of them.
+- **B.1.5**: Game code loads and unloads the sample data of all of a bank's events ahead of playing them, and checks its sample loading state.
 
 ## Rules
 - **B.1.R1**: Banks are read through Godot's file system, so a bank loads the same from the project folder and from an exported package.

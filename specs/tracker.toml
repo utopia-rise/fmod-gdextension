@@ -17,11 +17,12 @@
 "A.3.4" = { status = "done" }
 "A.3.5" = { status = "partial", note = "breaks §3: not available on the web platform" }
 "A.3.6" = { status = "done" }
-"B.1" = { hash = "b8dd3e2cad4f" }
+"B.1" = { hash = "2cd302837a24" }
 "B.1.1" = { status = "done" }
 "B.1.2" = { status = "done" }
 "B.1.3" = { status = "done" }
 "B.1.4" = { status = "done" }
+"B.1.5" = { status = "done" }
 "B.2" = { hash = "374789eaac59" }
 "B.2.1" = { status = "done" }
 "B.2.2" = { status = "partial", note = "breaks B.2.R2: calls on a released or invalid instance fail silently instead of reporting an error" }
@@ -61,9 +62,11 @@
 "C.2.2" = { status = "done" }
 "C.2.3" = { status = "done" }
 "C.2.4" = { status = "done" }
-"C.3" = { hash = "02833b91e0b6" }
+"C.3" = { hash = "6a661dd33aba" }
 "C.3.1" = { status = "done" }
 "C.3.2" = { status = "done" }
+"C.3.3" = { status = "done" }
+"C.3.4" = { status = "done" }
 "D.1" = { hash = "10146ea3157c" }
 "D.1.1" = { status = "done" }
 "D.1.2" = { status = "done" }
