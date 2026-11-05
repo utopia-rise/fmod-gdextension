@@ -47,5 +47,4 @@ jobs:
           name: ${{ matrix.target }}_macos
           path: |
             demo/addons/fmod/libs/macos
-            !demo/addons/fmod/libs/macos/CopyPast_Fmod_Libs_Here.txt
           if-no-files-found: error

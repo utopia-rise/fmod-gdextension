@@ -6,14 +6,21 @@
 This addon supports FMOD plugins.  
 First you'll need to add plugins libraries (`.dll`, `.dylib`, `.so`, `.a`) in a project's folder.  
 In this documentation we will use `assets/plugins` as an example.  
-In this directory you have to create one directory per os, like:  
+In this directory you have to create one directory per os, and one per architecture inside the `windows` and `linux`
+ones, like:  
 ```
 assets
 └───── plugins
        ├────── windows
-       │       └────── .dll for windows goes here
+       │       ├────── x86_64
+       │       │       └────── .dll for windows x86_64 goes here
+       │       └────── arm64
+       │               └────── .dll for windows arm64 goes here
        ├────── linux
-       │       └────── .so for linux goes here
+       │       ├────── x86_64
+       │       │       └────── .so for linux x86_64 goes here
+       │       └────── arm64
+       │               └────── .so for linux arm64 goes here
        ├────── macos
        │       └────── .dylib for macos goes here
        ├────── android

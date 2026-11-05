@@ -5,7 +5,8 @@
 We provide releases in github repository. 
 
 You can download `addons.zip` from this [page](https://github.com/utopia-rise/fmod-gdextension/releases), then unzip it
-at the root of your Godot project: it contains the `addons/fmod` folder.
+at the root of your Godot project: it contains the `addons/fmod` folder. Windows and Linux libraries are in one folder per architecture (`x86_64`,
+`arm64`) under `addons/fmod/libs/<platform>/`.
 
 ## 2 - Activate the plugin in Godot
 

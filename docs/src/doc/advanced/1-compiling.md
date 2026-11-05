@@ -42,11 +42,15 @@ If `target` is `editor` or `template_debug`, debug symbols will be generated.
 
 ### Additional Instructions
 
-On Windows, you need to pass the `arch` argument with values `x86_64` or `x86_32`.
+On Windows and Linux, you can pass the `arch` argument with values `x86_64` or `arm64`. The libraries are built into
+`demo/addons/fmod/libs/<platform>/<arch>/`, FMOD's libraries included. The FMOD SDK needs the `arm64` libraries of the
+platform for an `arm64` build.
+
+Build `arm64` on an arm64 machine, or on Windows with the MSVC ARM64 build tools of Visual Studio installed.
 
 Example:
 ```
-scons platform=windows arch=x86_64 target=editor
+scons platform=windows arch=arm64 target=editor
 ```
 
 You can also take the FMOD Studio API from another directory with `fmod_lib_dir` (keep the trailing `/`).

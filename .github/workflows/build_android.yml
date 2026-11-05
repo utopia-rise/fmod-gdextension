@@ -53,7 +53,6 @@ jobs:
           name: ${{ matrix.target }}_android_${{ matrix.arch }}
           path: |
             demo/addons/fmod/libs/android
-            !demo/addons/fmod/libs/android/**/CopyPast_Fmod_Libs_Here.txt
           if-no-files-found: error
       # The Android plugin compiles against FMOD's Java side, which only the FMOD Android SDK carries.
       - uses: actions/upload-artifact@v7

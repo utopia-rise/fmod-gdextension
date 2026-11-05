@@ -13,7 +13,7 @@
 			The names of the plugin libraries to load on desktop and Android, without platform prefix or extension.
 		</member>
 		<member name="plugins_base_path" type="String" setter="set_plugins_base_path" getter="get_fmod_plugins_base_path" default="&quot;&quot;">
-			The folder holding the plugin libraries, one subfolder per platform.
+			The folder holding the plugin libraries, one subfolder per platform, and for Windows, Linux and Android one per architecture inside it ([code]x86_64[/code] or [code]arm64[/code]).
 		</member>
 		<member name="static_plugins_methods" type="FmodStaticPluginMethod[]" setter="set_static_plugins_methods" getter="get_static_plugins_methods" default="[]">
 			The registration methods of the plugins linked statically on iOS.
