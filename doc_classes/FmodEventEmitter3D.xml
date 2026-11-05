@@ -19,6 +19,12 @@
 	<tutorials>
 	</tutorials>
 	<methods>
+		<method name="get_event" qualifiers="const">
+			<return type="FmodEvent" />
+			<description>
+				Returns the event instance this emitter plays, or [code]null[/code] when it has none: before it is loaded, after it stopped and was released, and in the editor. The instance of [method play_one_shot] is not the emitter's and is never returned. The emitter does not create the instance when this is called: it exists once the emitter played or preloaded its event.
+			</description>
+		</method>
 		<method name="get_parameter" qualifiers="const">
 			<return type="Variant" />
 			<param index="0" name="name" type="String" />
@@ -31,6 +37,12 @@
 			<param index="0" name="id" type="int" />
 			<description>
 				Gets the current value of the specified event parameter by its numerical ID.
+			</description>
+		</method>
+		<method name="get_timeline_position" qualifiers="const">
+			<return type="int" />
+			<description>
+				Returns the timeline position of the emitter's event in milliseconds, or 0 when the emitter has no event instance (see [method get_event]).
 			</description>
 		</method>
 		<method name="play">
@@ -67,6 +79,13 @@
 			<param index="0" name="sound_key" type="String" />
 			<description>
 				Sets the sound key for programmer instrument callbacks. Used with programmer instruments in FMOD Studio.
+			</description>
+		</method>
+		<method name="set_timeline_position">
+			<return type="void" />
+			<param index="0" name="position" type="int" />
+			<description>
+				Sets the timeline position of the emitter's event in milliseconds. Does nothing when the emitter has no event instance (see [method get_event]).
 			</description>
 		</method>
 		<method name="stop">

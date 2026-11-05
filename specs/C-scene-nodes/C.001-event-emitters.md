@@ -15,10 +15,12 @@ Choosing the event and editing parameters in the Inspector is E.2; finding event
 - **C.1.6**: An emitter plays a one-shot of its event, sets the volume of its event, and sets the audio table key of its programmer instruments.
 - **C.1.7**: An emitter preloads its event when ready, and frees itself when its event ends if auto release is on.
 - **C.1.8**: An emitter pauses its event when the scene tree pauses it and resumes it when it is unpaused.
+- **C.1.9**: Game code gets the event instance an emitter plays, to control it through B.2, and reads and sets the event's timeline position on the emitter.
 
 ## Rules
 - **C.1.R1**: Changing an emitter's event stops and releases the previous one and clears its parameter values: the node no longer exposes the previous event's parameters. In the editor the node keeps their values, so undoing the change gives them back.
 - **C.1.R2**: An emitter leaving the tree stops and releases its event.
+- **C.1.R3**: An emitter has no event instance to give before it plays or preloads its event, after its event is released, and in the editor; it never creates one when asked, and a one-shot's instance is never the emitter's.
 
 ## Non-goals
 - **C.1.N1**: Emitters do not play in the editor.
