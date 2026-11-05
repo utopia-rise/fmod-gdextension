@@ -160,6 +160,7 @@ namespace godot {
 
         static FmodServer* get_singleton();
         static bool is_initialized() { return isInitialized; }
+        float get_distance_scale() const { return distanceScale; }
 
         // LIFECYCLE
         void init(const Ref<FmodSettings>& p_settings = Ref<FmodSettings>());

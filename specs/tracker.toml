@@ -68,10 +68,12 @@
 "C.3.2" = { status = "done" }
 "C.3.3" = { status = "done" }
 "C.3.4" = { status = "done" }
-"D.1" = { hash = "59a44748c1a4" }
+"D.1" = { hash = "a7704d61fa2b" }
 "D.1.1" = { status = "done" }
 "D.1.2" = { status = "done" }
+"D.1.3" = { status = "done" }
 "D.1.R2" = { status = "abandoned" }
+"D.1.N1" = { status = "abandoned" }
 "D.2" = { hash = "2fde20d947d1" }
 "D.2.1" = { status = "done", note = "not exercised by the gdUnit4 tests" }
 "E.1" = { hash = "c2ac54bc4734" }

@@ -28,6 +28,19 @@ func test_assert_set_pitch():
 	music.pitch = 0.75
 	assert_float(music.pitch).is_equal(0.75)
 
+func test_assert_set_position():
+	sound.position = Vector3(1, 2, 3)
+	assert_vector(sound.position).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
+	sound.position_2d = Vector2(4, 5)
+	assert_vector(sound.position_2d).is_equal_approx(Vector2(4, 5), Vector2(0.001, 0.001))
+	assert_vector(sound.position).is_equal_approx(Vector3(-4, 0, 5), Vector3(0.001, 0.001, 0.001))
+
+func test_assert_set_velocity():
+	sound.velocity = Vector3(1, 2, 3)
+	assert_vector(sound.velocity).is_equal_approx(Vector3(1, 2, 3), Vector3(0.001, 0.001, 0.001))
+	sound.velocity_2d = Vector2(4, 5)
+	assert_vector(sound.velocity_2d).is_equal_approx(Vector2(4, 5), Vector2(0.001, 0.001))
+
 func test_assert_playing():
 	sound.play()
 	assert_bool(sound.is_playing()).is_true()
