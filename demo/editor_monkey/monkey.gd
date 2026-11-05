@@ -30,6 +30,7 @@ const NO_GUID := "{00000000-0000-0000-0000-000000000000}"
 class ErrorWatcher extends Logger:
 	var mutex := Mutex.new()
 	var errors: PackedStringArray = []
+	var missing_banks := 0
 
 	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool, error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
 		# A headless editor saving a scene reads its thumbnail from a renderer that draws nothing.
@@ -40,6 +41,10 @@ class ErrorWatcher extends Logger:
 			return
 		# FMOD destroys an instance's programmer sounds when it releases it, and reports that it waits for them.
 		if (rationale + code).contains("programmer sounds pending release"):
+			return
+		# Setting a bank list with a path matching no file warns about it, on purpose.
+		if (rationale + code).contains("cannot be opened. Check that it exists"):
+			missing_banks += 1
 			return
 		mutex.lock()
 		var kind := "warning" if error_type == ERROR_TYPE_WARNING else "error"
@@ -648,6 +653,15 @@ func step_edit_a_bank_loaders_banks() -> void:
 	press(unique(property, "ManualAddButton"))
 	await pause(2)
 	expect(bank_loader().bank_paths == BANKS, "a bank already listed is not added twice")
+	var missing_before: int = watcher.missing_banks
+	line_edit.text = "res://assets/Banks/Missing.bank"
+	press(unique(property, "ManualAddButton"))
+	await pause(2)
+	expect(watcher.missing_banks == missing_before + 1, "a bank path matching no file is warned about")
+	unique(bank_property(), "BankList").select(BANKS.size())
+	press(unique(bank_property(), "RemoveButton"))
+	await pause(2)
+	expect(bank_loader().bank_paths == BANKS, "the missing bank is removed again")
 	unique(bank_property(), "BankList").select(2)
 	press(unique(bank_property(), "UpButton"))
 	await pause(2)

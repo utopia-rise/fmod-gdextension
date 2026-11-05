@@ -2,8 +2,10 @@
 
 #include "fmod_server.h"
 #include "fmod_string_names.h"
+#include "helpers/common.h"
 
 #include <classes/engine.hpp>
+#include <classes/file_access.hpp>
 
 using namespace godot;
 
@@ -37,6 +39,16 @@ void FmodBankLoader::unload_banks(Vector<Ref<FmodBank>>& p_banks) {
 }
 
 void FmodBankLoader::set_bank_paths(const Array& p_paths) {
+#ifdef TOOLS_ENABLED
+    if (Engine::get_singleton()->is_editor_hint()) {
+        for (int i = 0; i < p_paths.size(); ++i) {
+            // Opening the file is what makes Godot report a case mismatch on a case-insensitive file system.
+            if (FileAccess::open(p_paths[i], FileAccess::READ).is_null()) {
+                GODOT_LOG_WARNING(vformat("Bank %s cannot be opened. Check that it exists, with the case of every folder and file name: paths are case-sensitive in exported projects and on Linux, Android and the web.", p_paths[i]))
+            }
+        }
+    }
+#endif
     bank_paths = p_paths;
     if (!is_inside_tree()) { return; }
     Vector<Ref<FmodBank>> previous_banks = banks;
